@@ -70,7 +70,7 @@ else() # build static lib
 		${LOADER_EXTERNAL_GEN_FILES}
 		${openxr_loader_RESOURCE_FILE}
 	)
-	endif()
+endif()
 set_source_files_properties(
     ${LOADER_EXTERNAL_GEN_FILES}
     PROPERTIES GENERATED TRUE
@@ -109,15 +109,21 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_custom_target(lib${LOADER_NAME}.so.${MAJOR}.${MINOR} ALL
         COMMAND ${CMAKE_COMMAND} -E create_symlink lib${LOADER_NAME}.so.${MAJOR}.${MINOR}.${PATCH} lib${LOADER_NAME}.so.${MAJOR}.${MINOR})
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    # Always link MSVCRT libraries dynamically
     foreach(configuration in CMAKE_C_FLAGS_DEBUG
                              CMAKE_C_FLAGS_RELEASE
                              CMAKE_C_FLAGS_RELWITHDEBINFO
                              CMAKE_CXX_FLAGS_DEBUG
                              CMAKE_CXX_FLAGS_RELEASE
                              CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-        if (${configuration} MATCHES "/MT")
-            string(REGEX REPLACE "/MT" "/MD" ${configuration} "${${configuration}}")
+        # If building DLLs, force static CRT linkage
+        if(DYNAMIC_LOADER)
+            if (${configuration} MATCHES "/MD")
+                string(REGEX REPLACE "/MD" "/MT" ${configuration} "${${configuration}}")
+            endif()
+        else()  # Otherwise for static libs, link the CRT dynamically
+            if (${configuration} MATCHES "/MT")
+                string(REGEX REPLACE "/MT" "/MD" ${configuration} "${${configuration}}")
+            endif()
         endif()
     endforeach()
 
