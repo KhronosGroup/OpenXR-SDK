@@ -34,5 +34,5 @@ incomplete at launch but will be added to going forward.
 
 ## Building
 
-See BUILDING.md
+See [BUILDING.md](https://github.com/KhronosGroup/OpenXR-SDK/BUILDING.md)
 
