@@ -299,12 +299,8 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
         std::string full_registry_location = OPENXR_REGISTRY_LOCATION;
         full_registry_location += std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION));
         full_registry_location += runtime_registry_location;
-        access_flags = KEY_QUERY_VALUE | KEY_WOW64_32KEY;  // Search registry in 32-bit 'view'
+        access_flags = KEY_QUERY_VALUE;
         LONG open_value = RegOpenKeyEx(HKEY_LOCAL_MACHINE, full_registry_location.c_str(), 0, access_flags, &hkey);
-        if (ERROR_FILE_NOT_FOUND == open_value) {
-            access_flags = KEY_QUERY_VALUE | KEY_WOW64_64KEY;  // Look in 64-bit 'view'
-            open_value = RegOpenKeyEx(HKEY_LOCAL_MACHINE, full_registry_location.c_str(), 0, access_flags, &hkey);
-        }
         if (ERROR_SUCCESS != open_value) {
             std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
             warning_message += full_registry_location;
