@@ -53,7 +53,7 @@ Open the build\win32\OPENXR.sln in the Visual Studio to build the samples.
 ## Linux Debug
 
 ```
-mkdir build/linux_debug
+mkdir -p build/linux_debug
 cd build/linux_debug
 cmake -DCMAKE_BUILD_TYPE=Debug ../..
 make
@@ -62,8 +62,8 @@ make
 ## Linux Release
 
 ```
-mkdir build/linux_release
-cd build/linux_debug
+mkdir -p build/linux_release
+cd build/linux_release
 cmake -DCMAKE_BUILD_TYPE=Release ../..
 make
 ```
