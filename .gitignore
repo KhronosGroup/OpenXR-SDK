@@ -1,0 +1,19 @@
+/build
+CMakeLists.txt.user
+*.orig
+.*
+*~
+*.tar.gz
+
+# Cached python scripts in bytecode form
+*.pyc
+applyfixes.sh
+
+# Files related to building examples
+specification/**/*.c
+specification/**/*.cpp
+specification/**/*.o
+specification/examples.mk
+
+# Files related to pytest
+specification/scripts/.cache

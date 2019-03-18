@@ -1,0 +1,30 @@
+*         text=auto
+
+*.txt     text
+*.c       text
+*.cpp     text
+*.h       text
+*.hpp     text
+*.inl     text
+*.adoc    text
+*.in      text
+*.json    text
+
+*.bat     eol=crlf
+*.cmd     eol=crlf
+*.vcproj  eol=crlf
+*.vcxproj eol=crlf
+*.sln     eol=crlf
+
+*.sh      eol=lf
+
+*.png     binary
+
+# Shell scripts that don't end in .sh
+specification/makeAllExts           eol=lf
+specification/makeExt               eol=lf
+specification/makeKHR               eol=lf
+specification/makeKHRAndKHX         eol=lf
+specification/makeReleaseArtifacts  eol=lf
+specification/checkMarkup           eol=lf
+specification/checkSpecLinks        eol=lf
