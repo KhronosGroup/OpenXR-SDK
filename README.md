@@ -23,7 +23,7 @@ specification/        xr.xml file
 src/                  Source code for various projects
 src/api_layer         Sample code for developing API layers
 src/loader            OpenXR loader code
-src/tests/            various test code (if looking for sample code start with hello_xr/
+src/tests/            various test code (if looking for sample code start with hello_xr/)
 ```
 
 Currently the best sample code is in src/tests/hello_xr/.  More will be added in the future.  
