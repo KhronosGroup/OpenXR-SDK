@@ -88,8 +88,13 @@ target_include_directories(${LOADER_NAME}
     PRIVATE ${CMAKE_BINARY_DIR}/src
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/dist
-    ${Vulkan_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(${LOADER_NAME}
+        PRIVATE ${Vulkan_INCLUDE_DIRS}
+    )
+endif()
+
 target_compile_definitions(${LOADER_NAME}
     PRIVATE API_NAME="OpenXR"
 )

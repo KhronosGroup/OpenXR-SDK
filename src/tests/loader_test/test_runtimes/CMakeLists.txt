@@ -38,8 +38,12 @@ target_include_directories(test_runtime
     PRIVATE ${CMAKE_SOURCE_DIR}/src
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_BINARY_DIR}/include
-    ${Vulkan_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(test_runtime
+        PRIVATE ${Vulkan_INCLUDE_DIRS}
+    )
+endif()
 
 macro(gen_xr_runtime_json filename libfile)
     add_custom_command(OUTPUT ${filename}

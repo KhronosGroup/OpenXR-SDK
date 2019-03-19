@@ -26,8 +26,12 @@ target_include_directories(list
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_SOURCE_DIR}/external/include
-    ${VulkanHeaders_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(list
+        PRIVATE ${VulkanHeaders_INCLUDE_DIRS}
+    )
+endif()
 
 if(WIN32)
     set(OPENXR_LIB openxr_loader-${MAJOR}_${MINOR})

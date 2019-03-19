@@ -52,8 +52,12 @@ target_include_directories(XrApiLayer_api_dump
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_BINARY_DIR}/src
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-    ${Vulkan_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(XrApiLayer_api_dump
+        PRIVATE ${Vulkan_INCLUDE_DIRS}
+    )
+endif()
 
 # Basics for core_validation API Layer
 add_library(XrApiLayer_core_validation SHARED
@@ -73,8 +77,12 @@ target_include_directories(XrApiLayer_core_validation
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_BINARY_DIR}/src
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-    ${Vulkan_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(XrApiLayer_core_validation
+        PRIVATE ${Vulkan_INCLUDE_DIRS}
+    )
+endif()
 
 # Flag generated files
 set_source_files_properties(

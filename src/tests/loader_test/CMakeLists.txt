@@ -30,8 +30,12 @@ target_include_directories(loader_test
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_SOURCE_DIR}/external/include
-    ${VulkanHeaders_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(loader_test
+        PRIVATE ${VulkanHeaders_INCLUDE_DIRS}
+    )
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(loader_test PRIVATE _CRT_SECURE_NO_WARNINGS)

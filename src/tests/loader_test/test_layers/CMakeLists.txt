@@ -38,8 +38,12 @@ target_include_directories(XrApiLayer_test
     PRIVATE ${CMAKE_SOURCE_DIR}/src
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_BINARY_DIR}/include
-    ${Vulkan_INCLUDE_DIRS}
 )
+if(VulkanHeaders_FOUND)
+    target_include_directories(XrApiLayer_test
+        PRIVATE ${Vulkan_INCLUDE_DIRS}
+    )
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(XrApiLayer_test PRIVATE _CRT_SECURE_NO_WARNINGS)
