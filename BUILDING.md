@@ -1,11 +1,10 @@
 # How to Build
 
-## Python
+## Python v3.6+ required
 
 Certain source files are generated at build time from the `xr.xml` file, utilizing 
 python scripts. The scripts make use of the python `pathlib` module, which is 
-fully supported as of python version 3.6. A known good version of python is 3.7.2,
-and a known failing version is 3.5.2 (on Windows).
+fully supported in python version 3.6 or later. 
 
 ## Windows
 
@@ -20,11 +19,6 @@ following table is provided to help you:
 | Visual Studio 2013   |       12       |
 | Visual Studio 2015   |       14       |
 | Visual Studio 2017   |       15       |
-
-**NOTE:** CMake can not create Visual Studio solutions or projects that can
-generate both 64-bit and 32-bit binaries.  Instead, if you need both, you must
-perform the following steps individually.  Otherwise, simply build for the
-target you desire.
 
 ### Windows 64-bit
 
@@ -50,7 +44,8 @@ cmake -G "Visual Studio [Version Number]" ..\..
 
 Open the build\win32\OPENXR.sln in the Visual Studio to build the samples.
 
-## Linux Debug
+## Linux
+### Linux Debug
 
 ```
 mkdir -p build/linux_debug
@@ -59,7 +54,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug ../..
 make
 ```
 
-## Linux Release
+### Linux Release
 
 ```
 mkdir -p build/linux_release
@@ -77,50 +72,34 @@ the cmake option `DYNAMIC_LOADER=ON`.  e.g. for Win64, replace the cmake line sh
 cmake -DDYNAMIC_LOADER=ON -G "Visual Studio [Version Number] Win64" ..\..
 ```
 
-### Configuring the OpenXR Loader - Linux
+# Running the HELLO_XR sample
 
-Since this CMake project tree doesn't represent a typical deployment on Linux, it is necessary to set
-up the environment to reflect the location of the binaries, etc, in the user's build tree.
+## OpenXR runtime installation
 
-LD\_LIBRARY\_PATH
+An OpenXR _runtime_ must first be installed before running the hello_xr sample. The runtime is an
+implementation of the OpenXR API, typically tailed to a specific device and distributed by the
+device manufacturer. To allow experimentation with the API in the absence of a specific device runtime, 
+several organizations have made available prototype OpenXR runtimes, linked from the main OpenXR landing 
+page at https://www.khronos.org/openxr
 
-The JSON file describing the implementation specifies the `library_path` as a simple path-less filename, since
-it is not known where in the filesystem the user's build tree is placed.
-Therefore, the Linux loader needs to be told where to find the implementation's shared library.
-This is accomplished by setting the LD\_LIBRARY\_PATH environment variable to include `<build_dir>/src/impl`.
+## Configuring the OpenXR Loader
+### XR\_RUNTIME\_JSON environment variable
 
-Alternately, the user may edit the `openxr_sample_impl.json` file and set `library_path` to the full
-pathname of the implementation binary.
-But some custom value for `library_path` would typically only be useful for a particular user's "sandbox".
+The OpenXR loader looks in system-specific locations for the JSON file `active_runtime.json`, which describes the
+default installed OpenXR runtime. To override the default selection, you may define an environment variable 
+`XR_RUNTIME_JSON` to select a different runtime, or a runtime which has not been installed in the default
+location.
 
-XR\_RUNTIME\_JSONS
-
-The OpenXR loader looks in system-specific locations for the JSON files that describe implementations.
-Rather than placing these files in filesystem locations that often require root access, it is convenient to
-use this XR\_RUNTIME\_JSONS environment variable to locate a specific JSON file.
-
-Therefore, the user might set XR\_RUNTIME\_JSON to `<build_dir>/src/impl/openxr_sample_impl.json`
-
-For example, if your build directory is `build` in the top of the tree, you can execute:
-```
-LD_LIBRARY_PATH=build/src/impl XR_RUNTIME_JSON=build/src/impl/openxr_sample_impl.json build/src/tests/hello_xr/hello_xr
-```
-
-### Configuring the OpenXR Loader - Windows
-
-The intended way for the loader to find the runtime in a production environment is via the Windows Registry.
-In a development environment it is generally easier to set the XR\_RUNTIME\_JSONS environment variable to
-`<build_dir>/src/impl/openxr_sample_impl.json`.
-This can be done in the Properties panel for the hello_xr test app in Visual Studio.
+For example, you might set XR\_RUNTIME\_JSON to `<build_dir>/test/runtime/my_custom_runtime.json` to select
+an OpenXR runtime described by JSON file `my_custom_runtime.json`.
 
 ## Running the Hello_XR Test
 
-The binary for the hello_xr application is written to the <build_dir>/src/tests/hello_xr directory.
+The binary for the hello_xr application is written to the `<build_dir>/src/tests/hello_xr` directory.
 Set your working directory to this directory and execute the hello_xr binary.
 
-# Hello_XR with a dynamic loader 
+### Hello_XR with a dynamic loader (Windows)
 
 When building a DLL version of the loader, the Visual Studio projects generated by CMake will copy the loader
-DLLs to the test application's (hello_xr) binary directory.
-This makes it unnecessary to copy these files to someplace like Windows/System32.
+DLLs to the test application's (hello_xr) binary directory. This makes it unnecessary to copy these files to someplace like `Windows\System32`.
 
