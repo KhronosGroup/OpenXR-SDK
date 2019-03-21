@@ -1,14 +1,14 @@
 # OpenXR &reg; Software Development Kit (SDK) Project
 
-[NOTE: This repository contains components that may eventually be assembled 
-into an SDK, but are currently not being packaged into a distributable SDK.]  
+**_NOTE: This repository contains components that will eventually be assembled 
+into an OpenXR SDK, but are currently not organized nor packaged as a distributable SDK._**  
 
 This repository contains source code and build scripts for implementations 
 of the OpenXR loader, validation layers, and code samples.
 
 The authoritative public repository is located at
 https://github.com/KhronosGroup/OpenXR-SDK/.
-It hosts public Issue tracker, and accepts patches (Pull Requests) from the
+It hosts the public Issue tracker, and accepts patches (Pull Requests) from the
 general public.
 
 ## Directory Structure
