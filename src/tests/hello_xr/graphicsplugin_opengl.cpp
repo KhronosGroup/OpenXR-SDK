@@ -81,15 +81,6 @@ struct OpenGLGraphicsPlugin : public IGraphicsPlugin {
         XrGraphicsRequirementsOpenGLKHR graphicsRequirements{XR_TYPE_GRAPHICS_REQUIREMENTS_OPENGL_KHR};
         CHECK_XRCMD(xrGetOpenGLGraphicsRequirementsKHR(instance, systemId, &graphicsRequirements));
 
-        GLint major, minor;
-        glGetIntegerv(GL_MAJOR_VERSION, &major);
-        glGetIntegerv(GL_MINOR_VERSION, &minor);
-
-        const uint32_t desiredApiVersion = XR_MAKE_VERSION(major, minor, 0);
-        if (graphicsRequirements.minApiVersionSupported > desiredApiVersion) {
-            THROW("Runtime does not support desired Graphics API and/or version");
-        }
-
         // Initialize the gl extensions. Note we have to open a window.
         ksDriverInstance driverInstance{};
         ksGpuQueueInfo queueInfo{};
@@ -98,6 +89,15 @@ struct OpenGLGraphicsPlugin : public IGraphicsPlugin {
         ksGpuSampleCount sampleCount{KS_GPU_SAMPLE_COUNT_1};
         if (!ksGpuWindow_Create(&window, &driverInstance, &queueInfo, 0, colorFormat, depthFormat, sampleCount, 640, 480, false)) {
             THROW("Unable to create GL context");
+        }
+
+        GLint major = 0, minor = 0;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+        const uint32_t desiredApiVersion = XR_MAKE_VERSION(major, minor, 0);
+        if (graphicsRequirements.minApiVersionSupported > desiredApiVersion) {
+            THROW("Runtime does not support desired Graphics API and/or version");
         }
 
 #ifdef XR_USE_PLATFORM_WIN32
