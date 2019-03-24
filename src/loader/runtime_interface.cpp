@@ -236,6 +236,10 @@ void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionPro
         if (count_output > 0) {
             runtime_extension_properties.resize(count_output);
             count = count_output;
+            for (XrExtensionProperties& ext_prop : runtime_extension_properties) {
+                ext_prop.type = XR_TYPE_EXTENSION_PROPERTIES;
+                ext_prop.next = nullptr;
+            }
             rt_xrEnumerateInstanceExtensionProperties(nullptr, count, &count_output, runtime_extension_properties.data());
         }
         size_t ext_count = runtime_extension_properties.size();
