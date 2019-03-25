@@ -63,3 +63,12 @@ set_source_files_properties(
     ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h
     PROPERTIES GENERATED TRUE
 )
+
+set(INSTALL_HEADERS 
+    ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
+    ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
+    ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h)
+
+INSTALL(FILES ${INSTALL_HEADERS} 
+    DESTINATION include/openxr
+)

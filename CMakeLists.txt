@@ -40,3 +40,5 @@ if(BASH_COMMAND)
             USES_TERMINAL)
     endif()
 endif()
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" DESTINATION share/doc/openxr)

@@ -162,6 +162,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     endif()
 endif()
 
+install(TARGETS ${LOADER_NAME} DESTINATION lib)
+
 # Custom target for generated helper sources
 add_custom_target(loader_gen_files
     DEPENDS
