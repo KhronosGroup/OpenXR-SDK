@@ -635,19 +635,34 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
             }
             cur_ptr = reinterpret_cast<const XrBaseInStructure *>(cur_ptr->next);
         }
-        if (num_graphics_bindings_found != 1) {
+        auto const &enabled_extensions = gen_instance_info->enabled_extensions;
+        bool has_headless = (enabled_extensions.end() !=
+                             std::find(enabled_extensions.begin(), enabled_extensions.end(), XR_KHR_HEADLESS_EXTENSION_NAME));
+        bool got_right_graphics_binding_count = (num_graphics_bindings_found == 1);
+        if (!got_right_graphics_binding_count && has_headless) {
+            // This permits 0 as well.
+            got_right_graphics_binding_count = (num_graphics_bindings_found == 0);
+        }
+        if (!got_right_graphics_binding_count) {
             std::vector<GenValidUsageXrObjectInfo> objects_info;
             GenValidUsageXrObjectInfo handle_info = {};
             handle_info.handle = CONVERT_HANDLE_TO_GENERIC(instance);
             handle_info.type = XR_OBJECT_TYPE_INSTANCE;
             objects_info.push_back(handle_info);
-            std::string error_str = "Invalid number of graphics binding structures provided.  ";
-            error_str = "Expected one, but received ";
-            error_str += std::to_string(num_graphics_bindings_found);
-            error_str += ".";
+            std::ostringstream error_stream;
+            error_stream << "Invalid number of graphics binding structures provided.  ";
+            error_stream << "Expected ";
+            if (has_headless) {
+                error_stream << "0 or 1";
+            } else {
+                error_stream << "1";
+            }
+            error_stream << ", but received ";
+            error_stream << num_graphics_bindings_found;
+            error_stream << ".";
             // TODO: This needs to be updated with the actual VUID once we generate it.
             CoreValidLogMessage(gen_instance_info, "VUID-xrCreateSession-next-parameter", VALID_USAGE_DEBUG_SEVERITY_ERROR,
-                                "xrDestroySession", objects_info, error_str);
+                                "xrCreateSession", objects_info, error_stream.str());
             return XR_ERROR_GRAPHICS_DEVICE_INVALID;
         }
         return GenValidUsageNextXrCreateSession(instance, createInfo, session);
