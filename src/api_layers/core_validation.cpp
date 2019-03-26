@@ -545,6 +545,7 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
                 }
                 break;
             }
+            next_header = reinterpret_cast<const XrBaseInStructure *>(next_header->next);
         }
 
         if (XR_SUCCESS == validation_result) {
