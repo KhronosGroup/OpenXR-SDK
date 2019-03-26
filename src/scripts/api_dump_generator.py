@@ -449,6 +449,28 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             write_string += self.writeIndent(indent)
             write_string += 'contents.push_back(std::make_tuple("%s", %s' % (full_type, description)
             write_string += ', oss_%s.str()));\n' % int_short_param_name
+        elif base_type == 'timespec':
+            # Unbeknownst to XR, this is actually a struct.
+            write_string += self.writeIndent(indent)
+            write_string += 'std::ostringstream oss_%s;\n' % int_short_param_name
+            write_string += self.writeIndent(indent)
+            deref = '' + '*' * pointer_count
+
+            # Write whole seconds
+            write_string += 'oss_%s << (' % int_short_param_name
+            write_string += deref
+            write_string += '%s).tv_sec << ".";\n' % full_name
+
+            # Write nanoseconds as a decimal
+            write_string += self.writeIndent(indent)
+            write_string += "oss_%s << std::setw(9) << std::setfill('0') << (" % int_short_param_name
+            write_string += deref
+            write_string += '%s).tv_nsec << "s";\n' % full_name
+
+            write_string += self.writeIndent(indent)
+            write_string += 'contents.push_back(std::make_tuple("%s", %s' % (
+                full_type, description)
+            write_string += ', oss_%s.str()));\n' % int_short_param_name
         else:
             if base_type == 'XrResult':
                 write_string += self.writeIndent(indent)
