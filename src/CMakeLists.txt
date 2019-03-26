@@ -81,6 +81,8 @@ CHECK_FUNCTION_EXISTS(secure_getenv HAVE_SECURE_GETENV)
 CHECK_FUNCTION_EXISTS(__secure_getenv HAVE___SECURE_GETENV)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/common_cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/common_cmake_config.h)
 
+add_definitions(-DXR_USE_TIMESPEC)
+
 # Set up the OpenXR version variables, used by several targets in this project.
 set(MAJOR "0")
 set(MINOR "0")
