@@ -1571,7 +1571,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 param_member_contents += self.writeIndent(indent)
                 param_member_contents += '// Optional array must be non-NULL when %s is non-zero\n' % prefixed_param_member_name
                 param_member_contents += self.writeIndent(indent)
-                param_member_contents += 'if (0 >= %s && nullptr == %s%s) {\n' % (
+                param_member_contents += 'if (0 != %s && nullptr == %s%s) {\n' % (
                     prefixed_param_member_name, param_member_prefix, param_member.array_length_for)
                 param_member_contents += self.writeIndent(indent + 1)
                 param_member_contents += 'CoreValidLogMessage(%s, "VUID-%s-%s-parameter",\n' % (instance_info_variable,
