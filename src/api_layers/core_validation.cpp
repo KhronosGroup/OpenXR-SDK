@@ -448,10 +448,7 @@ XrResult CoreValidationXrCreateInstance(const XrInstanceCreateInfo *info, XrInst
     return XR_SUCCESS;
 }
 
-struct CommonXrStructPrefix {
-    XrStructureType type;
-    const void *next;
-};  // See if there is a debug utils create structure in the "next" chain
+// See if there is a debug utils create structure in the "next" chain
 
 XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info, const struct XrApiLayerCreateInfo *apiLayerInfo,
                                                 XrInstance *instance) {
@@ -533,7 +530,7 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
         // See if a debug utils messenger is supposed to be created as part of the instance
         // NOTE: We have to wait until after the instance info is added to the map for this
         //       to work properly.
-        const CommonXrStructPrefix *next_header = reinterpret_cast<const CommonXrStructPrefix *>(info->next);
+        const XrBaseInStructure *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
         const XrDebugUtilsMessengerCreateInfoEXT *dbg_utils_create_info = nullptr;
         while (next_header != nullptr) {
             if (next_header->type == XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
