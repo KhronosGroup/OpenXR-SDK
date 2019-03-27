@@ -2290,17 +2290,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         pre_validate_func += self.writeIndent(indent)
         pre_validate_func += 'std::vector<GenValidUsageXrObjectInfo> objects_info;\n'
         if first_param_handle_tuple != None:
-            pre_validate_func += self.writeIndent(indent)
-            pre_validate_func += 'GenValidUsageXrObjectInfo handle_info = {};\n'
-            pre_validate_func += self.writeIndent(indent)
             handle_param = cur_command.params[0]
             first_handle_name = self.getFirstHandleName(handle_param)
-            pre_validate_func += 'handle_info.handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % first_handle_name
+            obj_type = self.genXrObjectType(handle_param.type)
             pre_validate_func += self.writeIndent(indent)
-            pre_validate_func += 'handle_info.type = %s;\n' % self.genXrObjectType(
-                handle_param.type)
-            pre_validate_func += self.writeIndent(indent)
-            pre_validate_func += 'objects_info.push_back(handle_info);\n\n'
+            pre_validate_func += 'objects_info.emplace_back(%s, %s);\n\n'% (first_handle_name, obj_type)
             lower_handle_name = first_param_handle_tuple.name[2:].lower()
             if first_param_handle_tuple.name == 'XrInstance':
                 pre_validate_func += self.writeIndent(indent)
