@@ -152,7 +152,8 @@ static void CopyIncludedPaths(bool is_directory_list, const std::string &cur_pat
         try {
             // Handle any path listings in the string (separated by the appropriate path separator)
             while (found != std::string::npos) {
-                output_path += cur_path.substr(last_found, found);
+                std::size_t length = found - last_found;
+                output_path += cur_path.substr(last_found, length);
                 if (is_directory_list && (cur_path[found - 1] != '\\' && cur_path[found - 1] != '/')) {
                     output_path += DIRECTORY_SYMBOL;
                 }
@@ -166,7 +167,7 @@ static void CopyIncludedPaths(bool is_directory_list, const std::string &cur_pat
             // If there's something remaining in the string, copy it over
             size_t last_char = cur_path.size() - 1;
             if (last_found != last_char) {
-                output_path += cur_path.substr(last_found, found);
+                output_path += cur_path.substr(last_found);
                 if (is_directory_list && (cur_path[last_char] != '\\' && cur_path[last_char] != '/')) {
                     output_path += DIRECTORY_SYMBOL;
                 }
