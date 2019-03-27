@@ -643,10 +643,7 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
         }
         if (!got_right_graphics_binding_count) {
             std::vector<GenValidUsageXrObjectInfo> objects_info;
-            GenValidUsageXrObjectInfo handle_info = {};
-            handle_info.handle = CONVERT_HANDLE_TO_GENERIC(instance);
-            handle_info.type = XR_OBJECT_TYPE_INSTANCE;
-            objects_info.push_back(handle_info);
+            objects_info.emplace_back(instance, XR_OBJECT_TYPE_INSTANCE);
             std::ostringstream error_stream;
             error_stream << "Invalid number of graphics binding structures provided.  ";
             error_stream << "Expected ";

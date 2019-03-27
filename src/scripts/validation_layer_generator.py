@@ -647,6 +647,10 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_header_info += 'struct GenValidUsageXrObjectInfo {\n'
         validation_header_info += '    XR_VALIDATION_GENERIC_HANDLE_TYPE handle;\n'
         validation_header_info += '    XrObjectType type;\n'
+        validation_header_info += '    GenValidUsageXrObjectInfo() = default;\n'
+        validation_header_info += '    template <typename T>\n'
+        validation_header_info += '    GenValidUsageXrObjectInfo(T h, XrObjectType t)\n'
+        validation_header_info += '        : handle(CONVERT_HANDLE_TO_GENERIC(h)), type(t) {}\n'
         validation_header_info += '};\n'
         validation_header_info += '// Debug message severity levels for logging.\n'
         validation_header_info += 'enum GenValidUsageDebugSeverity {\n'
@@ -2355,12 +2359,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 use_pointer_deref = True
             if count > 0 and param.is_handle and not param.pointer_count > 0:
                 pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'handle_info.handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % param.name
-                pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'handle_info.type = %s;\n' % self.genXrObjectType(
-                    param.type)
-                pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'objects_info.push_back(handle_info);\n'
+                pre_validate_func += 'objects_info.emplace_back(%s, %s);\n' % (param.name, self.genXrObjectType(
+                    param.type))
             if not param.no_auto_validity:
                 command_name_string = '"%s"' % cur_command.name
                 pre_validate_func += self.outputParamMemberContents(True, cur_command.name, param, '',
