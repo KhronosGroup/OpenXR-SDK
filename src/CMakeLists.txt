@@ -33,6 +33,12 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DXR_OS_LINUX)
 endif()
 
+# Determine the presentation backend for Linux systems.
+# Use an include because the code is pretty big.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    include(presentation)
+endif()
+
 # Several files use these compile-time platform switches
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions( -DXR_USE_PLATFORM_WIN32 )
@@ -105,12 +111,6 @@ if(WIN32)
     string(REGEX REPLACE "/" "\\\\" BASE_DIR "${CMAKE_SOURCE_DIR}")
 else()
     set(BASE_DIR "${CMAKE_SOURCE_DIR}")
-endif()
-
-# Determine the presentation backend for Linux systems.
-# Use an include because the code is pretty big. 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    include(presentation)
 endif()
 
 # Path separators ( : or ; ) are not handled well in CMake.
