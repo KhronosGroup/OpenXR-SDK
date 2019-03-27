@@ -2306,6 +2306,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'mlock.unlock();\n'
             else:
+                pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'GenValidUsageXrHandleInfo *gen_%s_info = ' % lower_handle_name
                 pre_validate_func += 'g_%s_info_map[%s];\n' % (
                     lower_handle_name, first_handle_name)
