@@ -118,6 +118,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include <openxr/openxr.h>\n'
             preamble += '#include <openxr/openxr_platform.h>\n\n'
             preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '#include "validation_utils.h"\n'
         elif self.genOpts.filename == 'xr_generated_core_validation.cpp':
             preamble += '#include <sstream>\n'
             preamble += '#include <cstring>\n'
@@ -140,6 +141,30 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         # Finish processing in superclass
         AutomaticSourceOutputGenerator.endFile(self)
 
+    def makeInfoName(self, handle_type=None, handle_type_name=None):
+        if not handle_type_name:
+            handle_type_name = handle_type.name
+        base_handle_name = handle_type_name[2:].lower()
+        return 'g_%s_info' % base_handle_name
+
+    def outputInfoMapDeclarations(self, extern):
+        lines = []
+        extern_keyword = 'extern ' if extern else ''
+        for handle in self.api_handles:
+            handle_name = handle.name
+            if handle.protect_value:
+                lines.append('#if %s' % handle.protect_string)
+            if handle.name == 'XrInstance':
+                info_type = "InstanceHandleInfo"
+            else:
+                info_type = 'HandleInfo<%s>' % handle_name
+
+            lines.append('%s%s %s;' % (extern_keyword,
+                                       info_type, self.makeInfoName(handle)))
+            if handle.protect_value:
+                lines.append('#endif // %s" % handle.protect_string')
+        return '\n'.join(lines)
+
     # Write out common internal types for validation
     #   self            the ValidationSourceOutputGenerator object
     def outputCommonTypesForValidation(self):
@@ -149,12 +174,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         common_validation_types += '    VALIDATE_XR_FLAGS_ZERO,\n'
         common_validation_types += '    VALIDATE_XR_FLAGS_INVALID,\n'
         common_validation_types += '    VALIDATE_XR_FLAGS_SUCCESS,\n'
-        common_validation_types += '};\n\n'
-        common_validation_types += '// Enum used for indicating handle validation status.\n'
-        common_validation_types += 'enum ValidateXrHandleResult {\n'
-        common_validation_types += '    VALIDATE_XR_HANDLE_NULL,\n'
-        common_validation_types += '    VALIDATE_XR_HANDLE_INVALID,\n'
-        common_validation_types += '    VALIDATE_XR_HANDLE_SUCCESS,\n'
         common_validation_types += '};\n\n'
         return common_validation_types
 
@@ -526,53 +545,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_header_info = ''
         cur_extension_name = ''
 
-        # Handle information
-        validation_header_info += '// Handle information for easy conversion\n'
-        validation_header_info += '#if (defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__) ) || defined(_M_X64) || defined(__ia64) || defined (_M_IA64) || defined(__aarch64__) || defined(__powerpc64__))\n'
-        validation_header_info += '    #define XR_VALIDATION_GENERIC_HANDLE_TYPE  uint64_t\n'
-        validation_header_info += '    #define CONVERT_HANDLE_TO_GENERIC(handle)  reinterpret_cast<uint64_t>(handle)\n'
-        validation_header_info += '    #define CONVERT_GENERIC_TO_HANDLE(type, handle)  reinterpret_cast<type>(handle)\n'
-        validation_header_info += '    #define CHECK_FOR_NULL_HANDLE(handle)  (XR_NULL_HANDLE == reinterpret_cast<void*>(handle))\n'
-        validation_header_info += '#else\n'
-        validation_header_info += '    #define XR_VALIDATION_GENERIC_HANDLE_TYPE  uint64_t\n'
-        validation_header_info += '    #define CONVERT_HANDLE_TO_GENERIC(handle)  (handle)\n'
-        validation_header_info += '    #define CONVERT_GENERIC_TO_HANDLE(type, handle)  (handle)\n'
-        validation_header_info += '    #define CHECK_FOR_NULL_HANDLE(handle)  (XR_NULL_HANDLE == handle)\n'
-        validation_header_info += '#endif\n'
-
-        # First, define the instance struct used for passing information around.
-        # This information includes things like the dispatch table as well as the
-        # enabled extensions.
-        validation_header_info += '// Structure used for storing the instance information we need for validating\n'
-        validation_header_info += '// various aspects of the OpenXR API.\n\n'
-        validation_header_info += '// Debug Utils items\n'
-        validation_header_info += 'struct CoreValidationMessengerInfo {\n'
-        validation_header_info += '    XrDebugUtilsMessengerEXT messenger;\n'
-        validation_header_info += '    XrDebugUtilsMessengerCreateInfoEXT* create_info;\n'
-        validation_header_info += '};\n\n'
-        validation_header_info += 'struct GenValidUsageXrInstanceInfo {\n'
-        validation_header_info += '    XrInstance instance;\n'
-        validation_header_info += '    XrGeneratedDispatchTable* dispatch_table;\n'
-        validation_header_info += '    std::vector<std::string> enabled_extensions;\n'
-        validation_header_info += '    std::vector<CoreValidationMessengerInfo*> debug_messengers;\n'
-        validation_header_info += '    std::vector<XrDebugUtilsObjectNameInfoEXT*> object_names;\n'
-        validation_header_info += '};\n\n'
-        validation_header_info += '// Structure used for storing information for other handles\n'
-        validation_header_info += 'struct GenValidUsageXrHandleInfo {\n'
-        validation_header_info += '    GenValidUsageXrInstanceInfo *instance_info;\n'
-        validation_header_info += '    XrObjectType direct_parent_type;\n'
-        validation_header_info += '    XR_VALIDATION_GENERIC_HANDLE_TYPE direct_parent_handle;\n'
-        validation_header_info += '};\n\n'
-        validation_header_info += '// Structure used for storing session label information\n'
-        validation_header_info += 'struct GenValidUsageXrInternalSessionLabel {\n'
-        validation_header_info += '    XrDebugUtilsLabelEXT debug_utils_label;\n'
-        validation_header_info += '    std::string label_name;\n'
-        validation_header_info += '    bool is_individual_label;\n'
-        validation_header_info += '};\n\n'
         validation_header_info += '// Unordered Map associating pointer to a vector of session label information to a session\'s handle\n'
         validation_header_info += 'extern std::unordered_map<XrSession, std::vector<GenValidUsageXrInternalSessionLabel*>*> g_xr_session_labels;\n\n'
-        validation_header_info += '// This function is used to delete session labels when a session is destroyed\n'
-        validation_header_info += 'extern void CoreValidationDeleteSessionLabels(XrSession session);\n\n'
 
         for x in range(0, 2):
             if x == 0:
@@ -628,37 +602,9 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_header_info += '\n'
 
         validation_header_info += '\n// Externs for Core Validation\n'
-        for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
-            if handle.protect_value:
-                validation_header_info += '#if %s\n' % handle.protect_string
-            if handle.name == 'XrInstance':
-                validation_header_info += 'extern std::unordered_map<%s, GenValidUsageXrInstanceInfo*> g_%s_info_map;\n' % (
-                    handle.name, base_handle_name)
-            else:
-                validation_header_info += 'extern std::unordered_map<%s, GenValidUsageXrHandleInfo*> g_%s_info_map;\n' % (
-                    handle.name, base_handle_name)
-            validation_header_info += 'extern std::mutex g_%s_dispatch_mutex;\n' % base_handle_name
-            if handle.protect_value:
-                validation_header_info += '#endif // %s\n' % handle.protect_string
+        validation_header_info += self.outputInfoMapDeclarations(extern=True)
         validation_header_info += 'void GenValidUsageCleanUpMaps(GenValidUsageXrInstanceInfo *instance_info);\n\n'
 
-        validation_header_info += '// Object information used for logging.\n'
-        validation_header_info += 'struct GenValidUsageXrObjectInfo {\n'
-        validation_header_info += '    XR_VALIDATION_GENERIC_HANDLE_TYPE handle;\n'
-        validation_header_info += '    XrObjectType type;\n'
-        validation_header_info += '    GenValidUsageXrObjectInfo() = default;\n'
-        validation_header_info += '    template <typename T>\n'
-        validation_header_info += '    GenValidUsageXrObjectInfo(T h, XrObjectType t)\n'
-        validation_header_info += '        : handle(CONVERT_HANDLE_TO_GENERIC(h)), type(t) {}\n'
-        validation_header_info += '};\n'
-        validation_header_info += '// Debug message severity levels for logging.\n'
-        validation_header_info += 'enum GenValidUsageDebugSeverity {\n'
-        validation_header_info += '    VALID_USAGE_DEBUG_SEVERITY_DEBUG = 0,\n'
-        validation_header_info += '    VALID_USAGE_DEBUG_SEVERITY_INFO = 7,\n'
-        validation_header_info += '    VALID_USAGE_DEBUG_SEVERITY_WARNING = 14,\n'
-        validation_header_info += '    VALID_USAGE_DEBUG_SEVERITY_ERROR = 21,\n'
-        validation_header_info += '};\n\n'
         validation_header_info += '\n// Function to convert XrObjectType to string\n'
         validation_header_info += 'std::string GenValidUsageXrObjectTypeToString(const XrObjectType& type);\n\n'
         validation_header_info += '// Function to record all the core validation information\n'
@@ -885,47 +831,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             verify_handle += 'ValidateXrHandleResult Verify%sHandle(const %s* handle_to_check) {\n' % (
                 handle.name, handle.name)
             verify_handle += self.writeIndent(indent)
-            verify_handle += 'try {\n'
-            indent = indent + 1
-            verify_handle += self.writeIndent(indent)
-            verify_handle += 'if (nullptr == handle_to_check) {\n'
-            verify_handle += self.writeIndent(indent + 1)
-            verify_handle += 'return VALIDATE_XR_HANDLE_INVALID;\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '}\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '// XR_NULL_HANDLE is valid in some cases, so we want to return that we found that value\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '// and let the calling function decide what to do with it.\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += 'if (CHECK_FOR_NULL_HANDLE(*handle_to_check)) {\n'
-            verify_handle += self.writeIndent(indent + 1)
-            verify_handle += 'return VALIDATE_XR_HANDLE_NULL;\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '}\n\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '// Try to find the handle in the appropriate map\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += 'std::unique_lock<std::mutex> lock(g_%s_dispatch_mutex);\n' % lower_handle_name
-            verify_handle += self.writeIndent(indent)
-            verify_handle += 'auto entry_returned = g_%s_info_map.find(*handle_to_check);\n' % lower_handle_name
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '// If it is not a valid handle, it should return the end of the map.\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += 'if (g_%s_info_map.end() == entry_returned) {\n' % lower_handle_name
-            verify_handle += self.writeIndent(indent + 1)
-            verify_handle += 'return VALIDATE_XR_HANDLE_INVALID;\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '}\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += 'return VALIDATE_XR_HANDLE_SUCCESS;\n'
-            indent = indent - 1
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '} catch (...) {\n'
-            verify_handle += self.writeIndent(indent + 1)
-            verify_handle += 'return VALIDATE_XR_HANDLE_INVALID;\n'
-            verify_handle += self.writeIndent(indent)
-            verify_handle += '}\n'
+            verify_handle += 'return %s.verifyHandle(handle_to_check);\n' % self.makeInfoName(handle)
             verify_handle += '}\n\n'
             if handle.protect_value:
                 verify_handle += '#endif // %s\n' % handle.protect_string
@@ -947,14 +853,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 verify_parent += self.writeIndent(indent)
                 verify_parent += '}\n'
             else:
-                handle_lower = handle.name[2:].lower()
-                handle_mutex = 'g_'
-                handle_mutex += handle_lower
-                handle_mutex += '_dispatch_mutex'
-                handle_lock = '%s_lock' % handle_lower
-                handle_map = 'g_'
-                handle_map += handle_lower
-                handle_map += '_info_map[CONVERT_GENERIC_TO_HANDLE(%s, inhandle)]' % handle.name
+                handle_info = '%s.get(CONVERT_GENERIC_TO_HANDLE(%s, inhandle))' % (self.makeInfoName(handle), handle.name)
+
                 verify_parent += self.writeIndent(indent)
                 verify_parent += 'if (inhandle_type == %s) {\n' % self.genXrObjectType(
                     handle.name)
@@ -962,9 +862,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 verify_parent += self.writeIndent(indent)
                 verify_parent += '// Get the object and parent of the handle\n'
                 verify_parent += self.writeIndent(indent)
-                verify_parent += 'std::unique_lock<std::mutex> %s(%s);\n' % (handle_lock, handle_mutex)
-                verify_parent += self.writeIndent(indent)
-                verify_parent += 'GenValidUsageXrHandleInfo *handle_info = %s;\n' % handle_map
+                verify_parent += 'GenValidUsageXrHandleInfo *handle_info = %s;\n' % handle_info
                 verify_parent += self.writeIndent(indent)
                 verify_parent += 'outhandle_type = handle_info->direct_parent_type;\n'
                 verify_parent += self.writeIndent(indent)
@@ -2298,18 +2196,15 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             lower_handle_name = first_param_handle_tuple.name[2:].lower()
             if first_param_handle_tuple.name == 'XrInstance':
                 pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'std::unique_lock<std::mutex> mlock(g_%s_dispatch_mutex);\n' % handle_param.type[2:].lower()
-                pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info_map[%s];\n' % first_handle_name
-                pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'mlock.unlock();\n'
+                pre_validate_func += 'GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info.get(%s);\n' % first_handle_name
             else:
                 pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'GenValidUsageXrHandleInfo *gen_%s_info = ' % lower_handle_name
-                pre_validate_func += 'g_%s_info_map[%s];\n' % (
-                    lower_handle_name, first_handle_name)
+                pre_validate_func += 'auto info_with_instance = %s.getWithInstanceInfo(%s);\n' % (
+                    self.makeInfoName(handle_type_name=handle_param.type), first_handle_name)
                 pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'GenValidUsageXrInstanceInfo *gen_instance_info = gen_%s_info->instance_info;\n' % lower_handle_name
+                pre_validate_func += 'GenValidUsageXrHandleInfo *gen_%s_info = info_with_instance.first;\n' % lower_handle_name
+                pre_validate_func += self.writeIndent(indent)
+                pre_validate_func += 'GenValidUsageXrInstanceInfo *gen_instance_info = info_with_instance.second;\n'
 
         # If any of the associated handles has validation state tracking, get the
         # appropriate struct setup for validation later in the function
@@ -2554,15 +2449,13 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         if cur_command.params[0].is_handle:
             handle_tuple = self.getHandle(cur_command.params[0].type)
             first_handle_name = self.getFirstHandleName(cur_command.params[0])
-            next_validate_func += '        std::unique_lock<std::mutex> dispatch_lock(g_%s_dispatch_mutex);\n' % base_handle_name
             if handle_tuple.name == 'XrInstance':
-                next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info_map[%s];\n' % first_handle_name
+                next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info.get(%s);\n' % first_handle_name
             else:
                 next_validate_func += '        GenValidUsageXrHandleInfo *gen_%s_info = ' % base_handle_name
-                next_validate_func += 'g_%s_info_map[%s];\n' % (
+                next_validate_func += 'g_%s_info.get(%s);\n' % (
                     base_handle_name, first_handle_name)
                 next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = gen_%s_info->instance_info;\n' % base_handle_name
-            next_validate_func += '        dispatch_lock.unlock();\n'
         else:
             next_validate_func += '#error("Bug")\n'
         # Call down, looking for the returned result if required.
@@ -2591,21 +2484,20 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             last_name = cur_command.params[-1].name
             if is_create:
                 next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % last_name
-                next_validate_func += '            std::unique_lock<std::mutex> info_lock(g_%s_dispatch_mutex);\n' % last_lower_type
-                next_validate_func += '            auto exists = g_%s_info_map.find(*%s);\n' % (
-                    last_lower_type, last_name)
-                next_validate_func += '            if (exists == g_%s_info_map.end()) {\n' % last_lower_type
+                next_validate_func += '            auto map_with_lock = g_%s_info.lockMap();\n' % last_lower_type
+                next_validate_func += '            auto & map = map_with_lock.second;\n'
+                next_validate_func += '            auto exists = map.find(*%s);\n' % last_name
+                next_validate_func += '            if (exists == map.end()) {\n'
                 if last_handle_tuple.name == 'XrInstance':
-                    next_validate_func += '                g_%s_info_map[*%s] = gen_instance_info;\n' % (
-                        last_lower_type, last_name)
+                    next_validate_func += '                map[*%s] = gen_instance_info;\n' % last_name
                 else:
-                    next_validate_func += '                GenValidUsageXrHandleInfo *handle_info = new GenValidUsageXrHandleInfo();\n'
+                    next_validate_func += '                std::unique_ptr<GenValidUsageXrHandleInfo> handle_info(new GenValidUsageXrHandleInfo());\n'
                     next_validate_func += '                handle_info->instance_info = gen_instance_info;\n'
                     next_validate_func += '                handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
                         cur_command.params[0].type)
                     next_validate_func += '                handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[
                         0].name
-                    next_validate_func += '                g_%s_info_map[*%s] = handle_info;\n' % (last_lower_type, last_name)
+                    next_validate_func += '                map[*%s] = std::move(handle_info);\n' % last_name
 
                 # If this object contains a state that needs tracking, allocate it
                 valid_type_list = []
@@ -2632,11 +2524,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 if cur_command.params[-1].type == 'XrSession':
                     next_validate_func += '\n        // Clean up any labels associated with this session\n'
                     next_validate_func += '        CoreValidationDeleteSessionLabels(session);\n\n'
-                next_validate_func += '        std::unique_lock<std::mutex> info_lock(g_%s_dispatch_mutex);\n' % last_lower_type
-                next_validate_func += '        auto exists = g_%s_info_map.find(%s);\n' % (
-                    last_lower_type, last_name)
                 # Only remove the handle from our map if the runtime returned success
-                next_validate_func += '        if (XR_SUCCEEDED(result) && (exists != g_%s_info_map.end())) {\n' % last_lower_type
+                next_validate_func += '        if (XR_SUCCEEDED(result)) {\n'
 
                 # If this object contains a state that needs tracking, free it
                 valid_type_list = []
@@ -2662,12 +2551,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '}\n'
 
-                if last_handle_tuple.name != 'XrInstance':
-                    next_validate_func += '            GenValidUsageXrHandleInfo *handle_info = g_%s_info_map[%s];\n' % (
-                        last_lower_type, last_name)
-                next_validate_func += '            g_%s_info_map.erase(%s);\n' % (last_lower_type, last_name)
-                if last_handle_tuple.name != 'XrInstance':
-                    next_validate_func += '            delete handle_info;\n'
+                next_validate_func += '            g_%s_info.erase(%s);\n' % (last_lower_type, last_name)
                 next_validate_func += '        }\n'
                 if 'xrDestroyInstance' in cur_command.name:
                     next_validate_func += '        GenValidUsageCleanUpMaps(gen_instance_info);\n'
@@ -2676,18 +2560,19 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 # these items, but it's also an array of items.
                 next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s && nullptr != %s) {\n' % (cur_command.params[-2].name,
                                                                                                                    last_name)
+                next_validate_func += '            auto map_with_lock = g_%s_info.lockMap(instance);\n' % last_lower_type
+                next_validate_func += '            auto & map = map_with_lock.second;\n'
                 next_validate_func += '            std::unique_lock<std::mutex> info_lock(g_%s_dispatch_mutex);\n' % last_lower_type
                 next_validate_func += '            for (uint32_t sempath = 0; sempath < *%s; ++sempath) {\n' % cur_command.params[-2].name
-                next_validate_func += '                auto exists = g_%s_info_map.find(%s[sempath]);\n' % (
-                    last_lower_type, cur_command.params[-1].name)
-                next_validate_func += '                if (exists != g_%s_info_map.end()) {\n' % last_lower_type
+                next_validate_func += '                auto exists = map.find(%s[sempath]);\n' % (
+                    cur_command.params[-1].name)
+                next_validate_func += '                if (exists != map.end()) {\n' % last_lower_type
                 next_validate_func += '                    GenValidUsageXrHandleInfo *handle_info = new GenValidUsageXrHandleInfo();\n'
                 next_validate_func += '                    handle_info->instance_info = gen_instance_info;\n'
-                next_validate_func += '                handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
+                next_validate_func += '                    handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
                     cur_command.params[0].type)
-                next_validate_func += '                handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[0].name
-                next_validate_func += '                    g_%s_info_map[%s[sempath]] = handle_info;\n' % (
-                    last_lower_type, last_name)
+                next_validate_func += '                    handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[0].name
+                next_validate_func += '                    map[%s[sempath]] = handle_info;\n' % last_name
                 next_validate_func += '                }\n'
                 next_validate_func += '            }\n'
                 next_validate_func += '        }\n'
@@ -2766,47 +2651,9 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         # First, output the mapping and mutex items
         validation_source_funcs += '// Unordered Map associating pointer to a vector of session label information to a session\'s handle\n'
         validation_source_funcs += 'std::unordered_map<XrSession, std::vector<GenValidUsageXrInternalSessionLabel*>*> g_xr_session_labels;\n\n'
-        for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
-            if handle.protect_value:
-                validation_source_funcs += '#if %s\n' % handle.protect_string
-            if handle.name == 'XrInstance':
-                validation_source_funcs += 'std::unordered_map<%s, GenValidUsageXrInstanceInfo*> g_%s_info_map;\n' % (
-                    handle.name, base_handle_name)
-            else:
-                validation_source_funcs += 'std::unordered_map<%s, GenValidUsageXrHandleInfo*> g_%s_info_map;\n' % (
-                    handle.name, base_handle_name)
-            validation_source_funcs += 'std::mutex g_%s_dispatch_mutex;\n' % base_handle_name
-            if handle.protect_value:
-                validation_source_funcs += '#endif // %s\n' % handle.protect_string
+        validation_source_funcs += self.outputInfoMapDeclarations(extern=False)
         validation_source_funcs += '\n'
         validation_source_funcs += self.outputValidationInternalProtos()
-        validation_source_funcs += '// Template function to reduce duplicating the map locking, searching, and deleting.`\n'
-        validation_source_funcs += 'void EraseAllInstanceTableMapElements(GenValidUsageXrInstanceInfo *search_value) {\n'
-        validation_source_funcs += '    for (auto it = g_instance_info_map.begin(); it != g_instance_info_map.end();) {\n'
-        validation_source_funcs += '        if (it->second == search_value) {\n'
-        validation_source_funcs += '            g_instance_info_map.erase(it++);\n'
-        validation_source_funcs += '        } else {\n'
-        validation_source_funcs += '            ++it;\n'
-        validation_source_funcs += '        }\n'
-        validation_source_funcs += '    }\n'
-        validation_source_funcs += '}\n'
-        validation_source_funcs += '\n'
-        validation_source_funcs += '// Template function to reduce duplicating the map locking, searching, and deleting.`\n'
-        validation_source_funcs += 'template <typename MapType>\n'
-        validation_source_funcs += 'void EraseAllTableMapElements(MapType &search_map, std::mutex &mutex, GenValidUsageXrInstanceInfo *search_value) {\n'
-        validation_source_funcs += '    std::unique_lock<std::mutex> mlock(mutex);\n'
-        validation_source_funcs += '    for (auto it = search_map.begin(); it != search_map.end();) {\n'
-        validation_source_funcs += '        GenValidUsageXrHandleInfo *map_handle_info = it->second;\n'
-        validation_source_funcs += '        if (nullptr != map_handle_info && map_handle_info->instance_info == search_value) {\n'
-        validation_source_funcs += '            search_map.erase(it++);\n'
-        validation_source_funcs += '            delete map_handle_info;\n'
-        validation_source_funcs += '        } else {\n'
-        validation_source_funcs += '            ++it;\n'
-        validation_source_funcs += '        }\n'
-        validation_source_funcs += '    }\n'
-        validation_source_funcs += '}\n'
-        validation_source_funcs += '\n'
         validation_source_funcs += '// Function used to clean up any residual map values that point to an instance prior to that\n'
         validation_source_funcs += '// instance being deleted.\n'
         validation_source_funcs += 'void GenValidUsageCleanUpMaps(GenValidUsageXrInstanceInfo *instance_info) {\n'
@@ -2817,9 +2664,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle.name == 'XrInstance':
                 validation_source_funcs += '    EraseAllInstanceTableMapElements(instance_info);\n'
             else:
-                validation_source_funcs += '    EraseAllTableMapElements<std::unordered_map<%s, GenValidUsageXrHandleInfo*>>(g_%s_info_map, ' % (
-                    handle.name, base_handle_name)
-                validation_source_funcs += 'g_%s_dispatch_mutex, instance_info);\n' % base_handle_name
+                validation_source_funcs += '    g_%s_info.removeHandlesForInstance(instance_info);\n' % base_handle_name
             if handle.protect_value:
                 validation_source_funcs += '#endif // %s\n' % handle.protect_string
         validation_source_funcs += '}\n'
@@ -2926,18 +2771,15 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_source_funcs += '    try {\n'
         validation_source_funcs += '        std::string func_name = name;\n'
         validation_source_funcs += '        std::vector<GenValidUsageXrObjectInfo> objects;\n'
-        validation_source_funcs += '        if (!CHECK_FOR_NULL_HANDLE(instance)) {\n'
-        validation_source_funcs += '            std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);\n'
+        validation_source_funcs += '        if (g_instance_info.verifyHandle(&instance) == VALIDATE_XR_HANDLE_INVALID) {\n'
         validation_source_funcs += '            // Make sure the instance is valid if it is not XR_NULL_HANDLE\n'
-        validation_source_funcs += '            if (nullptr == g_instance_info_map[instance]) {\n'
-        validation_source_funcs += '                std::vector<GenValidUsageXrObjectInfo> objects;\n'
-        validation_source_funcs += '                objects.resize(1);\n'
-        validation_source_funcs += '                objects[0].handle = CONVERT_HANDLE_TO_GENERIC(instance);\n'
-        validation_source_funcs += '                objects[0].type = XR_OBJECT_TYPE_INSTANCE;\n'
-        validation_source_funcs += '                CoreValidLogMessage(nullptr, "VUID-xrGetInstanceProcAddr-instance-parameter",\n'
-        validation_source_funcs += '                                    VALID_USAGE_DEBUG_SEVERITY_ERROR, "xrGetInstanceProcAddr", objects,\n'
-        validation_source_funcs += '                                    "Invalid instance handle provided.");\n'
-        validation_source_funcs += '            }\n'
+        validation_source_funcs += '            std::vector<GenValidUsageXrObjectInfo> objects;\n'
+        validation_source_funcs += '            objects.resize(1);\n'
+        validation_source_funcs += '            objects[0].handle = CONVERT_HANDLE_TO_GENERIC(instance);\n'
+        validation_source_funcs += '            objects[0].type = XR_OBJECT_TYPE_INSTANCE;\n'
+        validation_source_funcs += '            CoreValidLogMessage(nullptr, "VUID-xrGetInstanceProcAddr-instance-parameter",\n'
+        validation_source_funcs += '                                VALID_USAGE_DEBUG_SEVERITY_ERROR, "xrGetInstanceProcAddr", objects,\n'
+        validation_source_funcs += '                                "Invalid instance handle provided.");\n'
         validation_source_funcs += '        }\n'
         validation_source_funcs += '        // NOTE: Can\'t validate "VUID-xrGetInstanceProcAddr-name-parameter" null-termination\n'
         validation_source_funcs += '        // If we setup the function, just return\n'
@@ -2999,9 +2841,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_source_funcs += '            return XR_SUCCESS;\n'
         validation_source_funcs += '        }\n'
         validation_source_funcs += '        // We have not found it, so pass it down to the next layer/runtime\n'
-        validation_source_funcs += '        std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);\n'
-        validation_source_funcs += '        GenValidUsageXrInstanceInfo* instance_valid_usage_info = g_instance_info_map[instance];\n'
-        validation_source_funcs += '        mlock.unlock();\n'
+        validation_source_funcs += '        GenValidUsageXrInstanceInfo* instance_valid_usage_info = g_instance_info.get(instance);\n'
         validation_source_funcs += '        if (nullptr == instance_valid_usage_info) {\n'
         validation_source_funcs += '            return XR_ERROR_HANDLE_INVALID;\n'
         validation_source_funcs += '        }\n'

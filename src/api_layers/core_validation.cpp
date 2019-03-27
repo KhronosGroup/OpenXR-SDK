@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <cctype>
 #include <vector>
+#include <memory>
 
 #include "xr_generated_core_validation.hpp"
 #include "loader_interfaces.h"
@@ -286,7 +287,7 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
 
                 // Loop through all active messengers and give each a chance to output information
                 for (uint32_t msg_index = 0; msg_index < instance_info->debug_messengers.size(); ++msg_index) {
-                    CoreValidationMessengerInfo *validation_messenger_info = instance_info->debug_messengers[msg_index];
+                    CoreValidationMessengerInfo *validation_messenger_info = instance_info->debug_messengers[msg_index].get();
                     XrDebugUtilsMessengerCreateInfoEXT *messenger_create_info = validation_messenger_info->create_info;
                     // If a callback exists, and the message is of a type this callback cares about, call it.
                     if (nullptr != messenger_create_info->userCallback &&
@@ -448,6 +449,16 @@ XrResult CoreValidationXrCreateInstance(const XrInstanceCreateInfo *info, XrInst
     return XR_SUCCESS;
 }
 
+GenValidUsageXrInstanceInfo::GenValidUsageXrInstanceInfo(XrInstance inst, PFN_xrGetInstanceProcAddr next_get_instance_proc_addr)
+    : instance(inst), dispatch_table(new XrGeneratedDispatchTable()) {
+    /// @todo smart pointer here!
+
+    // Create the dispatch table to the next levels
+    GeneratedXrPopulateDispatchTable(dispatch_table, instance, next_get_instance_proc_addr);
+}
+
+GenValidUsageXrInstanceInfo::~GenValidUsageXrInstanceInfo() { delete dispatch_table; }
+
 // See if there is a debug utils create structure in the "next" chain
 
 XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info, const struct XrApiLayerCreateInfo *apiLayerInfo,
@@ -511,21 +522,15 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
         *instance = returned_instance;
 
         // Create the instance information
-        GenValidUsageXrInstanceInfo *instance_info = new GenValidUsageXrInstanceInfo();
-
-        // Create the dispatch table to the next levels
-        instance_info->dispatch_table = new XrGeneratedDispatchTable();
-        instance_info->instance = returned_instance;
-        GeneratedXrPopulateDispatchTable(instance_info->dispatch_table, returned_instance, next_get_instance_proc_addr);
+        std::unique_ptr<GenValidUsageXrInstanceInfo> instance_info(
+            new GenValidUsageXrInstanceInfo(returned_instance, next_get_instance_proc_addr));
 
         // Save the enabled extensions.
         for (uint32_t extension = 0; extension < info->enabledExtensionCount; ++extension) {
-            instance_info->enabled_extensions.push_back(info->enabledExtensionNames[extension]);
+            instance_info->enabled_extensions.emplace_back(info->enabledExtensionNames[extension]);
         }
 
-        std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);
-        g_instance_info_map[returned_instance] = instance_info;
-        mlock.unlock();
+        g_instance_info.insert(returned_instance, std::move(instance_info));
 
         // See if a debug utils messenger is supposed to be created as part of the instance
         // NOTE: We have to wait until after the instance info is added to the map for this
@@ -560,32 +565,26 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
     }
 }
 
+void EraseAllInstanceTableMapElements(GenValidUsageXrInstanceInfo *search_value) {
+    typedef typename InstanceHandleInfo::value_t value_t;
+    auto map_with_lock = g_instance_info.lockMap();
+    auto &map = map_with_lock.second;
+
+    map_erase_if(map, [=](value_t const &data) { return data.second.get() == search_value; });
+}
+
 XrResult CoreValidationXrDestroyInstance(XrInstance instance) {
     GenValidUsageInputsXrDestroyInstance(instance);
     if (XR_NULL_HANDLE != instance) {
-        std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);
-        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info_map[instance];
+        auto info_with_lock = g_instance_info.getWithLock(instance);
+        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
         if (nullptr != gen_instance_info) {
-            // If there are any object names associated with this instance, delete them.
-            while (0 < gen_instance_info->object_names.size()) {
-                // We have to delete the pointers manually, so step through each object deleting
-                // the things we allocated before we delete the object and it's entry in the vector.
-                delete gen_instance_info->object_names[0]->objectName;
-                delete gen_instance_info->object_names[0];
-                gen_instance_info->object_names.erase(gen_instance_info->object_names.begin());
-            }
-            // If there are any debug messengers associated with this instance, delete them.
-            while (0 < gen_instance_info->debug_messengers.size()) {
-                // We have to delete the pointers manually, so step through each object deleting
-                // the things we allocated before we delete the object and it's entry in the vector.
-                delete gen_instance_info->debug_messengers[0]->create_info;
-                delete gen_instance_info->debug_messengers[0];
-                gen_instance_info->debug_messengers.erase(gen_instance_info->debug_messengers.begin());
-            }
+            gen_instance_info->object_names.clear();
+            gen_instance_info->debug_messengers.clear();
         }
     }
     XrResult result = GenValidUsageNextXrDestroyInstance(instance);
-    if (g_instance_info_map.size() == 0 && g_record_info.type == RECORD_HTML_FILE) {
+    if (!g_instance_info.empty() && g_record_info.type == RECORD_HTML_FILE) {
         CoreValidationWriteHtmlFooter();
     }
     return result;
@@ -599,9 +598,7 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
             return test_result;
         }
 
-        std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);
-        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info_map[instance];
-        mlock.unlock();
+        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info.get(instance);
 
         // Check the next chain for a graphics binding structure, we need at least one.
         uint32_t num_graphics_bindings_found = 0;
@@ -674,9 +671,8 @@ XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const X
         }
         XrResult result = GenValidUsageNextXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
         if (XR_SUCCESS == result) {
-            std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);
-            GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info_map[instance];
-            mlock.unlock();
+            auto info_with_lock = g_instance_info.getWithLock(instance);
+            GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
             if (nullptr != gen_instance_info) {
                 // Create a copy of the base object name info (no next items)
                 char *name_string = new char[strlen(nameInfo->objectName) + 1];
@@ -692,11 +688,11 @@ XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const X
                     }
                 }
                 if (!found) {
-                    XrDebugUtilsObjectNameInfoEXT *new_object_name = new XrDebugUtilsObjectNameInfoEXT;
+                    UniqueXrDebugUtilsObjectNameInfoEXT new_object_name(new XrDebugUtilsObjectNameInfoEXT);
                     *new_object_name = *nameInfo;
                     new_object_name->next = nullptr;
                     new_object_name->objectName = name_string;
-                    gen_instance_info->object_names.push_back(new_object_name);
+                    gen_instance_info->object_names.push_back(std::move(new_object_name));
                 }
             }
         }
@@ -715,16 +711,16 @@ XrResult CoreValidationXrCreateDebugUtilsMessengerEXT(XrInstance instance, const
         }
         result = GenValidUsageNextXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
         if (XR_SUCCESS == result) {
-            std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);
-            GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info_map[instance];
+            auto info_with_lock = g_instance_info.getWithLock(instance);
+            GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
             if (nullptr != gen_instance_info) {
                 XrDebugUtilsMessengerCreateInfoEXT *new_create_info = new XrDebugUtilsMessengerCreateInfoEXT;
                 *new_create_info = *createInfo;
                 new_create_info->next = nullptr;
-                CoreValidationMessengerInfo *new_messenger_info = new CoreValidationMessengerInfo;
+                UniqueCoreValidationMessengerInfo new_messenger_info(new CoreValidationMessengerInfo);
                 new_messenger_info->messenger = *messenger;
                 new_messenger_info->create_info = new_create_info;
-                gen_instance_info->debug_messengers.push_back(new_messenger_info);
+                gen_instance_info->debug_messengers.push_back(std::move(new_messenger_info));
             }
         }
     } catch (...) {
@@ -740,14 +736,12 @@ XrResult CoreValidationXrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMessengerEXT 
         }
         XrResult result = GenValidUsageNextXrDestroyDebugUtilsMessengerEXT(messenger);
         if (XR_NULL_HANDLE != messenger) {
-            std::unique_lock<std::mutex> mlock(g_debugutilsmessengerext_dispatch_mutex);
-            GenValidUsageXrHandleInfo *gen_handle_info = g_debugutilsmessengerext_info_map[messenger];
+            auto info_with_lock = g_debugutilsmessengerext_info.getWithLock(messenger);
+            GenValidUsageXrHandleInfo *gen_handle_info = info_with_lock.second;
             if (nullptr != gen_handle_info) {
                 GenValidUsageXrInstanceInfo *gen_instance_info = gen_handle_info->instance_info;
                 for (uint32_t msg_index = 0; msg_index < gen_instance_info->debug_messengers.size(); ++msg_index) {
                     if (gen_instance_info->debug_messengers[msg_index]->messenger == messenger) {
-                        delete gen_instance_info->debug_messengers[msg_index]->create_info;
-                        delete gen_instance_info->debug_messengers[msg_index];
                         gen_instance_info->debug_messengers.erase(gen_instance_info->debug_messengers.begin() + msg_index);
                         break;
                     }
