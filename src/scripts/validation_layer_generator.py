@@ -2487,41 +2487,32 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 assert(last_handle_tuple.name != 'XrInstance')
 
                 next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % last_name
-                next_validate_func += '            auto map_with_lock = g_%s_info.lockMap();\n' % last_lower_type
-                next_validate_func += '            auto & map = map_with_lock.second;\n'
-                next_validate_func += '            auto exists = map.find(*%s);\n' % last_name
-                next_validate_func += '            if (exists == map.end()) {\n'
-                if last_handle_tuple.name == 'XrInstance':
-                    next_validate_func += '                map[*%s] = gen_instance_info;\n' % last_name
-                else:
-                    next_validate_func += '                std::unique_ptr<GenValidUsageXrHandleInfo> handle_info(new GenValidUsageXrHandleInfo());\n'
-                    next_validate_func += '                handle_info->instance_info = gen_instance_info;\n'
-                    next_validate_func += '                handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
-                        cur_command.params[0].type)
-                    next_validate_func += '                handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[
-                        0].name
-                    next_validate_func += '                map[*%s] = std::move(handle_info);\n' % last_name
+                next_validate_func += '            std::unique_ptr<GenValidUsageXrHandleInfo> handle_info(new GenValidUsageXrHandleInfo());\n'
+                next_validate_func += '            handle_info->instance_info = gen_instance_info;\n'
+                next_validate_func += '            handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
+                    cur_command.params[0].type)
+                next_validate_func += '            handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[
+                    0].name
+                next_validate_func += '            %s.insert(*%s, std::move(handle_info));\n' % (self.makeInfoName(last_handle_tuple), last_name)
 
                 # If this object contains a state that needs tracking, allocate it
                 valid_type_list = []
                 for cur_state in self.api_states:
                     if last_handle_tuple.name == cur_state.type and cur_state.type not in valid_type_list:
                         valid_type_list.append(cur_state.type)
-                        next_validate_func += self.writeIndent(4)
+                        next_validate_func += self.writeIndent(3)
                         next_validate_func += '// Check to see if this object that has been created has a validation\n'
-                        next_validate_func += self.writeIndent(4)
+                        next_validate_func += self.writeIndent(3)
                         next_validate_func += '// state structure that needs to be created as well.\n'
-                        next_validate_func += self.writeIndent(4)
+                        next_validate_func += self.writeIndent(3)
                         next_validate_func += '%sValidationStates *%s_valid_state = new %sValidationStates;\n' % (
                             cur_state.type, cur_state.type[2:].lower(), cur_state.type)
-                        next_validate_func += self.writeIndent(4)
-                        next_validate_func += '(*%s_valid_state) = {};\n' % cur_state.type[2:].lower(
-                        )
-                        next_validate_func += self.writeIndent(4)
+                        next_validate_func += self.writeIndent(3)
+                        next_validate_func += '(*%s_valid_state) = {};\n' % cur_state.type[2:].lower()
+                        next_validate_func += self.writeIndent(3)
                         next_validate_func += 'g_%s_valid_states[(*%s)] = %s_valid_state;\n' % (
                             cur_state.type[2:].lower(), last_name, cur_state.type[2:].lower())
 
-                next_validate_func += '            }\n'
                 next_validate_func += '        }\n'
             elif is_destroy:
                 if cur_command.params[-1].type == 'XrSession':
