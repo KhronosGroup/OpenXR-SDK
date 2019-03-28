@@ -1317,14 +1317,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
     #   vuid_name           the name of the structure or command to put in the VUID
     #   member_param        the member or parameter generated in automatic_source_generator.py to validate
     #   mem_par_desc_name   Descriptive name of parameter
-    #   output_result_type  Boolean indicating we need to output the handle result type (since it hasn't
-    #                       been defined in the C++ code yet).
     #   return_on_null      Boolean indicating we need to return immediately if we encounter a NULL
     #   instance_info_name  Name of the parameter storing the instance information
     #   element_in_array    This is a single element in an array
     #   indent              the number of "tabs" to space in for the resulting C+ code.
     def writeValidateInlineHandleValidation(self, cmd_name, vuid_name, member_param, mem_par_desc_name,
-                                            output_result_type, return_on_null, instance_info_name,
+                                            return_on_null, instance_info_name,
                                             element_in_array, indent):
         inline_validate_handle = ''
         adjust_to_pointer = ''
@@ -1535,7 +1533,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                                                                   struct_command_name,
                                                                                   param_member,
                                                                                   prefixed_param_member_name,
-                                                                                  first_time_handle_check,
                                                                                   is_command,
                                                                                   instance_info_variable,
                                                                                   False,
@@ -1567,7 +1564,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                                                                   struct_command_name,
                                                                                   param_member,
                                                                                   prefixed_param_member_name,
-                                                                                  first_time_handle_check,
                                                                                   is_command,
                                                                                   instance_info_variable,
                                                                                   True,
