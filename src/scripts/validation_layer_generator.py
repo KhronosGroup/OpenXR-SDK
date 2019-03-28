@@ -2188,6 +2188,21 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             obj_type = self.genXrObjectType(handle_param.type)
             pre_validate_func += self.writeIndent(indent)
             pre_validate_func += 'objects_info.emplace_back(%s, %s);\n\n'% (first_handle_name, obj_type)
+
+            # Must verify this param first.
+            # Can skip validating it later.
+
+            pre_validate_func += self.outputParamMemberContents(True, cur_command.name, handle_param, '',
+                                                                'nullptr', # no instance_info yet!
+                                                                command_name_string,
+                                                                True,
+                                                                handle_param,
+                                                                handle_param.name,
+                                                                first_param_handle_tuple,
+                                                                wrote_handle_check_proto,
+                                                                indent)
+            wrote_handle_check_proto = True
+
             lower_handle_name = first_param_handle_tuple.name[2:].lower()
             if first_param_handle_tuple.name == 'XrInstance':
                 pre_validate_func += self.writeIndent(indent)
@@ -2233,6 +2248,9 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         # Check for non-optional null pointers
         for count, param in enumerate(cur_command.params):
             is_first = (count == 0)
+            if is_first and first_param_handle_tuple:
+                # This is the first param, which we already validated as being a handle above. Skip this here.
+                continue
             # TODO use_pointer_deref never gets used?
             use_pointer_deref = False
             if len(param.array_count_var) != 0 or len(param.pointer_count_var) != 0:
