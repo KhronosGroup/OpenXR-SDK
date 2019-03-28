@@ -46,6 +46,12 @@
 #define CONVERT_GENERIC_TO_HANDLE(type, handle) (handle)
 #define CHECK_FOR_NULL_HANDLE(handle) (XR_NULL_HANDLE == handle)
 #endif
+
+/// Prints a message to stderr then throws an exception.
+///
+/// The printing of the message is because the exception will probably be caught and silently turned into a validation error.
+[[noreturn]] void reportInternalError(std::string const &message);
+
 // Structure used for storing the instance information we need for validating
 // various aspects of the OpenXR API.
 
@@ -201,6 +207,9 @@ class HandleInfo : public HandleInfoBase<HandleType, GenValidUsageXrHandleInfo> 
     void removeHandlesForInstance(GenValidUsageXrInstanceInfo *search_value);
 };
 
+/// Like std::remove_if, except it works on associative containers and it actually removes this.
+///
+/// The iterator stuff in here is subtle - .erase() invalidates only that iterator, so we must advance first.
 template <typename T, typename Pred>
 inline void map_erase_if(T &container, Pred &&predicate) {
     for (auto it = container.begin(); it != container.end();) {
@@ -215,18 +224,6 @@ inline void map_erase_if(T &container, Pred &&predicate) {
 }
 
 // -- Only implementations of templates follow --//
-
-template <typename HandleType, typename InfoType>
-inline std::pair<UniqueLock, InfoType *> HandleInfoBase<HandleType, InfoType>::getWithLock(HandleType handle) {
-    // Try to find the handle in the appropriate map
-    UniqueLock lock(dispatch_mutex_);
-    auto it = info_map_.find(handle);
-    // If it is not a valid handle, it should return the end of the map.
-    if (info_map_.end() == it) {
-        return {std::move(lock), nullptr};
-    }
-    return {std::move(lock), it->second.get()};
-}
 
 template <typename HT, typename IT>
 inline std::pair<UniqueLock, typename HandleInfoBase<HT, IT>::map_t const &> HandleInfoBase<HT, IT>::lockMapConst() {
@@ -265,30 +262,55 @@ inline ValidateXrHandleResult HandleInfoBase<HandleType, InfoType>::verifyHandle
 
 template <typename HandleType, typename InfoType>
 inline InfoType *HandleInfoBase<HandleType, InfoType>::get(HandleType handle) {
+    if (handle == XR_NULL_HANDLE) {
+        reportInternalError("Null handle passed to HandleInfoBase::get()");
+    }
     // Try to find the handle in the appropriate map
     UniqueLock lock(dispatch_mutex_);
     auto entry_returned = info_map_.find(handle);
     if (entry_returned == info_map_.end()) {
-        throw std::logic_error("Internal layer error: Handle not inserted");
+        reportInternalError("Handle passed to HandleInfoBase::insert() not inserted");
     }
     return entry_returned->second.get();
 }
 
 template <typename HandleType, typename InfoType>
+inline std::pair<UniqueLock, InfoType *> HandleInfoBase<HandleType, InfoType>::getWithLock(HandleType handle) {
+    if (handle == XR_NULL_HANDLE) {
+        reportInternalError("Null handle passed to HandleInfoBase::getWithLock()");
+    }
+    // Try to find the handle in the appropriate map
+    UniqueLock lock(dispatch_mutex_);
+    auto it = info_map_.find(handle);
+    // If it is not a valid handle, it should return the end of the map.
+    if (info_map_.end() == it) {
+        return {std::move(lock), nullptr};
+    }
+    return {std::move(lock), it->second.get()};
+}
+
+template <typename HandleType, typename InfoType>
 inline void HandleInfoBase<HandleType, InfoType>::insert(HandleType handle, std::unique_ptr<InfoType> &&info) {
+    if (handle == XR_NULL_HANDLE) {
+        reportInternalError("Null handle passed to HandleInfoBase::insert()");
+    }
     UniqueLock lock(dispatch_mutex_);
     auto entry_returned = info_map_.find(handle);
     if (entry_returned != info_map_.end()) {
-        throw std::logic_error("Internal layer error: Handle already inserted");
+        reportInternalError("Handle passed to HandleInfoBase::insert() already inserted");
     }
     info_map_[handle] = std::move(info);
 }
+
 template <typename HandleType, typename InfoType>
 inline void HandleInfoBase<HandleType, InfoType>::erase(HandleType handle) {
+    if (handle == XR_NULL_HANDLE) {
+        reportInternalError("Null handle passed to HandleInfoBase::erase()");
+    }
     UniqueLock lock(dispatch_mutex_);
     auto entry_returned = info_map_.find(handle);
     if (entry_returned == info_map_.end()) {
-        throw std::logic_error("Internal layer error: Handle not inserted");
+        reportInternalError("Handle passed to HandleInfoBase::insert() not inserted");
     }
     info_map_.erase(handle);
 }
@@ -296,11 +318,14 @@ inline void HandleInfoBase<HandleType, InfoType>::erase(HandleType handle) {
 template <typename HandleType>
 inline std::pair<GenValidUsageXrHandleInfo *, GenValidUsageXrInstanceInfo *> HandleInfo<HandleType>::getWithInstanceInfo(
     HandleType handle) {
+    if (handle == XR_NULL_HANDLE) {
+        reportInternalError("Null handle passed to HandleInfoBase::getWithInstanceInfo()");
+    }
     // Try to find the handle in the appropriate map
     UniqueLock lock(this->dispatch_mutex_);
     auto entry_returned = this->info_map_.find(handle);
     if (entry_returned == this->info_map_.end()) {
-        throw std::logic_error("Handle not registered, internal layer error.");
+        reportInternalError("Handle passed to HandleInfoBase::getWithInstanceInfo() not inserted");
     }
     GenValidUsageXrHandleInfo *info = entry_returned->second.get();
     GenValidUsageXrInstanceInfo *instance_info = info->instance_info;

@@ -435,6 +435,11 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
     }
 }
 
+void reportInternalError(std::string const &message) {
+    std::cerr << "INTERNAL VALIDATION LAYER ERROR: " << message << std::endl;
+    throw std::runtime_error("Internal validation layer error: " + message);
+}
+
 // NOTE: Can't validate the following VUIDs since the command never enters a layer:
 // Command: xrEnumerateApiLayerProperties
 //      VUIDs:  "VUID-xrEnumerateApiLayerProperties-propertyCountOutput-parameter"
