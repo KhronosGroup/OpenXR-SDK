@@ -95,7 +95,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
     # Override the base class header warning so the comment indicates this file.
     #   self            the ValidationSourceOutputGenerator object
-    def OutputGeneratedHeaderWarning(self):
+    def outputGeneratedHeaderWarning(self):
         generated_warning = '// *********** THIS FILE IS GENERATED - DO NOT EDIT ***********\n'
         generated_warning += '//     See validation_layer_generator.py for modifications\n'
         generated_warning += '// ************************************************************\n'
