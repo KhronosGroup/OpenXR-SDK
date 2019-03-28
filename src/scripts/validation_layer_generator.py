@@ -2484,6 +2484,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             last_lower_type = last_handle_tuple.name[2:].lower()
             last_name = cur_command.params[-1].name
             if is_create:
+                assert(last_handle_tuple.name != 'XrInstance')
+
                 next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % last_name
                 next_validate_func += '            auto map_with_lock = g_%s_info.lockMap();\n' % last_lower_type
                 next_validate_func += '            auto & map = map_with_lock.second;\n'
@@ -2557,6 +2559,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 if 'xrDestroyInstance' in cur_command.name:
                     next_validate_func += '        GenValidUsageCleanUpMaps(gen_instance_info);\n'
             elif is_sempath_query:
+                assert(False)
                 # xrEnumeratePhysicalDevices is a special case.  It's kind of like a create in that we need to track
                 # these items, but it's also an array of items.
                 next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s && nullptr != %s) {\n' % (cur_command.params[-2].name,
