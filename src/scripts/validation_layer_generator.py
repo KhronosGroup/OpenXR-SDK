@@ -18,11 +18,12 @@
 #
 # Author: Mark Young <marky@lunarg.com>
 
-import os
 import re
 import sys
-from automatic_source_generator import *
-from collections import namedtuple
+
+from automatic_source_generator import (AutomaticSourceGeneratorOptions,
+                                        AutomaticSourceOutputGenerator,
+                                        regSortFeatures, write)
 
 # The following commands should not be generated for the layer
 VALID_USAGE_DONT_GEN = [
@@ -186,7 +187,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         for cur_state in self.api_states:
             type_name = '%s' % cur_state.type
             cur_list = []
-            if None != active_structures.get(type_name):
+            if active_structures.get(type_name) is not None:
                 cur_list = active_structures.get(type_name)
             cur_list.append(cur_state.variable)
             active_structures[type_name] = cur_list
@@ -240,7 +241,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             flag_value_validate += '    }\n'
             # If the flag has no values defined for this flag, then anything other than
             # zero generates an error.
-            if flag_tuple.valid_flags == None:
+            if flag_tuple.valid_flags is None:
                 flag_value_validate += '    return VALIDATE_XR_FLAGS_INVALID;\n'
             else:
                 # This flag has values set.  So, check (and remove) each valid value.  Once that's done
