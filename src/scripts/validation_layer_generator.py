@@ -2599,7 +2599,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 next_validate_func += '            std::unique_lock<std::mutex> info_lock(g_%s_dispatch_mutex);\n' % last_lower_type
                 next_validate_func += '            auto exists = g_%s_info_map.find(*%s);\n' % (
                     last_lower_type, last_name)
-                next_validate_func += '            if (exists != g_%s_info_map.end()) {\n' % last_lower_type
+                next_validate_func += '            if (exists == g_%s_info_map.end()) {\n' % last_lower_type
                 if last_handle_tuple.name == 'XrInstance':
                     next_validate_func += '                g_%s_info_map[*%s] = gen_instance_info;\n' % (
                         last_lower_type, last_name)
