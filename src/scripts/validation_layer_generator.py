@@ -2168,19 +2168,13 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         pre_validate_func += 'XrResult %s(' % cur_command.name.replace("xr",
                                                                        "GenValidUsageInputsXr")
         pre_validate_func += '\n'
-        count = 0
-        for param in cur_command.params:
-            if count > 0:
-                pre_validate_func += ',\n'
-            pre_validate_func += '    '
-            pre_validate_func += param.cdecl.strip()
-            count = count + 1
-
+        pre_validate_func += ',\n'.join((param.cdecl.strip() for param in cur_command.params))
         pre_validate_func += ') {\n'
         wrote_handle_check_proto = False
         is_first_param_handle = cur_command.params[0].is_handle
         first_param_handle_tuple = self.getHandle(cur_command.params[0].type)
 
+        command_name_string = '"%s"' % cur_command.name
         # If the first parameter is a handle and we either have to validate that handle, or check
         # for extension information, then we will need the instance information.
         indent = 1
@@ -2241,8 +2235,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         instance_info_variable = 'gen_instance_info' if first_param_handle_tuple else 'nullptr'
 
         # Check for non-optional null pointers
-        count = 0
-        for param in cur_command.params:
+        for count, param in enumerate(cur_command.params):
+            is_first = (count == 0)
             # TODO use_pointer_deref never gets used?
             use_pointer_deref = False
             if len(param.array_count_var) != 0 or len(param.pointer_count_var) != 0:
@@ -2251,16 +2245,15 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     use_pointer_deref = True
             elif param.pointer_count > 0:
                 use_pointer_deref = True
-            if count > 0 and param.is_handle and not param.pointer_count > 0:
+            if not is_first and param.is_handle and not param.pointer_count > 0:
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'objects_info.emplace_back(%s, %s);\n' % (param.name, self.genXrObjectType(
                     param.type))
             if not param.no_auto_validity:
-                command_name_string = '"%s"' % cur_command.name
                 pre_validate_func += self.outputParamMemberContents(True, cur_command.name, param, '',
                                                                     instance_info_variable,
                                                                     command_name_string,
-                                                                    count == 0,
+                                                                    is_first,
                                                                     cur_command.params[0],
                                                                     cur_command.params[0].name,
                                                                     first_param_handle_tuple,
