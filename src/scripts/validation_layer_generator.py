@@ -2787,8 +2787,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_source_funcs += '\n'
         validation_source_funcs += self.outputValidationInternalProtos()
         validation_source_funcs += '// Template function to reduce duplicating the map locking, searching, and deleting.`\n'
-        validation_source_funcs += 'void EraseAllInstanceTableMapElements(std::mutex &mutex, GenValidUsageXrInstanceInfo *search_value) {\n'
-        validation_source_funcs += '    std::unique_lock<std::mutex> mlock(mutex);\n'
+        validation_source_funcs += 'void EraseAllInstanceTableMapElements(GenValidUsageXrInstanceInfo *search_value) {\n'
         validation_source_funcs += '    for (auto it = g_instance_info_map.begin(); it != g_instance_info_map.end();) {\n'
         validation_source_funcs += '        if (it->second == search_value) {\n'
         validation_source_funcs += '            g_instance_info_map.erase(it++);\n'
@@ -2821,11 +2820,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle.protect_value:
                 validation_source_funcs += '#if %s\n' % handle.protect_string
             if handle.name == 'XrInstance':
-                validation_source_funcs += '    EraseAllInstanceTableMapElements('
+                validation_source_funcs += '    EraseAllInstanceTableMapElements(instance_info);\n'
             else:
                 validation_source_funcs += '    EraseAllTableMapElements<std::unordered_map<%s, GenValidUsageXrHandleInfo*>>(g_%s_info_map, ' % (
                     handle.name, base_handle_name)
-            validation_source_funcs += 'g_%s_dispatch_mutex, instance_info);\n' % base_handle_name
+                validation_source_funcs += 'g_%s_dispatch_mutex, instance_info);\n' % base_handle_name
             if handle.protect_value:
                 validation_source_funcs += '#endif // %s\n' % handle.protect_string
         validation_source_funcs += '}\n'
