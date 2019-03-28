@@ -2549,28 +2549,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 next_validate_func += '        }\n'
                 if 'xrDestroyInstance' in cur_command.name:
                     next_validate_func += '        GenValidUsageCleanUpMaps(gen_instance_info);\n'
-            elif is_sempath_query:
-                assert(False)
-                # xrEnumeratePhysicalDevices is a special case.  It's kind of like a create in that we need to track
-                # these items, but it's also an array of items.
-                next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s && nullptr != %s) {\n' % (cur_command.params[-2].name,
-                                                                                                                   last_name)
-                next_validate_func += '            auto map_with_lock = g_%s_info.lockMap(instance);\n' % last_lower_type
-                next_validate_func += '            auto & map = map_with_lock.second;\n'
-                next_validate_func += '            std::unique_lock<std::mutex> info_lock(g_%s_dispatch_mutex);\n' % last_lower_type
-                next_validate_func += '            for (uint32_t sempath = 0; sempath < *%s; ++sempath) {\n' % cur_command.params[-2].name
-                next_validate_func += '                auto exists = map.find(%s[sempath]);\n' % (
-                    cur_command.params[-1].name)
-                next_validate_func += '                if (exists != map.end()) {\n' % last_lower_type
-                next_validate_func += '                    GenValidUsageXrHandleInfo *handle_info = new GenValidUsageXrHandleInfo();\n'
-                next_validate_func += '                    handle_info->instance_info = gen_instance_info;\n'
-                next_validate_func += '                    handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
-                    cur_command.params[0].type)
-                next_validate_func += '                    handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[0].name
-                next_validate_func += '                    map[%s[sempath]] = handle_info;\n' % last_name
-                next_validate_func += '                }\n'
-                next_validate_func += '            }\n'
-                next_validate_func += '        }\n'
 
         # Catch any exceptions that may have occurred.  If any occurred between any of the
         # valid mutex lock/unlock statements, perform the unlock now.  Notice that a create can
