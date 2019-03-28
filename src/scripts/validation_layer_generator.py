@@ -1331,9 +1331,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         if (not element_in_array and member_param.pointer_count == 0) or (element_in_array and member_param.pointer_count == 1):
             adjust_to_pointer = '&'
         inline_validate_handle += self.writeIndent(indent)
-        if output_result_type:
-            inline_validate_handle += 'ValidateXrHandleResult '
-        inline_validate_handle += 'handle_result = Verify%sHandle(%s%s);\n' % (member_param.type, adjust_to_pointer,
+        inline_validate_handle += '{\n'
+        indent += 1
+        inline_validate_handle += self.writeIndent(indent) + "// writeValidateInlineHandleValidation\n"
+        inline_validate_handle += self.writeIndent(indent)
+        inline_validate_handle += 'ValidateXrHandleResult handle_result = Verify%sHandle(%s%s);\n' % (member_param.type, adjust_to_pointer,
                                                                                mem_par_desc_name)
         wrote_first_if = False
         if member_param.is_optional:
@@ -1366,14 +1368,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 inline_validate_handle += self.writeIndent(indent)
                 inline_validate_handle += '// Not a valid handle or NULL (which is not valid in this case)\n'
             inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += 'std::ostringstream oss_handle;\n'
+            inline_validate_handle += 'std::ostringstream oss;\n'
             inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += 'oss_handle << std::hex << reinterpret_cast<const void*>(%s);\n' % mem_par_desc_name
-            inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += 'std::string error_str = "Invalid %s handle \\"%s\\" 0x";\n' % (member_param.type,
+            inline_validate_handle += 'oss << "Invalid %s handle \\"%s\\" 0x";\n' % (member_param.type,
                                                                                                       member_param.name)
             inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += 'error_str += oss_handle.str();\n'
+            inline_validate_handle += 'oss << std::hex << reinterpret_cast<const void*>(%s);\n' % mem_par_desc_name
             inline_validate_handle += self.writeIndent(indent)
             inline_validate_handle += 'CoreValidLogMessage(%s, "VUID-%s-%s-parameter",\n' % (instance_info_name,
                                                                                              vuid_name,
@@ -1381,7 +1381,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             inline_validate_handle += self.writeIndent(indent)
             inline_validate_handle += '                    VALID_USAGE_DEBUG_SEVERITY_ERROR, %s,\n' % cmd_name
             inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += '                    objects_info, error_str);\n'
+            inline_validate_handle += '                    objects_info, oss.str());\n'
             inline_validate_handle += self.writeIndent(indent)
             inline_validate_handle += 'return XR_ERROR_HANDLE_INVALID;\n'
             indent = indent - 1
@@ -1389,6 +1389,10 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             inline_validate_handle += '}\n'
         else:
             inline_validate_handle += '\n'
+        indent -= 1
+
+        inline_validate_handle += self.writeIndent(indent)
+        inline_validate_handle += '}\n'
         return inline_validate_handle
 
     def outputParamMemberContents(self, is_command, struct_command_name, param_member, param_member_prefix, instance_info_variable,
