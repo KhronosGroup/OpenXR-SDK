@@ -2556,7 +2556,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '}\n'
 
-                next_validate_func += '            g_%s_info.erase(%s);\n' % (last_lower_type, last_name)
+                next_validate_func += '            %s.erase(%s);\n' % (self.makeInfoName(handle_type=last_handle_tuple), last_name)
                 next_validate_func += '        }\n'
                 if 'xrDestroyInstance' in cur_command.name:
                     next_validate_func += '        GenValidUsageCleanUpMaps(gen_instance_info);\n'
@@ -2648,7 +2648,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle.name == 'XrInstance':
                 validation_source_funcs += '    EraseAllInstanceTableMapElements(instance_info);\n'
             else:
-                validation_source_funcs += '    g_%s_info.removeHandlesForInstance(instance_info);\n' % base_handle_name
+                validation_source_funcs += '    %s.removeHandlesForInstance(instance_info);\n' % self.makeInfoName(handle_type=handle)
             if handle.protect_value:
                 validation_source_funcs += '#endif // %s\n' % handle.protect_string
         validation_source_funcs += '}\n'
