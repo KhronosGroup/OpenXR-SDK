@@ -2166,7 +2166,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         pre_validate_func += ',\n'.join((param.cdecl.strip() for param in cur_command.params))
         pre_validate_func += ') {\n'
         wrote_handle_check_proto = False
-        first_param_handle_tuple = self.getHandle(cur_command.params[0].type)
 
         command_name_string = '"%s"' % cur_command.name
         # If the first parameter is a handle and we either have to validate that handle, or check
@@ -2180,37 +2179,37 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         pre_validate_func += 'XrResult xr_result = XR_SUCCESS;\n'
         pre_validate_func += self.writeIndent(indent)
         pre_validate_func += 'std::vector<GenValidUsageXrObjectInfo> objects_info;\n'
-        if first_param_handle_tuple != None:
-            handle_param = cur_command.params[0]
-            first_handle_name = self.getFirstHandleName(handle_param)
-            obj_type = self.genXrObjectType(handle_param.type)
+        first_param = cur_command.params[0]
+        first_param_tuple = self.getHandle(first_param.type)
+        if first_param_tuple != None:
+            first_handle_name = self.getFirstHandleName(first_param)
+            obj_type = self.genXrObjectType(first_param.type)
             pre_validate_func += self.writeIndent(indent)
             pre_validate_func += 'objects_info.emplace_back(%s, %s);\n\n'% (first_handle_name, obj_type)
 
             # Must verify this param first.
             # Can skip validating it later.
 
-            pre_validate_func += self.outputParamMemberContents(True, cur_command.name, handle_param, '',
+            pre_validate_func += self.outputParamMemberContents(True, cur_command.name, first_param, '',
                                                                 'nullptr', # no instance_info yet!
                                                                 command_name_string,
                                                                 True,
-                                                                handle_param,
-                                                                handle_param.name,
-                                                                first_param_handle_tuple,
+                                                                first_param,
+                                                                first_param.name,
+                                                                first_param_tuple,
                                                                 wrote_handle_check_proto,
                                                                 indent)
             wrote_handle_check_proto = True
 
-            lower_handle_name = first_param_handle_tuple.name[2:].lower()
-            if first_param_handle_tuple.name == 'XrInstance':
+            if first_param_tuple.name == 'XrInstance':
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info.get(%s);\n' % first_handle_name
             else:
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'auto info_with_instance = %s.getWithInstanceInfo(%s);\n' % (
-                    self.makeInfoName(handle_type_name=handle_param.type), first_handle_name)
+                    self.makeInfoName(handle_type_name=first_param.type), first_handle_name)
                 pre_validate_func += self.writeIndent(indent)
-                pre_validate_func += 'GenValidUsageXrHandleInfo *gen_%s_info = info_with_instance.first;\n' % lower_handle_name
+                pre_validate_func += 'GenValidUsageXrHandleInfo *gen_%s_info = info_with_instance.first;\n' % undecorate(first_param_tuple.name)
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'GenValidUsageXrInstanceInfo *gen_instance_info = info_with_instance.second;\n'
 
@@ -2241,12 +2240,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += '}\n'
 
-        instance_info_variable = 'gen_instance_info' if first_param_handle_tuple else 'nullptr'
+        instance_info_variable = 'gen_instance_info' if first_param_tuple else 'nullptr'
 
         # Check for non-optional null pointers
         for count, param in enumerate(cur_command.params):
             is_first = (count == 0)
-            if is_first and first_param_handle_tuple:
+            if is_first and first_param_tuple:
                 # This is the first param, which we already validated as being a handle above. Skip this here.
                 continue
             if not is_first and param.is_handle and not param.pointer_count > 0:
@@ -2258,9 +2257,9 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                                                     instance_info_variable,
                                                                     command_name_string,
                                                                     is_first,
-                                                                    cur_command.params[0],
-                                                                    cur_command.params[0].name,
-                                                                    first_param_handle_tuple,
+                                                                    first_param,
+                                                                    first_param.name,
+                                                                    first_param_tuple,
                                                                     wrote_handle_check_proto,
                                                                     indent)
                 wrote_handle_check_proto = True
@@ -2443,17 +2442,18 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
         next_validate_func += '    try {\n'
 
+        first_param = cur_command.params[0]
         # Next, we have to call down to the next implementation of this command in the call chain.
         # Before we can do that, we have to figure out what the dispatch table is
-        base_handle_name = cur_command.params[0].type[2:].lower()
-        if cur_command.params[0].is_handle:
-            handle_tuple = self.getHandle(cur_command.params[0].type)
-            first_handle_name = self.getFirstHandleName(cur_command.params[0])
-            if handle_tuple.name == 'XrInstance':
+        base_handle_name = first_param.type[2:].lower()
+        if first_param.is_handle:
+            first_handle_tuple = self.getHandle(first_param.type)
+            first_handle_name = self.getFirstHandleName(first_param)
+            if first_handle_tuple.name == 'XrInstance':
                 next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info.get(%s);\n' % first_handle_name
             else:
                 next_validate_func += '        auto info_with_instance = %s.getWithInstanceInfo(%s);\n' % (
-                    self.makeInfoName(handle_type_name=handle_tuple.name), first_handle_name)
+                    self.makeInfoName(handle_type_name=first_handle_tuple.name), first_handle_name)
                 next_validate_func += '        GenValidUsageXrHandleInfo *gen_%s_info = info_with_instance.first;\n' % base_handle_name
                 next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_instance.second;\n'
         else:
@@ -2476,23 +2476,21 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         # unordered_map pointing to the correct dispatch table for the newly created
         # object.  Likewise, if it's a delete command, we have to remove the entry
         # for the dispatch table from the unordered_map
-        last_name = ''
-        last_lower_type = ''
-        if cur_command.params[-1].is_handle:
-            last_handle_tuple = self.getHandle(cur_command.params[-1].type)
-            last_lower_type = last_handle_tuple.name[2:].lower()
-            last_name = cur_command.params[-1].name
+        last_param = cur_command.params[-1]
+        if last_param.is_handle:
+            first_param = cur_command.params[0]
+            last_handle_tuple = self.getHandle(last_param.type)
+            last_handle_name = last_param.name
             if is_create:
                 assert(last_handle_tuple.name != 'XrInstance')
 
-                next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % last_name
+                next_validate_func += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % last_handle_name
                 next_validate_func += '            std::unique_ptr<GenValidUsageXrHandleInfo> handle_info(new GenValidUsageXrHandleInfo());\n'
                 next_validate_func += '            handle_info->instance_info = gen_instance_info;\n'
                 next_validate_func += '            handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
-                    cur_command.params[0].type)
-                next_validate_func += '            handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % cur_command.params[
-                    0].name
-                next_validate_func += '            %s.insert(*%s, std::move(handle_info));\n' % (self.makeInfoName(last_handle_tuple), last_name)
+                    first_param.type)
+                next_validate_func += '            handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % first_param.name
+                next_validate_func += '            %s.insert(*%s, std::move(handle_info));\n' % (self.makeInfoName(last_handle_tuple), last_handle_name)
 
                 # If this object contains a state that needs tracking, allocate it
                 valid_type_list = []
@@ -2510,11 +2508,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         next_validate_func += '(*%s_valid_state) = {};\n' % cur_state.type[2:].lower()
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += 'g_%s_valid_states[(*%s)] = %s_valid_state;\n' % (
-                            cur_state.type[2:].lower(), last_name, cur_state.type[2:].lower())
+                            cur_state.type[2:].lower(), last_handle_name, cur_state.type[2:].lower())
 
                 next_validate_func += '        }\n'
             elif is_destroy:
-                if cur_command.params[-1].type == 'XrSession':
+                if last_param.type == 'XrSession':
                     next_validate_func += '\n        // Clean up any labels associated with this session\n'
                     next_validate_func += '        CoreValidationDeleteSessionLabels(session);\n\n'
                 # Only remove the handle from our map if the runtime returned success
@@ -2531,7 +2529,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         next_validate_func += '// validation state structure that needs to be cleaned up.\n'
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '%sValidationStates *%s_valid_state = g_%s_valid_states[%s];\n' % (
-                            cur_state.type, cur_state.type[2:].lower(), cur_state.type[2:].lower(), last_name)
+                            cur_state.type, cur_state.type[2:].lower(), cur_state.type[2:].lower(), last_handle_name)
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += 'if (nullptr != %s_valid_state) {\n' % cur_state.type[2:].lower(
                         )
@@ -2540,11 +2538,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         )
                         next_validate_func += self.writeIndent(4)
                         next_validate_func += 'g_%s_valid_states.erase(%s);\n' % (
-                            cur_state.type[2:].lower(), last_name)
+                            cur_state.type[2:].lower(), last_handle_name)
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '}\n'
 
-                next_validate_func += '            %s.erase(%s);\n' % (self.makeInfoName(handle_type=last_handle_tuple), last_name)
+                next_validate_func += '            %s.erase(%s);\n' % (self.makeInfoName(handle_type=last_handle_tuple), last_handle_name)
                 next_validate_func += '        }\n'
                 if 'xrDestroyInstance' in cur_command.name:
                     next_validate_func += '        GenValidUsageCleanUpMaps(gen_instance_info);\n'
@@ -2713,11 +2711,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 is_destroy = False
                 has_return = False
                 is_sempath_query = False
-
-                if ('xrCreate' in cur_cmd.name or 'xrConnect' in cur_cmd.name) and cur_cmd.params[-1].is_handle:
+                last_param = cur_cmd.params[-1]
+                if ('xrCreate' in cur_cmd.name or 'xrConnect' in cur_cmd.name) and last_param.is_handle:
                     is_create = True
                     has_return = True
-                elif ('xrDestroy' in cur_cmd.name or 'xrDisconnect' in cur_cmd.name) and cur_cmd.params[-1].is_handle:
+                elif ('xrDestroy' in cur_cmd.name or 'xrDisconnect' in cur_cmd.name) and last_param.is_handle:
                     is_destroy = True
                     has_return = True
                 elif (cur_cmd.return_type != None):
