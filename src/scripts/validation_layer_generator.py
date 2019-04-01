@@ -163,7 +163,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             lines.append('%s%s %s;' % (extern_keyword,
                                        info_type, self.makeInfoName(handle)))
             if handle.protect_value:
-                lines.append('#endif // %s" % handle.protect_string')
+                lines.append('#endif // %s' % handle.protect_string)
         return '\n'.join(lines)
 
     # Write out common internal types for validation
