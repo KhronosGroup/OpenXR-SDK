@@ -29,6 +29,12 @@ from generator import *
 from collections import namedtuple
 from inspect import currentframe, getframeinfo
 
+def undecorate(name):
+    """Undecorate a name by removing the leading Xr and making it lowercase."""
+    lower = name.lower()
+    assert(lower.startswith('xr'))
+    return lower[2:]
+
 # AutomaticSourceGeneratorOptions - subclass of GeneratorOptions.
 
 

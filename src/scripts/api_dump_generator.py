@@ -145,7 +145,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
     def outputApiDumpExterns(self):
         externs = '\n// Externs for API dump\n'
         for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
+            base_handle_name = undecorate(handle.name)
             if handle.protect_value is not None:
                 externs += '#if %s\n' % handle.protect_string
             externs += 'extern std::unordered_map<%s, XrGeneratedDispatchTable*> g_%s_dispatch_map;\n' % (
@@ -200,7 +200,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
     def outputApiDumpMapMutexItems(self):
         maps_mutexes = ''
         for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
+            base_handle_name = undecorate(handle.name)
             if handle.protect_value:
                 maps_mutexes += '#if %s\n' % handle.protect_string
             maps_mutexes += 'std::unordered_map<%s, XrGeneratedDispatchTable*> g_%s_dispatch_map;\n' % (
@@ -227,7 +227,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         maps_mutexes += 'void ApiDumpCleanUpMapsForTable(XrGeneratedDispatchTable *table) {\n'
         # Call each handle's erase utility function using the template we defined above.
         for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
+            base_handle_name = undecorate(handle.name)
             if handle.protect_value:
                 maps_mutexes += '#if %s\n' % handle.protect_string
             maps_mutexes += '    eraseAllTableMapElements<std::unordered_map<%s, XrGeneratedDispatchTable*>>' % handle.name
@@ -1145,7 +1145,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 # Before we can do that, we have to figure out what the dispatch table is
                 if cur_cmd.params[0].is_handle:
                     handle_param = cur_cmd.params[0]
-                    base_handle_name = handle_param.type[2:].lower()
+                    base_handle_name = undecorate(handle_param.type)
                     first_handle_name = self.getFirstHandleName(handle_param)
                     generated_commands += '        std::unique_lock<std::mutex> mlock(g_%s_dispatch_mutex);\n' % base_handle_name
                     generated_commands += '        XrGeneratedDispatchTable *gen_dispatch_table = g_%s_dispatch_map[%s];\n' % (base_handle_name, first_handle_name)
@@ -1193,7 +1193,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 # for the dispatch table from the unordered_map
                 second_base_handle_name = ''
                 if cur_cmd.params[-1].is_handle and (is_create or is_destroy):
-                    second_base_handle_name = cur_cmd.params[-1].type[2:].lower()
+                    second_base_handle_name = undecorate(cur_cmd.params[-1].type)
                     if is_create:
                         generated_commands += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % cur_cmd.params[-1].name
                         generated_commands += '            auto exists = g_%s_dispatch_map.find(*%s);\n' % (

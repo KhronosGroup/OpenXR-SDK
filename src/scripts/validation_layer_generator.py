@@ -23,7 +23,7 @@ import sys
 
 from automatic_source_generator import (AutomaticSourceGeneratorOptions,
                                         AutomaticSourceOutputGenerator,
-                                        regSortFeatures, write)
+                                        regSortFeatures, undecorate, write)
 
 # The following commands should not be generated for the layer
 VALID_USAGE_DONT_GEN = [
@@ -46,9 +46,8 @@ VALID_USAGE_MANUALLY_DEFINED = [
     'xrSessionInsertDebugUtilsLabelEXT',
 ]
 
+
 # ValidationSourceGeneratorOptions - subclass of AutomaticSourceGeneratorOptions.
-
-
 class ValidationSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
     def __init__(self,
                  filename=None,
@@ -145,7 +144,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
     def makeInfoName(self, handle_type=None, handle_type_name=None):
         if not handle_type_name:
             handle_type_name = handle_type.name
-        base_handle_name = handle_type_name[2:].lower()
+        base_handle_name = undecorate(handle_type_name)
         return 'g_%s_info' % base_handle_name
 
     def outputInfoMapDeclarations(self, extern):
@@ -197,7 +196,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 validation_state_checks += '    bool %s;\n' % variable
             validation_state_checks += '};\n'
             validation_state_checks += 'std::unordered_map<%s, %sValidationStates*> g_%s_valid_states;\n' % (
-                type_name, type_name, type_name[2:].lower())
+                type_name, type_name, undecorate(type_name))
         validation_state_checks += '\n'
         return validation_state_checks
 
@@ -1592,7 +1591,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         param_member.type, child)
                     param_member_contents += self.writeIndent(indent)
 
-                    base_child_struct_name = child[2:].lower()
+                    base_child_struct_name = undecorate(child)
 
                     if is_pointer or is_array:
                         new_type_info = param_member.cdecl.replace(
@@ -2228,7 +2227,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         valid_type_list.append(cur_state.type)
                         pre_validate_func += self.writeIndent(2)
                         pre_validate_func += 'auto %s_valid = g_%s_valid_states[%s];\n' % (
-                            cur_state.type[2:].lower(), cur_state.type[2:].lower(), command_param_of_type)
+                            undecorate(cur_state.type), undecorate(cur_state.type), command_param_of_type)
 
             for additional_ext in cur_command.required_exts:
                 pre_validate_func += self.writeIndent(indent)
@@ -2279,7 +2278,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     pre_validate_func += '// appropriate commands\n'
                     pre_validate_func += self.writeIndent(2)
                     pre_validate_func += 'if (!%s_valid->%s) {\n' % (
-                        cur_state.type[2:].lower(), cur_state.variable)
+                        undecorate(cur_state.type), cur_state.variable)
                     pre_validate_func += self.writeIndent(3)
                     pre_validate_func += 'std::string error_msg = "%s is required to be called between successful calls to ";\n' % cur_command.name
                     pre_validate_func += self.writeIndent(3)
@@ -2324,7 +2323,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     pre_validate_func += '// "completion" commands\n'
                     pre_validate_func += self.writeIndent(2)
                     pre_validate_func += 'if (%s_valid->%s) {\n' % (
-                        cur_state.type[2:].lower(), cur_state.variable)
+                        undecorate(cur_state.type), cur_state.variable)
                     pre_validate_func += self.writeIndent(3)
                     pre_validate_func += 'std::string error_msg = "%s is called again without first successfully calling ";\n' % cur_command.name
                     pre_validate_func += self.writeIndent(3)
@@ -2352,7 +2351,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     pre_validate_func += '// Begin the %s state\n' % cur_state.state
                     pre_validate_func += self.writeIndent(2)
                     pre_validate_func += '%s_valid->%s = true;\n' % (
-                        cur_state.type[2:].lower(), cur_state.variable)
+                        undecorate(cur_state.type), cur_state.variable)
 
         # If this command needs to indicate an end of a validation state, do so.
         if cur_command.ends_state:
@@ -2368,7 +2367,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     pre_validate_func += '// "begin" commands\n'
                     pre_validate_func += self.writeIndent(2)
                     pre_validate_func += 'if (!%s_valid->%s) {\n' % (
-                        cur_state.type[2:].lower(), cur_state.variable)
+                        undecorate(cur_state.type), cur_state.variable)
                     pre_validate_func += self.writeIndent(3)
                     pre_validate_func += 'std::string error_msg = "%s is called again without first successfully calling ";\n' % cur_command.name
                     pre_validate_func += self.writeIndent(3)
@@ -2396,7 +2395,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     pre_validate_func += '// End the %s state\n' % cur_state.state
                     pre_validate_func += self.writeIndent(2)
                     pre_validate_func += '%s_valid->%s = false;\n' % (
-                        cur_state.type[2:].lower(), cur_state.variable)
+                        undecorate(cur_state.type), cur_state.variable)
 
         pre_validate_func += self.writeIndent(indent)
         pre_validate_func += 'return XR_SUCCESS;\n'
@@ -2445,7 +2444,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         first_param = cur_command.params[0]
         # Next, we have to call down to the next implementation of this command in the call chain.
         # Before we can do that, we have to figure out what the dispatch table is
-        base_handle_name = first_param.type[2:].lower()
+        base_handle_name = undecorate(first_param.type)
         if first_param.is_handle:
             first_handle_tuple = self.getHandle(first_param.type)
             first_handle_name = self.getFirstHandleName(first_param)
@@ -2503,12 +2502,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         next_validate_func += '// state structure that needs to be created as well.\n'
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '%sValidationStates *%s_valid_state = new %sValidationStates;\n' % (
-                            cur_state.type, cur_state.type[2:].lower(), cur_state.type)
+                            cur_state.type, undecorate(cur_state.type), cur_state.type)
                         next_validate_func += self.writeIndent(3)
-                        next_validate_func += '(*%s_valid_state) = {};\n' % cur_state.type[2:].lower()
+                        next_validate_func += '(*%s_valid_state) = {};\n' % undecorate(cur_state.type)
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += 'g_%s_valid_states[(*%s)] = %s_valid_state;\n' % (
-                            cur_state.type[2:].lower(), last_handle_name, cur_state.type[2:].lower())
+                            undecorate(cur_state.type), last_handle_name, undecorate(cur_state.type))
 
                 next_validate_func += '        }\n'
             elif is_destroy:
@@ -2529,7 +2528,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         next_validate_func += '// validation state structure that needs to be cleaned up.\n'
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '%sValidationStates *%s_valid_state = g_%s_valid_states[%s];\n' % (
-                            cur_state.type, cur_state.type[2:].lower(), cur_state.type[2:].lower(), last_handle_name)
+                            cur_state.type, undecorate(cur_state.type), undecorate(cur_state.type), last_handle_name)
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += 'if (nullptr != %s_valid_state) {\n' % cur_state.type[2:].lower(
                         )
@@ -2538,7 +2537,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                         )
                         next_validate_func += self.writeIndent(4)
                         next_validate_func += 'g_%s_valid_states.erase(%s);\n' % (
-                            cur_state.type[2:].lower(), last_handle_name)
+                            undecorate(cur_state.type), last_handle_name)
                         next_validate_func += self.writeIndent(3)
                         next_validate_func += '}\n'
 

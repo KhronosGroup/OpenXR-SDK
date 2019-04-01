@@ -302,7 +302,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         for handle in self.api_handles:
             if handle.protect_value:
                 map_externs += '#if %s\n' % handle.protect_string
-            base_handle_name = handle.name[2:].lower()
+            base_handle_name = undecorate(handle.name)
             map_externs += 'extern std::unordered_map<%s, class LoaderInstance*> g_%s_map;\n' % (
                 handle.name, base_handle_name)
             map_externs += 'extern std::mutex g_%s_mutex;\n' % base_handle_name
@@ -370,7 +370,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
     def outputLoaderMapDefines(self):
         map_defines = '// Unordered maps to lookup the instance for a given object type\n'
         for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
+            base_handle_name = undecorate(handle.name)
             if handle.protect_value:
                 map_defines += '#if %s\n' % handle.protect_string
             map_defines += 'std::unordered_map<%s, class LoaderInstance*> g_%s_map;\n' % (
@@ -404,7 +404,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         for handle in self.api_handles:
             if handle.protect_value:
                 map_defines += '#if %s\n' % handle.protect_string
-            base_handle_name = handle.name[2:].lower()
+            base_handle_name = undecorate(handle.name)
             map_defines += '    EraseAllInstanceMapElements<std::unordered_map<%s, class LoaderInstance*>>' % handle.name
             map_defines += '(g_%s_map, g_%s_mutex, instance);\n' % (
                 base_handle_name, base_handle_name)
@@ -497,7 +497,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     cmd_tramp_is_handle = param.is_handle
                     if count == 0:
                         if param.is_handle:
-                            base_handle_name = param.type[2:].lower()
+                            base_handle_name = undecorate(param.type)
                             first_handle_name = self.getFirstHandleName(param)
                             if pointer_count == 1 and param.pointer_count_var is not None:
                                 if not param.is_optional:
@@ -597,7 +597,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
                     if count == len(cur_cmd.params) - 1:
                         if param.is_handle:
-                            base_handle_name = param.type[2:].lower()
+                            base_handle_name = undecorate(param.type)
                             if cur_cmd.is_create_connect:
                                 func_follow_up += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % param.name
                                 func_follow_up += '            std::unique_lock<std::mutex> %s_lock(g_%s_mutex);\n' % (base_handle_name, base_handle_name)
