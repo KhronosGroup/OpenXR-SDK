@@ -2716,7 +2716,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 elif ('xrDestroy' in cur_cmd.name or 'xrDisconnect' in cur_cmd.name) and last_param.is_handle:
                     is_destroy = True
                     has_return = True
-                elif (cur_cmd.return_type != None):
+                elif (cur_cmd.return_type is not None):
                     has_return = True
 
                 validation_source_funcs += self.genValidateInputsFunc(cur_cmd)
