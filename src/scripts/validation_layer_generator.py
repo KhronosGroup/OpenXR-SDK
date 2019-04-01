@@ -2642,8 +2642,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_source_funcs += '    std::string object_string;\n'
         count = 0
         for object_type in self.api_object_types:
-            object_string = object_type.name.replace("XR_OBJECT_TYPE_", "")
-            object_string = object_string.replace("_", "")
+            object_string = object_type.name.replace("XR_OBJECT_TYPE_", "").replace("_", "")
             if object_string == "UNKNOWN":
                 if count == 0:
                     validation_source_funcs += '    if '
