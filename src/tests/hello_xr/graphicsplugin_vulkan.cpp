@@ -850,7 +850,7 @@ struct SwapchainImageContext {
             bases[i] = reinterpret_cast<XrSwapchainImageBaseHeader*>(&swapchainImages[i]);
         }
 
-        return std::move(bases);
+        return bases;
     }
 
     uint32_t ImageIndex(const XrSwapchainImageBaseHeader* swapchainImageHeader) {
