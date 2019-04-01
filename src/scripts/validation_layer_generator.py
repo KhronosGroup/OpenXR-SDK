@@ -828,7 +828,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle.protect_value:
                 verify_handle += '#if %s\n' % handle.protect_string
             indent = 1
-            lower_handle_name = handle.name[2:].lower()
             verify_handle += 'ValidateXrHandleResult Verify%sHandle(const %s* handle_to_check) {\n' % (
                 handle.name, handle.name)
             verify_handle += self.writeIndent(indent)
@@ -2167,7 +2166,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         pre_validate_func += ',\n'.join((param.cdecl.strip() for param in cur_command.params))
         pre_validate_func += ') {\n'
         wrote_handle_check_proto = False
-        is_first_param_handle = cur_command.params[0].is_handle
         first_param_handle_tuple = self.getHandle(cur_command.params[0].type)
 
         command_name_string = '"%s"' % cur_command.name
@@ -2251,14 +2249,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if is_first and first_param_handle_tuple:
                 # This is the first param, which we already validated as being a handle above. Skip this here.
                 continue
-            # TODO use_pointer_deref never gets used?
-            use_pointer_deref = False
-            if len(param.array_count_var) != 0 or len(param.pointer_count_var) != 0:
-                if ((len(param.array_count_var) != 0 and param.pointer_count > 0) or
-                        (len(param.pointer_count_var) != 0 and param.pointer_count > 1)):
-                    use_pointer_deref = True
-            elif param.pointer_count > 0:
-                use_pointer_deref = True
             if not is_first and param.is_handle and not param.pointer_count > 0:
                 pre_validate_func += self.writeIndent(indent)
                 pre_validate_func += 'objects_info.emplace_back(%s, %s);\n' % (param.name, self.genXrObjectType(
@@ -2275,8 +2265,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                                                     indent)
                 wrote_handle_check_proto = True
             count = count + 1
-
-        base_handle_name = cur_command.params[0].type[2:].lower()
 
         # If this command needs to be checked to ensure that it is executing between
         # a "begin" and an "end" command, do so.
@@ -2642,7 +2630,6 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_source_funcs += '// instance being deleted.\n'
         validation_source_funcs += 'void GenValidUsageCleanUpMaps(GenValidUsageXrInstanceInfo *instance_info) {\n'
         for handle in self.api_handles:
-            base_handle_name = handle.name[2:].lower()
             if handle.protect_value:
                 validation_source_funcs += '#if %s\n' % handle.protect_string
             if handle.name == 'XrInstance':
