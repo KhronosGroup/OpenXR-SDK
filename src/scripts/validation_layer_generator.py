@@ -2464,10 +2464,10 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle_tuple.name == 'XrInstance':
                 next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = g_instance_info.get(%s);\n' % first_handle_name
             else:
-                next_validate_func += '        GenValidUsageXrHandleInfo *gen_%s_info = ' % base_handle_name
-                next_validate_func += 'g_%s_info.get(%s);\n' % (
-                    base_handle_name, first_handle_name)
-                next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = gen_%s_info->instance_info;\n' % base_handle_name
+                next_validate_func += '        auto info_with_instance = %s.getWithInstanceInfo(%s);\n' % (
+                    self.makeInfoName(handle_type_name=handle_tuple.name), first_handle_name)
+                next_validate_func += '        GenValidUsageXrHandleInfo *gen_%s_info = info_with_instance.first;\n' % base_handle_name
+                next_validate_func += '        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_instance.second;\n'
         else:
             next_validate_func += '#error("Bug")\n'
         # Call down, looking for the returned result if required.
