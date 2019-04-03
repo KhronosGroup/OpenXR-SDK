@@ -637,40 +637,39 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
             LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - unknown manifest file requested");
             throw std::runtime_error("invalid manifest type");
         }
-        bool override_active = false;
-        std::vector<std::string> filenames;
-        ReadDataFilesInSearchPaths(type, OPENXR_RUNTIME_JSON_ENV_VAR, "", override_active, filenames);
-        if (!override_active) {
+        std::string filename;
+        const char *override_path = PlatformUtilsGetSecureEnv(OPENXR_RUNTIME_JSON_ENV_VAR);
+        if (override_path != nullptr && *override_path != '\0') {
+            filename = override_path;
+            std::string info_message = "RuntimeManifestFile::FindManifestFiles - using environment variable override runtime file ";
+            info_message += filename;
+            LoaderLogger::LogInfoMessage("", info_message);
+        } else {
 #ifdef XR_OS_WINDOWS
+            std::vector<std::string> filenames;
             ReadRuntimeDataFilesInRegistry(type, "", "ActiveRuntime", filenames);
             if (filenames.size() == 0) {
                 LoaderLogger::LogErrorMessage(
-                    "", "RuntimeManifestFile::findManifestFiles - failed to find active runtime file in registry");
+                    "", "RuntimeManifestFile::FindManifestFiles - failed to find active runtime file in registry");
                 return XR_ERROR_FILE_ACCESS_ERROR;
             }
             if (filenames.size() > 1) {
                 LoaderLogger::LogWarningMessage(
-                    "", "RuntimeManifestFile::findManifestFiles - found too many default runtime files in registry");
+                    "", "RuntimeManifestFile::FindManifestFiles - found too many default runtime files in registry");
             }
+            filename = filenames[0];
 #else
-            std::string global_rt_filename;
-            PlatformGetGlobalRuntimeFileName(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION), global_rt_filename);
-            filenames.push_back(global_rt_filename);
+            if (!PlatformGetGlobalRuntimeFileName(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION), filename)) {
+                LoaderLogger::LogErrorMessage(
+                    "", "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
+                return XR_ERROR_FILE_ACCESS_ERROR;
+            }
 #endif
             std::string info_message = "RuntimeManifestFile::FindManifestFiles - using global runtime file ";
-            info_message += filenames[0];
+            info_message += filename;
             LoaderLogger::LogInfoMessage("", info_message);
-        } else if (filenames.size() > 0) {
-            std::string info_message = "RuntimeManifestFile::FindManifestFiles - using environment variable override runtime file ";
-            info_message += filenames[0];
-            LoaderLogger::LogInfoMessage("", info_message);
-        } else {
-            LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - failed to find any runtime manifest files");
-            result = XR_ERROR_FILE_ACCESS_ERROR;
         }
-        for (std::string &cur_file : filenames) {
-            RuntimeManifestFile::CreateIfValid(cur_file, manifest_files);
-        }
+        RuntimeManifestFile::CreateIfValid(filename, manifest_files);
     } catch (std::bad_alloc &) {
         LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - failed to allocate memory");
         return XR_ERROR_OUT_OF_MEMORY;
