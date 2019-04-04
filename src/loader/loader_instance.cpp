@@ -47,77 +47,73 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
     XrResult last_error = XR_SUCCESS;
     try {
         LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering LoaderInstance::CreateInstance");
-        std::stack<PFN_xrGetInstanceProcAddr> get_instance_proc_addr_stack;
-        std::stack<PFN_xrCreateInstance> create_instance_stack;
-        std::stack<PFN_xrCreateApiLayerInstance> create_api_layer_instance_stack;
         LoaderInstance* loader_instance;
 
-        get_instance_proc_addr_stack.push(LoaderXrTermGetInstanceProcAddr);
-        create_instance_stack.push(LoaderXrTermCreateInstance);
+        // Topmost means "closest to the application"
+        PFN_xrCreateInstance topmost_ci_fp = LoaderXrTermCreateInstance;
+        PFN_xrCreateApiLayerInstance topmost_cali_fp = LoaderXrTermCreateApiLayerInstance;
 
-        // Now create the loader instance instance
+        // Create the loader instance
         loader_instance = new LoaderInstance(api_layer_interfaces);
         *instance = reinterpret_cast<XrInstance>(loader_instance);
 
-        std::vector<std::unique_ptr<ApiLayerInterface>>& instance_layer_interfaces = loader_instance->LayerInterfaces();
-
         // Only start the xrCreateApiLayerInstance stack if we have layers.
-        if (instance_layer_interfaces.size() > 0) {
-            XrApiLayerCreateInfo api_layer_create_info = {};
-            XrApiLayerNextInfo* next_api_layer_info = new XrApiLayerNextInfo[instance_layer_interfaces.size()];
-            uint32_t next_info_index = static_cast<uint32_t>(instance_layer_interfaces.size() - 1);
-
-            create_api_layer_instance_stack.push(LoaderXrTermCreateApiLayerInstance);
+        std::vector<std::unique_ptr<ApiLayerInterface>>& layer_interfaces = loader_instance->LayerInterfaces();
+        if (layer_interfaces.size() > 0) {
+            // Initialize an array of ApiLayerNextInfo structs
+            XrApiLayerNextInfo* next_info_list = new XrApiLayerNextInfo[layer_interfaces.size()];
+            uint32_t ni_index = static_cast<uint32_t>(layer_interfaces.size() - 1);
+            for (uint32_t i = 0; i <= ni_index; i++) {
+                next_info_list[i].structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_NEXT_INFO;
+                next_info_list[i].structVersion = XR_API_LAYER_NEXT_INFO_STRUCT_VERSION;
+                next_info_list[i].structSize = sizeof(XrApiLayerNextInfo);
+            }
 
             // Go through all layers, and override the instance pointers with the layer version.  However,
             // go backwards through the layer list so we replace in reverse order so the layers can call their next function
             // appropriately.
-            XrApiLayerNextInfo* last_layer_next_api_layer_info = nullptr;
-            PFN_xrGetInstanceProcAddr last_layer_get_instance_proc_addr = LoaderXrTermGetInstanceProcAddr;
-            PFN_xrCreateApiLayerInstance last_layer_create_api_layer_instance = LoaderXrTermCreateApiLayerInstance;
-            for (auto layer_interface = instance_layer_interfaces.rbegin(); layer_interface != instance_layer_interfaces.rend();
-                 ++layer_interface) {
-                PFN_xrGetInstanceProcAddr layer_get_instance_proc_addr = (*layer_interface)->GetInstanceProcAddrFuncPointer();
-                PFN_xrCreateInstance layer_create_instance;
-                layer_get_instance_proc_addr(XR_NULL_HANDLE, "xrCreateInstance",
-                                             reinterpret_cast<PFN_xrVoidFunction*>(&layer_create_instance));
-                get_instance_proc_addr_stack.push(layer_get_instance_proc_addr);
-                create_instance_stack.push(layer_create_instance);
-                PFN_xrCreateApiLayerInstance layer_create_api_layer_instance =
-                    (*layer_interface)->GetCreateApiLayerInstanceFuncPointer();
-                create_api_layer_instance_stack.push(layer_create_api_layer_instance);
-                next_api_layer_info[next_info_index].structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_NEXT_INFO;
-                next_api_layer_info[next_info_index].structVersion = XR_API_LAYER_NEXT_INFO_STRUCT_VERSION;
-                next_api_layer_info[next_info_index].structSize = sizeof(XrApiLayerNextInfo);
-                strncpy(next_api_layer_info[next_info_index].layerName, (*layer_interface)->LayerName().c_str(),
-                        XR_MAX_API_LAYER_NAME_SIZE - 1);
-                next_api_layer_info[next_info_index].layerName[XR_MAX_API_LAYER_NAME_SIZE - 1] = '\0';
+            XrApiLayerNextInfo* prev_nextinfo = nullptr;
+            PFN_xrGetInstanceProcAddr prev_gipa_fp = LoaderXrTermGetInstanceProcAddr;
+            PFN_xrCreateApiLayerInstance prev_cali_fp = LoaderXrTermCreateApiLayerInstance;
+            for (auto layer_interface = layer_interfaces.rbegin(); layer_interface != layer_interfaces.rend(); ++layer_interface) {
+                // Collect current layer's function pointers
+                PFN_xrGetInstanceProcAddr cur_gipa_fp = (*layer_interface)->GetInstanceProcAddrFuncPointer();
+                PFN_xrCreateApiLayerInstance cur_cali_fp = (*layer_interface)->GetCreateApiLayerInstanceFuncPointer();
+                // Update topmosts
+                cur_gipa_fp(XR_NULL_HANDLE, "xrCreateInstance", reinterpret_cast<PFN_xrVoidFunction*>(&topmost_ci_fp));
+                topmost_cali_fp = cur_cali_fp;
 
-                next_api_layer_info[next_info_index].next = last_layer_next_api_layer_info;
-                next_api_layer_info[next_info_index].nextGetInstanceProcAddr = last_layer_get_instance_proc_addr;
-                next_api_layer_info[next_info_index].nextCreateApiLayerInstance = last_layer_create_api_layer_instance;
-                last_layer_next_api_layer_info = &next_api_layer_info[next_info_index];
-                last_layer_get_instance_proc_addr = layer_get_instance_proc_addr;
-                last_layer_create_api_layer_instance = layer_create_api_layer_instance;
-                next_info_index--;
+                // Fill in layer info and link previous (lower) layer fxn pointers
+                strncpy(next_info_list[ni_index].layerName, (*layer_interface)->LayerName().c_str(),
+                        XR_MAX_API_LAYER_NAME_SIZE - 1);
+                next_info_list[ni_index].layerName[XR_MAX_API_LAYER_NAME_SIZE - 1] = '\0';
+                next_info_list[ni_index].next = prev_nextinfo;
+                next_info_list[ni_index].nextGetInstanceProcAddr = prev_gipa_fp;
+                next_info_list[ni_index].nextCreateApiLayerInstance = prev_cali_fp;
+
+                // Update saved pointers for next iteration
+                prev_nextinfo = &next_info_list[ni_index];
+                prev_gipa_fp = cur_gipa_fp;
+                prev_cali_fp = cur_cali_fp;
+                ni_index--;
             }
 
-            // Setup the layer create info
-            api_layer_create_info.structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_CREATE_INFO;
-            api_layer_create_info.structVersion = XR_API_LAYER_CREATE_INFO_STRUCT_VERSION;
-            api_layer_create_info.structSize = sizeof(XrApiLayerCreateInfo);
-            api_layer_create_info.loaderInstance = reinterpret_cast<void*>(loader_instance);
-            api_layer_create_info.settings_file_location[0] = '\0';
-            api_layer_create_info.nextInfo = next_api_layer_info;
+            // Populate the ApiLayerCreateInfo struct and pass to topmost CreateApiLayerInstance()
+            XrApiLayerCreateInfo api_layer_ci = {};
+            api_layer_ci.structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_CREATE_INFO;
+            api_layer_ci.structVersion = XR_API_LAYER_CREATE_INFO_STRUCT_VERSION;
+            api_layer_ci.structSize = sizeof(XrApiLayerCreateInfo);
+            api_layer_ci.loaderInstance = reinterpret_cast<void*>(loader_instance);
+            api_layer_ci.settings_file_location[0] = '\0';
+            api_layer_ci.nextInfo = next_info_list;
+            last_error = topmost_cali_fp(info, &api_layer_ci, instance);
 
-            last_error = create_api_layer_instance_stack.top()(info, &api_layer_create_info, instance);
-
-            delete[] next_api_layer_info;
+            delete[] next_info_list;
         } else {
-            last_error = create_instance_stack.top()(info, instance);
+            last_error = topmost_ci_fp(info, instance);
         }
 
-        if (XR_SUCCESS == last_error) {
+        if (XR_SUCCEEDED(last_error)) {
             // Check the list of enabled extensions to make sure something supports them, and, if we do,
             // add it to the list of enabled extensions
             for (uint32_t ext = 0; ext < info->enabledExtensionCount; ++ext) {
@@ -137,8 +133,8 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
                 }
                 // Finally, check the enabled layers
                 if (!found) {
-                    for (auto layer_interface = instance_layer_interfaces.begin();
-                         layer_interface != instance_layer_interfaces.end(); ++layer_interface) {
+                    for (auto layer_interface = layer_interfaces.begin(); layer_interface != layer_interfaces.end();
+                         ++layer_interface) {
                         if ((*layer_interface)->SupportsExtension(info->enabledExtensionNames[ext])) {
                             found = true;
                             break;
@@ -146,8 +142,9 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
                     }
                 }
                 if (!found) {
-                    LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                                  "LoaderInstance::CreateInstance encountered unsupported extension.");
+                    std::string msg = "LoaderInstance::CreateInstance, no support found for requested extension: ";
+                    msg += info->enabledExtensionNames[ext];
+                    LoaderLogger::LogErrorMessage("xrCreateInstance", msg);
                     last_error = XR_ERROR_EXTENSION_NOT_PRESENT;
                     break;
                 }
@@ -157,23 +154,23 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateInstance chained CreateInstance call failed");
         }
 
-        if (XR_SUCCESS == last_error) {
+        if (XR_SUCCEEDED(last_error)) {
             // Create the top-level dispatch table for the instance.  This will contain the function pointers to the
             // first instantiation of every command, whether that is in a layer, or a runtime.
             last_error = loader_instance->CreateDispatchTable(*instance);
-            if (XR_SUCCESS != last_error) {
+            if (XR_FAILED(last_error)) {
                 LoaderLogger::LogErrorMessage("xrCreateInstance",
                                               "LoaderInstance::CreateInstance failed creating top-level dispatch table");
-            }
-
-            std::unique_lock<std::mutex> lock(g_instance_mutex);
-            auto exists = g_instance_map.find(*instance);
-            if (exists == g_instance_map.end()) {
-                g_instance_map[*instance] = loader_instance;
+            } else {
+                std::unique_lock<std::mutex> lock(g_instance_mutex);
+                auto exists = g_instance_map.find(*instance);
+                if (exists == g_instance_map.end()) {
+                    g_instance_map[*instance] = loader_instance;
+                }
             }
         }
 
-        if (XR_SUCCESS != last_error) {
+        if (XR_FAILED(last_error)) {
             delete loader_instance;
             loader_instance = nullptr;
         } else {

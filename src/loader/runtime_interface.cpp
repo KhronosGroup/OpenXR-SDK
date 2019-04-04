@@ -277,7 +277,7 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
         res = rt_xrCreateInstance(info, instance);
         if (XR_SUCCESS == res) {
             create_succeeded = true;
-            XrGeneratedDispatchTable* dispatch_table = new XrGeneratedDispatchTable;
+            XrGeneratedDispatchTable* dispatch_table = new XrGeneratedDispatchTable();
             GeneratedXrPopulateDispatchTable(dispatch_table, *instance, _get_instant_proc_addr);
             std::unique_lock<std::mutex> mlock(_dispatch_table_mutex);
             _dispatch_table_map[*instance] = dispatch_table;

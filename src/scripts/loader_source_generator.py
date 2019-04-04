@@ -328,7 +328,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         result_to_str += self.writeIndent(indent)
         result_to_str += 'XrResult result = GeneratedXrUtilitiesResultToString(value, %s);\n' % buffer_param_name
         result_to_str += self.writeIndent(indent)
-        result_to_str += 'if (XR_SUCCESS != result) {\n'
+        result_to_str += 'if (XR_SUCCEEDED(result)) {\n'
         result_to_str += self.writeIndent(indent + 1)
         result_to_str += 'return result;\n'
         result_to_str += self.writeIndent(indent)
@@ -352,7 +352,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         struct_to_str += self.writeIndent(indent)
         struct_to_str += 'XrResult result = GeneratedXrUtilitiesStructureTypeToString(value, %s);\n' % buffer_param_name
         struct_to_str += self.writeIndent(indent)
-        struct_to_str += 'if (XR_SUCCESS != result) {\n'
+        struct_to_str += 'if (XR_SUCCEEDED(result)) {\n'
         struct_to_str += self.writeIndent(indent + 1)
         struct_to_str += 'return result;\n'
         struct_to_str += self.writeIndent(indent)
@@ -968,12 +968,8 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
                 if cur_cmd.name in NO_TRAMPOLINE_OR_TERMINATOR:
                     export_funcs += '    table->%s = nullptr;\n' % base_name
-                elif ((cur_cmd.name in MANUAL_LOADER_INSTANCE_FUNCS or cur_cmd.name in MANUAL_LOADER_INSTANCE_TERMINATOR_FUNCS) and
-                      not cur_cmd.name in NO_TRAMPOLINE_OR_TERMINATOR):
-                    export_funcs += '    table->%s = LoaderXrTerm%s;\n' % (
-                        base_name, base_name)
                 else:
-                    export_funcs += '    RuntimeInterface::GetInstanceProcAddr(instance, "%s", reinterpret_cast<PFN_xrVoidFunction*>(&table->%s));\n' % (
+                    export_funcs += '    LoaderXrTermGetInstanceProcAddr(instance, "%s", reinterpret_cast<PFN_xrVoidFunction*>(&table->%s));\n' % (
                         cur_cmd.name, base_name)
 
                 if cur_cmd.protect_value:
