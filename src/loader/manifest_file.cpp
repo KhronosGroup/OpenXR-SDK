@@ -741,22 +741,23 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
                 LoaderLogger::LogErrorMessage("", error_message);
                 return;
             }
-            // If there's an enable environment variable, this has to be enabled before it's used.
+            // Check if there's an enable environment variable provided
             if (!layer_root_node["enable_environment"].isNull() && layer_root_node["enable_environment"].isString()) {
                 char *enable_val = PlatformUtilsGetEnv(layer_root_node["enable_environment"].asString().c_str());
-                // If it's either not defined, or it's 0, disable the layer by default
-                if (NULL == enable_val || atoi(enable_val) == 0) {
+                // If it's not set in the environment, disable the layer
+                if (NULL == enable_val) {
                     enabled = false;
                 }
                 PlatformUtilsFreeEnv(enable_val);
             }
-            // If there's an enable environment variable, this has to be enabled before it's used.
+            // Check for the disable environment variable, which must be provided in the JSON
             char *disable_val = PlatformUtilsGetEnv(layer_root_node["disable_environment"].asString().c_str());
-            // If it's either not defined, or it's 0, disable the layer by default
-            if (NULL != disable_val || atoi(disable_val) == 0) {
+            // If the envar is set, disable the layer. Disable envar overrides enable above
+            if (NULL != disable_val) {
                 enabled = false;
             }
             PlatformUtilsFreeEnv(disable_val);
+
             // Not enabled, so pretend like it isn't even there.
             if (!enabled) {
                 std::string info_message = "ApiLayerManifestFile::CreateIfValid Implicit layer ";
