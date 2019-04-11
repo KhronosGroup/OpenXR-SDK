@@ -95,7 +95,7 @@ int main() {
     printf("Evaluating system\n");
     printf("\t           name: '%s'\n", systemProperties.systemName);
     printf("\t       vendorId: 0x%" PRIx32 "\n", systemProperties.vendorId);
-    printf("\\t      systemId: 0x%" PRIx64 "\n", systemProperties.systemId);
+    printf("\t       systemId: 0x%" PRIx64 "\n", systemProperties.systemId);
     printf("\t     systemName: %s\n", systemProperties.systemName);
 
     // The program struct will do cleanup for us.
