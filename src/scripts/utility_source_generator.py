@@ -244,6 +244,16 @@ class UtilitySourceOutputGenerator(AutomaticSourceOutputGenerator):
         result_to_str += self.writeIndent(indent + 1)
         result_to_str += '// Unknown result type\n'
         result_to_str += self.writeIndent(indent + 1)
+        result_to_str += 'if (XR_SUCCEEDED(result)) {\n'
+        result_to_str += self.writeIndent(indent + 2)
+        result_to_str += 'snprintf(buffer, XR_MAX_RESULT_STRING_SIZE, "XR_UNKNOWN_SUCCESS_%d", result);\n'
+        result_to_str += self.writeIndent(indent + 1)
+        result_to_str += '} else {\n'
+        result_to_str += self.writeIndent(indent + 2)
+        result_to_str += 'snprintf(buffer, XR_MAX_RESULT_STRING_SIZE, "XR_UNKNOWN_FAILURE_%d", result);\n'
+        result_to_str += self.writeIndent(indent + 1)
+        result_to_str += '}\n'
+        result_to_str += self.writeIndent(indent + 1)
         result_to_str += 'int_result = XR_ERROR_VALIDATION_FAILURE;\n'
         result_to_str += self.writeIndent(indent + 1)
         result_to_str += 'break;\n'
@@ -295,7 +305,9 @@ class UtilitySourceOutputGenerator(AutomaticSourceOutputGenerator):
         struct_to_str += self.writeIndent(indent)
         struct_to_str += 'default:\n'
         struct_to_str += self.writeIndent(indent + 1)
-        struct_to_str += '// Unknown result type\n'
+        struct_to_str += '// Unknown structure type\n'
+        struct_to_str += self.writeIndent(indent + 1)
+        struct_to_str += 'snprintf(buffer, XR_MAX_STRUCTURE_NAME_SIZE, "XR_UNKNOWN_STRUCTURE_TYPE_%d", struct_type);\n'
         struct_to_str += self.writeIndent(indent + 1)
         struct_to_str += 'int_result = XR_ERROR_VALIDATION_FAILURE;\n'
         struct_to_str += self.writeIndent(indent + 1)
