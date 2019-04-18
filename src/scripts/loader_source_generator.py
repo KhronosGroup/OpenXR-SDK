@@ -794,6 +794,15 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += 'if (loader_instance == nullptr) {\n'
         indent = indent + 1
         export_funcs += self.writeIndent(indent)
+        export_funcs += '// Null instance is allowed for 3 specific API entry points, otherwise return error\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'if (!((func_name == "CreateInstance") ||\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '      (func_name == "EnumerateApiLayerProperties") ||\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '      (func_name == "EnumerateInstanceExtensionProperties"))) {\n'
+        indent = indent + 1
+        export_funcs += self.writeIndent(indent)
         export_funcs += 'std::string error_str = "XR_NULL_HANDLE for instance but query for ";\n'
         export_funcs += self.writeIndent(indent)
         export_funcs += 'error_str += name;\n'
@@ -805,6 +814,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += '                                        "xrGetInstanceProcAddr", error_str);\n'
         export_funcs += self.writeIndent(indent)
         export_funcs += 'return XR_ERROR_HANDLE_INVALID;\n'
+        indent = indent - 1
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '}\n'
         indent = indent - 1
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
