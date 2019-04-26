@@ -19,13 +19,12 @@
 # Purpose:      This script searches for and extracts embedded source code
 #               from specification chapters.
 
-import re
-import errno
-from pathlib import Path
-from collections import namedtuple
-from enum import Enum, unique
 import argparse
+import errno
+import re
 from abc import ABC, abstractmethod
+from enum import Enum, unique
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 ALL_DOCS = sorted((ROOT / 'specification/sources/').glob('**/*.adoc'))
@@ -162,7 +161,7 @@ class CodeExtractor(LinewiseFileProcessor):
         self.nextSnippetId = 0
         self.inCodeBlock = False
         self.blockPattern = re.compile(r'\[source(,?)(?P<tags>.*)\]')
-        self.languagesToExtract = set([Language.CPP, Language.C])
+        self.languagesToExtract = set((Language.CPP, Language.C))
         self.codeLines = None
 
         self.generatedFiles = []
@@ -320,7 +319,7 @@ class CodeExtractorGroup(object):
             if self.outputLineNumbers:
                 extra_arg = '--linenumbers'
             f.write("""
-OUTDIR	 ?= $(CURDIR)/{out}
+OUTDIR  ?= $(CURDIR)/{out}
 CODEDIR ?= $(CURDIR)/{codedir}
 PYTHON   ?= python3
 QUIET    ?= @

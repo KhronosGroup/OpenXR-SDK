@@ -5,8 +5,19 @@
 #include "graphicsplugin.h"
 #include "openxr_program.h"
 #include <common/xr_linear.h>
+#include <array>
 
 namespace {
+
+#if !defined(XR_USE_PLATFORM_WIN32)
+#define strcpy_s(dest, source) strncpy((dest), (source), sizeof(dest))
+#endif
+
+namespace Side {
+const int LEFT = 0;
+const int RIGHT = 1;
+const int COUNT = 2;
+}  // namespace Side
 
 inline std::string GetXrVersionString(uint32_t ver) {
     return Fmt("%d.%d.%d", XR_VERSION_MAJOR(ver), XR_VERSION_MINOR(ver), XR_VERSION_PATCH(ver));
@@ -120,6 +131,13 @@ struct OpenXrProgram : IOpenXrProgram {
         : m_options(options), m_platformPlugin(platformPlugin), m_graphicsPlugin(graphicsPlugin) {}
 
     ~OpenXrProgram() {
+        if (m_input.actionSet != XR_NULL_HANDLE) {
+            for (auto hand : {Side::LEFT, Side::RIGHT}) {
+                xrDestroySpace(m_input.handSpace[hand]);
+            }
+            xrDestroyActionSet(m_input.actionSet);
+        }
+
         for (Swapchain swapchain : m_swapchains) {
             xrDestroySwapchain(swapchain.handle);
         }
@@ -335,6 +353,156 @@ struct OpenXrProgram : IOpenXrProgram {
         }
     }
 
+    using InputState = struct {
+        XrActionSet actionSet;
+        XrAction gripAction;
+        XrAction poseAction;
+        XrAction vibrateAction;
+        std::array<XrPath, Side::COUNT> handSubactionPath;
+        std::array<XrSpace, Side::COUNT> handSpace;
+        std::array<float, Side::COUNT> handScale;
+        std::array<XrBool32, Side::COUNT> renderHand;
+    };
+
+    void InitializeActions() {
+        // Create an action set.
+        {
+            XrActionSetCreateInfo actionSetInfo{XR_TYPE_ACTION_SET_CREATE_INFO};
+            strcpy_s(actionSetInfo.actionSetName, "gameplay");
+            strcpy_s(actionSetInfo.localizedActionSetName, "Gameplay");
+            actionSetInfo.priority = 0;
+            CHECK_XRCMD(xrCreateActionSet(m_session, &actionSetInfo, &m_input.actionSet));
+        }
+
+        // Create subactions for left and right hands.
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/left", &m_input.handSubactionPath[Side::LEFT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/right", &m_input.handSubactionPath[Side::RIGHT]));
+
+        // Create actions.
+        {
+            // Create an input action for gripping objects with the left and right hands.
+            XrActionCreateInfo actionInfo{XR_TYPE_ACTION_CREATE_INFO};
+            actionInfo.actionType = XR_INPUT_ACTION_TYPE_VECTOR1F;
+            strcpy_s(actionInfo.actionName, "grip_object");
+            strcpy_s(actionInfo.localizedActionName, "Grip Object");
+            actionInfo.countSubactionPaths = uint32_t(m_input.handSubactionPath.size());
+            actionInfo.subactionPaths = m_input.handSubactionPath.data();
+            CHECK_XRCMD(xrCreateAction(m_input.actionSet, &actionInfo, &m_input.gripAction));
+
+            // Create an input action getting the left and right hand poses.
+            actionInfo.actionType = XR_INPUT_ACTION_TYPE_POSE;
+            strcpy_s(actionInfo.actionName, "hand_pose");
+            strcpy_s(actionInfo.localizedActionName, "Hand Pose");
+            actionInfo.countSubactionPaths = uint32_t(m_input.handSubactionPath.size());
+            actionInfo.subactionPaths = m_input.handSubactionPath.data();
+            CHECK_XRCMD(xrCreateAction(m_input.actionSet, &actionInfo, &m_input.poseAction));
+
+            // Create output actions for vibrating the left and right controller.
+            actionInfo.actionType = XR_OUTPUT_ACTION_TYPE_VIBRATION;
+            strcpy_s(actionInfo.actionName, "vibrate_hand");
+            strcpy_s(actionInfo.localizedActionName, "Vibrate Hand");
+            actionInfo.countSubactionPaths = uint32_t(m_input.handSubactionPath.size());
+            actionInfo.subactionPaths = m_input.handSubactionPath.data();
+            CHECK_XRCMD(xrCreateAction(m_input.actionSet, &actionInfo, &m_input.vibrateAction));
+        }
+
+        std::array<XrPath, Side::COUNT> selectPath;
+        std::array<XrPath, Side::COUNT> gripValuePath;
+        std::array<XrPath, Side::COUNT> gripClickPath;
+        std::array<XrPath, Side::COUNT> posePath;
+        std::array<XrPath, Side::COUNT> hapticPath;
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/left/input/select/click", &selectPath[Side::LEFT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/right/input/select/click", &selectPath[Side::RIGHT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/left/input/grip/value", &gripValuePath[Side::LEFT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/right/input/grip/value", &gripValuePath[Side::RIGHT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/left/input/grip/click", &gripClickPath[Side::LEFT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/right/input/grip/click", &gripClickPath[Side::RIGHT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/left/input/palm/pose", &posePath[Side::LEFT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/right/input/palm/pose", &posePath[Side::RIGHT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/left/output/haptic", &hapticPath[Side::LEFT]));
+        CHECK_XRCMD(xrStringToPath(m_instance, "/user/hand/right/output/haptic", &hapticPath[Side::RIGHT]));
+
+        // Suggest bindings for KHR Simple.
+        {
+            XrPath khrSimpleInteractionProfilePath;
+            CHECK_XRCMD(
+                xrStringToPath(m_instance, "/interaction_profiles/khr/simple_controller", &khrSimpleInteractionProfilePath));
+            std::array<XrActionSuggestedBinding, 6> bindings{{// Fall back to a click input to emulate the grip action.
+                                                              {m_input.gripAction, selectPath[Side::LEFT]},
+                                                              {m_input.gripAction, selectPath[Side::RIGHT]},
+                                                              {m_input.poseAction, posePath[Side::LEFT]},
+                                                              {m_input.poseAction, posePath[Side::RIGHT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::LEFT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::RIGHT]}}};
+            XrInteractionProfileSuggestedBinding suggestedBindings{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
+            suggestedBindings.interactionProfile = khrSimpleInteractionProfilePath;
+            suggestedBindings.suggestedBindings = &bindings[0];
+            suggestedBindings.countSuggestedBindings = (uint32_t)bindings.size();
+            CHECK_XRCMD(xrSetInteractionProfileSuggestedBindings(m_session, &suggestedBindings));
+        }
+
+        // Suggest bindings for the Oculus Touch.
+        {
+            XrPath oculusTouchInteractionProfilePath;
+            CHECK_XRCMD(
+                xrStringToPath(m_instance, "/interaction_profiles/oculus/touch_controller", &oculusTouchInteractionProfilePath));
+            std::array<XrActionSuggestedBinding, 6> bindings{{{m_input.gripAction, gripValuePath[Side::LEFT]},
+                                                              {m_input.gripAction, gripValuePath[Side::RIGHT]},
+                                                              {m_input.poseAction, posePath[Side::LEFT]},
+                                                              {m_input.poseAction, posePath[Side::RIGHT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::LEFT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::RIGHT]}}};
+            XrInteractionProfileSuggestedBinding suggestedBindings{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
+            suggestedBindings.interactionProfile = oculusTouchInteractionProfilePath;
+            suggestedBindings.suggestedBindings = &bindings[0];
+            suggestedBindings.countSuggestedBindings = (uint32_t)bindings.size();
+            CHECK_XRCMD(xrSetInteractionProfileSuggestedBindings(m_session, &suggestedBindings));
+        }
+
+        // Suggest bindings for the Vive Controller.
+        {
+            XrPath viveControllerInteractionProfilePath;
+            CHECK_XRCMD(
+                xrStringToPath(m_instance, "/interaction_profiles/htc/vive_controller", &viveControllerInteractionProfilePath));
+            std::array<XrActionSuggestedBinding, 6> bindings{{{m_input.gripAction, gripClickPath[Side::LEFT]},
+                                                              {m_input.gripAction, gripClickPath[Side::RIGHT]},
+                                                              {m_input.poseAction, posePath[Side::LEFT]},
+                                                              {m_input.poseAction, posePath[Side::RIGHT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::LEFT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::RIGHT]}}};
+            XrInteractionProfileSuggestedBinding suggestedBindings{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
+            suggestedBindings.interactionProfile = viveControllerInteractionProfilePath;
+            suggestedBindings.suggestedBindings = &bindings[0];
+            suggestedBindings.countSuggestedBindings = (uint32_t)bindings.size();
+            CHECK_XRCMD(xrSetInteractionProfileSuggestedBindings(m_session, &suggestedBindings));
+        }
+
+        // Suggest bindings for the Microsoft Mixed Reality Motion Controller.
+        {
+            XrPath microsoftMixedRealityInteractionProfilePath;
+            CHECK_XRCMD(xrStringToPath(m_instance, "/interaction_profiles/microsoft/motion_controller",
+                                       &microsoftMixedRealityInteractionProfilePath));
+            std::array<XrActionSuggestedBinding, 6> bindings{{{m_input.gripAction, gripClickPath[Side::LEFT]},
+                                                              {m_input.gripAction, gripClickPath[Side::RIGHT]},
+                                                              {m_input.poseAction, posePath[Side::LEFT]},
+                                                              {m_input.poseAction, posePath[Side::RIGHT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::LEFT]},
+                                                              {m_input.vibrateAction, hapticPath[Side::RIGHT]}}};
+            XrInteractionProfileSuggestedBinding suggestedBindings{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
+            suggestedBindings.interactionProfile = microsoftMixedRealityInteractionProfilePath;
+            suggestedBindings.suggestedBindings = &bindings[0];
+            suggestedBindings.countSuggestedBindings = (uint32_t)bindings.size();
+            CHECK_XRCMD(xrSetInteractionProfileSuggestedBindings(m_session, &suggestedBindings));
+        }
+
+        XrActionSpaceCreateInfo actionSpaceInfo{XR_TYPE_ACTION_SPACE_CREATE_INFO};
+        actionSpaceInfo.poseInActionSpace.orientation.w = 1.f;
+        actionSpaceInfo.subactionPath = m_input.handSubactionPath[Side::LEFT];
+        CHECK_XRCMD(xrCreateActionSpace(m_input.poseAction, &actionSpaceInfo, &m_input.handSpace[Side::LEFT]));
+        actionSpaceInfo.subactionPath = m_input.handSubactionPath[Side::RIGHT];
+        CHECK_XRCMD(xrCreateActionSpace(m_input.poseAction, &actionSpaceInfo, &m_input.handSpace[Side::RIGHT]));
+    }
+
     void CreateVisualizedSpaces() {
         CHECK(m_session != XR_NULL_HANDLE);
 
@@ -349,7 +517,7 @@ struct OpenXrProgram : IOpenXrProgram {
                 m_visualizedSpaces.push_back(space);
             } else {
                 Log::Write(Log::Level::Warning,
-                           Fmt("Failed to create space %s with error %d for visualization", visualizedSpace.c_str(), res));
+                           Fmt("Failed to create reference space %s with error %d", visualizedSpace.c_str(), res));
             }
         }
     }
@@ -368,6 +536,7 @@ struct OpenXrProgram : IOpenXrProgram {
         }
 
         LogReferenceSpaces();
+        InitializeActions();
         CreateVisualizedSpaces();
 
         {
@@ -538,10 +707,11 @@ struct OpenXrProgram : IOpenXrProgram {
             }
             case XR_SESSION_STATE_LOSS_PENDING: {
                 *exitRenderLoop = true;
-                // Poll for a new instance
+                // Poll for a new instance.
                 *requestRestart = true;
                 break;
             }
+            default: { break; }
         }
     }
 
@@ -562,8 +732,32 @@ struct OpenXrProgram : IOpenXrProgram {
                     ManageSession(*reinterpret_cast<const XrEventDataSessionStateChanged*>(event), exitRenderLoop, requestRestart);
                     break;
                 }
+                case XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED: {
+                    static const XrInputSourceLocalizedNameFlags all = XR_INPUT_SOURCE_LOCALIZED_NAME_USER_PATH_BIT |
+                                                                       XR_INPUT_SOURCE_LOCALIZED_NAME_INTERACTION_PROFILE_BIT |
+                                                                       XR_INPUT_SOURCE_LOCALIZED_NAME_COMPONENT_BIT;
+
+                    std::array<XrPath, 4> paths{};
+                    uint32_t pathCount = 0;
+                    CHECK_XRCMD(xrGetBoundSourcesForAction(m_input.gripAction, uint32_t(paths.size()), &pathCount, &paths[0]));
+                    std::string gripSources;
+                    for (uint32_t i = 0; i < pathCount; ++i) {
+                        uint32_t size = 0;
+                        CHECK_XRCMD(xrGetInputSourceLocalizedName(m_session, paths[i], all, 0, &size, nullptr));
+                        if (size < 1) continue;
+                        std::string gripSource;
+                        gripSource.resize(size);
+                        CHECK_XRCMD(xrGetInputSourceLocalizedName(m_session, paths[i], all, uint32_t(gripSource.size()), &size,
+                                                                  &gripSource[0]));
+                        // Strip the null character
+                        gripSource.resize(size - 1);
+                        if (gripSources.size() > 0) gripSources += ", ";
+                        gripSources += gripSource;
+                    }
+                    Log::Write(Log::Level::Info,
+                               Fmt("grip action bound to %s", ((gripSources.size() > 0) ? gripSources.c_str() : " nothing")));
+                }
                 case XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING:
-                case XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED:
                 default: {
                     Log::Write(Log::Level::Verbose, Fmt("Ignoring event type %d", event->type));
                     break;
@@ -578,17 +772,62 @@ struct OpenXrProgram : IOpenXrProgram {
             case XR_SESSION_STATE_VISIBLE:
             case XR_SESSION_STATE_FOCUSED:
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
-    bool IsSessionVisible() {
+    bool IsSessionVisible() override {
         switch (m_sessionState) {
             case XR_SESSION_STATE_VISIBLE:
             case XR_SESSION_STATE_FOCUSED:
                 return true;
+            default:
+                return false;
         }
-        return false;
+    }
+
+    bool IsSessionFocused() override {
+        switch (m_sessionState) {
+            case XR_SESSION_STATE_FOCUSED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    void PollActions() override {
+        m_input.renderHand = {XR_FALSE, XR_FALSE};
+        if (IsSessionFocused()) {
+            // Sync action data
+            XrActiveActionSet activeActionSet{XR_TYPE_ACTIVE_ACTION_SET};
+            activeActionSet.actionSet = m_input.actionSet;
+            activeActionSet.subactionPath = XR_NULL_PATH;
+            CHECK_XRCMD(xrSyncActionData(m_session, 1, &activeActionSet));
+
+            // Get pose and grip action state and start haptic vibrate when grip is 90% depressed.
+            for (auto hand : {Side::LEFT, Side::RIGHT}) {
+                XrActionStateVector1f gripValue{XR_TYPE_ACTION_STATE_VECTOR1F};
+                CHECK_XRCMD(xrGetActionStateVector1f(m_input.gripAction, 1, &m_input.handSubactionPath[hand], &gripValue));
+
+                if (gripValue.isActive) {
+                    // Scale the rendered hand by 1.0f (open) to 0.5f (fully depressed).
+                    m_input.handScale[hand] = 1.0f - 0.5f * gripValue.currentState;
+                    if (gripValue.currentState > 0.9f) {
+                        XrHapticVibration vibration{XR_TYPE_HAPTIC_VIBRATION};
+                        vibration.amplitude = 0.5;
+                        vibration.duration = XR_MIN_HAPTIC_DURATION;
+                        vibration.frequency = XR_FREQUENCY_UNSPECIFIED;
+                        CHECK_XRCMD(xrApplyHapticFeedback(m_input.vibrateAction, 1, &m_input.handSubactionPath[hand],
+                                                          (XrHapticBaseHeader*)&vibration));
+                    }
+                }
+
+                XrActionStatePose poseState{XR_TYPE_ACTION_STATE_POSE};
+                CHECK_XRCMD(xrGetActionStatePose(m_input.poseAction, m_input.handSubactionPath[hand], &poseState));
+                m_input.renderHand[hand] = poseState.isActive;
+            }
+        }
     }
 
     void RenderFrame() override {
@@ -641,6 +880,7 @@ struct OpenXrProgram : IOpenXrProgram {
 
             // For each locatable space that we want to visualize, render a 25cm cube.
             std::vector<Cube> cubes;
+
             for (XrSpace visualizedSpace : m_visualizedSpaces) {
                 XrSpaceRelation spaceRelation{XR_TYPE_SPACE_RELATION};
                 res = xrLocateSpace(visualizedSpace, m_appSpace, predictedDisplayTime, &spaceRelation);
@@ -651,7 +891,28 @@ struct OpenXrProgram : IOpenXrProgram {
                         cubes.push_back(Cube{spaceRelation.pose, {0.25f, 0.25f, 0.25f}});
                     }
                 } else {
-                    Log::Write(Log::Level::Verbose, Fmt("Unable to relate a visualized space to app space: %d", res));
+                    Log::Write(Log::Level::Verbose, Fmt("Unable to relate a visualized reference space to app space: %d", res));
+                }
+            }
+
+            // Render a 10cm cube scaled by gripAction for each hand. Note renderHand will only be true when the application has
+            // focus.
+            for (auto hand : {Side::LEFT, Side::RIGHT}) {
+                if (m_input.renderHand[hand]) {
+                    XrSpaceRelation spaceRelation{XR_TYPE_SPACE_RELATION};
+                    res = xrLocateSpace(m_input.handSpace[hand], m_appSpace, predictedDisplayTime, &spaceRelation);
+                    CHECK_XRRESULT(res, "xrLocateSpace");
+                    if (XR_UNQUALIFIED_SUCCESS(res)) {
+                        if ((spaceRelation.relationFlags & XR_SPACE_RELATION_POSITION_VALID_BIT) != 0 &&
+                            (spaceRelation.relationFlags & XR_SPACE_RELATION_ORIENTATION_VALID_BIT) != 0) {
+                            float scale = 0.1f * m_input.handScale[hand];
+                            cubes.push_back(Cube{spaceRelation.pose, {scale, scale, scale}});
+                        }
+                    } else {
+                        const char* handName[] = {"left", "right"};
+                        Log::Write(Log::Level::Verbose,
+                                   Fmt("Unable to relate %s hand action space to app space: %d", handName[hand], res));
+                    }
                 }
             }
 
@@ -719,6 +980,7 @@ struct OpenXrProgram : IOpenXrProgram {
     XrSessionState m_sessionState{XR_SESSION_STATE_UNKNOWN};
 
     XrEventDataBuffer m_eventDataBuffer;
+    InputState m_input{XR_NULL_HANDLE};
 };
 }  // namespace
 

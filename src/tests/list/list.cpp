@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <vector>
 
 // Struct that does book keeping of what a
 // OpenXr application need to keep track of.
@@ -97,6 +98,19 @@ int main() {
     printf("\t       vendorId: 0x%" PRIx32 "\n", systemProperties.vendorId);
     printf("\t       systemId: 0x%" PRIx64 "\n", systemProperties.systemId);
     printf("\t     systemName: %s\n", systemProperties.systemName);
+
+    uint32_t size;
+    xrEnumerateInstanceExtensionProperties(nullptr, 0, &size, nullptr);
+    std::vector<XrExtensionProperties> extensions;
+    for (uint32_t i = 0; i < size; i++) {
+        extensions.push_back(XrExtensionProperties{XR_TYPE_EXTENSION_PROPERTIES, nullptr});
+    }
+    xrEnumerateInstanceExtensionProperties(nullptr, size, &size, extensions.data());
+
+    printf("List instance extensions\n");
+    for (XrExtensionProperties extension : extensions) {
+        printf("\t%s %d\n", extension.extensionName, extension.specVersion);
+    }
 
     // The program struct will do cleanup for us.
     return 0;

@@ -32,16 +32,16 @@ from spec_tools.shared import MessageId
 ###
 # "Configuration" constants
 
-EXTRA_DEFINES = ['XRAPI_ATTR', 'XRAPI_CALL', 'XRAPI_PTR', 'XR_NO_STDINT_H']
+EXTRA_DEFINES = ('XRAPI_ATTR', 'XRAPI_CALL', 'XRAPI_PTR', 'XR_NO_STDINT_H')
 
 # These are marked with the code: macro
-SYSTEM_TYPES = ['void', 'char', 'float', 'size_t', 'uintptr_t',
-                'int8_t', 'uint8_t',
-                'int32_t', 'uint32_t',
-                'int64_t', 'uint64_t']
+SYSTEM_TYPES = set(('void', 'char', 'float', 'size_t', 'uintptr_t',
+                    'int8_t', 'uint8_t',
+                    'int32_t', 'uint32_t',
+                    'int64_t', 'uint64_t'))
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_DISABLED_MESSAGES = set([MessageId.REFPAGE_MISSING])
+DEFAULT_DISABLED_MESSAGES = set((MessageId.REFPAGE_MISSING,))
 
 CWD = Path('.').resolve()
 
@@ -70,7 +70,7 @@ class XREntityDatabase(EntityDatabase):
         # #Not mentioned in the style guide.
         # TODO: What about flag wildcards? There are a few such uses...
 
-        self.addMacro('basetype', ['basetypes'], link=True)
+        self.addMacro('basetype', ('basetypes',), link=True)
 
     def populateEntities(self):
         # These are not mentioned in the XML

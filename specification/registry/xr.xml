@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <registry>
     <comment>
 Copyright (c) 2017-2019 The Khronos Group Inc.
@@ -68,6 +68,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type requires="CL/cl_gl_ext.h" name="CGLContextObj"/>
         <type requires="D3D10.h" name="ID3D10Device"/>
         <type requires="D3D10.h" name="ID3D10Texture2D"/>
+        <type requires="D3D10_1.h" name="D3D10_FEATURE_LEVEL1"/>
+        <type requires="d3dcommon.h" name="D3D_FEATURE_LEVEL"/>
         <type requires="D3D11.h" name="ID3D11Device"/>
         <type requires="D3D11.h" name="ID3D11Texture2D"/>
         <type requires="D3D12.h" name="ID3D12CommandQueue"/>
@@ -81,17 +83,9 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type requires="GL/glxext.h" name="GLXContext"/>
         <type requires="GL/wglext.h" name="HGLRC"/>
         <type requires="wayland-client.h" name="wl_display"/>
-        <type requires="windows.h" name="HINSTANCE"/>
         <type requires="windows.h" name="HDC"/>
-        <type requires="windows.h" name="HWND"/>
-        <type requires="windows.h" name="HANDLE"/>
-        <type requires="windows.h" name="SECURITY_ATTRIBUTES"/>
-        <type requires="windows.h" name="DWORD"/>
         <type requires="windows.h" name="LUID"/>
         <type requires="windows.h" name="LARGE_INTEGER"/>
-        <type requires="d3dcommon.h" name="D3D_FEATURE_LEVEL"/>
-        <type requires="D3D10_1.h" name="D3D10_FEATURE_LEVEL1"/>
-        <type requires="windows.h" name="GUID"/>
         <type requires="X11/Xlib.h" name="Display"/>
         <type requires="X11/Xlib.h" name="VisualID"/>
         <type requires="X11/Xlib.h" name="Window"/>
@@ -114,10 +108,15 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type category="define">#define <name>XR_VERSION_MINOR</name>(version) (((uint32_t)(version) &gt;&gt; 12) &amp; 0x3ff)</type>
         <type category="define">#define <name>XR_VERSION_PATCH</name>(version) ((uint32_t)(version) &amp; 0xfff)</type>
 
+        <!--
+        NOTE: The following group of lines defining the two version constants
+        must not be re-arranged or re-flowed, since scripts/update_version.py
+        updates them automatically by processing a line at a time.
+        -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(0, 90, 0)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(0, 90, 1)</type>
         <type category="define">// Version of this file
-#define <name>XR_HEADER_VERSION</name> 42</type>
+#define <name>XR_HEADER_VERSION</name> 43</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -679,8 +678,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*     <name>next</name></member>
             <member><type>XrTime</type>                      <name>displayTime</name></member>
             <member><type>XrEnvironmentBlendMode</type>      <name>environmentBlendMode</name></member>
-            <member><type>uint32_t</type>                    <name>layerCount</name></member>
-            <member len="layerCount">const <type>XrCompositionLayerBaseHeader</type>* const*   <name>layers</name></member>
+            <member optional="true"><type>uint32_t</type>                    <name>layerCount</name></member>
+            <member optional="true" len="layerCount">const <type>XrCompositionLayerBaseHeader</type>* const*   <name>layers</name></member>
         </type>
         <type category="struct" name="XrFrameWaitInfo">
             <member values="XR_TYPE_FRAME_WAIT_INFO"><type>XrStructureType</type> <name>type</name></member>
@@ -953,8 +952,6 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum value="128"   name="XR_MAX_APPLICATION_NAME_SIZE"/>
         <enum value="128"   name="XR_MAX_ENGINE_NAME_SIZE"/>
         <enum value="128"   name="XR_MAX_RUNTIME_NAME_SIZE"/>
-        <enum value="2"     name="XR_MAX_TOUCH_COUNT"/>
-        <enum value="8"     name="XR_MAX_ACTION_SOURCES_COUNT"/>
         <enum value="256"   name="XR_MAX_PATH_LENGTH"/>
         <enum value="64"    name="XR_MAX_STRUCTURE_NAME_SIZE"/>
         <enum value="64"    name="XR_MAX_RESULT_STRING_SIZE"/>
@@ -1039,7 +1036,6 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum value="-5"    name="XR_ERROR_DRIVER_INCOMPATIBLE" comment="The driver is incompatible with the runtime."/>
         <enum value="-6"    name="XR_ERROR_INITIALIZATION_FAILED" comment="Initialization of object could not be completed."/>
         <enum value="-7"    name="XR_ERROR_FUNCTION_UNSUPPORTED" comment="The requested function was not found or is otherwise unsupported."/>
-        <enum value="-8"    name="XR_ERROR_FEATURE_UNSUPPORTED" comment="The requested feature is unavailable."/>
         <enum value="-9"    name="XR_ERROR_EXTENSION_NOT_PRESENT" comment="A requested extension is not supported."/>
         <enum value="-10"   name="XR_ERROR_LIMIT_REACHED" comment="The runtime supports no more of the requested resource."/>
         <enum value="-11"   name="XR_ERROR_SIZE_INSUFFICIENT" comment="The supplied size was smaller than required."/>
@@ -1298,7 +1294,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrSystemId</type> <name>systemId</name></param>
             <param><type>XrSystemProperties</type>* <name>properties</name></param>
         </command>
-        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_INITIALIZATION_FAILED,XR_ERROR_SYSTEM_INVALID,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_GRAPHICS_DEVICE_INVALID,XR_ERROR_VALIDATION_FAILURE">
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_INITIALIZATION_FAILED,XR_ERROR_SYSTEM_INVALID,XR_ERROR_GRAPHICS_DEVICE_INVALID,XR_ERROR_VALIDATION_FAILURE">
             <proto><type>XrResult</type> <name>xrCreateSession</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
             <param>const <type>XrSessionCreateInfo</type>* <name>createInfo</name></param>
@@ -1457,7 +1453,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param optional="true"><type>uint32_t</type> <name>countSubactionPaths</name></param>
             <param len="countSubactionPaths" optional="true">const <type>XrPath</type>* <name>subactionPaths</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_EVENT_UNAVAILABLE" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_VALIDATION_FAILURE">
+        <command successcodes="XR_SUCCESS,XR_EVENT_UNAVAILABLE" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE">
             <proto><type>XrResult</type> <name>xrPollEvent</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
             <param><type>XrEventDataBuffer</type>* <name>eventData</name></param>
@@ -1746,8 +1742,6 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <enum name="XR_MAX_APPLICATION_NAME_SIZE"/>
             <enum name="XR_MAX_ENGINE_NAME_SIZE"/>
             <enum name="XR_MAX_RUNTIME_NAME_SIZE"/>
-            <enum name="XR_MAX_TOUCH_COUNT"/>
-            <enum name="XR_MAX_ACTION_SOURCES_COUNT"/>
             <enum name="XR_MAX_PATH_LENGTH"/>
             <enum name="XR_MAX_STRUCTURE_NAME_SIZE"/>
             <enum name="XR_MAX_RESULT_STRING_SIZE"/>

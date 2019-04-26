@@ -21,7 +21,6 @@ from functools import reduce
 
 from generator import OutputGenerator, write
 
-
 class UnhandledCaseError(RuntimeError):
     def __init__(self):
         super().__init__('Got a case in the validity generator that we have not explicitly handled.')
@@ -80,7 +79,6 @@ class LengthEntry:
     def parse_len_from_param(param):
         """Get a list  of LengthEntry."""
         return [LengthEntry(elt) for elt in param.get('len').split(',')]
-
 
 def _getElemName(elem, default=None):
     """Get the name associated with an element, either a name child or name attribute."""
@@ -178,7 +176,7 @@ class ValidityOutputGenerator(OutputGenerator):
     pages and the Vulkan specification. Similar to DocOutputGenerator.
 
     ---- methods ----
-    ValidityOutputGenerator(conventions, errFile, warnFile, diagFile) - args as for
+    ValidityOutputGenerator(errFile, warnFile, diagFile) - args as for
     OutputGenerator. Defines additional internal state.
     ---- methods overriding base class ----
     beginFile(genOpts)
@@ -269,6 +267,22 @@ class ValidityOutputGenerator(OutputGenerator):
         """
         return self.conventions.null
 
+    @property
+    def structtype_member_name(self):
+        """Return name of the structure type member.
+
+        Delegates to the object implementing ConventionsBase.
+        """
+        return self.conventions.structtype_member_name
+
+    @property
+    def nextpointer_member_name(self):
+        """Return name of the structure pointer chain member.
+
+        Delegates to the object implementing ConventionsBase.
+        """
+        return self.conventions.nextpointer_member_name
+
     def makeProseList(self, elements, connective='and'):
         """Make a (comma-separated) list for use in prose.
 
@@ -298,7 +312,7 @@ class ValidityOutputGenerator(OutputGenerator):
             validity.addText(struct.validity)
 
             self.writeInclude(struct.directory, struct.name,
-                              validity.text, struct.threadsafety, None, None)
+                              validity.text, struct.threadsafety, None, None, None)
 
         for command in self.commandstorage:
             validity = self.makeValidityCollection(command.name)
@@ -309,8 +323,8 @@ class ValidityOutputGenerator(OutputGenerator):
                 for state_name in command.beginsstate:
                     stored_state = self.statestorage.get(state_name)
                     if stored_state and stored_state.endcommands:
-                        command_list = '/'.join(('flink:{}'.format(command)
-                                                 for command in stored_state.endcommands))
+                        command_list = '/'.join('flink:{}'.format(command)
+                                                for command in stored_state.endcommands)
                         line = 'flink:{} must: not be called more than once without first successfully calling {}'.format(
                             command.name, command_list)
                         validity.addValidityEntry(line, stored_state.name, 'beginstate')
@@ -319,8 +333,8 @@ class ValidityOutputGenerator(OutputGenerator):
                 for state_name in command.endsstate:
                     stored_state = self.statestorage.get(state_name)
                     if stored_state and stored_state.begincommands:
-                        command_list = '/'.join(('flink:{}'.format(command)
-                                                 for command in stored_state.begincommands))
+                        command_list = '/'.join('flink:{}'.format(command)
+                                                for command in stored_state.begincommands)
                         line = 'flink:{} must: only be called after a successful call to {}'.format(
                             command.name, command_list)
                         validity.addValidityEntry(line, stored_state.name, 'endstate')
@@ -330,17 +344,17 @@ class ValidityOutputGenerator(OutputGenerator):
                     stored_state = self.statestorage.get(state_name)
                     if stored_state and stored_state.begincommands and stored_state.endcommands:
 
-                        begin_command_list = '/'.join(('flink:{}'.format(command)
-                                                       for command in stored_state.begincommands))
-                        end_command_list = '/'.join(('flink:{}'.format(command)
-                                                     for command in stored_state.endcommands))
+                        begin_command_list = '/'.join('flink:{}'.format(command)
+                                                      for command in stored_state.begincommands)
+                        end_command_list = '/'.join('flink:{}'.format(command)
+                                                    for command in stored_state.endcommands)
 
                         line = 'flink:{} must: only be called between successful calls to {} and {}'.format(
                             command.name, begin_command_list, end_command_list)
                         validity.addValidityEntry(line, stored_state.name, 'checkstate')
 
             self.writeInclude(command.directory, command.name, validity.text,
-                              command.threadsafety, command.successcodes, command.errorcodes)
+                              command.threadsafety, None, command.successcodes, command.errorcodes)
 
     def beginFeature(self, interface, emit):
         # Start processing in superclass
@@ -401,10 +415,10 @@ class ValidityOutputGenerator(OutputGenerator):
 
         return '* [[VUID-%s-%s]] ' % (blockname, category)
 
-    def writeInclude(self, directory, basename, validity, threadsafety, successcodes, errorcodes):
+    def writeInclude(self, directory, basename, validity, threadsafety, commandpropertiesentry, successcodes, errorcodes):
         """Generate an include file.
 
-        directory - subdirectory to put file in
+        directory - subdirectory to put file in (absolute pathname)
         basename - base name of the file
         contents - contents of the file (Asciidoc boilerplate aside)
         """
@@ -417,7 +431,7 @@ class ValidityOutputGenerator(OutputGenerator):
 
         fp = open(filename, 'w', encoding='utf-8')
         # Asciidoc anchor
-        write('// WARNING: DO NOT MODIFY! This file is automatically generated from the xr.xml registry', file=fp)
+        write(self.conventions.warning_comment, file=fp)
 
         # Valid Usage
         if validity:
@@ -432,6 +446,18 @@ class ValidityOutputGenerator(OutputGenerator):
             write('.Host Synchronization', file=fp)
             write('****', file=fp)
             write(threadsafety, file=fp, end='')
+            write('****', file=fp)
+            write('', file=fp)
+
+        # Command Properties - contained within a block, to avoid table numbering
+        if commandpropertiesentry:
+            write('.Command Properties', file=fp)
+            write('****', file=fp)
+            write('[options="header", width="100%"]', file=fp)
+            write('|====', file=fp)
+            write('|<<VkCommandBufferLevel,Command Buffer Levels>>|<<vkCmdBeginRenderPass,Render Pass Scope>>|<<VkQueueFlagBits,Supported Queue Types>>|<<synchronization-pipeline-stages-types,Pipeline Type>>', file=fp)
+            write(commandpropertiesentry, file=fp)
+            write('|====', file=fp)
             write('****', file=fp)
             write('', file=fp)
 
@@ -464,8 +490,8 @@ class ValidityOutputGenerator(OutputGenerator):
 
     def paramIsPointer(self, param):
         """Check if the parameter passed in is a pointer."""
-        paramtype = param.find('type')
-        return paramtype.tail is not None and '*' in paramtype.tail
+        tail = param.find('type').tail
+        return tail is not None and '*' in tail
 
     def paramIsStaticArray(self, param):
         """Check if the parameter passed in is a static array."""
@@ -510,13 +536,32 @@ class ValidityOutputGenerator(OutputGenerator):
                 return ancestors
             ancestors.append(current)
 
+    def getHandleDispatchableAncestors(self, typename):
+        """Get the ancestors of a handle object."""
+        ancestors = []
+        current = typename
+        while True:
+            current = self.getHandleParent(current)
+            if current is None:
+                return ancestors
+            if self.isHandleTypeDispatchable(current):
+                ancestors.append(current)
+
+    def isHandleTypeDispatchable(self, handlename):
+        """Check if a parent object is dispatchable or not."""
+        handle = self.registry.tree.find("types/type/[name='" + handlename + "'][@category='handle']")
+        if handle is not None and _getElemType(handle) == 'VK_DEFINE_HANDLE':
+            return True
+        else:
+            return False
+
     def isHandleOptional(self, param, params):
         # Simple, if it's optional, return true
-        if param.attrib.get('optional') is not None:
+        if param.get('optional') is not None:
             return True
 
         # If no validity is being generated, it usually means that validity is complex and not absolute, so let's say yes.
-        if param.attrib.get('noautovalidity') is not None:
+        if param.get('noautovalidity') is not None:
             return True
 
         # If the parameter is an array and we haven't already returned, find out if any of the len parameters are optional
@@ -545,14 +590,14 @@ class ValidityOutputGenerator(OutputGenerator):
     def makeAsciiDocPreChunk(self, blockname, param, params):
         """Make a chunk of text for the end of a parameter if it is an array."""
         param_name = _getElemName(param)
-        paramtype = param.find('type')
+        paramtype = _getElemType(param)
 
         # General pre-amble. Check optionality and add stuff.
         asciidoc = self.makeAnchor(blockname, param_name, 'parameter')
         optionallengths = []
 
         if self.paramIsStaticArray(param):
-            if paramtype.text != 'char':
+            if paramtype != 'char':
                 asciidoc += 'Any given element of '
         elif self.paramIsArray(param) and param.get('len') != 'null-terminated':
             # Find all the parameters that are called out as optional, so we can document that they might be zero, and the array may be ignored
@@ -584,14 +629,14 @@ class ValidityOutputGenerator(OutputGenerator):
 
         elif param.get('optional'):
             # Don't generate this stub for bitflags
-            if self.getTypeCategory(paramtype.text) != 'bitmask':
-                if param.attrib.get('optional').split(',')[0] == 'true':
+            if self.getTypeCategory(paramtype) != 'bitmask':
+                if param.get('optional').split(',')[0] == 'true':
                     asciidoc += 'If '
                     asciidoc += self.makeParameterName(param_name)
                     asciidoc += ' is not '
                     if self.paramIsArray(param) or self.paramIsPointer(param):
                         asciidoc += self.null
-                    elif self.getTypeCategory(paramtype.text) == 'handle':
+                    elif self.getTypeCategory(paramtype) == 'handle':
                         asciidoc += 'dlink:XR_NULL_HANDLE'
                     else:
                         asciidoc += '`0`'
@@ -605,12 +650,21 @@ class ValidityOutputGenerator(OutputGenerator):
 
         May return an empty string if nothing to validate.
         """
+
+        # Vulkan says 'must: be a valid pointer' a lot, OpenXR just says
+        # 'must: be a pointer'.
+        valid_text = self.genOpts.conventions.valid_pointer_prefix
+        if valid_text == '':
+            valid_pointer_text = 'pointer'
+        else:
+            valid_pointer_text = valid_text + ' pointer'
+
         asciidoc = ''
         param_name = _getElemName(param)
-        paramtype = param.find('type')
+        paramtype = _getElemType(param)
 
         # Handle structure type "type" parameter later
-        if paramtype.text == 'XrStructureType' and param_name == 'type':
+        if self.conventions.is_structure_type_member(paramtype, param_name):
             return ''
 
         asciidoc += self.makeAsciiDocPreChunk(blockname, param, params)
@@ -618,20 +672,20 @@ class ValidityOutputGenerator(OutputGenerator):
         asciidoc += self.makeParameterName(param_name)
         asciidoc += ' must: be '
 
-        if self.paramIsStaticArray(param) and paramtype.text == 'char':
+        if self.paramIsStaticArray(param) and paramtype == 'char':
             asciidoc += 'a null-terminated UTF-8 string whose length is less than or equal to %s' % self.staticArrayLength(param)
 
         elif self.paramIsArray(param):
             # Arrays. These are hard to get right, apparently
 
-            lengths = param.attrib.get('len').split(',')
+            lengths = param.get('len').split(',')
 
-            if (lengths[0]) == 'null-terminated':
+            if lengths[0] == 'null-terminated':
                 asciidoc += 'a null-terminated '
-            elif (lengths[0]) == '1':
-                asciidoc += 'a pointer to '
+            elif lengths[0] == '1':
+                asciidoc += 'a ' + valid_pointer_text + ' to '
             else:
-                asciidoc += 'a pointer to an array of '
+                asciidoc += 'a ' + valid_pointer_text + ' to an array of '
 
                 # Handle equations, which are currently denoted with latex
                 if 'latexmath:' in lengths[0]:
@@ -641,14 +695,14 @@ class ValidityOutputGenerator(OutputGenerator):
                 asciidoc += ' '
 
             for length in lengths[1:]:
-                if (length) == 'null-terminated':
+                if length == 'null-terminated':
                     # This should always be the last thing.
                     # If it ever isn't for some bizarre reason, then this will need some massaging.
                     asciidoc += 'null-terminated '
-                elif (length) == '1':
-                    asciidoc += 'pointers to '
+                elif length == '1':
+                    asciidoc += valid_pointer_text + 's to '
                 else:
-                    asciidoc += 'pointers to arrays of '
+                    asciidoc += valid_pointer_text + 's to arrays of '
                     # Handle equations, which are currently denoted with latex
                     if 'latexmath:' in length:
                         asciidoc += length
@@ -657,7 +711,7 @@ class ValidityOutputGenerator(OutputGenerator):
                     asciidoc += ' '
 
             # Void pointers don't actually point at anything - remove the word "to"
-            if paramtype.text == 'void':
+            if paramtype == 'void':
                 if lengths[-1] == '1':
                     if len(lengths) > 1:
                         asciidoc = asciidoc[:-5]    # Take care of the extra s added by the post array chunk function. #HACK#
@@ -667,7 +721,7 @@ class ValidityOutputGenerator(OutputGenerator):
                     # An array of void values is a byte array.
                     asciidoc += 'byte'
 
-            elif paramtype.text == 'char':
+            elif paramtype == 'char':
                 # A null terminated array of chars is a string
                 if lengths[-1] == 'null-terminated':
                     asciidoc += 'UTF-8 string'
@@ -677,9 +731,9 @@ class ValidityOutputGenerator(OutputGenerator):
             elif param.text is not None:
                 # If a value is "const" that means it won't get modified, so it must be valid going into the function.
                 if 'const' in param.text:
-                    typecategory = self.getTypeCategory(paramtype.text)
-                    if (typecategory != 'struct' and typecategory != 'union' and typecategory != 'basetype' and typecategory is not None) \
-                            or not self.isStructAlwaysValid(blockname, paramtype.text):
+                    typecategory = self.getTypeCategory(paramtype)
+                    if (typecategory not in ('struct', 'union', 'basetype') and typecategory is not None) \
+                            or not self.isStructAlwaysValid(blockname, paramtype):
                         asciidoc += 'valid '
 
             asciidoc += typetext
@@ -691,29 +745,28 @@ class ValidityOutputGenerator(OutputGenerator):
         elif self.paramIsPointer(param):
             # Handle pointers - which are really special case arrays (i.e. they don't have a length)
             #TODO  should do something here if someone ever uses some intricate comma-separated `optional`
-            pointercount = paramtype.tail.count('*')
+            pointercount = param.find('type').tail.count('*')
 
             # Treat void* as an int
-            if paramtype.text == 'void':
+            if paramtype == 'void':
                 pointercount -= 1
 
             # Could be multi-level pointers (e.g. ppData - pointer to a pointer). Handle that.
             asciidoc += 'a '
-            asciidoc += 'pointer to a ' * pointercount
+            asciidoc += (valid_pointer_text + ' to a ') * pointercount
 
             # Handle void* and pointers to it
-            if paramtype.text == 'void':
+            if paramtype == 'void':
                 # If there is only void*, it is just optional int - we don't need any language.
-                if pointercount == 0 and param.attrib.get('optional') is not None:
+                if pointercount == 0 and param.get('optional') is not None:
                     return '' # early return
 
-                if param.attrib.get('optional') is None or param.attrib.get('optional').split(',')[pointercount] is not None:
+                if param.get('optional') is None or param.get('optional').split(',')[pointercount]:
                     # The last void* is just optional int (e.g. to be filled by the impl.)
                     typetext = 'pointer value'
 
-
             # If a value is "const" that means it won't get modified, so it must be valid going into the function.
-            if param.text is not None and paramtype.text != 'void':
+            if param.text is not None and paramtype != 'void':
                 if 'const' in param.text:
                     asciidoc += 'valid '
 
@@ -721,8 +774,8 @@ class ValidityOutputGenerator(OutputGenerator):
 
         else:
             # Add additional line for non-optional bitmasks
-            if self.getTypeCategory(paramtype.text) == 'bitmask':
-                isMandatory = param.attrib.get('optional') is None #TODO does not really handle if someone tries something like optional="true,false"
+            if self.getTypeCategory(paramtype) == 'bitmask':
+                isMandatory = param.get('optional') is None #TODO does not really handle if someone tries something like optional="true,false"
                 if not isMandatory:
                     asciidoc += '0 or '
                 # Non-pointer, non-optional things must be valid
@@ -747,12 +800,11 @@ class ValidityOutputGenerator(OutputGenerator):
         return asciidoc
 
     def makeAsciiDocLineForParameter(self, blockname, param, params, typetext):
-        if param.attrib.get('noautovalidity') is not None:
+        if param.get('noautovalidity') is not None:
             return ''
-        asciidoc  = self.createValidationLineForParameterIntroChunk(blockname, param, params, typetext)
+        asciidoc = self.createValidationLineForParameterIntroChunk(blockname, param, params, typetext)
 
         return asciidoc
-
 
     def isStructAlwaysValid(self, blockname, structname):
         """Try to do check if a structure is always considered valid (i.e. there's no rules to its acceptance)."""
@@ -763,19 +815,19 @@ class ValidityOutputGenerator(OutputGenerator):
 
         for param in params:
             param_name = _getElemName(param)
-            param_type = param.find('type').text
-            typecategory = self.getTypeCategory(param_type)
+            paramtype = _getElemType(param)
+            typecategory = self.getTypeCategory(paramtype)
 
-            if param_name in ('type', 'next'):
+            if param_name in (self.structtype_member_name, self.nextpointer_member_name):
                 return False
 
-            if param_type in ('void', 'char') or self.paramIsArray(param) or self.paramIsPointer(param):
+            if paramtype in ('void', 'char') or self.paramIsArray(param) or self.paramIsPointer(param):
                 if self.makeAsciiDocLineForParameter(blockname, param, params, '') != '':
                     return False
             elif typecategory in ('handle', 'enum', 'bitmask'):
                 return False
             elif typecategory in ('struct', 'union'):
-                if self.isStructAlwaysValid(blockname, param_type) is False:
+                if self.isStructAlwaysValid(blockname, paramtype) is False:
                     return False
 
         return True
@@ -788,8 +840,8 @@ class ValidityOutputGenerator(OutputGenerator):
         """Make an entire asciidoc line for a given parameter."""
         asciidoc = ''
         param_name = _getElemName(param)
-        paramtype = param.find('type')
-        type_name = paramtype.text
+        paramtype = _getElemType(param)
+        type_name = paramtype
 
         is_array = self.paramIsArray(param)
         is_pointer = self.paramIsPointer(param)
@@ -817,16 +869,16 @@ class ValidityOutputGenerator(OutputGenerator):
 
                 if is_array:
                     if const_in_text:
-                        template = 'combinations of {} value'
+                        template = 'combination of {} value'
                     else:
                         template = '{} value'
                 elif is_pointer:
                     if const_in_text:
-                        template = 'combinations of {} values'
+                        template = 'combination of {} values'
                     else:
                         template = '{} value'
                 else:
-                    template = 'combinations of {} values'
+                    template = 'combination of {} values'
 
                 # The above few cases all use makeEnumerationName, just with different context.
                 typetext = template.format(self.makeEnumerationName(bitsname))
@@ -884,16 +936,16 @@ class ValidityOutputGenerator(OutputGenerator):
         """
         asciidoc = ''
         param_name = _getElemName(param)
-        param_type = param.find('type').text
+        paramtype = _getElemType(param)
 
         # Deal with handle parents
-        handleparent = self.getHandleParent(param_type)
+        handleparent = self.getHandleParent(paramtype)
         if handleparent is None:
             return asciidoc
 
         otherparam = None
         for p in params:
-            if p.find('type').text == handleparent:
+            if _getElemType(p) == handleparent:
                 otherparam = p
                 break
         if otherparam is None:
@@ -951,12 +1003,12 @@ class ValidityOutputGenerator(OutputGenerator):
         }
 
         # all handle types supplied to this function
-        handle_types = set((_getElemType(h) for h in handles))
+        handle_types = set(_getElemType(h) for h in handles)
 
         # Only consider the handles without any ancestors also being
         # supplied to this function.
-        top_level_handles = set((h for h in input_handles
-                                 if _genericIsDisjoint(ancestor_map[h], handle_types)))
+        top_level_handles = set(h for h in input_handles
+                                if _genericIsDisjoint(ancestor_map[h], handle_types))
 
         # Remove all non-top-level-handles from further consideration
         for removal in set(ancestor_map.keys()).difference(top_level_handles):
@@ -1020,25 +1072,25 @@ class ValidityOutputGenerator(OutputGenerator):
         if not struct:
             return asciidoc
 
-        param = _findNamedObject(struct.params, 'type')
+        param = _findNamedObject(struct.params, self.structtype_member_name)
         if not param:
             return asciidoc
 
-        asciidoc += self.makeAnchor(structname, param.name, 'type')
+        asciidoc += self.makeAnchor(structname, param.name, self.structtype_member_name)
         asciidoc += self.makeParameterName(param.name)
         asciidoc += ' must: be '
         if struct.childrenstructs:
             if len(struct.childrenstructs) > 1:
                 asciidoc += 'one of the following XrStructureType values: '
-            asciidoc += ', '.join((self.makeStructureTypeFromName(child)
-                                   for child in struct.childrenstructs))
+            asciidoc += ', '.join(self.makeStructureTypeFromName(child)
+                                  for child in struct.childrenstructs)
         elif param.values:
             # Extract each enumerant value. They could be validated in the
             # same fashion as validextensionstructs in
             # makeStructureExtensionPointer, although that's not relevant in
             # the current extension struct model.
-            asciidoc += ', '.join((self.makeEnumerantName(value)
-                                   for value in param.values))
+            asciidoc += ', '.join(self.makeEnumerantName(value)
+                                  for value in param.values)
         elif 'Base' in structname:
             # This type doesn't even have any values for its type,
             # and it seems like it might be a base struct that we'd expect to lack its own type,
@@ -1052,13 +1104,13 @@ class ValidityOutputGenerator(OutputGenerator):
         return asciidoc
 
     def makeStructureExtensionPointer(self, blockname, param):
-        """Generate an asciidoc validity line for the 'next' value of a struct."""
+        """Generate an asciidoc validity line for the pointer chain member value of a struct."""
         param_name = _getElemName(param)
 
-        if (param.attrib.get('validextensionstructs') is not None):
+        if param.get('validextensionstructs') is not None:
             self.logMsg('warn', blockname, 'validextensionstructs is deprecated/removed', '\n')
 
-        asciidoc = self.makeAnchor(blockname, param_name, 'next')
+        asciidoc = self.makeAnchor(blockname, param_name, self.nextpointer_member_name)
         validextensionstructs = self.registry.validextensionstructs.get(blockname)
         extensionstructs = []
 
@@ -1069,15 +1121,15 @@ class ValidityOutputGenerator(OutputGenerator):
             # being targeted.
             for struct in validextensionstructs:
                 # Unpleasantly breaks encapsulation. Should be a method in the registry class
-                t = self.registry.lookupElementInfo(struct, self.registry.typedict)
-                if t is None:
+                type = self.registry.lookupElementInfo(struct, self.registry.typedict)
+                if type is None:
                     self.logMsg('warn', 'makeStructureExtensionPointer: struct', struct, 'is in a validextensionstructs= attribute but is not in the registry')
-                elif t.required:
+                elif type.required:
                     extensionstructs.append('slink:' + struct)
                 else:
                     self.logMsg('diag', 'makeStructureExtensionPointer: struct', struct, 'IS NOT required')
 
-        if len(extensionstructs) == 0:
+        if not extensionstructs:
             asciidoc += self.makeParameterName(param_name)
             asciidoc += ' must: be '
             asciidoc += self.null
@@ -1090,7 +1142,9 @@ class ValidityOutputGenerator(OutputGenerator):
         else:
             asciidoc += 'Each '
             asciidoc += self.makeParameterName(param_name)
-            asciidoc += ' member of any structure (including this one) in the pname:next chain must: be either '
+            asciidoc += ' member of any structure (including this one) in the '
+            asciidoc += 'pname:' + self.nextpointer_member_name
+            asciidoc += ' chain must: be either '
             asciidoc += self.null
             asciidoc += ' or a pointer to a valid instance of '
 
@@ -1098,29 +1152,35 @@ class ValidityOutputGenerator(OutputGenerator):
             asciidoc += '\n'
 
             # OpenXR allows non-unique type values.  Instances other than the first are just ignored
-            asciidoc += self.makeAnchor(blockname, 'next', 'unique')
-            asciidoc += 'Each pname:type member in the pname:next chain must: be unique'
+            asciidoc += self.makeAnchor(blockname, self.nextpointer_member_name, 'unique')
+            asciidoc += 'Each pname:' + self.structtype_member_name + ' member in the '
+            asciidoc += 'pname:' + self.nextpointer_member_name
+            asciidoc += ' chain must: be unique'
 
         asciidoc += '\n'
 
         return asciidoc
 
     def makeValidUsageStatementsReturnedOnly(self, cmd, blockname, params):
-        """Generate all the valid usage information for a given struct that's only ever filled out by the implementation other than type and next."""
+        """Generate all the valid usage information for a given struct
+        that's only ever filled out by the implementation other than the
+        structure type and pointer chain members.
+        """
+
         # Start the asciidoc block for this
         asciidoc = ''
 
         for param in params:
             param_name = _getElemName(param)
-            paramtype = param.find('type')
+            paramtype = _getElemType(param)
 
             # Valid usage ID tags (VUID) are generated for various
             # conditions based on the name of the block (structure or
             # command), name of the element (member or parameter), and type
             # of VU statement.
 
-            if param.attrib.get('noautovalidity') is None:
-                if paramtype.text == 'void' and param_name == 'next':
+            if param.get('noautovalidity') is None:
+                if self.conventions.is_nextpointer_member(paramtype, param_name):
                     asciidoc += self.makeStructureExtensionPointer(blockname, param)
 
         # In case there's nothing to report, return None
@@ -1138,7 +1198,7 @@ class ValidityOutputGenerator(OutputGenerator):
         arraylengths = set()
         for param in params:
             param_name = _getElemName(param)
-            paramtype = param.find('type')
+            paramtype = _getElemType(param)
 
             # Valid usage ID tags (VUID) are generated for various
             # conditions based on the name of the block (structure or
@@ -1146,11 +1206,11 @@ class ValidityOutputGenerator(OutputGenerator):
             # of VU statement.
 
             # Get the type's category
-            typecategory = self.getTypeCategory(paramtype.text)
+            typecategory = self.getTypeCategory(paramtype)
 
-            if param.attrib.get('noautovalidity') is None:
+            if param.get('noautovalidity') is None:
                 # Generate language to independently validate a parameter
-                if paramtype.text == 'void' and param_name == 'next':
+                if self.conventions.is_nextpointer_member(paramtype, param_name):
                     asciidoc += self.makeStructureExtensionPointer(blockname, param)
                 else:
                     asciidoc += self.createValidationLineForParameter(blockname, param, params, typecategory)
@@ -1160,7 +1220,7 @@ class ValidityOutputGenerator(OutputGenerator):
                 handles.append(param)
 
             # Get the array length for this parameter
-            arraylength = param.attrib.get('len')
+            arraylength = param.get('len')
             if arraylength is not None:
                 arraylengths.update(set(arraylength.split(',')))
 
@@ -1212,11 +1272,11 @@ class ValidityOutputGenerator(OutputGenerator):
 
         # Find the parents of all objects referenced in this command
         for param in handles:
-            paramtype = param.find('type')
+            paramtype = _getElemType(param)
             # Don't detect a parent for return values!
             if not self.paramIsPointer(param) or (param.text is not None and 'const' in param.text):
 
-                parent = self.getHandleParent(paramtype.text)
+                parent = self.getHandleParent(paramtype)
 
                 if parent is not None:
                     asciidoc += self.makeAsciiDocHandleParent(blockname, param, params)
@@ -1236,9 +1296,9 @@ class ValidityOutputGenerator(OutputGenerator):
 
         # Find and add any parameters that are thread unsafe
         explicitexternsyncparams = cmd.findall(paramtext + "[@externsync]")
-        if (explicitexternsyncparams is not None):
+        if explicitexternsyncparams is not None:
             for param in explicitexternsyncparams:
-                externsyncattribs = param.attrib.get('externsync')
+                externsyncattribs = param.get('externsync')
                 param_name = _getElemName(param)
                 for externsyncattrib in externsyncattribs.split(','):
                     paramdecl += '* '
@@ -1257,9 +1317,16 @@ class ValidityOutputGenerator(OutputGenerator):
                         paramdecl += externsyncattrib
                     paramdecl += ' must: be externally synchronized\n'
 
+        # Vulkan-specific
+        # For any vkCmd* functions, the command pool is externally synchronized
+        # if cmd.find('proto/name') is not None and 'vkCmd' in cmd.find('proto/name').text:
+        #     paramdecl += '* '
+        #     paramdecl += 'Host access to the sname:VkCommandPool that pname:commandBuffer was allocated from must: be externally synchronized'
+        #     paramdecl += '\n'
+
         # Find and add any "implicit" parameters that are thread unsafe
         implicitexternsyncparams = cmd.find('implicitexternsyncparams')
-        if (implicitexternsyncparams is not None):
+        if implicitexternsyncparams is not None:
             for elem in implicitexternsyncparams:
                 paramdecl += '* '
                 paramdecl += 'Host access to '
@@ -1296,7 +1363,7 @@ class ValidityOutputGenerator(OutputGenerator):
         return_lines = []
         RETURN_CODE_FORMAT = '* ename:{}'
 
-        codes_attr = cmd.attrib.get(attrib)
+        codes_attr = cmd.get(attrib)
         if codes_attr:
             codes = self.findRequiredEnums(codes_attr.split(','))
             if codes:
@@ -1317,6 +1384,7 @@ class ValidityOutputGenerator(OutputGenerator):
             return '\n'.join(return_lines)
 
         return None
+
     def makeSuccessCodes(self, cmd, name):
         return self.makeReturnCodeList('successcodes', cmd, name)
 
@@ -1324,7 +1392,7 @@ class ValidityOutputGenerator(OutputGenerator):
         return self.makeReturnCodeList('errorcodes', cmd, name)
 
     def makeBeginState(self, cmd, name):
-        states_str = cmd.attrib.get('beginvalidstate')
+        states_str = cmd.get('beginvalidstate')
         if not states_str:
             return None
 
@@ -1339,7 +1407,7 @@ class ValidityOutputGenerator(OutputGenerator):
         return state_names
 
     def makeEndState(self, cmd, name):
-        states_str = cmd.attrib.get('endvalidstate')
+        states_str = cmd.get('endvalidstate')
         if not states_str:
             return None
 
@@ -1354,7 +1422,7 @@ class ValidityOutputGenerator(OutputGenerator):
         return state_names
 
     def makeCheckState(self, cmd, name):
-        states_str = cmd.attrib.get('checkvalidstate')
+        states_str = cmd.get('checkvalidstate')
         if not states_str:
             return None
 
@@ -1376,18 +1444,20 @@ class ValidityOutputGenerator(OutputGenerator):
             return True
         return False
 
-    #
-    # Command generation
-    def genCmd(self, cmdinfo, name):
-        OutputGenerator.genCmd(self, cmdinfo, name)
-        #
+    def genCmd(self, cmdinfo, name, alias):
+        """Command generation."""
+        OutputGenerator.genCmd(self, cmdinfo, name, alias)
+
+        # @@@ (Jon) something needs to be done here to handle aliases, probably
+
         # Get all the parameters
         params = cmdinfo.elem.findall('param')
 
-        validity = ''
-        validity += self.makeValidUsageStatements(cmdinfo.elem, name, params)
+        validity = self.makeValidUsageStatements(cmdinfo.elem, name, params)
 
         threadsafety = self.makeThreadSafetyBlock(cmdinfo.elem, 'param')
+        # Vulkan-specific
+        # commandpropertiesentry = self.makeCommandPropertiesTableEntry(cmdinfo.elem, name)
         successcodes = self.makeSuccessCodes(cmdinfo.elem, name)
         errorcodes = self.makeErrorCodes(cmdinfo.elem, name)
         beginsstate = self.makeBeginState(cmdinfo.elem, name)
@@ -1411,10 +1481,11 @@ class ValidityOutputGenerator(OutputGenerator):
                                  successcodes=successcodes,
                                  errorcodes=errorcodes))
 
-    #
-    # Struct Generation
-    def genStruct(self, typeinfo, typename):
-        OutputGenerator.genStruct(self, typeinfo, typename)
+    def genStruct(self, typeinfo, typeName, alias):
+        """Struct Generation."""
+        OutputGenerator.genStruct(self, typeinfo, typeName, alias)
+
+        # @@@ (Jon) something needs to be done here to handle aliases, probably
 
         # Anything that's only ever returned can't be set by the user, so shouldn't have any validity information.
         params = []
@@ -1423,30 +1494,30 @@ class ValidityOutputGenerator(OutputGenerator):
         childrenstructs = []
         paramdata = []
 
-        if typeinfo.elem.attrib.get('returnedonly') is None:
+        if typeinfo.elem.get('returnedonly') is None:
             params = typeinfo.elem.findall('member')
 
-            generalvalidity = self.makeValidUsageStatements(typeinfo.elem, typename, params)
+            generalvalidity = self.makeValidUsageStatements(typeinfo.elem, typeName, params)
             if generalvalidity:
                 validity += generalvalidity
             threadsafety = self.makeThreadSafetyBlock(typeinfo.elem, 'member')
         else:
-            # Need to generate type and next validation
+            # Need to generate structure type and next pointer chain member validation
             params = typeinfo.elem.findall('member')
 
-            retvalidity = self.makeValidUsageStatementsReturnedOnly(typeinfo.elem, typename, params)
+            retvalidity = self.makeValidUsageStatementsReturnedOnly(typeinfo.elem, typeName, params)
             if retvalidity:
                 validity += retvalidity
 
         if params:
             for param in params:
                 param_name = _getElemName(param)
-                paramtype = param.find('type').text
+                paramtype = param.find('type')
                 paramvalues = []
                 values = param.get('values')
                 if values is not None:
                     paramvalues = values.split(',')
-                paramnoautovalidity = param.attrib.get('noautovalidity')
+                paramnoautovalidity = param.get('noautovalidity')
                 paramdata.append(self.ParameterData(
                     name=param_name, type=paramtype, values=paramvalues, noautovalidity=paramnoautovalidity))
 
@@ -1454,11 +1525,11 @@ class ValidityOutputGenerator(OutputGenerator):
         if not self.isCoreExtensionName(self.currentExtension):
             extensionname = self.currentExtension
 
-        parentstruct = typeinfo.elem.attrib.get('parentstruct')
+        parentstruct = typeinfo.elem.get('parentstruct')
         if parentstruct is not None:
             storedstruct = _findNamedObject(self.structstorage, parentstruct)
             if storedstruct:
-                    storedstruct.childrenstructs.append(typename)
+                storedstruct.childrenstructs.append(typeName)
             else:
                 # We haven't encountered this parent yet, so fill in a stub
                 self.structstorage.append(
@@ -1468,12 +1539,12 @@ class ValidityOutputGenerator(OutputGenerator):
                             params=[],
                             validity='',
                             threadsafety=[],
-                            childrenstructs=[typename]))
+                            childrenstructs=[typeName]))
 
         alreadyexists = False
         # If it already exists, just append validity and threadsafety info
         for storedstruct in self.structstorage:
-            if storedstruct.name == typename:
+            if storedstruct.name == typeName:
                 alreadyexists = True
                 storedstruct.extensionname = extensionname
                 storedstruct.params.append(paramdata)
@@ -1483,7 +1554,7 @@ class ValidityOutputGenerator(OutputGenerator):
         # If it doesn't exist, create a new one from scratch
         if not alreadyexists:
             self.structstorage.append(
-                                self.StructureData(name=typename,
+                                self.StructureData(name=typeName,
                                     extensionname=extensionname,
                                     directory=self.genOpts.directory + '/structs',
                                     params=paramdata,
@@ -1492,12 +1563,14 @@ class ValidityOutputGenerator(OutputGenerator):
                                     childrenstructs=childrenstructs))
 
 
-    #
-    # Group (e.g. C "enum" type) generation.
-    # For the validity generator, this just tags individual enumerants
-    # as required or not.
-    def genGroup(self, groupinfo, groupName):
-        OutputGenerator.genGroup(self, groupinfo, groupName)
+    def genGroup(self, groupinfo, groupName, alias):
+        """Group (e.g. C "enum" type) generation.
+        For the validity generator, this just tags individual enumerants
+        as required or not.
+        """
+        OutputGenerator.genGroup(self, groupinfo, groupName, alias)
+
+        # @@@ (Jon) something needs to be done here to handle aliases, probably
 
         groupElem = groupinfo.elem
 
@@ -1511,11 +1584,13 @@ class ValidityOutputGenerator(OutputGenerator):
 
             # Tag enumerant as required or not
             ei.required = self.isEnumRequired(elem)
-    #
-    # Type Generation
-    def genType(self, typeinfo, typename):
-        OutputGenerator.genType(self, typeinfo, typename)
+
+    def genType(self, typeinfo, name, alias):
+        """Type Generation."""
+        OutputGenerator.genType(self, typeinfo, name, alias)
+
+        # @@@ (Jon) something needs to be done here to handle aliases, probably
 
         category = typeinfo.elem.get('category')
         if category in ('struct', 'union'):
-            self.genStruct(typeinfo, typename)
+            self.genStruct(typeinfo, name, alias)

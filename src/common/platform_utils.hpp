@@ -19,14 +19,12 @@
 
 #pragma once
 
+#include "xr_dependencies.h"
+
 #if defined(XR_OS_LINUX)
 #include <unistd.h>
 #include <fcntl.h>
 #include <iostream>
-#elif defined(XR_OS_WINDOWS)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <stdint.h>
 #endif
 
 // Structure used to track the global runtime file information
@@ -331,8 +329,8 @@ static inline bool PlatformLockGlobalRuntimeFile(uint16_t major_version, GlobalR
     bool ret_value = false;
     std::string rt_filename;
     if (PlatformGetGlobalRuntimeFileName(major_version, rt_filename)) {
-        HANDLE file_handle = CreateFile(rt_filename.c_str(), (GENERIC_READ | GENERIC_WRITE), FILE_SHARE_READ, nullptr,
-                                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        HANDLE file_handle = CreateFileA(rt_filename.c_str(), (GENERIC_READ | GENERIC_WRITE), FILE_SHARE_READ, nullptr,
+                                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
         if (file_handle != INVALID_HANDLE_VALUE) {
             global_rt_file.valid = true;
             global_rt_file.locked = true;

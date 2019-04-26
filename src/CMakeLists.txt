@@ -27,7 +27,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
     option(DYNAMIC_LOADER "Build the loader as a .dll library" ON)
 endif()
-
 option(BUILD_API_LAYERS "Build API layers" ON)
 option(BUILD_TESTS "Build tests" ON)
 

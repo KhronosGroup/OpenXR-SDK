@@ -18,6 +18,7 @@ import argparse, cProfile, pdb, string, sys, time
 from reg import *
 from generator import write
 from cgenerator import CGeneratorOptions, COutputGenerator
+from xrconventions import OpenXRConventions
 from automatic_source_generator import AutomaticSourceGeneratorOptions, AutomaticSourceOutputGenerator
 from loader_source_generator import LoaderSourceGeneratorOptions, LoaderSourceOutputGenerator
 from utility_source_generator import UtilitySourceGeneratorOptions, UtilitySourceOutputGenerator
@@ -34,7 +35,7 @@ def startTimer(timeit):
 def endTimer(timeit, msg):
     global startTime
     endTime = time.process_time()
-    if (timeit):
+    if timeit:
         write(msg, endTime - startTime, file=sys.stderr)
         startTime = None
 
@@ -100,9 +101,13 @@ def makeGenOpts(args):
         ''
     ]
 
+    # An API style conventions object
+    conventions = OpenXRConventions()
+
     genOpts['xr_generated_dispatch_table.h'] = [
           UtilitySourceOutputGenerator,
           UtilitySourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_dispatch_table.h',
             directory         = directory,
             apiname           = 'openxr',
@@ -126,6 +131,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_dispatch_table.c'] = [
           UtilitySourceOutputGenerator,
           UtilitySourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_dispatch_table.c',
             directory         = directory,
             apiname           = 'openxr',
@@ -149,6 +155,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_utilities.h'] = [
           UtilitySourceOutputGenerator,
           UtilitySourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_utilities.h',
             directory         = directory,
             apiname           = 'openxr',
@@ -172,6 +179,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_utilities.c'] = [
           UtilitySourceOutputGenerator,
           UtilitySourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_utilities.c',
             directory         = directory,
             apiname           = 'openxr',
@@ -195,6 +203,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_loader.hpp'] = [
           LoaderSourceOutputGenerator,
           LoaderSourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_loader.hpp',
             directory         = directory,
             apiname           = 'openxr',
@@ -218,6 +227,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_loader.cpp'] = [
           LoaderSourceOutputGenerator,
           LoaderSourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_loader.cpp',
             directory         = directory,
             apiname           = 'openxr',
@@ -242,6 +252,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_api_dump.cpp'] = [
           ApiDumpOutputGenerator,
           ApiDumpGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_api_dump.cpp',
             directory         = directory,
             apiname           = 'openxr',
@@ -265,6 +276,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_api_dump.hpp'] = [
           ApiDumpOutputGenerator,
           ApiDumpGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_api_dump.hpp',
             directory         = directory,
             apiname           = 'openxr',
@@ -289,6 +301,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_core_validation.hpp'] = [
           ValidationSourceOutputGenerator,
           ValidationSourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_core_validation.hpp',
             directory         = directory,
             apiname           = 'openxr',
@@ -312,6 +325,7 @@ def makeGenOpts(args):
     genOpts['xr_generated_core_validation.cpp'] = [
           ValidationSourceOutputGenerator,
           ValidationSourceGeneratorOptions(
+            conventions       = conventions,
             filename          = 'xr_generated_core_validation.cpp',
             directory         = directory,
             apiname           = 'openxr',
@@ -345,7 +359,7 @@ def genTarget(args):
     # Create generator options with specified parameters
     makeGenOpts(args)
 
-    if (args.target in genOpts.keys()):
+    if args.target in genOpts.keys():
         createGenerator = genOpts[args.target][0]
         options = genOpts[args.target][1]
 
@@ -440,27 +454,27 @@ if __name__ == '__main__':
     reg.loadElementTree(tree)
     endTimer(args.time, '* Time to parse ElementTree =')
 
-    if (args.validate):
+    if args.validate:
         reg.validateGroups()
 
-    if (args.dump):
+    if args.dump:
         write('* Dumping registry to regdump.txt', file=sys.stderr)
         reg.dumpReg(filehandle = open('regdump.txt', 'w', encoding='utf-8'))
 
     # create error/warning & diagnostic files
-    if (args.errfile):
+    if args.errfile:
         errWarn = open(args.errfile, 'w', encoding='utf-8')
     else:
         errWarn = sys.stderr
 
-    if (args.diagfile):
+    if args.diagfile:
         diag = open(args.diagfile, 'w', encoding='utf-8')
     else:
         diag = None
 
-    if (args.debug):
+    if args.debug:
         pdb.run('genTarget(args)')
-    elif (args.profile):
+    elif args.profile:
         import cProfile, pstats
         cProfile.run('genTarget(args)', 'profile.txt')
         p = pstats.Stats('profile.txt')

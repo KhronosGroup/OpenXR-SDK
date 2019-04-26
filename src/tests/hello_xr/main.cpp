@@ -104,6 +104,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 if (program->IsSessionRunning()) {
+                    program->PollActions();
                     program->RenderFrame();
                 } else {
                     // Throttle loop since xrWaitFrame won't be called.

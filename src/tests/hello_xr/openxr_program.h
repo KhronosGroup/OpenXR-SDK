@@ -22,6 +22,11 @@ struct IOpenXrProgram {
 
     // Manage session lifecycle and return true if RenderFrame should be called.
     virtual bool IsSessionRunning() = 0;
+    virtual bool IsSessionVisible() = 0;
+    virtual bool IsSessionFocused() = 0;
+
+    // Sample input actions and generate haptic feedback.
+    virtual void PollActions() = 0;
 
     // Create and submit a frame.
     virtual void RenderFrame() = 0;

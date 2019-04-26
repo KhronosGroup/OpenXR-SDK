@@ -293,21 +293,24 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
     try {
         HKEY hkey;
         DWORD access_flags;
-        TCHAR value[1024];
+        char value[1024];
         DWORD value_size = 1023;
 
         // Generate the full registry location for the registry information
         std::string full_registry_location = OPENXR_REGISTRY_LOCATION;
         full_registry_location += std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION));
         full_registry_location += runtime_registry_location;
+
+        // Use 64 bit regkey for 64bit application, and use 32 bit regkey in WOW for 32bit application.
         access_flags = KEY_QUERY_VALUE;
-        LONG open_value = RegOpenKeyEx(HKEY_LOCAL_MACHINE, full_registry_location.c_str(), 0, access_flags, &hkey);
+        LONG open_value = RegOpenKeyExA(HKEY_LOCAL_MACHINE, full_registry_location.c_str(), 0, access_flags, &hkey);
+
         if (ERROR_SUCCESS != open_value) {
             std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
             warning_message += full_registry_location;
             LoaderLogger::LogWarningMessage("", warning_message);
-        } else if (ERROR_SUCCESS == RegQueryValueEx(hkey, default_runtime_value_name.c_str(), NULL, NULL,
-                                                    reinterpret_cast<LPBYTE>(&value), &value_size) &&
+        } else if (ERROR_SUCCESS == RegQueryValueExA(hkey, default_runtime_value_name.c_str(), NULL, NULL,
+                                                     reinterpret_cast<LPBYTE>(&value), &value_size) &&
                    value_size < 1024) {
             AddFilesInPath(type, value, false, manifest_files);
         }
@@ -339,7 +342,7 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
             full_registry_location += registry_location;
 
             access_flags = KEY_QUERY_VALUE;
-            LONG open_value = RegOpenKeyEx(hive[hive_index], full_registry_location.c_str(), 0, access_flags, &hkey);
+            LONG open_value = RegOpenKeyExA(hive[hive_index], full_registry_location.c_str(), 0, access_flags, &hkey);
             if (ERROR_SUCCESS != open_value) {
                 if (hive_index == 1 && !found[0]) {
                     std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
@@ -351,7 +354,7 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
             }
             found[hive_index] = true;
             while (ERROR_SUCCESS ==
-                   (rtn_value = RegEnumValue(hkey, key_index++, name, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
+                   (rtn_value = RegEnumValueA(hkey, key_index++, name, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
                 if (value_size == sizeof(value) && value == 0) {
                     std::string filename = name;
                     AddFilesInPath(type, filename, false, manifest_files);
@@ -661,7 +664,8 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
 #else
             if (!PlatformGetGlobalRuntimeFileName(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION), filename)) {
                 LoaderLogger::LogErrorMessage(
-                    "", "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
+                    "",
+                    "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
                 return XR_ERROR_FILE_ACCESS_ERROR;
             }
 #endif

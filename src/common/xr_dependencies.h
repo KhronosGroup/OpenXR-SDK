@@ -21,11 +21,24 @@
 #include <android/native_window.h>
 #endif  // XR_USE_PLATFORM_ANDROID
 
-#ifdef XR_USE_GRAPHICS_API_D3D
-// Windows.h is needed for the LUID definition.
+#ifdef XR_USE_PLATFORM_WIN32
+
+#include <winapifamily.h>
+#if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM))
+#pragma push_macro("WINAPI_PARTITION_DESKTOP")
+#undef WINAPI_PARTITION_DESKTOP
+#define WINAPI_PARTITION_DESKTOP 1  // Enable desktop partition apis, such as RegOpenKeyEx, LoadLibraryEx etc.
+#define CHANGED_WINAPI_PARTITION_DESKTOP_VALUE
+#endif
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#endif  // XR_USE_GRAPHICS_API_D3D
+
+#if defined(CHANGED_WINAPI_PARTITION_DESKTOP_VALUE)
+#pragma pop_macro("WINAPI_PARTITION_DESKTOP")
+#endif
+
+#endif  // XR_USE_PLATFORM_WIN32
 
 #ifdef XR_USE_GRAPHICS_API_D3D10
 // d3d10_1 must be included to ensure proper SAL annotations, otherwise the compiler will emit:

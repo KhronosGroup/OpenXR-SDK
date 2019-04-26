@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os,re,sys
-from generator import *
+import sys
+from generator import (GeneratorOptions, OutputGenerator, noneStr,
+                       regSortFeatures, write)
 
 doc = """
 /*
@@ -131,7 +132,7 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
 
         #
         # User-supplied prefix text, if any (list of strings)
-        if (genOpts.prefixText):
+        if genOpts.prefixText:
             for s in genOpts.prefixText:
                 write(s, file=self.outFile)
                 write(s, file=self.outFileHeader)
@@ -150,20 +151,20 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
 
     def endFile(self):
         for pointer in self.pointers:
-          write(pointer, file=self.outFile)
+            write(pointer, file=self.outFile)
 
         self.newline()
 
         write('void vkExtInitInstance(VkInstance instance)\n{', file=self.outFile)
         for pointerInitializer in self.pointerInitializersInstance:
-          write(pointerInitializer, file=self.outFile)
+            write(pointerInitializer, file=self.outFile)
         write('}', file=self.outFile)
 
         self.newline()
 
         write('void vkExtInitDevice(VkDevice device)\n{', file=self.outFile)
         for pointerInitializer in self.pointerInitializersDevice:
-          write(pointerInitializer, file=self.outFile)
+            write(pointerInitializer, file=self.outFile)
         write('}', file=self.outFile)
 
         self.newline()
@@ -190,29 +191,29 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
 
     def endFeature(self):
         # Add feature to global list with protectFeature
-        if (self.emit and self.featurePointers):
-          if (self.genOpts.protectFeature):
-              self.pointers.append('#ifdef ' + self.featureName)
-              self.pointerInitializersInstance.append('#ifdef ' + self.featureName)
-              self.pointerInitializersDevice.append('#ifdef ' + self.featureName)
+        if self.emit and self.featurePointers:
+            if self.genOpts.protectFeature:
+                self.pointers.append('#ifdef ' + self.featureName)
+                self.pointerInitializersInstance.append('#ifdef ' + self.featureName)
+                self.pointerInitializersDevice.append('#ifdef ' + self.featureName)
 
-          if (self.featureExtraProtect != None):
-              self.pointers.append('#ifdef ' + self.featureExtraProtect)
-              self.pointerInitializersInstance.append('#ifndef ' + self.featureName)
-              self.pointerInitializersDevice.append('#ifndef ' + self.featureName)
+            if self.featureExtraProtect is not None:
+                self.pointers.append('#ifdef ' + self.featureExtraProtect)
+                self.pointerInitializersInstance.append('#ifndef ' + self.featureName)
+                self.pointerInitializersDevice.append('#ifndef ' + self.featureName)
 
-          self.pointers += self.featurePointers
-          self.pointerInitializersInstance += self.featurePointerInitializersInstance
-          self.pointerInitializersDevice += self.featurePointerInitializersDevice
+            self.pointers += self.featurePointers
+            self.pointerInitializersInstance += self.featurePointerInitializersInstance
+            self.pointerInitializersDevice += self.featurePointerInitializersDevice
 
-          if (self.featureExtraProtect != None):
-              self.pointers.append('#endif /* ' + self.featureExtraProtect + ' */')
-              self.pointerInitializersInstance.append('#endif /* ' + self.featureExtraProtect + ' */')
-              self.pointerInitializersDevice.append('#endif /* ' + self.featureExtraProtect + ' */')
-          if (self.genOpts.protectFeature):
-              self.pointers.append('#endif /* ' + self.featureName + ' */')
-              self.pointerInitializersInstance.append('#endif /* ' + self.featureName + ' */')
-              self.pointerInitializersDevice.append('#endif /* ' + self.featureName + ' */')
+            if self.featureExtraProtect is not None:
+                self.pointers.append('#endif /* ' + self.featureExtraProtect + ' */')
+                self.pointerInitializersInstance.append('#endif /* ' + self.featureExtraProtect + ' */')
+                self.pointerInitializersDevice.append('#endif /* ' + self.featureExtraProtect + ' */')
+            if self.genOpts.protectFeature:
+                self.pointers.append('#endif /* ' + self.featureName + ' */')
+                self.pointerInitializersInstance.append('#endif /* ' + self.featureName + ' */')
+                self.pointerInitializersDevice.append('#endif /* ' + self.featureName + ' */')
 
         # Finish processing in superclass
         OutputGenerator.endFeature(self)
@@ -220,16 +221,16 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
     #
     # Type generation
     def genType(self, typeinfo, name):
-      pass
+        pass
 
     def genStruct(self, typeinfo, typeName):
-      pass
+        pass
 
     def genGroup(self, groupinfo, groupName):
-      pass
+        pass
 
     def genEnum(self, enuminfo, name):
-      pass
+        pass
 
     #
     # Command generation
@@ -261,7 +262,7 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
         tail = noneStr(nameTag.tail)
         returnType = noneStr(proto.find('type').text)
 
-        type = self.makeFunctionPointerType(nameTag.text, tail)
+        pfn_type = self.makeFunctionPointerType(nameTag.text, tail)
 
         # For each child element, if it's a <name> wrap in appropriate
         # declaration. Otherwise append its contents and tail con#tents.
@@ -269,14 +270,14 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
         for elem in proto:
             text = noneStr(elem.text)
             tail = noneStr(elem.tail)
-            if (elem.tag == 'name'):
+            if elem.tag == 'name':
                 name = self.makeProtoName(text, tail)
                 stubDecl += name
             else:
                 stubDecl += text + tail
 
         pfnName = self.makeFunctionPointerName(nameTag.text, noneStr(tail))
-        pfnDecl += type + ' ' + pfnName + ';'
+        pfnDecl += pfn_type + ' ' + pfnName + ';'
 
         # Now generate the stub function
         pfnDecl += '\n'
@@ -294,11 +295,11 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
         if n > 0:
             indentCallParam = '(\n'
             indentdecl = '(\n'
-            indentdecl += ',\n'.join([self.makeCParamDecl(p, align)
-                                      for p in params])
+            indentdecl += ',\n'.join(self.makeCParamDecl(p, align)
+                                     for p in params)
             indentdecl += ')'
-            pfnCall += ',\n'.join([self.makeCCallParam(p, align)
-                                   for p in params])
+            pfnCall += ',\n'.join(self.makeCCallParam(p, align)
+                                  for p in params)
             pfnCall += '\n    );\n'
             indentCallParam += pfnCall
         else:
@@ -306,17 +307,17 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
 
         pfnCall += '}\n'
 
-        featureInstance = '    '  + pfnName + ' = ('+type+')vkGetInstanceProcAddr(instance, "' + name + '");'
-        featureDevice = '    '  + pfnName + ' = ('+type+')vkGetDeviceProcAddr(device, "' + name + '");'
+        featureInstance = '    '  + pfnName + ' = ('+pfn_type+')vkGetInstanceProcAddr(instance, "' + name + '");'
+        featureDevice = '    '  + pfnName + ' = ('+pfn_type+')vkGetDeviceProcAddr(device, "' + name + '");'
         return [featureInstance, featureDevice , pfnDecl  + stubDecl + paramdecl + pfnCall]
 
     # Return function pointer type for given function
     def makeFunctionPointerType(self, name, tail):
-       return 'PFN_' + name + tail
+        return 'PFN_' + name + tail
 
     # Return name of static variable which stores the function pointer for the given function
     def makeFunctionPointerName(self, name, tail):
-       return 'pfn_' + name + tail
+        return 'pfn_' + name + tail
 
     #
     # makeCParamDecl - return a string which is an indented, formatted
@@ -325,6 +326,5 @@ class ExtensionStubSourceOutputGenerator(OutputGenerator):
     # param - Element (<param> or <member>) to format
     # aligncol - if non-zero, attempt to align the nested <name> element
     #   at this column
-    def makeCCallParam(self, param, aligncol):
+    def makeCCallParam(self, param, _aligncol):
         return '        ' + param.find('name').text
-

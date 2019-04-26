@@ -94,3 +94,39 @@ class ConventionsBase(ABC):
         if not comma_for_two_elts and len(my_elts) <= 2:
             return ' '.join(my_elts)
         return ', '.join(my_elts)
+
+    @property
+    @abstractmethod
+    def file_suffix(self):
+        """Return suffix of generated Asciidoctor files"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def api_name(self):
+        """Return API name"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def api_prefix(self):
+        """Return API token prefix"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def api_version_prefix(self):
+        """Return API core version token prefix"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def KHR_prefix(self):
+        """Return extension name prefix for KHR extensions"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def EXT_prefix(self):
+        """Return extension name prefix for EXT extensions"""
+        raise NotImplementedError

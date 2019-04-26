@@ -19,7 +19,8 @@
 # some other filter, since whitespace inside a tag isn't part of the
 # internal representation.
 
-import copy, sys, string, re
+import re
+import sys
 
 def realignXML(fp):
     patterns = [
@@ -38,21 +39,21 @@ def realignXML(fp):
         emitted = False
         for i in range(0,len(patterns)):
             match = regexp[i].match(line)
-            if (match):
-                if (not emitted):
+            if match:
+                if not emitted:
                     #print('# While processing line: ' + line, end='')
                     emitted = True
                 #print('# matched expression: ' + patterns[i][0])
                 #print('# clause 1 = ' + match.group(1))
                 #print('# clause 2 = ' + match.group(2))
                 line = match.group(1).ljust(column[i]) + match.group(2)
-        if (emitted):
+        if emitted:
             print(line)
         else:
             print(line, end='')
 
 if __name__ == '__main__':
-    if (len(sys.argv) > 1):
+    if len(sys.argv) > 1:
         realignXML(open(sys.argv[1], 'r', encoding='utf-8'))
     else:
         realignXML(sys.stdin)

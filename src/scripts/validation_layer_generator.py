@@ -50,6 +50,7 @@ VALID_USAGE_MANUALLY_DEFINED = [
 # ValidationSourceGeneratorOptions - subclass of AutomaticSourceGeneratorOptions.
 class ValidationSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
     def __init__(self,
+                 conventions=None,
                  filename=None,
                  directory='.',
                  apiname=None,
@@ -74,10 +75,19 @@ class ValidationSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
                  indentFuncPointer=False,
                  alignFuncParam=0,
                  genEnumBeginEndRange=False):
-        AutomaticSourceGeneratorOptions.__init__(self, filename, directory, apiname, profile,
-                                                 versions, emitversions, defaultExtensions,
-                                                 addExtensions, removeExtensions,
-                                                 emitExtensions, sortProcedure)
+        AutomaticSourceGeneratorOptions.__init__(self,
+                                                 conventions=conventions,
+                                                 filename=filename,
+                                                 directory=directory,
+                                                 apiname=apiname,
+                                                 profile=profile,
+                                                 versions=versions,
+                                                 emitversions=emitversions,
+                                                 defaultExtensions=defaultExtensions,
+                                                 addExtensions=addExtensions,
+                                                 removeExtensions=removeExtensions,
+                                                 emitExtensions=emitExtensions,
+                                                 sortProcedure=sortProcedure)
 
 # ValidationSourceOutputGenerator - subclass of AutomaticSourceOutputGenerator.
 
@@ -2716,7 +2726,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 elif ('xrDestroy' in cur_cmd.name or 'xrDisconnect' in cur_cmd.name) and last_param.is_handle:
                     is_destroy = True
                     has_return = True
-                elif (cur_cmd.return_type is not None):
+                elif cur_cmd.return_type is not None:
                     has_return = True
 
                 validation_source_funcs += self.genValidateInputsFunc(cur_cmd)
@@ -2777,7 +2787,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     continue
 
                 has_return = False
-                if (cur_cmd.return_type != None):
+                if cur_cmd.return_type != None:
                     has_return = True
 
                 if cur_cmd.name in VALID_USAGE_MANUALLY_DEFINED:

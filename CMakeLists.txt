@@ -29,7 +29,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 find_program(BASH_COMMAND NAMES bash)
-if(BASH_COMMAND)
+if(BASH_COMMAND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/specification/Makefile")
     option(BUILD_SPECIFICATION "Run './makeAllExts all' in the specification directory as part of the build - intended for one-step checking of spec changes" OFF)
     if(BUILD_SPECIFICATION)
         add_custom_target(spec-all ALL

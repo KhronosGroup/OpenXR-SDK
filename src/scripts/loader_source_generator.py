@@ -87,6 +87,7 @@ EXTENSIONS_LOADER_IMPLEMENTS = [
 
 class LoaderSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
     def __init__(self,
+                 conventions=None,
                  filename=None,
                  directory='.',
                  apiname=None,
@@ -111,10 +112,19 @@ class LoaderSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
                  indentFuncPointer=False,
                  alignFuncParam=0,
                  genEnumBeginEndRange=False):
-        AutomaticSourceGeneratorOptions.__init__(self, filename, directory, apiname, profile,
-                                                 versions, emitversions, defaultExtensions,
-                                                 addExtensions, removeExtensions,
-                                                 emitExtensions, sortProcedure)
+        AutomaticSourceGeneratorOptions.__init__(self,
+                                                 conventions=conventions,
+                                                 filename=filename,
+                                                 directory=directory,
+                                                 apiname=apiname,
+                                                 profile=profile,
+                                                 versions=versions,
+                                                 emitversions=emitversions,
+                                                 defaultExtensions=defaultExtensions,
+                                                 addExtensions=addExtensions,
+                                                 removeExtensions=removeExtensions,
+                                                 emitExtensions=emitExtensions,
+                                                 sortProcedure=sortProcedure)
         # Instead of using prefixText, we write our own
         self.prefixText = None
         self.genFuncPointers = genFuncPointers
@@ -482,7 +492,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     param_cdecl = param.cdecl
                     is_const = False
                     const_check = param_cdecl.strip()
-                    if (const_check[:5].lower() == "const"):
+                    if const_check[:5].lower() == "const":
                         is_const = True
                     pointer_count = self.paramPointerCount(
                         param.cdecl, param.type, param.name)
@@ -654,7 +664,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 generated_funcs += '('
                 count = 0
                 for param in tramp_param_replace:
-                    if (count > 0):
+                    if count > 0:
                         generated_funcs += ', '
                     generated_funcs += param.name
                     count = count + 1
@@ -732,7 +742,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     generated_funcs += '('
                     count = 0
                     for param in cur_cmd.params:
-                        if (count > 0):
+                        if count > 0:
                             generated_funcs += ', '
                         generated_funcs += param.name
                         count = count + 1

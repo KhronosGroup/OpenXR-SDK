@@ -44,6 +44,7 @@ DONT_GEN_IN_LAYER = [
 
 class ApiDumpGeneratorOptions(AutomaticSourceGeneratorOptions):
     def __init__(self,
+                 conventions=None,
                  filename=None,
                  directory='.',
                  apiname=None,
@@ -68,7 +69,7 @@ class ApiDumpGeneratorOptions(AutomaticSourceGeneratorOptions):
                  indentFuncPointer=False,
                  alignFuncParam=0,
                  genEnumBeginEndRange=False):
-        AutomaticSourceGeneratorOptions.__init__(self, filename, directory, apiname, profile,
+        AutomaticSourceGeneratorOptions.__init__(self, conventions, filename, directory, apiname, profile,
                                                  versions, emitversions, defaultExtensions,
                                                  addExtensions, removeExtensions,
                                                  emitExtensions, sortProcedure)
@@ -273,9 +274,9 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         period_pos = param_name.rfind(".")
         arrow_pos = param_name.rfind(">")
         param_name_prefix = ''
-        if (arrow_pos > period_pos):
+        if arrow_pos > period_pos:
             param_name_prefix = param_name[:arrow_pos + 1]
-        elif (period_pos > arrow_pos):
+        elif period_pos > arrow_pos:
             param_name_prefix = param_name[:period_pos + 1]
         return param_name_prefix
 

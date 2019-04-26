@@ -20,12 +20,8 @@
 #               that depend on the API being used.
 
 import pytest
-
-from check_spec_links import MacroChecker, MessageId, makeMacroChecker
-from spec_tools.console_printer import ConsolePrinter
-from spec_tools.macro_checker_file import shouldEntityBeText
-from test_check_spec_links import (CheckerWrapper, allMessages,
-                                   loneMsgReplacement, message, msgReplacement)
+from check_spec_links import MessageId, makeMacroChecker
+from test_check_spec_links import CheckerWrapper, allMessages, msgReplacement
 
 
 @pytest.fixture

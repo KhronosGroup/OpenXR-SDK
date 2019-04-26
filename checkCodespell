@@ -1,0 +1,123 @@
+#!/bin/sh
+#
+# Copyright (c) 2019 The Khronos Group Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# checkCodespell - Run the codespell (https://github.com/codespell-project/codespell)
+# tool on the specification, registry, scripts, and source. Forwards any command line arguments
+# on to the codespell invocation.
+#
+# Usage: ./checkCodespell
+#        Any command-line arguments are passed along to the codespell call,
+#        so e.g. to fix interactively, do ./checkCodespell -q4 -w -i 3
+#
+#        If no arguments are passed, the number of errors will be counted,
+#        and the script will exit with a non-zero error code if the number
+#        of warnings is greater than ${CODESPELL_IGNORE}
+#        (default defined below as DEFAULT_CODESPELL_IGNORE).
+#
+#        Environment variable CODESPELL can be set to the path to codespell.
+
+ROOT=$(dirname $0)
+
+# How many lines of warnings should be ignored?
+DEFAULT_CODESPELL_IGNORE=0
+
+# This syntax allows the default to be overridden by external definition of CODESPELL_IGNORE
+CODESPELL_IGNORE=${CODESPELL_IGNORE:-${DEFAULT_CODESPELL_IGNORE}}
+
+# Add to this list when codespell mis-identifies a term actually used as a misspelling
+# (comma-delimited)
+IGNORE_WORDS="lod,LOD"
+
+# Add to this to exclude individual files or directories (comma-delimited)
+# - Skipping external code.
+# - Skipping binary files.
+SKIP="${ROOT}/src/external,*.pyc,*.png"
+
+# Args that get passed if no args are provided to this script.
+# -q4 to silence "UINT  ==> UNIT  | disabled due to being a data type"
+DEFAULT_ARGS="-q4"
+
+which_codespell=$(which codespell)
+
+CODESPELL=${CODESPELL:-${which_codespell}}
+
+# This command is in a function so we can call it again easily to do a count.
+doCodespell() {
+    ${CODESPELL} --ignore-words-list="${IGNORE_WORDS}" \
+    --skip="${SKIP}" \
+    --exclude-file=${ROOT}/openxr-codespell.exclude \
+    "$@" \
+    ${ROOT}/*.md \
+    ${ROOT}/*.sh \
+    ${ROOT}/*.bat \
+    ${ROOT}/include/ \
+    ${ROOT}/specification/check* \
+    ${ROOT}/specification/make* \
+    ${ROOT}/specification/*.md \
+    ${ROOT}/specification/loader/ \
+    ${ROOT}/specification/registry/ \
+    ${ROOT}/specification/scripts/*.py \
+    ${ROOT}/specification/scripts/*.rb \
+    ${ROOT}/specification/scripts/openxr-macros/*.rb \
+    ${ROOT}/specification/sources/ \
+    ${ROOT}/src \
+    ${ROOT}/vuid_database/ \
+
+    # Keep a blank line after the last pattern, so that a trailing backslash is OK!
+}
+
+echo "Using CODESPELL=${CODESPELL} - version $(${CODESPELL} --version)"
+
+EXTRA_ARGS=""
+
+if [ $# -eq 0 ]; then
+    echo "No arguments passed, will use default arguments: ${DEFAULT_ARGS}"
+    EXTRA_ARGS="${DEFAULT_ARGS}"
+fi
+
+echo ""
+
+doCodespell "$@" ${EXTRA_ARGS}
+
+if [ $# -eq 0 ]; then
+    # No arguments were passed, so this isn't, e.g., an interactive repair call.
+    # Thus, check it against our built-in requirements.
+
+    echo ""
+    echo "No arguments passed, so counting errors and comparing to CODESPELL_IGNORE=${CODESPELL_IGNORE}"
+    if [ ${CODESPELL_IGNORE} -ne ${DEFAULT_CODESPELL_IGNORE} ]; then
+        echo "Note: Manually-set CODESPELL_IGNORE is overriding the built in default value, DEFAULT_CODESPELL_IGNORE=${DEFAULT_CODESPELL_IGNORE}"
+    else
+        echo "(set from the built in default value, DEFAULT_CODESPELL_IGNORE)"
+    fi
+    echo ""
+
+    numErrors=$(doCodespell -q5 |wc -l)
+    echo "${numErrors} errors seen"
+
+    if [ "${numErrors}" -gt "${CODESPELL_IGNORE}" ]; then
+        echo "Error limit exceeded - exiting with error"
+        exit 1
+    else
+        echo "OK - limit not exceeded."
+    fi
+
+    if [ "${numErrors}" -lt "${DEFAULT_CODESPELL_IGNORE}" ]; then
+        echo ""
+        echo "Note: Error count is less than DEFAULT_CODESPELL_IGNORE,"
+        echo "please update that variable in $0 to tighten requirements."
+    fi
+fi

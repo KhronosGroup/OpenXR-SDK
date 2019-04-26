@@ -14,25 +14,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# genRef.py - create OpenXR ref pages from spec source files
-#
+# genRef.py - create API ref pages from spec source files
 #
 # Usage: genRef.py files
 
-from reflib import *
-from xrapi import *
-from reg import Registry
+import argparse
+import io
+import os
+import re
+import sys
 from collections import OrderedDict
-import argparse, copy, io, os, pdb, re, string, sys
-
+from reflib import (findRefs, fixupRefs, loadFile, logDiag, logWarn,
+                    printPageInfo, setLogFile)
+from reg import Registry
+import xrapi as api
+from xrconventions import OpenXRConventions as APIConventions
 
 def makeExtensionInclude(name):
     """Return an include command, given an extension name."""
-    return 'include::../sources/chapters/extensions/meta/refpage.{}.adoc[]'.format(
-        name)
+    return 'include::{}/refpage.{}{}[]'.format(
+        conventions.specification_path,
+        name,
+        conventions.file_suffix)
 
-
-# Return True if name is an OpenXR extension name (ends with an upper-case
+# Return True if name is an API extension name (ends with an upper-case
 # author ID). This assumes that author IDs are at least two characters.
 def isextension(name):
     return name[-2:].isalpha() and name[-2:].isupper()
@@ -43,34 +48,34 @@ def isextension(name):
 # which copyrights the outputs. Also include some asciidoc boilerplate
 # needed by all the standalone ref pages.
 def printCopyrightSourceComments(fp):
-        print('// Copyright (c) 2014-2019 Khronos Group. This work is licensed under a', file=fp)
-        print('// Creative Commons Attribution 4.0 International License; see', file=fp)
-        print('// http://creativecommons.org/licenses/by/4.0/', file=fp)
-        print('', file=fp)
+    print('// Copyright (c) 2014-2019 Khronos Group. This work is licensed under a', file=fp)
+    print('// Creative Commons Attribution 4.0 International License; see', file=fp)
+    print('// http://creativecommons.org/licenses/by/4.0/', file=fp)
+    print('', file=fp)
 
 def printFooter(fp):
     print('include::footer.txt[]', file=fp)
     print('', file=fp)
 
 
-# Add a spec asciidoc macro prefix to an OpenXR name, depending on its type
+# Add a spec asciidoc macro prefix to an API name, depending on its type
 # (protos, structs, enums, etc.)
 def macroPrefix(name):
-    if name in basetypes.keys():
+    if name in api.basetypes:
         return 'basetype:' + name
-    elif name in defines.keys():
+    elif name in api.defines:
         return 'dlink:' + name
-    elif name in enums.keys():
+    elif name in api.enums:
         return 'elink:' + name
-    elif name in flags.keys():
+    elif name in api.flags:
         return 'elink:' + name
-    elif name in funcpointers.keys():
+    elif name in api.funcpointers:
         return 'tlink:' + name
-    elif name in handles.keys():
+    elif name in api.handles:
         return 'slink:' + name
-    elif name in protos.keys():
+    elif name in api.protos:
         return 'flink:' + name
-    elif name in structs.keys():
+    elif name in api.structs:
         return 'slink:' + name
     elif name == 'TBD':
         return 'No cross-references are available'
@@ -78,29 +83,27 @@ def macroPrefix(name):
         return 'UNKNOWN:' + name
 
 # Return an asciidoc string with a list of 'See Also' references for the
-# OpenXR entity 'name', based on the relationship mapping in xrapi.py and
+# API entity 'name', based on the relationship mapping in the api module and
 # the additional references in explicitRefs. If no relationships are
 # available, return None.
 def seeAlsoList(apiName, explicitRefs = None):
     refs = {}
 
     # Add all the implicit references to refs
-    if apiName in mapDict.keys():
-        for name in sorted(mapDict[apiName].keys()):
+    if apiName in api.mapDict:
+        for name in sorted(api.mapDict[apiName]):
             refs[name] = None
 
     # Add all the explicit references
-    if explicitRefs != None:
+    if explicitRefs is not None:
         if isinstance(explicitRefs, str):
             explicitRefs = explicitRefs.split()
         for name in explicitRefs:
             refs[name] = None
 
-    names = [macroPrefix(name) for name in sorted(refs.keys())]
-    if len(names) > 0:
-        return ', '.join(names) + '\n'
-    else:
+    if not refs:
         return None
+    return ', '.join(macroPrefix(name) for name in sorted(refs.keys())) + '\n'
 
 # Remap include directives in a list of lines so they can be extracted to a
 # different directory. Returns remapped lines.
@@ -115,16 +118,21 @@ def remapIncludes(lines, baseDir, specDir):
     newLines = []
     for line in lines:
         matches = includePat.search(line)
-        if matches != None:
+        if matches is not None:
             path = matches.group('path')
 
-            # Relative path to include file from here
-            incPath = specDir + '/' + path
-            # Remap to be relative to baseDir
-            newPath = os.path.relpath(incPath, baseDir)
-            newLine = 'include::' + newPath + '[]\n'
-            logDiag('remapIncludes: remapping', line, '->', newLine)
-            newLines.append(newLine)
+            if path[0] != '{':
+                # Relative path to include file from here
+                incPath = specDir + '/' + path
+                # Remap to be relative to baseDir
+                newPath = os.path.relpath(incPath, baseDir)
+                newLine = 'include::' + newPath + '[]\n'
+                logDiag('remapIncludes: remapping', line, '->', newLine)
+                newLines.append(newLine)
+            else:
+                # An asciidoctor variable starts the path.
+                # This must be an absolute path, not needing to be rewritten.
+                newLines.append(line)
         else:
             newLines.append(line)
     return newLines
@@ -135,6 +143,7 @@ def refPageShell(pageName, pageDesc, fp, sections=None, tail_content=None, man_s
 
     print(':data-uri:',
           ':icons: font',
+          conventions.extra_refpage_headers,
           '',
           sep='\n', file=fp)
 
@@ -176,7 +185,7 @@ def refPageShell(pageName, pageDesc, fp, sections=None, tail_content=None, man_s
 def refPageHead(pageName, pageDesc, specText, fieldName, fieldText, descText, fp):
     sections = OrderedDict()
     sections['C Specification'] = specText
-    if fieldName != None:
+    if fieldName is not None:
         sections[fieldName] = fieldText
 
     if descText is None or descText.strip() == '':
@@ -188,35 +197,28 @@ def refPageHead(pageName, pageDesc, specText, fieldName, fieldText, descText, fp
     refPageShell(pageName, pageDesc, fp, sections=sections)
 
 def refPageTail(pageName, seeAlso, fp, auto = False):
-    # This is difficult to get working properly in asciidoc
-    # specURL = 'link:{xrspecpath}/xrspec.html'
-
-    # Where to find the current all-extensions OpenXR HTML spec, so xrefs in
-    # the asciidoc source that aren't to ref pages can link into it instead.
-    specURL = 'https://www.khronos.org/registry/openxr/specs/1.0-extensions/html/xrspec.html'
-
-    if seeAlso == None:
+    if seeAlso is None:
         seeAlso = 'No cross-references are available\n'
 
     notes = [
-        'For more information, see the OpenXR Specification at URL',
+        'For more information, see the ' + apiName + ' Specification at URL',
         '',
-        specURL + '#' + pageName,
+        conventions.specURL + '#' + pageName,
         '',
         ]
 
     if auto:
-        notes.extend([
+        notes.extend((
             'This page is a generated document.',
             'Fixes and changes should be made to the generator scripts, '
             'not directly.',
-            ])
+            ))
     else:
-        notes.extend([
-            'This page is extracted from the OpenXR Specification. ',
+        notes.extend((
+            'This page is extracted from the ' + apiName + ' Specification. ',
             'Fixes and changes should be made to the Specification, '
             'not directly.',
-            ])
+            ))
 
     print('== See Also',
           '',
@@ -246,12 +248,12 @@ def emitPage(baseDir, specDir, pi, file):
     logDiag('emitPage:', pageName)
 
     # Short description
-    if pi.desc == None:
+    if pi.desc is None:
         pi.desc = '(no short description available)'
 
     # Not sure how this happens yet
-    if pi.include == None:
-        logWarn('emitPage:', pageName, 'INCLUDE == None, no page generated')
+    if pi.include is None:
+        logWarn('emitPage:', pageName, 'INCLUDE is None, no page generated')
         return
 
     # Specification text
@@ -261,7 +263,7 @@ def emitPage(baseDir, specDir, pi, file):
     # Member/parameter list, if there is one
     field = None
     fieldText = None
-    if pi.param != None:
+    if pi.param is not None:
         if pi.type == 'structs':
             field = 'Members'
         elif pi.type in ['protos', 'funcpointers']:
@@ -286,7 +288,7 @@ def emitPage(baseDir, specDir, pi, file):
     specLinksPattern = re.compile(r'<<([^>,]+)[,]?[ \t\n]*([^>,]*)>>')
     specLinksSubstitute = r"link:{html_spec_relative}#\1[\2]"
     specText, _ = specLinksPattern.subn(specLinksSubstitute, specText)
-    if fieldText != None:
+    if fieldText is not None:
         fieldText, _ = specLinksPattern.subn(specLinksSubstitute, fieldText)
     if descText is not None:
         descText, _ = specLinksPattern.subn(specLinksSubstitute, descText)
@@ -316,7 +318,7 @@ def autoGenEnumsPage(baseDir, pi, file):
     logDiag('autoGenEnumsPage:', pageName)
 
     # Short description
-    if pi.desc == None:
+    if pi.desc is None:
         pi.desc = '(no short description available)'
 
     # Description text. Allow for the case where an enum definition
@@ -324,16 +326,16 @@ def autoGenEnumsPage(baseDir, pi, file):
     if not pi.embed:
         embedRef = ''
     else:
-        embedRef = ''.join([
-                        '  * The reference page for ',
-                        macroPrefix(pi.embed),
-                        ', where this interface is defined.\n' ])
+        embedRef = ''.join((
+                           '  * The reference page for ',
+                           macroPrefix(pi.embed),
+                           ', where this interface is defined.\n' ))
 
-    txt = ''.join([
+    txt = ''.join((
         'For more information, see:\n\n',
         embedRef,
         '  * The See Also section for other reference pages using this type.\n',
-        '  * The OpenXR Specification.\n' ])
+        '  * The ' + apiName + ' Specification.\n' ))
 
     refPageHead(pi.name,
                 pi.desc,
@@ -344,12 +346,15 @@ def autoGenEnumsPage(baseDir, pi, file):
     refPageTail(pi.name, seeAlsoList(pi.name, pi.refs), fp, auto = True)
     fp.close()
 
-# Pattern to break apart a Vk*Flags{authorID} name, used in autoGenFlagsPage.
+
+# Pattern to break apart an API *Flags{authorID} name, used in
+# autoGenFlagsPage.
 flagNamePat = re.compile(r'(?P<name>\w+)Flags(?P<author>[A-Z]*)')
 
-# Autogenerate a single reference page in baseDir for a Vk*Flags type
+
+# Autogenerate a single reference page in baseDir for an API *Flags type
 #   baseDir - base directory to emit page into
-#   flagName - Vk*Flags name
+#   flagName - API *Flags name
 def autoGenFlagsPage(baseDir, flagName):
     pageName = baseDir + '/' + flagName + '.txt'
     fp = open(pageName, 'w', encoding='utf-8')
@@ -361,7 +366,7 @@ def autoGenFlagsPage(baseDir, flagName):
 
     # Short description
     matches = flagNamePat.search(flagName)
-    if matches != None:
+    if matches is not None:
         name = matches.group('name')
         author = matches.group('author')
         logDiag('autoGenFlagsPage: split name into', name, 'Flags', author)
@@ -370,19 +375,19 @@ def autoGenFlagsPage(baseDir, flagName):
     else:
         logWarn('autoGenFlagsPage:', pageName, 'does not end in "Flags{author ID}". Cannot infer FlagBits type.')
         flagBits = None
-        desc = 'Unknown OpenXR flags type'
+        desc = 'Unknown ' + apiName + ' flags type'
 
     # Description text
-    if flagBits != None:
-        txt = ''.join([
+    if flagBits is not None:
+        txt = ''.join((
             'etext:' + flagName,
             ' is a mask of zero or more elink:' + flagBits + '.\n',
             'It is used as a member and/or parameter of the structures and commands\n',
-            'in the See Also section below.\n' ])
+            'in the See Also section below.\n' ))
     else:
-        txt = ''.join([
+        txt = ''.join((
             'etext:' + flagName,
-            ' is an unknown OpenXR type, assumed to be a bitmask.\n' ])
+            ' is an unknown ' + apiName + ' type, assumed to be a bitmask.\n' ))
 
     refPageHead(flagName,
                 desc,
@@ -393,9 +398,9 @@ def autoGenFlagsPage(baseDir, flagName):
     refPageTail(flagName, seeAlsoList(flagName), fp, auto = True)
     fp.close()
 
-# Autogenerate a single handle page in baseDir for a Vk* handle type
+# Autogenerate a single handle page in baseDir for an API handle type
 #   baseDir - base directory to emit page into
-#   handleName - Vk* handle name
+#   handleName - API handle name
 # @@ Need to determine creation function & add handles/ include for the
 # @@ interface in generator.py.
 def autoGenHandlePage(baseDir, handleName):
@@ -408,14 +413,14 @@ def autoGenHandlePage(baseDir, handleName):
     logDiag('autoGenHandlePage:', pageName)
 
     # Short description
-    desc = 'OpenXR object handle'
+    desc = apiName + ' object handle'
 
-    descText = ''.join([
+    descText = ''.join((
         'sname:' + handleName,
         ' is an object handle type, referring to an object used\n',
-        'by the OpenXR implementation. These handles are created or allocated\n',
-        'by the xr @@ TBD @@ function, and used by other OpenXR structures\n',
-        'and commands in the See Also section below.\n' ])
+        'by the ' + apiName + ' implementation. These handles are created or allocated\n',
+        'by the @@ TBD @@ function, and used by other ' + apiName + ' structures\n',
+        'and commands in the See Also section below.\n' ))
 
     refPageHead(handleName,
                 desc,
@@ -432,7 +437,7 @@ def autoGenHandlePage(baseDir, handleName):
 #
 def genRef(specFile, baseDir):
     file = loadFile(specFile)
-    if file == None:
+    if file is None:
         return
 
     # Save the path to this file for later use in rewriting relative includes
@@ -448,7 +453,7 @@ def genRef(specFile, baseDir):
 
     # Create each page, if possible
 
-    for name in sorted(pageMap.keys()):
+    for name in sorted(pageMap):
         pi = pageMap[name]
 
         printPageInfo(pi, file)
@@ -467,7 +472,7 @@ def genRef(specFile, baseDir):
             logWarn('genRef: Cannot extract or autogenerate:', pi.name)
 
 # Generate baseDir/apispec.txt, the single-page version of the ref pages.
-# This assumes there's a page for everything in the xrapi.py dictionaries.
+# This assumes there's a page for everything in the api module dictionaries.
 # Extensions (KHR, EXT, etc.) are currently skipped
 def genSinglePageRef(baseDir):
     # Accumulate head of page
@@ -475,7 +480,7 @@ def genSinglePageRef(baseDir):
 
     printCopyrightSourceComments(head)
 
-    print('= OpenXR API Reference Pages',
+    print('= ' + apiName + ' API Reference Pages',
           ':data-uri:',
           ':icons: font',
           ':doctype: book',
@@ -493,15 +498,16 @@ def genSinglePageRef(baseDir):
     # this for us.
 
     sections = [
-        [ protos,       'protos',       'OpenXR Commands' ],
-        [ handles,      'handles',      'Object Handles' ],
-        [ structs,      'structs',      'Structures' ],
-        [ enums,        'enums',        'Enumerations' ],
-        [ flags,        'flags',        'Flags' ],
-        [ funcpointers, 'funcpointers', 'Function Pointer Types' ],
-        [ basetypes,    'basetypes',    'OpenXR Scalar types' ],
-        [ defines,      'defines',      'C Macro Definitions' ],
-        [ extensions,   'extensions',   'OpenXR Extensions' ] ]
+        [ api.protos,       'protos',       apiName + ' Commands' ],
+        [ api.handles,      'handles',      'Object Handles' ],
+        [ api.structs,      'structs',      'Structures' ],
+        [ api.enums,        'enums',        'Enumerations' ],
+        [ api.flags,        'flags',        'Flags' ],
+        [ api.funcpointers, 'funcpointers', 'Function Pointer Types' ],
+        [ api.basetypes,    'basetypes',    apiName + ' Scalar types' ],
+        [ api.defines,      'defines',      'C Macro Definitions' ],
+        [ extensions,       'extensions',   apiName + ' Extensions' ]
+      ]
 
     # Accumulate body of page
     body = io.StringIO()
@@ -523,12 +529,27 @@ def genSinglePageRef(baseDir):
             keys = sorted(apiDict.keys())
 
         for refPage in keys:
-            # Add page to body
-            if 'FlagBits' in refPage:
-                # OpenXR does not create separate ref pages for FlagBits:
-                # the FlagBits includes go in the Flags refpage.
-                continue
-            print('include::' + refPage + '.txt[]', file=body)
+            # Don't generate links for aliases, which are included with the
+            # aliased page
+            if refPage not in api.alias:
+                # Add page to body
+                if 'FlagBits' in refPage and conventions.unified_flag_refpages:
+                    # OpenXR does not create separate ref pages for FlagBits:
+                    # the FlagBits includes go in the Flags refpage.
+                    # Previously the Vulkan script would only emit non-empty
+                    # Vk*Flags pages, via the logic
+                    #   if refPage not in api.flags or api.flags[refPage] is not None
+                    #       emit page
+                    # Now, all are emitted.
+                    continue
+                else:
+                    print('include::' + refPage + '.txt[]', file=body)
+            else:
+                # Alternatively, we could (probably should) link to the
+                # aliased refpage
+                logWarn('(Benign) Not including', refPage,
+                        'in single-page reference',
+                        'because it is an alias of', api.alias[refPage])
 
         print('\n' + ':leveloffset: 0' + '\n', file=body)
 
@@ -589,10 +610,11 @@ def genExtension(baseDir, name, info):
 
 
 if __name__ == '__main__':
-    global genDict
-    global extensions
+    global genDict, extensions, conventions, apiName
     genDict = {}
     extensions = OrderedDict()
+    conventions = APIConventions()
+    apiName = conventions.api_name
 
     parser = argparse.ArgumentParser()
 
@@ -614,8 +636,8 @@ if __name__ == '__main__':
                         default=[],
                         help='Specify an extension or extensions to add to targets')
     parser.add_argument('-registry', action='store',
-                        default='registry/xr.xml',
-                        help='Use specified registry file instead of xr.xml')
+                        default=conventions.registry_path,
+                        help='Use specified registry file instead of default')
 
     results = parser.parse_args()
 
@@ -629,58 +651,69 @@ if __name__ == '__main__':
         genRef(file, baseDir)
 
     # Now figure out which pages *weren't* generated from the spec.
-    # This relies on the dictionaries of API constructs in xrapi.py.
+    # This relies on the dictionaries of API constructs in the api module.
 
-    # For Flags (e.g. Vk*Flags types), it's easy to autogenerate pages.
     if not results.noauto:
 
         registry = Registry()
         registry.loadFile(results.registry)
 
-        # Only extensions with a supported="..." attribute in this set
-        # will be considered for extraction/generation.
-        supported_strings = set('openxr')
-        ext_names = set(
-            [k for k, v in registry.extdict.items() if v.supported in supported_strings])
+        if conventions.write_refpage_include:
+            # Only extensions with a supported="..." attribute in this set
+            # will be considered for extraction/generation.
+            supported_strings = set((conventions.xml_supported_name_of_api,))
+            ext_names = set(k for k, v in registry.extdict.items()
+                            if v.supported in supported_strings)
 
-        desired_extensions = ext_names.intersection(set(results.extension))
-        for prefix in ['XR_KHR', 'XR_KHX', 'XR_EXT', 'XR']:
-            # Splits up into chunks, sorted within each chunk.
-            filtered_extensions = sorted(
-                [name for name in ext_names
-                 if name.startswith(prefix) and name not in extensions])
-            for name in filtered_extensions:
-                extensions[name] = None
-                genExtension(baseDir, name, registry.extdict[name])
+            desired_extensions = ext_names.intersection(set(results.extension))
+            for prefix in conventions.extension_index_prefixes:
+                # Splits up into chunks, sorted within each chunk.
+                filtered_extensions = sorted(
+                    [name for name in ext_names
+                     if name.startswith(prefix) and name not in extensions])
+                for name in filtered_extensions:
+                    extensions[name] = None
+                    genExtension(baseDir, name, registry.extdict[name])
 
         # autoGenFlagsPage is no longer needed because they are added to
         # the spec sources now.
-        # for page in flags.keys():
-            # if not (page in genDict.keys()):
-                # autoGenFlagsPage(baseDir, page)
+        # for page in api.flags:
+        #     if page not in genDict:
+        #         autoGenFlagsPage(baseDir, page)
 
         # autoGenHandlePage is no longer needed because they are added to
         # the spec sources now.
-        # for page in structs.keys():
+        # for page in api.structs:
         #    if typeCategory[page] == 'handle':
         #        autoGenHandlePage(baseDir, page)
 
         sections = [
-            [ flags,        'Flag Types' ],
-            [ enums,        'Enumerated Types' ],
-            [ structs,      'Structures' ],
-            [ protos,       'Prototypes' ],
-            [ funcpointers, 'Function Pointers' ],
-            [ basetypes,    'OpenXR Scalar Types' ],
-            [ extensions,   'OpenXR Extensions'] ]
+            ( api.flags,        'Flag Types' ),
+            ( api.enums,        'Enumerated Types' ),
+            ( api.structs,      'Structures' ),
+            ( api.protos,       'Prototypes' ),
+            ( api.funcpointers, 'Function Pointers' ),
+            ( api.basetypes,    apiName + ' Scalar Types' ),
+            ( extensions,       apiName + ' Extensions'),
+          ]
+
+        # Summarize pages that weren't generated, for good or bad reasons
 
         for (apiDict,title) in sections:
-            flagged = False
-            for page in apiDict.keys():
-                if not (page in genDict.keys()):
-                    if not flagged:
-                        logWarn(title, 'with no ref page generated:')
-                        flagged = True
-                    logWarn('    ', page)
+            # OpenXR was keeping a 'flagged' state which only printed out a
+            # warning for the first non-generated page, but was otherwise
+            # unused. This doesn't seem helpful.
+            for page in apiDict:
+                if page not in genDict:
+                    # Page was not generated - why not?
+                    if page in api.alias:
+                        logWarn('(Benign, is an alias) Ref page for', title, page, 'is aliased into', api.alias[page])
+                    elif page in api.flags and api.flags[page] is None:
+                        logWarn('(Benign, no FlagBits defined) No ref page generated for ', title,
+                                page)
+                    else:
+                        # Could introduce additional logic to detect
+                        # external types and not emit them.
+                        logWarn('No ref page generated for  ', title, page)
 
         genSinglePageRef(baseDir)

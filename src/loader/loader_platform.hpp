@@ -21,6 +21,7 @@
 #pragma once
 
 #include <cassert>
+#include "xr_dependencies.h"
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LOADER_EXPORT __attribute__((visibility("default")))
@@ -78,12 +79,8 @@ static inline const char *LoaderPlatformLibraryGetProcAddrError(const std::strin
 
 #elif defined(XR_OS_WINDOWS)
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <Winreg.h>
-
-static inline bool PathFileExists(LPCTSTR szPath) {
-    DWORD dwAttrib = GetFileAttributes(szPath);
+static inline bool PathFileExists(LPCSTR szPath) {
+    DWORD dwAttrib = GetFileAttributesA(szPath);
     return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -122,10 +119,10 @@ static inline int32_t xr_snprintf(char *result_buffer, size_t buffer_size, const
 typedef HMODULE LoaderPlatformLibraryHandle;
 static LoaderPlatformLibraryHandle LoaderPlatformLibraryOpen(const std::string &path) {
     // Try loading the library the original way first.
-    LoaderPlatformLibraryHandle handle = LoadLibrary(path.c_str());
+    LoaderPlatformLibraryHandle handle = LoadLibraryA(path.c_str());
     if (handle == NULL && GetLastError() == ERROR_MOD_NOT_FOUND && PathFileExists(path.c_str())) {
         // If that failed, then try loading it with broader search folders.
-        handle = LoadLibraryEx(path.c_str(), NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR);
+        handle = LoadLibraryExA(path.c_str(), NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR);
     }
     return handle;
 }

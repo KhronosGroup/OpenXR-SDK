@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # Used for automatic reflow of Vulkan spec to satisfy the agreed layout to
-# minimize git churn. Most of the logic has to to with detecting asciidoc
+# minimize git churn. Most of the logic has to do with detecting asciidoc
 # markup or block types that *shouldn't* be reflowed (tables, code) and
 # ignoring them. It's very likely there are many asciidoc constructs not yet
 # accounted for in the script, our usage of asciidoc markup is intentionally
@@ -36,10 +36,19 @@
 #   files are asciidoc source files from the Vulkan spec to reflow.
 
 # For error and file-loading interfaces only
-from reflib import *
+import argparse
+import os
+import re
+import sys
+from reflib import loadFile, logDiag, logWarn, setLogFile
 from reflow_count import startVUID
 
-import argparse, copy, os, pdb, re, string, sys
+# Vulkan-specific - will consolidate into scripts/ like OpenXR soon
+sys.path.insert(0, 'xml')
+
+import xrapi as api
+from xrconventions import OpenXRConventions as APIConventions
+conventions = APIConventions()
 
 # Markup that always ends a paragraph
 #   empty line or whitespace
@@ -53,8 +62,11 @@ import argparse, copy, os, pdb, re, string, sys
 #   label::             labelled list - label must be standalone
 endPara = re.compile(r'^( *|\[.*\]|//.*|<<<<|:.*|[a-z]+::.*|\+|.*::)$')
 
-# Special case of markup ending a paragraph, used to track the current command/structure
-includePat = re.compile(r'^include::(\.\./)+generated/+api/+(?P<type>\w+)/(?P<name>\w+).txt\[\]')
+# Special case of markup ending a paragraph, used to track the current
+# command/structure. This allows for either OpenXR or Vulkan API path
+# conventions, and uses the file suffix defined by the API conventions.
+includePat = re.compile(r'^include::(\.\./)+(generated/+)?api/+(?P<type>\w+)/(?P<name>\w+)'
+                        + conventions.file_suffix + r'\[\]')
 
 # Find the first pname: pattern in a Valid Usage statement
 pnamePat = re.compile(r'pname:(?P<param>\w+)')
@@ -91,7 +103,7 @@ beginBullet = re.compile(r'^ *([*-.]+|::) ')
 # Text that (may) not end sentences
 
 # A single letter followed by a period, typically a middle initial.
-endInitial = re.compile(r'^[[:upper:]]\.$')
+endInitial = re.compile(r'^[A-Z]\.$')
 # An abbreviation, which doesn't (usually) end a line.
 endAbbrev = re.compile(r'(e\.g|i\.e|c\.f)\.$', re.IGNORECASE)
 
@@ -172,10 +184,10 @@ class ReflowState:
     def endSentence(self, word):
         if (word[-1:] != '.' or
             endAbbrev.search(word) or
-            (self.breakInitial and endInitial.match(word))):
+                (self.breakInitial and endInitial.match(word))):
             return False
-        else:
-            return True
+
+        return True
 
     # Returns True if word is a Valid Usage ID Tag anchor.
     def vuidAnchor(self, word):
@@ -216,12 +228,12 @@ class ReflowState:
                 wordCount += 1
 
                 endEscape = False
-                if (i == numWords and word == '+'):
+                if i == numWords and word == '+':
                     # Trailing ' +' must stay on the same line
                     endEscape = word
                     # logDiag('reflowPara last word of line =', word, 'prevWord =', prevWord, 'endEscape =', endEscape)
                 else:
-                    True
+                    pass
                     # logDiag('reflowPara wordCount =', wordCount, 'word =', word, 'prevWord =', prevWord)
 
                 if wordCount == 1:
@@ -267,7 +279,7 @@ class ReflowState:
                     # Are we on the first word following a bullet point?
                     firstBullet = (wordCount == 2 and bulletPoint)
 
-                    if (endEscape):
+                    if endEscape:
                         # If the new word ends the input line with ' +',
                         # add it to the current line.
 
@@ -327,7 +339,7 @@ class ReflowState:
                 prevWord = word
 
         # Add this line to the output paragraph.
-        if (outLine):
+        if outLine:
             outPara.append(outLine + '\n')
 
         return outPara
@@ -336,50 +348,57 @@ class ReflowState:
     # context. Reset the paragraph accumulator.
     def emitPara(self):
         if self.para != []:
-            if (self.vuStack[-1] and
-                self.nextvu != None and
-                self.vuPrefix not in self.para[0]):
+            if self.vuStack[-1] and self.nextvu is not None:
                 # If:
                 #   - this paragraph is in a Valid Usage block,
                 #   - VUID tags are being assigned,
-                #   - a tag is not already present, and
-                #   - the paragraph is a properly marked-up list item
-                # Then add a VUID tag starting with the next free ID.
+                # Try to assign VUIDs
 
-                # Split the first line after the bullet point
-                matches = vuPat.search(self.para[0])
-                if matches != None:
-                    logDiag('findRefs: Matched vuPat on line:', self.para[0], end='')
-                    head = matches.group('head')
-                    tail = matches.group('tail')
+                if nestedVuPat.search(self.para[0]):
+                    # Check for nested bullet points. These should not be
+                    # assigned VUIDs, nor present at all, because they break
+                    # the VU extractor.
+                    logWarn(self.filename + ': Invalid nested bullet point in VU block:', self.para[0])
+                elif self.vuPrefix not in self.para[0]:
+                    # If:
+                    #   - a tag is not already present, and
+                    #   - the paragraph is a properly marked-up list item
+                    # Then add a VUID tag starting with the next free ID.
 
-                    # Use the first pname: statement in the paragraph as
-                    # the parameter name in the VUID tag. This won't always
-                    # be correct, but should be highly reliable.
-                    for vuLine in self.para:
-                        matches = pnamePat.search(vuLine)
-                        if matches != None:
-                            break
+                    # Split the first line after the bullet point
+                    matches = vuPat.search(self.para[0])
+                    if matches is not None:
+                        logDiag('findRefs: Matched vuPat on line:', self.para[0], end='')
+                        head = matches.group('head')
+                        tail = matches.group('tail')
 
-                    if matches != None:
-                        paramName = matches.group('param')
-                    else:
-                        paramName = 'None'
-                        logWarn(self.filename,
-                                'No param name found for VUID tag on line:',
-                                self.para[0])
+                        # Use the first pname: statement in the paragraph as
+                        # the parameter name in the VUID tag. This won't always
+                        # be correct, but should be highly reliable.
+                        for vuLine in self.para:
+                            matches = pnamePat.search(vuLine)
+                            if matches is not None:
+                                break
 
-                    newline = (head + ' [[' +
-                               self.vuFormat.format(self.vuPrefix,
-                                                    self.apiName,
-                                                    paramName,
-                                                    self.nextvu) + ']] ' + tail)
+                        if matches is not None:
+                            paramName = matches.group('param')
+                        else:
+                            paramName = 'None'
+                            logWarn(self.filename,
+                                    'No param name found for VUID tag on line:',
+                                    self.para[0])
 
-                    logDiag('Assigning', self.vuPrefix, self.apiName, self.nextvu,
-                            ' on line:', self.para[0], '->', newline, 'END')
+                        newline = (head + ' [[' +
+                                   self.vuFormat.format(self.vuPrefix,
+                                                        self.apiName,
+                                                        paramName,
+                                                        self.nextvu) + ']] ' + tail)
 
-                    self.para[0] = newline
-                    self.nextvu = self.nextvu + 1
+                        logDiag('Assigning', self.vuPrefix, self.apiName, self.nextvu,
+                                ' on line:', self.para[0], '->', newline, 'END')
+
+                        self.para[0] = newline
+                        self.nextvu = self.nextvu + 1
                 # else:
                 #     There are only a few cases of this, and they're all
                 #     legitimate. Leave detecting this case to another tool
@@ -486,7 +505,7 @@ def reflowFile(filename, args):
     logDiag('reflow: filename', filename)
 
     lines = loadFile(filename)
-    if (lines == None):
+    if lines is None:
         return
 
     # Output file handle and reflow object for this file. There are no race
@@ -502,7 +521,7 @@ def reflowFile(filename, args):
         fp = open(outFilename, 'w', encoding='utf8')
     except:
         logWarn('Cannot open output file', filename, ':', sys.exc_info()[0])
-        return None
+        return
 
     state = ReflowState(filename,
                         file = fp,
@@ -529,9 +548,9 @@ def reflowFile(filename, args):
             # structure or command, track that for use in VUID generation.
 
             matches = includePat.search(line)
-            if matches != None:
-                type = matches.group('type')
-                if (type == 'protos' or type == 'structs'):
+            if matches is not None:
+                include_type = matches.group('type')
+                if include_type in ('protos', 'structs'):
                     state.apiName = matches.group('name')
 
         elif endParaContinue.match(line):
@@ -583,20 +602,20 @@ def reflowFile(filename, args):
     fp.close()
 
     # Update the 'nextvu' value
-    if (args.nextvu != state.nextvu):
+    if args.nextvu != state.nextvu:
         logWarn('Updated nextvu to', state.nextvu, 'after file', filename)
         args.nextvu = state.nextvu
 
 def reflowAllAdocFiles(folder_to_reflow, args):
     for root, subdirs, files in os.walk(folder_to_reflow):
         for file in files:
-            if file.endswith(".adoc"):
+            if file.endswith(conventions.file_suffix):
                 file_path = os.path.join(root, file)
                 reflowFile(file_path, args)
         for subdir in subdirs:
             sub_folder = os.path.join(root, subdir)
             print('Sub-folder = %s' % sub_folder)
-            if not (subdir.lower() == "loader") and not (subdir.lower() == "styleguide"):
+            if subdir.lower() not in conventions.spec_no_reflow_dirs:
                 print('   Parsing = %s' % sub_folder)
                 reflowAllAdocFiles(sub_folder, args)
             else:
@@ -610,6 +629,9 @@ def reflowAllAdocFiles(folder_to_reflow, args):
 # the trailing newline.
 vuPat = re.compile(r'^(?P<head>  [*]+)( *)(?P<tail>.*)', re.DOTALL)
 
+# Pattern matching leading nested bullet points
+global nestedVuPat
+nestedVuPat = re.compile(r'^  \*\*')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -648,22 +670,22 @@ if __name__ == '__main__':
     if args.overwrite:
         logWarn('reflow.py: will overwrite all input files')
 
-    if args.tagvu and args.nextvu == None:
+    if args.tagvu and args.nextvu is None:
         args.nextvu = startVUID
 
-    if args.nextvu != None:
+    if args.nextvu is not None:
         logWarn('Tagging untagged Valid Usage statements starting at', args.nextvu)
 
     # If no files are specified, reflow the entire specification chapters folder
-    if len(args.files) == 0:
+    if not args.files:
         folder_to_reflow = os.getcwd()
-        folder_to_reflow += '/specification/sources'
+        folder_to_reflow += '/' + conventions.spec_reflow_path
         reflowAllAdocFiles(folder_to_reflow, args)
     else:
         for file in args.files:
             reflowFile(file, args)
 
-    if args.nextvu != None and args.nextvu != startVUID:
+    if args.nextvu is not None and args.nextvu != startVUID:
         try:
             reflow_count_file_path = os.path.dirname(os.path.realpath(__file__))
             reflow_count_file_path += '/reflow_count.py'

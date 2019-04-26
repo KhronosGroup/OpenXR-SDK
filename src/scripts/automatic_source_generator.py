@@ -40,6 +40,7 @@ def undecorate(name):
 
 class AutomaticSourceGeneratorOptions(GeneratorOptions):
     def __init__(self,
+                 conventions=None,
                  filename=None,
                  directory='.',
                  apiname=None,
@@ -64,10 +65,19 @@ class AutomaticSourceGeneratorOptions(GeneratorOptions):
                  indentFuncPointer=False,
                  alignFuncParam=0,
                  genEnumBeginEndRange=False):
-        GeneratorOptions.__init__(self, filename, directory, apiname, profile,
-                                  versions, emitversions, defaultExtensions,
-                                  addExtensions, removeExtensions,
-                                  emitExtensions, sortProcedure)
+        GeneratorOptions.__init__(self,
+                                  conventions=conventions,
+                                  filename=filename,
+                                  directory=directory,
+                                  apiname=apiname,
+                                  profile=profile,
+                                  versions=versions,
+                                  emitversions=emitversions,
+                                  defaultExtensions=defaultExtensions,
+                                  addExtensions=addExtensions,
+                                  removeExtensions=removeExtensions,
+                                  emitExtensions=emitExtensions,
+                                  sortProcedure=sortProcedure)
         # Instead of using prefixText, we write our own
         self.prefixText = None
         self.genFuncPointers = genFuncPointers
@@ -446,7 +456,7 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
             self.vendor_tags.append(tag.get('name'))
 
         # User-supplied prefix text, if any (list of strings)
-        if (gen_opts.prefixText):
+        if gen_opts.prefixText:
             for s in gen_opts.prefixText:
                 write(s, file=self.outFile)
         self.outputGeneratedHeaderWarning()
@@ -460,6 +470,9 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
         self.outputErrorIfNeeded()
         # Finish processing in superclass
         OutputGenerator.endFile(self)
+
+        if self.encountered_error:
+            exit(-1)
 
     # This is called for the beginning of each API feature.  Each feature includes a set of
     # API types, commands, etc.  Each feature is identified by a name, this includes the API
@@ -550,8 +563,8 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
     #   self            the AutomaticSourceOutputGenerator object
     #   cmd_info        the XML information for this command
     #   name            the name of the command
-    def genCmd(self, cmd_info, name):
-        OutputGenerator.genCmd(self, cmd_info, name)
+    def genCmd(self, cmd_info, name, alias):
+        OutputGenerator.genCmd(self, cmd_info, name, alias)
 
         self.num_commands = self.num_commands + 1
         self.addCommandToDispatchList(
@@ -562,8 +575,8 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
     #   self            the AutomaticSourceOutputGenerator object
     #   cmd_info        the XML information for this group
     #   name            the name of the group
-    def genGroup(self, group_info, name):
-        OutputGenerator.genGroup(self, group_info, name)
+    def genGroup(self, group_info, name, alias):
+        OutputGenerator.genGroup(self, group_info, name, alias)
         group_type = group_info.elem.get('type')
         group_supported = group_info.elem.get('supported') != 'disabled'
         is_extension = not self.isCoreExtensionName(self.currentExtension)
@@ -740,8 +753,8 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
     #   self            the AutomaticSourceOutputGenerator object
     #   type_info       the XML information for this type
     #   type_name       the name of this type
-    def genType(self, type_info, type_name):
-        OutputGenerator.genType(self, type_info, type_name)
+    def genType(self, type_info, type_name, alias):
+        OutputGenerator.genType(self, type_info, type_name, alias)
         type_elem = type_info.elem
         type_category = type_elem.get('category')
         (protect_value, protect_string) = self.genProtectInfo(
@@ -753,7 +766,7 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
             if not has_proper_ending:
                 self.printCodeGenErrorMessage('Struct/union %s in XML (for extension %s) does not end with the expected vendor tag \"%s\"' % (
                     type_name, self.currentExtension, self.current_vendor_tag))
-            self.genStructUnion(type_info, type_category, type_name)
+            self.genStructUnion(type_info, type_category, type_name, alias)
         elif type_category == 'handle':
             if not has_proper_ending:
                 self.printCodeGenErrorMessage('Handle %s in XML (for extension %s) does not end with the expected vendor tag \"%s\"' % (
@@ -812,7 +825,8 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
     #   self            the AutomaticSourceOutputGenerator object
     #   enum_info       the XML information for this enum
     #   name            the name of this enum
-    def genEnum(self, enum_info, name):
+    def genEnum(self, enum_info, name, alias):
+        OutputGenerator.genEnum(self, enum_info, name, alias)
         if name == 'XR_MAX_EXTENSION_NAME_SIZE':
             self.max_extension_name_length = int(enum_info.elem.get('value'))
         if name == 'XR_MAX_STRUCTURE_NAME_SIZE':
@@ -860,9 +874,9 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
     #   type_info       the XML information for this type
     #   type_category   the category of this type.  In this case 'union' or 'struct'.
     #   type_name       the name of this type
-
-    def genStructUnion(self, type_info, type_category, type_name):
-        OutputGenerator.genStruct(self, type_info, type_name)
+    #
+    def genStructUnion(self, type_info, type_category, type_name, alias):
+        OutputGenerator.genStruct(self, type_info, type_name, alias)
         is_union = type_category == 'union'
         (protect_value, protect_string) = self.genProtectInfo(
             self.featureExtraProtect, type_info.elem.get('protect'))
@@ -1071,7 +1085,7 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
         return_type = cmd_info.elem.find('proto/type')
 
         # If the return type is void, we really don't have a return type so set it to None
-        if (return_type is not None and return_type.text == 'void'):
+        if return_type is not None and return_type.text == 'void':
             return_type = None
 
         if not is_core:
@@ -1159,7 +1173,7 @@ class AutomaticSourceOutputGenerator(OutputGenerator):
                     pointer_count_var = param_len
 
             # If this is a handle, and it is a pointer, it really must also be an array unless it is a create command
-            if (self.isHandle(param_type) and pointer_count > 0 and not (is_create_connect or is_array or self.paramIsStaticArray(param) or len(array_count_var) > 0 or len(pointer_count_var) > 0)):
+            if self.isHandle(param_type) and pointer_count > 0 and not (is_create_connect or is_array or self.paramIsStaticArray(param) or len(array_count_var) > 0 or len(pointer_count_var) > 0):
                 self.printCodeGenErrorMessage('OpenXR command %s has parameter %s which is a non-array pointer to a handle and is not a create command' % (
                     name, param_name))
 

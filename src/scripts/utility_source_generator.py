@@ -41,6 +41,7 @@ NO_TRAMPOLINE_OR_TERMINATOR = [
 
 class UtilitySourceGeneratorOptions(AutomaticSourceGeneratorOptions):
     def __init__(self,
+                 conventions=None,
                  filename=None,
                  directory='.',
                  apiname=None,
@@ -65,10 +66,19 @@ class UtilitySourceGeneratorOptions(AutomaticSourceGeneratorOptions):
                  indentFuncPointer=False,
                  alignFuncParam=0,
                  genEnumBeginEndRange=False):
-        AutomaticSourceGeneratorOptions.__init__(self, filename, directory, apiname, profile,
-                                                 versions, emitversions, defaultExtensions,
-                                                 addExtensions, removeExtensions,
-                                                 emitExtensions, sortProcedure)
+        AutomaticSourceGeneratorOptions.__init__(self,
+                                                 conventions=conventions,
+                                                 filename=filename,
+                                                 directory=directory,
+                                                 apiname=apiname,
+                                                 profile=profile,
+                                                 versions=versions,
+                                                 emitversions=emitversions,
+                                                 defaultExtensions=defaultExtensions,
+                                                 addExtensions=addExtensions,
+                                                 removeExtensions=removeExtensions,
+                                                 emitExtensions=emitExtensions,
+                                                 sortProcedure=sortProcedure)
         # Instead of using prefixText, we write our own
         self.prefixText = None
         self.genFuncPointers = genFuncPointers

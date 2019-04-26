@@ -19,6 +19,7 @@
 //
 
 #include <cstring>
+#include "xr_dependencies.h"
 
 // If the C++ macro is set to the version containing C++17, it must support
 // the final C++17 package
@@ -26,17 +27,17 @@
 #define USE_EXPERIMENTAL_FS 0
 #define USE_FINAL_FS 1
 
-#elif defined(XR_OS_WINDOWS)
-#if defined(_MSC_VER) && _MSC_VER >= 1900
-// MS VS 2015/2017 only supports the <experimental/filesystem> package.
+#elif defined(_MSC_VER) && _MSC_VER >= 1900
+
+#if defined(_HAS_CXX17) && _HAS_CXX17
+// When MSC supports c++17 use <filesystem> package.
+#define USE_EXPERIMENTAL_FS 0
+#define USE_FINAL_FS 1
+#else
+// MSC before c++17 need to use <experimental/filesystem> package.
 #define USE_EXPERIMENTAL_FS 1
 #define USE_FINAL_FS 0
-#else
-// MS VS 2010/2013 don't support either the final <filesystem or <experimental/filesystem>
-// packages.
-#define USE_EXPERIMENTAL_FS 0
-#define USE_FINAL_FS 0
-#endif
+#endif  // !_HAS_CXX17
 
 // Right now, GCC still only supports the experimental filesystem items starting in GCC 6
 #elif (__GNUC__ >= 6)
@@ -63,9 +64,12 @@
 #include <filesystem>
 #define FS_PREFIX std::filesystem
 #elif USE_EXPERIMENTAL_FS == 1
+#if (WINAPI_FAMILY != WINAPI_FAMILY_DESKTOP_APP)
+#error "Windows universal application doesn't support system::experimental::filesystem"
+#endif
 #include <experimental/filesystem>
 #define FS_PREFIX std::experimental::filesystem
-#elif defined(XR_OS_WINDOWS)
+#elif defined(XR_USE_PLATFORM_WIN32)
 // Windows fallback includes
 #include <stdint.h>
 #include <direct.h>
@@ -81,7 +85,7 @@
 
 #include "filesystem_utils.hpp"
 
-#if defined(XR_OS_WINDOWS)
+#if defined(XR_USE_PLATFORM_WIN32)
 #define PATH_SEPARATOR ';'
 #define DIRECTORY_SYMBOL '\\'
 #else

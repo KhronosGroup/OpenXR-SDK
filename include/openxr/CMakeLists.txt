@@ -23,7 +23,7 @@ set(XR_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 # Other targets that need the OpenXR headers should use openxrHeader as a dependency.
 add_custom_target(generate_openxr_header
     SOURCES ${XR_ROOT}/specification/registry/xr.xml
-    DEPENDS 
+    DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
         ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
         ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h
@@ -64,11 +64,11 @@ set_source_files_properties(
     PROPERTIES GENERATED TRUE
 )
 
-set(INSTALL_HEADERS 
+set(INSTALL_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
     ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
     ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h)
 
-INSTALL(FILES ${INSTALL_HEADERS} 
+INSTALL(FILES ${INSTALL_HEADERS}
     DESTINATION include/openxr
 )

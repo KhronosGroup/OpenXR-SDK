@@ -46,6 +46,7 @@ SET(LOADER_EXTERNAL_GEN_FILES
 )
 
 if(DYNAMIC_LOADER)
+    add_definitions(-DXRAPI_DLL_EXPORT)
 	add_library(${LOADER_NAME} SHARED
 		api_layer_interface.cpp
 		loader_core.cpp
