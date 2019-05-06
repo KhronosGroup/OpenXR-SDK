@@ -22,7 +22,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # All options defined here
 option(BUILD_LOADER "Build loader" ON)
-option(DYNAMIC_LOADER "Build the loader as a .dll library" OFF)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    option(DYNAMIC_LOADER "Build the loader as a .dll library" OFF)
+else()
+    option(DYNAMIC_LOADER "Build the loader as a .dll library" ON)
+endif()
+
 option(BUILD_API_LAYERS "Build API layers" ON)
 option(BUILD_TESTS "Build tests" ON)
 
