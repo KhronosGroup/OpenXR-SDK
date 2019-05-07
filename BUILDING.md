@@ -45,6 +45,14 @@ cmake -G "Visual Studio [Version Number]" ..\..
 Open the build\win32\OPENXR.sln in the Visual Studio to build the samples.
 
 ## Linux
+
+The following packages are required, at minimum.
+ - cmake (of _somewhat_ recent vintage, 3.10+ known working)
+ - libx11-dev
+ - libxxf86vm-dev
+ - libxrandr-dev
+ - freeglut3-dev (or another way to support -lGL in ld)
+
 ### Linux Debug
 
 ```
