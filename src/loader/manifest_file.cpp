@@ -24,6 +24,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #include "filesystem_utils.hpp"
@@ -621,7 +622,7 @@ void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::u
                     continue;
                 }
                 std::string original_name = func_it.key().asString();
-                std::string new_name = func_it->asString();
+                std::string new_name = (*func_it).asString();
                 manifest_files.back()->_functions_renamed.insert(std::make_pair(original_name, new_name));
             }
         }
@@ -879,7 +880,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
                     continue;
                 }
                 std::string original_name = func_it.key().asString();
-                std::string new_name = func_it->asString();
+                std::string new_name = (*func_it).asString();
                 manifest_files.back()->_functions_renamed.insert(std::make_pair(original_name, new_name));
             }
         }
