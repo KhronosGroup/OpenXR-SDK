@@ -12,21 +12,22 @@ endif()
 
 message(STATUS "Using presentation backend: ${PRESENTATION_BACKEND}")
 
-find_package(PkgConfig REQUIRED)
 
 if( PRESENTATION_BACKEND MATCHES "xlib" )
-    pkg_search_module(X11 REQUIRED x11)
-    pkg_search_module(XXF86VM REQUIRED xxf86vm)
-    pkg_search_module(XRANDR REQUIRED xrandr)
+    find_package(X11 REQUIRED)
+    if ((NOT X11_Xxf86vm_LIB) OR (NOT X11_Xrandr_LIB))
+        message(FATAL_ERROR "OpenXR xlib backend requires Xxf86vm and Xrandr")
+    endif()
 
     add_definitions( -DSUPPORT_X )
     add_definitions( -DOS_LINUX_XLIB )
     set( XLIB_LIBRARIES
             ${X11_LIBRARIES}
-            ${XXF86VM_LIBRARIES}
-            ${XRANDR_LIBRARIES} )
+            ${X11_Xxf86vm_LIB}
+            ${X11_Xrandr_LIB} )
 
 elseif( PRESENTATION_BACKEND MATCHES "xcb" )
+    find_package(PkgConfig REQUIRED)
     # XCB + XCB GLX is limited to OpenGL 2.1
     # add_definitions( -DOS_LINUX_XCB )
     # XCB + Xlib GLX 1.3
@@ -49,6 +50,7 @@ elseif( PRESENTATION_BACKEND MATCHES "xcb" )
             ${X11_LIBRARIES} )
 
 elseif( PRESENTATION_BACKEND MATCHES "wayland" )
+    find_package(PkgConfig REQUIRED)
     pkg_search_module(WAYLAND_CLIENT REQUIRED wayland-client)
     pkg_search_module(WAYLAND_EGL REQUIRED wayland-egl)
     pkg_search_module(WAYLAND_SCANNER REQUIRED wayland-scanner)
