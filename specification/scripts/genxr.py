@@ -15,10 +15,13 @@
 # limitations under the License.
 
 import argparse
+import os
 import re
 import sys
 import time
 import xml.etree.ElementTree as etree
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from cgenerator import CGeneratorOptions, COutputGenerator
 from docgenerator import DocGeneratorOptions, DocOutputGenerator

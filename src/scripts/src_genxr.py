@@ -14,7 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse, cProfile, pdb, string, sys, time
+import argparse, cProfile, os, pdb, string, sys, time
+
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(os.path.join(base_dir, 'src', 'scripts'))
+sys.path.append(os.path.join(base_dir, 'specification', 'scripts'))
+
 from reg import *
 from generator import write
 from cgenerator import CGeneratorOptions, COutputGenerator
