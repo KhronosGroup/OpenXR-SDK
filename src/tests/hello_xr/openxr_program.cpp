@@ -737,16 +737,16 @@ struct OpenXrProgram : IOpenXrProgram {
                                                                        XR_INPUT_SOURCE_LOCALIZED_NAME_INTERACTION_PROFILE_BIT |
                                                                        XR_INPUT_SOURCE_LOCALIZED_NAME_COMPONENT_BIT;
 
-                    std::array<XrPath, 4> paths{};
                     uint32_t pathCount = 0;
-                    CHECK_XRCMD(xrGetBoundSourcesForAction(m_input.gripAction, uint32_t(paths.size()), &pathCount, &paths[0]));
+                    CHECK_XRCMD(xrGetBoundSourcesForAction(m_input.gripAction, 0, &pathCount, nullptr));
+                    std::vector<XrPath> paths(pathCount);
+                    CHECK_XRCMD(xrGetBoundSourcesForAction(m_input.gripAction, uint32_t(paths.size()), &pathCount, paths.data()));
                     std::string gripSources;
                     for (uint32_t i = 0; i < pathCount; ++i) {
                         uint32_t size = 0;
                         CHECK_XRCMD(xrGetInputSourceLocalizedName(m_session, paths[i], all, 0, &size, nullptr));
                         if (size < 1) continue;
-                        std::string gripSource;
-                        gripSource.resize(size);
+                        std::string gripSource(size, '\0');
                         CHECK_XRCMD(xrGetInputSourceLocalizedName(m_session, paths[i], all, uint32_t(gripSource.size()), &size,
                                                                   &gripSource[0]));
                         // Strip the null character
