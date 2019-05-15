@@ -178,7 +178,7 @@ else()
     gen_xr_layer_json(
         ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_api_dump.json
         api_dump
-        ${CMAKE_CURRENT_BINARY_DIR}/libXrApiLayer_api_dump.so
+        libXrApiLayer_api_dump.so
         1
         "API Layer to record api calls as they occur"
         ""
@@ -190,7 +190,7 @@ else()
     gen_xr_layer_json(
         ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_core_validation.json
         core_validation
-        ${CMAKE_CURRENT_BINARY_DIR}/libXrApiLayer_core_validation.so
+        libXrApiLayer_core_validation.so
         1
         "API Layer to record api calls as they occur"
         ""
@@ -221,3 +221,12 @@ add_custom_target(core_validation_json_file DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_core_validation.json
 )
 
+# Install explicit layers on Linux
+set(TARGET_NAMES
+    XrApiLayer_api_dump
+    XrApiLayer_core_validation)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    foreach(TARGET_NAME ${TARGET_NAMES})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.json DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/openxr/${MAJOR}/api_layers/explicit.d)
+    endforeach()
+endif()

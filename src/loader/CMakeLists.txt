@@ -17,6 +17,8 @@
 
 #set (CMAKE_VERBOSE_MAKEFILE 1)
 
+include(GNUInstallDirs)
+
 # Use this feature for Windows to automatically generate an exports file for the DLL.
 # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/
 include(GenerateExportHeader)
@@ -114,6 +116,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     add_custom_target(lib${LOADER_NAME}.so.${MAJOR}.${MINOR} ALL
         COMMAND ${CMAKE_COMMAND} -E create_symlink lib${LOADER_NAME}.so.${MAJOR}.${MINOR}.${PATCH} lib${LOADER_NAME}.so.${MAJOR}.${MINOR})
+
+    install(TARGETS ${LOADER_NAME}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    set(XR_API_VERSION "${MAJOR}.${MINOR}")
+    configure_file("openxr.pc.in" "openxr.pc" @ONLY)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openxr.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     foreach(configuration in CMAKE_C_FLAGS_DEBUG
                              CMAKE_C_FLAGS_RELEASE
