@@ -715,13 +715,15 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
             throw std::runtime_error("invalid manifest type");
         }
         std::string filename;
-        const char *override_path = PlatformUtilsGetSecureEnv(OPENXR_RUNTIME_JSON_ENV_VAR);
+        char *override_path = PlatformUtilsGetSecureEnv(OPENXR_RUNTIME_JSON_ENV_VAR);
         if (override_path != nullptr && *override_path != '\0') {
             filename = override_path;
+            PlatformUtilsFreeEnv(override_path);
             std::string info_message = "RuntimeManifestFile::FindManifestFiles - using environment variable override runtime file ";
             info_message += filename;
             LoaderLogger::LogInfoMessage("", info_message);
         } else {
+            PlatformUtilsFreeEnv(override_path);
 #ifdef XR_OS_WINDOWS
             std::vector<std::string> filenames;
             ReadRuntimeDataFilesInRegistry(type, "", "ActiveRuntime", filenames);
