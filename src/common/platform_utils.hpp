@@ -59,17 +59,6 @@ static inline void PlatformUtilsFreeEnv(char* val) {
     (void)val;
 }
 
-// Prefix for the Linux/Apple global runtime JSON file name
-static const std::string rt_dir_prefix = "/usr/local/share/openxr/";
-static const std::string rt_filename = "/active_runtime.json";
-
-static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std::string& file_name) {
-    file_name = rt_dir_prefix;
-    file_name += std::to_string(major_version);
-    file_name += rt_filename;
-    return true;
-}
-
 #elif defined(XR_OS_APPLE)
 
 static inline char *PlatformUtilsGetEnv(const char *name) { return getenv(name); }
@@ -94,7 +83,7 @@ static inline void PlatformUtilsFreeEnv(char *val) {
     (void)val;
 }
 
-// Prefix for the Linux/Apple global runtime JSON file name
+// Prefix for the Apple global runtime JSON file name
 static const std::string rt_dir_prefix = "/usr/local/share/openxr/";
 static const std::string rt_filename = "/active_runtime.json";
 

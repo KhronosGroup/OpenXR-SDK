@@ -284,6 +284,79 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
     }
 }
 
+#ifdef XR_OS_LINUX
+
+// If ${name} has a nonempty value, return it; if both other arguments are supplied return
+// ${fallback_env}/fallback_path; otherwise, return whichever of ${fallback_env} and fallback_path
+// is supplied. If ${fallback_env} or ${fallback_env}/... would be returned but that environment
+// variable is unset or empty, return the empty string.
+static std::string GetXDGEnv(const char *name, const char *fallback_env, const char *fallback_path) {
+    char *path = PlatformUtilsGetSecureEnv(name);
+    std::string result;
+    if (path) {
+        result = path;
+        PlatformUtilsFreeEnv(path);
+        if (!result.empty()) {
+            return result;
+        }
+    }
+    if (fallback_env) {
+        char *path = PlatformUtilsGetSecureEnv(fallback_env);
+        if (path) {
+            result = path;
+            PlatformUtilsFreeEnv(path);
+        }
+        if (result.empty()) {
+            return "";
+        }
+        if (fallback_path) {
+            result += "/";
+        }
+    }
+    if (fallback_path) {
+        result += fallback_path;
+    }
+    return result;
+}
+
+// Return the first instance of relative_path occuring in an XDG config dir according to standard
+// precedence order.
+static bool FindXDGConfigFile(const std::string &relative_path, std::string &out) {
+    out = GetXDGEnv("XDG_CONFIG_HOME", "HOME", ".config");
+    if (!out.empty()) {
+        out += "/";
+        out += relative_path;
+        if (FileSysUtilsPathExists(out)) return true;
+    }
+
+    std::istringstream iss(GetXDGEnv("XDG_CONFIG_DIRS", nullptr, FALLBACK_CONFIG_DIRS));
+    std::string path;    
+    while (std::getline(iss, path, PATH_SEPARATOR)) {
+        if (path.empty()) continue;
+        out = path;
+        out += "/";
+        out += relative_path;
+        if (FileSysUtilsPathExists(out)) return true;
+    }
+
+    out = SYSCONFDIR;
+    out += "/";
+    out += relative_path;
+    if (FileSysUtilsPathExists(out)) return true;
+
+#if defined(EXTRASYSCONFDIR)
+    out = EXTRASYSCONFDIR;
+    out += "/";
+    out += relative_path;
+    if (FileSysUtilsPathExists(out)) return true;
+#endif
+
+    out.clear();
+    return false;
+}
+
+#endif
+
 #ifdef XR_OS_WINDOWS
 
 // Look for runtime data files in the provided paths, but first check the environment override to determine
@@ -662,6 +735,16 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
                     "", "RuntimeManifestFile::FindManifestFiles - found too many default runtime files in registry");
             }
             filename = filenames[0];
+#elif defined(XR_OS_LINUX)
+            const std::string relative_path = "openxr/"
+                + std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION))
+                + "/active_runtime.json";
+            if (!FindXDGConfigFile(relative_path, filename)) {
+                LoaderLogger::LogErrorMessage(
+                    "",
+                    "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
+                return XR_ERROR_FILE_ACCESS_ERROR;
+            }
 #else
             if (!PlatformGetGlobalRuntimeFileName(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION), filename)) {
                 LoaderLogger::LogErrorMessage(
