@@ -126,33 +126,6 @@ static inline void PlatformUtilsFreeEnv(char *val) {
     }
 }
 
-// Prefix for the Windows global runtime JSON file name
-static const std::string rt_file_folder = "\\ProgramData\\Khronos\\OpenXR\\";
-static const std::string rt_file_prefix = "\\openxr_runtime_";
-
-static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std::string &file_name) {
-    bool ret_value = false;
-    try {
-        char *sys_drive = PlatformUtilsGetSecureEnv("SystemDrive");
-        if (nullptr != sys_drive) {
-            file_name = sys_drive;
-            PlatformUtilsFreeEnv(sys_drive);
-            file_name += rt_file_folder;
-            if (sizeof(void *) == 8) {
-                file_name += "64";
-            } else {
-                file_name += "32";
-            }
-            file_name += rt_file_prefix;
-            file_name += std::to_string(major_version);
-            file_name += ".json";
-            ret_value = true;
-        }
-    } catch (...) {
-    }
-    return ret_value;
-}
-
 #else  // Not Linux or Windows
 
 static inline char *PlatformUtilsGetEnv(const char *name) {

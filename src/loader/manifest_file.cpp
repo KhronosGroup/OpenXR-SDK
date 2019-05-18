@@ -126,7 +126,6 @@ static void AddFilesInPath(ManifestFileType type, const std::string &search_path
             // This works around issue if multiple path separator follow each other directly.
             last_found = found;
             while (found == last_found) {
-                std::ostringstream stringStream2;
                 last_found = found + 1;
                 found = search_path.find_first_of(PATH_SEPARATOR, last_found);
             }
