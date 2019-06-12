@@ -208,6 +208,15 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 
 // Workaround for MS VS 2010/2013 don't support the experimental filesystem
 
+std::vector<wchar_t> MultibyteToWChar(std::string str) {
+    const char* mbstr = str.c_str();
+    std::mbstate_t state = std::mbstate_t();
+    std::size_t len = 1 + std::mbsrtowcs(NULL, &mbstr, 0, &state);
+    std::vector<wchar_t> wstr(len);
+    std::mbsrtowcs(&wstr[0], &mbstr, wstr.size(), &state);
+    return wstr;
+}
+
 bool FileSysUtilsIsRegularFile(const std::string& path) {
     try {
         return (1 != PathIsDirectoryA(path.c_str()));
@@ -320,7 +329,12 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
         if (file_handle != INVALID_HANDLE_VALUE) {
             do {
                 if (!(file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-                    files.push_back(file_data.cFileName);
+                    const wchar_t* wstr = file_data.cFileName;
+                    std::mbstate_t state = std::mbstate_t();
+                    std::size_t len = 1 + std::wcsrtombs(nullptr, &wstr, 0, &state);
+                    std::vector<char> mbstr(len);
+                    std::wcsrtombs(&mbstr[0], &wstr, mbstr.size(), &state);
+                    files.push_back(mbstr.data());
                 }
             } while (FindNextFile(file_handle, &file_data));
             return true;
