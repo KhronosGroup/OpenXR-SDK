@@ -17,3 +17,7 @@ specification/examples.mk
 
 # Files related to pytest
 specification/scripts/.cache
+
+# VS misc
+*.sln
+*.pyproj
