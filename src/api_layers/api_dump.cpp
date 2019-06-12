@@ -573,8 +573,17 @@ XrResult ApiDumpLayerXrDestroyInstance(XrInstance instance) {
     ApiDumpLayerRecordContent(contents);
 
     std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);
-    XrGeneratedDispatchTable *next_dispatch = g_instance_dispatch_map[instance];
+    XrGeneratedDispatchTable *next_dispatch = nullptr;
+    auto map_iter = g_instance_dispatch_map.find(instance);
+    if (map_iter != g_instance_dispatch_map.end()) {
+        next_dispatch = map_iter->second;
+    }
     mlock.unlock();
+
+    if (nullptr == next_dispatch) {
+        return XR_ERROR_HANDLE_INVALID;
+    }
+
     next_dispatch->DestroyInstance(instance);
     ApiDumpCleanUpMapsForTable(next_dispatch);
 
