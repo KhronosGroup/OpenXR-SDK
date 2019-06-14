@@ -21,7 +21,11 @@
 #include <cstring>
 #include "xr_dependencies.h"
 
-#if !defined(USE_EXPERIMENTAL_FS) && !defined(USE_FINAL_FS)
+#if defined DISABLE_STD_FILESYSTEM
+#define USE_EXPERIMENTAL_FS 0
+#define USE_FINAL_FS 0
+
+#else
 // If the C++ macro is set to the version containing C++17, it must support
 // the final C++17 package
 #if __cplusplus >= 201703L
