@@ -73,8 +73,6 @@
 // Windows fallback includes
 #include <stdint.h>
 #include <direct.h>
-#include <shlwapi.h>
-#include <cwchar>
 #else
 // Linux/Apple fallback includes
 #include <sys/stat.h>
@@ -203,18 +201,9 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 
 // Workaround for MS VS 2010/2013 don't support the experimental filesystem
 
-std::vector<wchar_t> MultibyteToWChar(std::string str) {
-    const char* mbstr = str.c_str();
-    std::mbstate_t state = std::mbstate_t();
-    std::size_t len = 1 + std::mbsrtowcs(NULL, &mbstr, 0, &state);
-    std::vector<wchar_t> wstr(len);
-    std::mbsrtowcs(&wstr[0], &mbstr, wstr.size(), &state);
-    return wstr;
-}
-
 bool FileSysUtilsIsRegularFile(const std::string& path) {
     try {
-        return (1 != PathIsDirectoryW(MultibyteToWChar(path).data()));
+        return (1 != PathIsDirectoryA(path.c_str()));
     } catch (...) {
         return false;
     }
@@ -222,7 +211,7 @@ bool FileSysUtilsIsRegularFile(const std::string& path) {
 
 bool FileSysUtilsIsDirectory(const std::string& path) {
     try {
-        return (1 == PathIsDirectoryW(MultibyteToWChar(path).data()));
+        return (1 == PathIsDirectoryA(path.c_str()));
     } catch (...) {
         return false;
     }
@@ -230,7 +219,7 @@ bool FileSysUtilsIsDirectory(const std::string& path) {
 
 bool FileSysUtilsPathExists(const std::string& path) {
     try {
-        return (1 == PathFileExistsW(MultibyteToWChar(path).data()));
+        return (1 == PathFileExistsA(path.c_str()));
     } catch (...) {
         return false;
     }
@@ -274,7 +263,7 @@ bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute) {
     try {
         char tmp_path[MAX_PATH];
-        if (0 != GetFullPathNameW(MultibyteToWChar(path).data(), MAX_PATH, MultibyteToWChar(tmp_path).data(), NULL)) {
+        if (0 != GetFullPathNameA(path.c_str(), MAX_PATH, tmp_path, NULL)) {
             absolute = tmp_path;
             return true;
         }
@@ -320,16 +309,11 @@ bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>&
 bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::string>& files) {
     try {
         WIN32_FIND_DATA file_data;
-        HANDLE file_handle = FindFirstFileW(MultibyteToWChar(path).data(), &file_data);
+        HANDLE file_handle = FindFirstFileA(path.c_str(), &file_data);
         if (file_handle != INVALID_HANDLE_VALUE) {
             do {
                 if (!(file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-                    const wchar_t* wstr = file_data.cFileName;
-                    std::mbstate_t state = std::mbstate_t();
-                    std::size_t len = 1 + std::wcsrtombs(nullptr, &wstr, 0, &state);
-                    std::vector<char> mbstr(len);
-                    std::wcsrtombs(&mbstr[0], &wstr, mbstr.size(), &state);
-                    files.push_back(mbstr.data());
+                    files.push_back(file_data.cFileName);
                 }
             } while (FindNextFile(file_handle, &file_data));
             return true;
