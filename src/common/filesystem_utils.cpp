@@ -73,6 +73,7 @@
 // Windows fallback includes
 #include <stdint.h>
 #include <direct.h>
+#include <shlwapi.h>
 #else
 // Linux/Apple fallback includes
 #include <sys/stat.h>
