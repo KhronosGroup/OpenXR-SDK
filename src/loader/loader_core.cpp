@@ -355,19 +355,6 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
 
 // ---- Core 0.1 manual loader terminator functions
 
-// Validate that the XrInstanceCreateInfo 'next' chain is valid.
-static bool ValidateInstanceCreateInfoNextChain(LoaderInstance *loader_instance, const XrInstanceCreateInfo *info) {
-    // See if there is a debug utils create structure in the "next" chain
-    const XrBaseInStructure *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
-    while (next_header != nullptr) {
-        if (next_header->type != XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
-            return false;
-        }
-        next_header = reinterpret_cast<const XrBaseInStructure *>(next_header->next);
-    }
-    return true;
-}
-
 // Validate that the applicationInfo structure in the XrInstanceCreateInfo is valid.
 static bool ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApplicationInfo &info) {
     if (IsMissingNullTerminator<XR_MAX_APPLICATION_NAME_SIZE>(info.applicationName)) {
@@ -389,12 +376,6 @@ static bool ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const Xr
     if (XR_TYPE_INSTANCE_CREATE_INFO != info->type) {
         LoaderLogger::LogErrorMessage("xrCreateInstance",
                                       "VUID-XrInstanceCreateInfo-type-type: expected XR_TYPE_INSTANCE_CREATE_INFO.");
-        return false;
-    }
-    // Should have a valid 'next' chain
-    if (!ValidateInstanceCreateInfoNextChain(loader_instance, info)) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                      "VUID-XrInstanceCreateInfo-next-next: unexpected struct in \'next\' chain.");
         return false;
     }
     // Flags must be 0
