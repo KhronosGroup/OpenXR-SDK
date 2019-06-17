@@ -251,7 +251,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
             }
         }
 
-        if (XR_FAILED(result)) {
+        if (XR_SUCCESS != result) {
             if (runtime_loaded) {
                 RuntimeInterface::UnloadRuntime("xrCreateInstance");
             }
@@ -264,13 +264,12 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
         XrInstance created_instance = XR_NULL_HANDLE;
         result = LoaderInstance::CreateInstance(api_layer_interfaces, info, &created_instance);
 
-        if (XR_SUCCEEDED(result)) {
+        if (XR_SUCCESS == result) {
             *instance = created_instance;
 
-            LoaderInstance *loader_instance = nullptr;
+            LoaderInstance *loader_instance;
             {
                 std::unique_lock<std::mutex> lock(g_instance_mutex);
-                // Unguarded RHS bracket operator ok here - we know it was just successfully found or inserted above
                 loader_instance = g_instance_map[created_instance];
             }
 
@@ -455,14 +454,10 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instanc
     try {
         LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Entering loader trampoline");
 
-        LoaderInstance *loader_instance = nullptr;
+        LoaderInstance *loader_instance;
         {
             std::unique_lock<std::mutex> lock(g_instance_mutex);
-            auto map_iter = g_instance_map.find(instance);
-            if (map_iter == g_instance_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+            loader_instance = g_instance_map[instance];
         }
 
         if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
@@ -512,14 +507,10 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
             return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
         }
 
-        LoaderInstance *loader_instance = nullptr;
+        LoaderInstance *loader_instance;
         {
             std::unique_lock<std::mutex> lock(g_debugutilsmessengerext_mutex);
-            auto map_iter = g_debugutilsmessengerext_map.find(messenger);
-            if (map_iter == g_debugutilsmessengerext_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+            loader_instance = g_debugutilsmessengerext_map[messenger];
         }
 
         if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
@@ -664,14 +655,10 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSetDebugUtilsObjectNameEXT(XrInstance
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession session, const XrDebugUtilsLabelEXT *labelInfo) {
     try {
-        LoaderInstance *loader_instance = nullptr;
+        LoaderInstance *loader_instance;
         {
             std::unique_lock<std::mutex> lock(g_session_mutex);
-            auto map_iter = g_session_map.find(session);
-            if (map_iter == g_session_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+            loader_instance = g_session_map[session];
         }
 
         std::vector<XrLoaderLogObjectInfo> loader_objects;
@@ -712,14 +699,10 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession 
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession session) {
     try {
-        LoaderInstance *loader_instance = nullptr;
+        LoaderInstance *loader_instance;
         {
             std::unique_lock<std::mutex> lock(g_session_mutex);
-            auto map_iter = g_session_map.find(session);
-            if (map_iter == g_session_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+            loader_instance = g_session_map[session];
         }
 
         if (nullptr == loader_instance) {
@@ -750,14 +733,10 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession se
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession session, const XrDebugUtilsLabelEXT *labelInfo) {
     try {
-        LoaderInstance *loader_instance = nullptr;
+        LoaderInstance *loader_instance;
         {
             std::unique_lock<std::mutex> lock(g_session_mutex);
-            auto map_iter = g_session_map.find(session);
-            if (map_iter == g_session_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+            loader_instance = g_session_map[session];
         }
 
         XrLoaderLogObjectInfo object_info = {};

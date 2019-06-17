@@ -526,11 +526,8 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                     tramp_variable_defines += '        }\n'
                             secondary_mutex_name = 'g_%s_mutex' % base_handle_name
                             tramp_variable_defines += '        std::unique_lock<std::mutex> secondary_lock(%s);\n' % secondary_mutex_name
-                            tramp_variable_defines += '        auto map_iter = g_%s_map.find(%s);\n' % (base_handle_name, first_handle_name)
-                            tramp_variable_defines += '        LoaderInstance *loader_instance = nullptr;\n'
-                            tramp_variable_defines += '        if (map_iter != g_%s_map.end()) {\n' % base_handle_name
-                            tramp_variable_defines += '            loader_instance = map_iter->second;\n'
-                            tramp_variable_defines += '        }\n'
+                            tramp_variable_defines += '        LoaderInstance *loader_instance = g_%s_map[%s];\n' % (
+                                base_handle_name, first_handle_name)
                             if cur_cmd.is_destroy_disconnect:
                                 tramp_variable_defines += '        // Destroy the mapping entry for this item if it was valid.\n'
                                 tramp_variable_defines += '        if (nullptr != loader_instance) {\n'
@@ -541,13 +538,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                             assert((not cur_cmd.is_destroy_disconnect)
                                    or (pointer_count == 0))
                             if pointer_count == 1:
-                                # NOTE - @ 10-June-2019 this stanza is never exercised in loader code-gen. Consider whether necessary. DJH
                                 tramp_variable_defines += '        for (uint32_t i = 1; i < %s; ++i) {\n' % param.pointer_count_var
-                                tramp_variable_defines += '            LoaderInstance *elt_loader_instance = nullptr;\n'
-                                tramp_variable_defines += '            auto map_iter = g_%s_map.find(%s[i]);\n' % (base_handle_name, param.name)
-                                tramp_variable_defines += '            if (map_iter != g_%s_map.end()) {\n' % base_handle_name
-                                tramp_variable_defines += '                elt_loader_instance = map_iter->second;\n'
-                                tramp_variable_defines += '            }\n'
+                                tramp_variable_defines += '            LoaderInstance *elt_loader_instance = g_%s_map[%s[i]];\n' % (
+                                    base_handle_name, param.name)
                                 tramp_variable_defines += '            if (elt_loader_instance == nullptr || elt_loader_instance != loader_instance) {\n'
                                 tramp_variable_defines += '                XrLoaderLogObjectInfo bad_object = {};\n'
                                 tramp_variable_defines += '                bad_object.type = %s;\n' % self.genXrObjectType(
@@ -570,7 +563,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                     tramp_variable_defines += '                return XR_ERROR_HANDLE_INVALID;\n'
                                 tramp_variable_defines += '            }\n'
                                 tramp_variable_defines += '        }\n'
-                            tramp_variable_defines += '        secondary_lock.unlock();\n\n'
+                            tramp_variable_defines += '        secondary_lock.unlock();\n'
                             tramp_variable_defines += '        if (nullptr == loader_instance) {\n'
                             tramp_variable_defines += '            XrLoaderLogObjectInfo bad_object = {};\n'
                             tramp_variable_defines += '            bad_object.type = %s;\n' % self.genXrObjectType(

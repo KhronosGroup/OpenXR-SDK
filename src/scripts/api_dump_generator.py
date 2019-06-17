@@ -1149,10 +1149,8 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                     base_handle_name = undecorate(handle_param.type)
                     first_handle_name = self.getFirstHandleName(handle_param)
                     generated_commands += '        std::unique_lock<std::mutex> mlock(g_%s_dispatch_mutex);\n' % base_handle_name
-                    generated_commands += '        auto map_iter = g_%s_dispatch_map.find(%s);\n' % (base_handle_name, first_handle_name)
-                    generated_commands += '        mlock.unlock();\n\n'
-                    generated_commands += '        if (map_iter == g_%s_dispatch_map.end()) return XR_ERROR_VALIDATION_FAILURE;\n' % base_handle_name
-                    generated_commands += '        XrGeneratedDispatchTable *gen_dispatch_table = map_iter->second;\n'
+                    generated_commands += '        XrGeneratedDispatchTable *gen_dispatch_table = g_%s_dispatch_map[%s];\n' % (base_handle_name, first_handle_name)
+                    generated_commands += '        mlock.unlock();\n'
                 else:
                     generated_commands += self.printCodeGenErrorMessage(
                         'Command %s does not have an OpenXR Object handle as the first parameter.' % cur_cmd.name)
@@ -1174,7 +1172,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                         param, False, can_expand, 2)
 
                 # Now record the information
-                generated_commands += '        ApiDumpLayerRecordContent(contents);\n\n'
+                generated_commands += '        ApiDumpLayerRecordContent(contents);\n'
 
                 # Call down, looking for the returned result if required.
                 generated_commands += '        '
@@ -1297,12 +1295,8 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         generated_commands += '        }\n\n'
         generated_commands += '        // We have not found it, so pass it down to the next layer/runtime\n'
         generated_commands += '        std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);\n'
-        generated_commands += '        auto map_iter = g_instance_dispatch_map.find(instance);\n'
+        generated_commands += '        XrGeneratedDispatchTable *gen_dispatch_table = g_instance_dispatch_map[instance];\n'
         generated_commands += '        mlock.unlock();\n\n'
-        generated_commands += '        if (map_iter == g_instance_dispatch_map.end()) {\n'
-        generated_commands += '            return XR_ERROR_HANDLE_INVALID;\n'
-        generated_commands += '        }\n\n'
-        generated_commands += '        XrGeneratedDispatchTable *gen_dispatch_table = map_iter->second;\n'
         generated_commands += '        if (nullptr == gen_dispatch_table) {\n'
         generated_commands += '            return XR_ERROR_HANDLE_INVALID;\n'
         generated_commands += '        }\n\n'

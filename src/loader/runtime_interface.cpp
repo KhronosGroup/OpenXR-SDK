@@ -193,19 +193,14 @@ XrResult RuntimeInterface::GetInstanceProcAddr(XrInstance instance, const char* 
 const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance instance) {
     XrGeneratedDispatchTable* table = nullptr;
     std::unique_lock<std::mutex> mlock(_single_runtime_interface->_dispatch_table_mutex);
-    if (0 != _single_runtime_interface->_dispatch_table_map.count(instance)) {
-        table = _single_runtime_interface->_dispatch_table_map[instance];
-    }
+    table = _single_runtime_interface->_dispatch_table_map[instance];
     return table;
 }
 
 const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger) {
     try {
         std::unique_lock<std::mutex> mlock(_single_runtime_interface->_messenger_to_instance_mutex);
-        XrInstance runtime_instance = nullptr;
-        if (0 != _single_runtime_interface->_messenger_to_instance_map.count(messenger)) {
-            runtime_instance = _single_runtime_interface->_messenger_to_instance_map[messenger];
-        }
+        XrInstance runtime_instance = _single_runtime_interface->_messenger_to_instance_map[messenger];
         mlock.unlock();
         return GetDispatchTable(runtime_instance);
     } catch (...) {
@@ -311,12 +306,8 @@ XrResult RuntimeInterface::DestroyInstance(XrInstance instance) {
         if (XR_NULL_HANDLE != instance) {
             // Destroy the dispatch table for this instance first
             std::unique_lock<std::mutex> mlock(_dispatch_table_mutex);
-            XrGeneratedDispatchTable* table = nullptr;
-            auto map_iter = _dispatch_table_map.find(instance);
-            if (map_iter != _dispatch_table_map.end()) {
-                table = map_iter->second;
-                _dispatch_table_map.erase(map_iter);
-            }
+            XrGeneratedDispatchTable* table = _dispatch_table_map[instance];
+            _dispatch_table_map.erase(instance);
             mlock.unlock();
 
             if (nullptr != table) {
