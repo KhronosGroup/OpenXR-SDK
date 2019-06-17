@@ -1,0 +1,45 @@
+version: 0.90.1.{build}
+image: Visual Studio 2017
+
+
+environment:
+  VULKAN_SDK: c:\VulkanSDK\1.1.106.0
+  VKSDKURL: https://sdk.lunarg.com/sdk/download/1.1.106.0/windows/VulkanSDK-1.1.106.0-Installer.exe
+  VKSDKINSTALLER: c:\tools\vksdk1.1.106.0.exe
+  matrix:
+# 32-bit
+    - VCVARS: vcvarsamd64_x86
+      VCPKG_PLATFORM: x86-windows
+# 64-bit
+    - VCVARS: vcvars64
+      VCPKG_PLATFORM: x64-windows
+
+matrix:
+  fast_finish: true # finish immediately once one of the jobs fails
+
+# fetch repository as zip archive
+shallow_clone: true                 # default is "false"
+
+
+cache:
+  - c:\VulkanSDK\1.1.106.0
+install:
+  - choco install -y ninja
+  # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  # Download and install Vulkan SDK if not cached - the "Start-Process" is to not continue until install is done
+  - ps: >-
+      if (-not (Test-Path "$env:VULKAN_SDK/Include/vulkan/vulkan.h")) {
+        $wc = New-Object System.Net.WebClient
+        $wc.DownloadFile($env:VKSDKURL, $env:VKSDKINSTALLER)
+        Start-Process $env:VKSDKINSTALLER -ArgumentList "/S" -Wait }
+
+# for future use if we need vcpkg
+# -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+build_script:
+- cmd: >-
+    call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\%VCVARS%.bat" &&
+    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=C:/Python37-x64/python.exe &&
+    cd build &&
+    ninja &&
+    cd ..
