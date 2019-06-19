@@ -315,14 +315,14 @@ bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>&
 
 bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::string>& files) {
     try {
-        LPWIN32_FIND_DATAA file_data;
-        HANDLE file_handle = FindFirstFileA(path.c_str(), file_data);
+        WIN32_FIND_DATAA file_data;
+        HANDLE file_handle = FindFirstFileA(path.c_str(), &file_data);
         if (file_handle != INVALID_HANDLE_VALUE) {
             do {
-                if (!(file_data->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-                    files.push_back(file_data->cFileName);
+                if (!(file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+                    files.push_back(file_data.cFileName);
                 }
-            } while (FindNextFileA(file_handle, file_data));
+            } while (FindNextFileA(file_handle, &file_data));
             return true;
         }
     } catch (...) {
