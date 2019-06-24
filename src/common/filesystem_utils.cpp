@@ -259,7 +259,7 @@ bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent
         std::string full_path;
         if (FileSysUtilsGetAbsolutePath(file_path, full_path)) {
             std::string::size_type lastSeperator = full_path.find_last_of(DIRECTORY_SYMBOL);
-            parent_path = (lastSeperator == 0) ? full_path : full_path.substr(0, lastSeperator - 1);
+            parent_path = (lastSeperator == 0) ? full_path : full_path.substr(0, lastSeperator);
             return true;
         }
     } catch (...) {
