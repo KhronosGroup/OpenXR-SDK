@@ -154,9 +154,8 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionPropert
         } else if (nullptr != properties) {
             if (propertyCapacityInput < num_extension_properties) {
                 *propertyCountOutput = num_extension_properties;
-                LoaderLogger::LogErrorMessage(
-                    "xrEnumerateInstanceExtensionProperties",
-                    "VUID-xrEnumerateInstanceExtensionProperties-propertyCountOutput-parameter: insufficient space in array");
+                LoaderLogger::LogValidationErrorMessage("VUID-xrEnumerateInstanceExtensionProperties-propertyCountOutput-parameter",
+                                                        "xrEnumerateInstanceExtensionProperties", "insufficient space in array");
                 return XR_ERROR_SIZE_INSUFFICIENT;
             }
 
@@ -169,12 +168,12 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionPropert
             for (uint32_t prop = 0; prop < propertyCapacityInput && prop < extension_properties.size(); ++prop) {
                 if (XR_TYPE_EXTENSION_PROPERTIES != properties[prop].type) {
                     properties_valid = false;
-                    LoaderLogger::LogErrorMessage("xrEnumerateInstanceExtensionProperties",
-                                                  "VUID-XrExtensionProperties-type-type: unknown type in properties");
+                    LoaderLogger::LogValidationErrorMessage("VUID-XrExtensionProperties-type-type",
+                                                            "xrEnumerateInstanceExtensionProperties", "unknown type in properties");
                 }
                 if (nullptr != properties[prop].next) {
-                    LoaderLogger::LogErrorMessage("xrEnumerateInstanceExtensionProperties",
-                                                  "VUID-XrExtensionProperties-next-next: expected NULL");
+                    LoaderLogger::LogValidationErrorMessage("VUID-XrExtensionProperties-next-next",
+                                                            "xrEnumerateInstanceExtensionProperties", "expected NULL");
                     properties_valid = false;
                 }
                 if (properties_valid) {
@@ -182,9 +181,8 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionPropert
                 }
             }
             if (!properties_valid) {
-                LoaderLogger::LogErrorMessage(
-                    "xrEnumerateInstanceExtensionProperties",
-                    "VUID-xrEnumerateInstanceExtensionProperties-properties-parameter: invalid properties");
+                LoaderLogger::LogValidationErrorMessage("VUID-xrEnumerateInstanceExtensionProperties-properties-parameter",
+                                                        "xrEnumerateInstanceExtensionProperties", "invalid properties");
                 return XR_ERROR_VALIDATION_FAILURE;
             } else if (nullptr != propertyCountOutput) {
                 *propertyCountOutput = num_to_copy;
@@ -204,7 +202,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
     try {
         LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader trampoline");
         if (nullptr == info) {
-            LoaderLogger::LogErrorMessage("xrCreateInstance", "VUID-xrCreateInstance-info-parameter: must be non-NULL");
+            LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance", "must be non-NULL");
             return XR_ERROR_VALIDATION_FAILURE;
         } else {
             // If application requested OpenXR API version is higher than the loader version, then we need to throw
@@ -222,8 +220,9 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
             }
         }
         if (nullptr == instance) {
-            LoaderLogger::LogErrorMessage("xrCreateInstance", "VUID-xrCreateInstance-instance-parameter: must be non-NULL");
-            return XR_ERROR_HANDLE_INVALID;
+            LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-instance-parameter", "xrCreateInstance",
+                                                    "must be non-NULL");
+            return XR_ERROR_VALIDATION_FAILURE;
         }
 
         std::vector<std::unique_ptr<ApiLayerInterface>> api_layer_interfaces;
@@ -311,7 +310,8 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
 
         LoaderInstance *const loader_instance = g_instance_map.Get(instance);
         if (loader_instance == nullptr) {
-            LoaderLogger::LogErrorMessage("xrDestroyInstance", "VUID-xrDestroyInstance-instance-parameter: invalid instance");
+            LoaderLogger::LogValidationErrorMessage("VUID-xrDestroyInstance-instance-parameter", "xrDestroyInstance",
+                                                    "invalid instance");
             return XR_ERROR_HANDLE_INVALID;
         }
 
@@ -350,13 +350,13 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
 // Validate that the applicationInfo structure in the XrInstanceCreateInfo is valid.
 static bool ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApplicationInfo &info) {
     if (IsMissingNullTerminator<XR_MAX_APPLICATION_NAME_SIZE>(info.applicationName)) {
-        LoaderLogger::LogErrorMessage(
-            "xrCreateInstance", "VUID-XrApplicationInfo-applicationName-parameter: application name missing NULL terminator.");
+        LoaderLogger::LogValidationErrorMessage("VUID-XrApplicationInfo-applicationName-parameter", "xrCreateInstance",
+                                                "application name missing NULL terminator.");
         return false;
     }
     if (IsMissingNullTerminator<XR_MAX_ENGINE_NAME_SIZE>(info.engineName)) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                      "VUID-XrApplicationInfo-engineName-parameter: engine name missing NULL terminator.");
+        LoaderLogger::LogValidationErrorMessage("VUID-XrApplicationInfo-engineName-parameter", "xrCreateInstance",
+                                                "engine name missing NULL terminator.");
         return false;
     }
     return true;
@@ -366,26 +366,26 @@ static bool ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApp
 static bool ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const XrInstanceCreateInfo *info) {
     // Should have a valid 'type'
     if (XR_TYPE_INSTANCE_CREATE_INFO != info->type) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                      "VUID-XrInstanceCreateInfo-type-type: expected XR_TYPE_INSTANCE_CREATE_INFO.");
+        LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-type-type", "xrCreateInstance",
+                                                "expected XR_TYPE_INSTANCE_CREATE_INFO.");
         return false;
     }
     // Flags must be 0
     if (0 != info->createFlags) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "VUID-XrInstanceCreateInfo-createFlags-zerobitmask: flags must be 0.");
+        LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-createFlags-zerobitmask", "xrCreateInstance",
+                                                "flags must be 0.");
         return false;
     }
     // ApplicationInfo struct must be valid
     if (!ValidateApplicationInfo(loader_instance, info->applicationInfo)) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                      "VUID-XrInstanceCreateInfo-applicationInfo-parameter: info->applicationInfo is not valid.");
+        LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-applicationInfo-parameter", "xrCreateInstance",
+                                                "info->applicationInfo is not valid.");
         return false;
     }
     // VUID-XrInstanceCreateInfo-enabledApiLayerNames-parameter already tested in LoadApiLayers()
     if (info->enabledExtensionCount && nullptr == info->enabledExtensionNames) {
-        LoaderLogger::LogErrorMessage(
-            "xrCreateInstance",
-            "VUID-XrInstanceCreateInfo-enabledExtensionNames-parameter: enabledExtensionCount is non-0 but array is NULL");
+        LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-enabledExtensionNames-parameter", "xrCreateInstance",
+                                                "enabledExtensionCount is non-0 but array is NULL");
         return false;
     }
     return true;
@@ -395,8 +395,8 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(const XrInstanceCreate
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader terminator");
     LoaderInstance *loader_instance = reinterpret_cast<LoaderInstance *>(*instance);
     if (!ValidateInstanceCreateInfo(loader_instance, info)) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                      "VUID-xrCreateInstance-info-parameter: something wrong with XrInstanceCreateInfo contents");
+        LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance",
+                                                "something wrong with XrInstanceCreateInfo contents");
         return XR_ERROR_VALIDATION_FAILURE;
     }
     XrResult result = RuntimeInterface::GetRuntime().CreateInstance(info, instance);
@@ -429,8 +429,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instanc
 
         LoaderInstance *loader_instance = g_instance_map.Get(instance);
         if (loader_instance == nullptr) {
-            LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
-                                          "VUID-xrCreateDebugUtilsMessengerEXT-instance-parameter: invalid instance");
+            LoaderLogger::LogValidationErrorMessage("VUID-xrCreateDebugUtilsMessengerEXT-instance-parameter",
+                                                    "xrCreateDebugUtilsMessengerEXT", "invalid instance");
             return XR_ERROR_HANDLE_INVALID;
         }
 
@@ -479,8 +479,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
 
         LoaderInstance *loader_instance = g_debugutilsmessengerext_map.Get(messenger);
         if (loader_instance == nullptr) {
-            LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT",
-                                          "VUID-xrDestroyDebugUtilsMessengerEXT-messenger-parameter: invalid messenger");
+            LoaderLogger::LogValidationErrorMessage("VUID-xrDestroyDebugUtilsMessengerEXT-messenger-parameter",
+                                                    "xrDestroyDebugUtilsMessengerEXT", "invalid messenger");
 
             return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
         }
@@ -515,8 +515,8 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstan
     try {
         LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Entering loader terminator");
         if (nullptr == messenger) {
-            LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
-                                          "VUID-xrCreateDebugUtilsMessengerEXT-messenger-parameter: invalid messenger pointer");
+            LoaderLogger::LogValidationErrorMessage("VUID-xrCreateDebugUtilsMessengerEXT-messenger-parameter",
+                                                    "xrCreateDebugUtilsMessengerEXT", "invalid messenger pointer");
             return XR_ERROR_VALIDATION_FAILURE;
         }
         const XrGeneratedDispatchTable *dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);
