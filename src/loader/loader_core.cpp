@@ -214,15 +214,10 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
             uint16_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
             uint16_t loader_minor = XR_VERSION_MINOR(XR_CURRENT_API_VERSION);
             if (app_major > loader_major || (app_major == loader_major && app_minor > loader_minor)) {
-                std::string error_message = "xrCreateInstance called with invalid API version ";
-                error_message += std::to_string(app_major);
-                error_message += ".";
-                error_message += std::to_string(app_minor);
-                error_message += ".  Max supported version is ";
-                error_message += std::to_string(loader_major);
-                error_message += ".";
-                error_message += std::to_string(loader_minor);
-                LoaderLogger::LogErrorMessage("xrCreateInstance", error_message);
+                std::ostringstream oss;
+                oss << "xrCreateInstance called with invalid API version " << app_major << "." << app_minor
+                    << ".  Max supported version is " << loader_major << "." << loader_minor;
+                LoaderLogger::LogErrorMessage("xrCreateInstance", oss.str());
                 return XR_ERROR_DRIVER_INCOMPATIBLE;
             }
         }

@@ -313,24 +313,21 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
                 if (!any_loaded) {
                     last_error = res;
                 }
-                std::string warning_message = "ApiLayerInterface::LoadApiLayers skipping layer ";
-                warning_message += manifest_file->LayerName();
-                warning_message += " due to failed negotiation with error ";
-                warning_message += std::to_string(res);
-                LoaderLogger::LogWarningMessage(openxr_command, warning_message);
+                std::ostringstream oss;
+                oss << "ApiLayerInterface::LoadApiLayers skipping layer " << manifest_file->LayerName()
+                    << " due to failed negotiation with error " << res;
+                LoaderLogger::LogWarningMessage(openxr_command, oss.str());
                 LoaderPlatformLibraryClose(layer_library);
                 continue;
             }
 
-            std::string info_message = "ApiLayerInterface::LoadApiLayers succeeded loading layer ";
-            info_message += manifest_file->LayerName();
-            info_message += " using interface version ";
-            info_message += std::to_string(api_layer_info.layerInterfaceVersion);
-            info_message += " and OpenXR API version ";
-            info_message += std::to_string(XR_VERSION_MAJOR(api_layer_info.layerXrVersion));
-            info_message += ".";
-            info_message += std::to_string(XR_VERSION_MINOR(api_layer_info.layerXrVersion));
-            LoaderLogger::LogInfoMessage(openxr_command, info_message);
+            {
+                std::ostringstream oss;
+                oss << "ApiLayerInterface::LoadApiLayers succeeded loading layer " << manifest_file->LayerName()
+                    << " using interface version " << api_layer_info.layerInterfaceVersion << " and OpenXR API version "
+                    << XR_VERSION_MAJOR(api_layer_info.layerXrVersion) << "." << XR_VERSION_MINOR(api_layer_info.layerXrVersion);
+                LoaderLogger::LogInfoMessage(openxr_command, oss.str());
+            }
 
             // Grab the list of extensions this layer supports for easy filtering after the
             // xrCreateInstance call
