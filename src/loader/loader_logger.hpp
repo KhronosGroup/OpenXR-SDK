@@ -144,6 +144,13 @@ class LoaderLogRecorder {
     virtual bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                             const XrLoaderLogMessengerCallbackData* callback_data) = 0;
 
+    // Extension-specific logging functions - defaults to do nothing.
+    virtual bool LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT message_severity,
+                                      XrDebugUtilsMessageTypeFlagsEXT message_type,
+                                      const XrDebugUtilsMessengerCallbackDataEXT* callback_data) {
+        return false;
+    }
+
    protected:
     bool _active;
     XrLoaderLogType _type;
@@ -159,8 +166,8 @@ class StdErrLoaderLogRecorder : public LoaderLogRecorder {
     StdErrLoaderLogRecorder(void* user_data);
     ~StdErrLoaderLogRecorder() {}
 
-    virtual bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                            const XrLoaderLogMessengerCallbackData* callback_data);
+    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
+                    const XrLoaderLogMessengerCallbackData* callback_data) override;
 };
 
 // Standard Output logger used with XR_LOADER_DEBUG
@@ -169,8 +176,8 @@ class StdOutLoaderLogRecorder : public LoaderLogRecorder {
     StdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags);
     ~StdOutLoaderLogRecorder() {}
 
-    virtual bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                            const XrLoaderLogMessengerCallbackData* callback_data);
+    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
+                    const XrLoaderLogMessengerCallbackData* callback_data) override;
 };
 
 // Debug Utils logger used with XR_EXT_debug_utils
@@ -179,12 +186,12 @@ class DebugUtilsLogRecorder : public LoaderLogRecorder {
     DebugUtilsLogRecorder(const XrDebugUtilsMessengerCreateInfoEXT* create_info, XrDebugUtilsMessengerEXT debug_messenger);
     ~DebugUtilsLogRecorder() {}
 
-    virtual bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                            const XrLoaderLogMessengerCallbackData* callback_data);
+    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
+                    const XrLoaderLogMessengerCallbackData* callback_data) override;
 
     // Extension-specific logging functions
     bool LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT message_severity, XrDebugUtilsMessageTypeFlagsEXT message_type,
-                              const XrDebugUtilsMessengerCallbackDataEXT* callback_data);
+                              const XrDebugUtilsMessengerCallbackDataEXT* callback_data) override;
 
    private:
     PFN_xrDebugUtilsMessengerCallbackEXT _user_callback;

@@ -427,55 +427,58 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
                                         XrDebugUtilsMessageTypeFlagsEXT message_type,
                                         const XrDebugUtilsMessengerCallbackDataEXT* callback_data) {
     bool exit_app = false;
-    for (std::unique_ptr<LoaderLogRecorder>& recorder : _recorders) {
-        XrLoaderLogMessageSeverityFlags log_message_severity = DebugUtilsSeveritiesToLoaderLogMessageSeverities(message_severity);
-        XrLoaderLogMessageTypeFlags log_message_type = DebugUtilsMessageTypesToLoaderLogMessageTypes(message_type);
-        bool dumped = false;
-        // Only send the message if it's a debug utils recorder and of the type the recorder cares about.
-        if (recorder->Type() == XR_LOADER_LOG_DEBUG_UTILS &&
-            (recorder->MessageSeverities() & log_message_severity) == log_message_severity &&
-            (recorder->MessageTypes() & log_message_type) == log_message_type) {
-            DebugUtilsLogRecorder* debug_utils_recorder = reinterpret_cast<DebugUtilsLogRecorder*>(recorder.get());
-            bool obj_name_found = false;
-            std::vector<XrDebugUtilsLabelEXT> labels;
-            if (!_object_names.Empty() && callback_data->objectCount > 0) {
-                for (uint32_t obj = 0; obj < callback_data->objectCount; ++obj) {
-                    auto& current_obj = callback_data->objects[obj];
-                    auto stored_info = _object_names.LookUpStoredObjectInfo(current_obj.objectHandle, current_obj.objectType);
-                    if (stored_info != nullptr) {
-                        obj_name_found = true;
-                    }
-                    // If this is a session, see if there are any labels associated with it for us to add
-                    // to the callback content.
-                    if (XR_OBJECT_TYPE_SESSION == callback_data->objects[obj].objectType) {
-                        XrSession session = reinterpret_cast<XrSession&>(callback_data->objects[obj].objectHandle);
-                        LookUpSessionLabels(session, labels);
-                    }
-                }
-            }
-            XrDebugUtilsMessengerCallbackDataEXT new_callback_data = *callback_data;
-            std::vector<XrDebugUtilsObjectNameInfoEXT> new_objects;
+    XrLoaderLogMessageSeverityFlags log_message_severity = DebugUtilsSeveritiesToLoaderLogMessageSeverities(message_severity);
+    XrLoaderLogMessageTypeFlags log_message_type = DebugUtilsMessageTypesToLoaderLogMessageTypes(message_type);
 
-            // If a name or a label has been found, we should update it in a new version of the callback
-            if (obj_name_found || !labels.empty()) {
-                // Copy objects
-                new_objects = std::vector<XrDebugUtilsObjectNameInfoEXT>(callback_data->objects,
-                                                                         callback_data->objects + callback_data->objectCount);
-                for (auto& obj : new_objects) {
-                    // Check for any names that have been associated with the objects and set them up here
-                    _object_names.LookUpObjectName(obj);
-                }
-                new_callback_data.objects = new_objects.data();
-                new_callback_data.sessionLabelCount = static_cast<uint32_t>(labels.size());
-                new_callback_data.sessionLabels = labels.empty() ? nullptr : labels.data();
-                exit_app |= debug_utils_recorder->LogDebugUtilsMessage(message_severity, message_type, &new_callback_data);
-                dumped = true;
+    bool obj_name_found = false;
+    std::vector<XrDebugUtilsLabelEXT> labels;
+    if (!_object_names.Empty() && callback_data->objectCount > 0) {
+        for (uint32_t obj = 0; obj < callback_data->objectCount; ++obj) {
+            auto& current_obj = callback_data->objects[obj];
+            auto stored_info = _object_names.LookUpStoredObjectInfo(current_obj.objectHandle, current_obj.objectType);
+            if (stored_info != nullptr) {
+                obj_name_found = true;
             }
 
-            if (!dumped) {
-                exit_app |= debug_utils_recorder->LogDebugUtilsMessage(message_severity, message_type, callback_data);
+            // If this is a session, see if there are any labels associated with it for us to add
+            // to the callback content.
+            if (XR_OBJECT_TYPE_SESSION == current_obj.objectType) {
+                XrSession session = reinterpret_cast<XrSession&>(current_obj.objectHandle);
+                LookUpSessionLabels(session, labels);
             }
         }
+    }
+    // Use unmodified ones by default.
+    XrDebugUtilsMessengerCallbackDataEXT const* callback_data_to_use = callback_data;
+
+    XrDebugUtilsMessengerCallbackDataEXT new_callback_data = *callback_data;
+    std::vector<XrDebugUtilsObjectNameInfoEXT> new_objects;
+
+    // If a name or a label has been found, we should update it in a new version of the callback
+    if (obj_name_found || !labels.empty()) {
+        // Copy objects
+        new_objects =
+            std::vector<XrDebugUtilsObjectNameInfoEXT>(callback_data->objects, callback_data->objects + callback_data->objectCount);
+        for (auto& obj : new_objects) {
+            // Check for any names that have been associated with the objects and set them up here
+            _object_names.LookUpObjectName(obj);
+        }
+        new_callback_data.objects = new_objects.data();
+        new_callback_data.sessionLabelCount = static_cast<uint32_t>(labels.size());
+        new_callback_data.sessionLabels = labels.empty() ? nullptr : labels.data();
+        callback_data_to_use = &new_callback_data;
+    }
+
+    // Loop through the recorders
+    for (std::unique_ptr<LoaderLogRecorder>& recorder : _recorders) {
+        // Only send the message if it's a debug utils recorder and of the type the recorder cares about.
+        if (recorder->Type() != XR_LOADER_LOG_DEBUG_UTILS ||
+            (recorder->MessageSeverities() & log_message_severity) != log_message_severity ||
+            (recorder->MessageTypes() & log_message_type) != log_message_type) {
+            continue;
+        }
+
+        exit_app |= recorder->LogDebugUtilsMessage(message_severity, message_type, callback_data_to_use);
     }
     return exit_app;
 }
