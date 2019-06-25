@@ -64,6 +64,8 @@ add_library(${LOADER_NAME} ${LIBRARY_TYPE}
     loader_instance.hpp
     loader_logger.cpp
     loader_logger.hpp
+    loader_logger_recorders.cpp
+    loader_logger_recorders.hpp
     manifest_file.cpp
     manifest_file.hpp
     runtime_interface.cpp

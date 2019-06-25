@@ -160,47 +160,6 @@ class LoaderLogRecorder {
     XrLoaderLogMessageTypeFlags _message_types;
 };
 
-// Standard Error logger, always on for now
-class StdErrLoaderLogRecorder : public LoaderLogRecorder {
-   public:
-    StdErrLoaderLogRecorder(void* user_data);
-    ~StdErrLoaderLogRecorder() {}
-
-    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                    const XrLoaderLogMessengerCallbackData* callback_data) override;
-};
-
-// Standard Output logger used with XR_LOADER_DEBUG
-class StdOutLoaderLogRecorder : public LoaderLogRecorder {
-   public:
-    StdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags);
-    ~StdOutLoaderLogRecorder() {}
-
-    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                    const XrLoaderLogMessengerCallbackData* callback_data) override;
-};
-
-// Debug Utils logger used with XR_EXT_debug_utils
-class DebugUtilsLogRecorder : public LoaderLogRecorder {
-   public:
-    DebugUtilsLogRecorder(const XrDebugUtilsMessengerCreateInfoEXT* create_info, XrDebugUtilsMessengerEXT debug_messenger);
-    ~DebugUtilsLogRecorder() {}
-
-    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                    const XrLoaderLogMessengerCallbackData* callback_data) override;
-
-    // Extension-specific logging functions
-    bool LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT message_severity, XrDebugUtilsMessageTypeFlagsEXT message_type,
-                              const XrDebugUtilsMessengerCallbackDataEXT* callback_data) override;
-
-   private:
-    PFN_xrDebugUtilsMessengerCallbackEXT _user_callback;
-};
-
-// TODO: Add other Derived classes:
-//  - FileLoaderLogRecorder     - During/after xrCreateInstance
-//  - PipeLoaderLogRecorder?    - During/after xrCreateInstance
-
 class ObjectInfoCollection {
    public:
     //! Called from LoaderXrTermSetDebugUtilsObjectNameEXT - an empty name means remove
@@ -241,7 +200,7 @@ class LoaderLogger {
         return *(_instance.get());
     }
 
-    void AddLogRecorder(std::unique_ptr<LoaderLogRecorder>& recorder);
+    void AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder);
     void RemoveLogRecorder(uint64_t unique_id);
 
     //! Called from LoaderXrTermSetDebugUtilsObjectNameEXT - an empty name means remove

@@ -32,6 +32,7 @@
 #include <openxr/openxr_platform.h>
 
 #include "loader_logger.hpp"
+#include "loader_logger_recorders.hpp"
 #include "loader_instance.hpp"
 #include "xr_generated_loader.hpp"
 
@@ -530,8 +531,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstan
             *messenger = reinterpret_cast<XrDebugUtilsMessengerEXT>(temp_mess_ptr);
         }
         if (XR_SUCCESS == result) {
-            std::unique_ptr<LoaderLogRecorder> base_recorder(new DebugUtilsLogRecorder(createInfo, *messenger));
-            LoaderLogger::GetInstance().AddLogRecorder(base_recorder);
+            LoaderLogger::GetInstance().AddLogRecorder(MakeDebugUtilsLoaderLogRecorder(createInfo, *messenger));
             RuntimeInterface::GetRuntime().TrackDebugMessenger(instance, *messenger);
         }
         LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Completed loader terminator");
