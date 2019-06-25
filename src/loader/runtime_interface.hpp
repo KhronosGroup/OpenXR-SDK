@@ -23,6 +23,7 @@
 #include <vector>
 #include <unordered_map>
 #include <mutex>
+#include <memory>
 
 #include "loader_platform.hpp"
 #include "xr_generated_dispatch_table.h"
@@ -57,7 +58,7 @@ class RuntimeInterface {
     static uint32_t _single_runtime_count;
     LoaderPlatformLibraryHandle _runtime_library;
     PFN_xrGetInstanceProcAddr _get_instant_proc_addr;
-    std::unordered_map<XrInstance, XrGeneratedDispatchTable*> _dispatch_table_map;
+    std::unordered_map<XrInstance, std::unique_ptr<XrGeneratedDispatchTable>> _dispatch_table_map;
     std::mutex _dispatch_table_mutex;
     std::unordered_map<XrDebugUtilsMessengerEXT, XrInstance> _messenger_to_instance_map;
     std::mutex _messenger_to_instance_mutex;
