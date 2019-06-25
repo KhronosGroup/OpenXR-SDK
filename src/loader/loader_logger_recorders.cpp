@@ -24,24 +24,18 @@
 
 // Anonymous namespace to keep these types private
 namespace {
-// Standard Error logger, always on for now
-class StdErrLoaderLogRecorder : public LoaderLogRecorder {
+// With std::cerr: Standard Error logger, always on for now
+// With std::cout: Standard Output logger used with XR_LOADER_DEBUG
+class OstreamLoaderLogRecorder : public LoaderLogRecorder {
    public:
-    StdErrLoaderLogRecorder(void* user_data);
-    ~StdErrLoaderLogRecorder() {}
+    OstreamLoaderLogRecorder(std::ostream& os, void* user_data, XrLoaderLogMessageSeverityFlags flags);
+    ~OstreamLoaderLogRecorder() {}
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const XrLoaderLogMessengerCallbackData* callback_data) override;
-};
 
-// Standard Output logger used with XR_LOADER_DEBUG
-class StdOutLoaderLogRecorder : public LoaderLogRecorder {
-   public:
-    StdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags);
-    ~StdOutLoaderLogRecorder() {}
-
-    bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
-                    const XrLoaderLogMessengerCallbackData* callback_data) override;
+   private:
+    std::ostream& os_;
 };
 
 // Debug Utils logger used with XR_EXT_debug_utils
@@ -61,94 +55,50 @@ class DebugUtilsLogRecorder : public LoaderLogRecorder {
     PFN_xrDebugUtilsMessengerCallbackEXT _user_callback;
 };
 
-// Standard Error logger, always on for now
-StdErrLoaderLogRecorder::StdErrLoaderLogRecorder(void* user_data)
-    : LoaderLogRecorder(XR_LOADER_LOG_STDERR, user_data, XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT, 0xFFFFFFFFUL) {
+// Unified stdout/stderr logger
+OstreamLoaderLogRecorder::OstreamLoaderLogRecorder(std::ostream& os, void* user_data, XrLoaderLogMessageSeverityFlags flags)
+    : LoaderLogRecorder(XR_LOADER_LOG_STDOUT, user_data, flags, 0xFFFFFFFFUL), os_(os) {
     // Automatically start
     Start();
 }
 
-bool StdErrLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity,
-                                         XrLoaderLogMessageTypeFlags message_type,
-                                         const XrLoaderLogMessengerCallbackData* callback_data) {
-    if (_active && XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT <= message_severity) {
-        std::cerr << "Error [";
-        switch (message_type) {
-            case XR_LOADER_LOG_MESSAGE_TYPE_GENERAL_BIT:
-                std::cerr << "GENERAL";
-                break;
-            case XR_LOADER_LOG_MESSAGE_TYPE_SPECIFICATION_BIT:
-                std::cerr << "SPEC";
-                break;
-            case XR_LOADER_LOG_MESSAGE_TYPE_PERFORMANCE_BIT:
-                std::cerr << "PERF";
-                break;
-            default:
-                std::cerr << "UNKNOWN";
-                break;
-        }
-        std::cerr << " | " << callback_data->command_name << " | " << callback_data->message_id << "] : " << callback_data->message
-                  << std::endl;
-
-        for (uint32_t obj = 0; obj < callback_data->object_count; ++obj) {
-            std::cerr << "    Object[" << obj << "] = " << callback_data->objects[obj].ToString();
-            std::cerr << std::endl;
-        }
-        for (uint32_t label = 0; label < callback_data->session_labels_count; ++label) {
-            std::cerr << "    SessionLabel[" << std::to_string(label) << "] = " << callback_data->session_labels[label].labelName;
-            std::cerr << std::endl;
-        }
-    }
-
-    // Return of "true" means that we should exit the application after the logged message.  We
-    // don't want to do that for our internal logging.  Only let a user return true.
-    return false;
-}
-
-// Standard Output logger used with XR_LOADER_DEBUG
-StdOutLoaderLogRecorder::StdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags)
-    : LoaderLogRecorder(XR_LOADER_LOG_STDOUT, user_data, flags, 0xFFFFFFFFUL) {
-    // Automatically start
-    Start();
-}
-
-bool StdOutLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity,
-                                         XrLoaderLogMessageTypeFlags message_type,
-                                         const XrLoaderLogMessengerCallbackData* callback_data) {
+bool OstreamLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity,
+                                          XrLoaderLogMessageTypeFlags message_type,
+                                          const XrLoaderLogMessengerCallbackData* callback_data) {
     if (_active && 0 != (_message_severities & message_severity) && 0 != (_message_types & message_type)) {
         if (XR_LOADER_LOG_MESSAGE_SEVERITY_INFO_BIT > message_severity) {
-            std::cout << "Verbose [";
+            os_ << "Verbose [";
         } else if (XR_LOADER_LOG_MESSAGE_SEVERITY_WARNING_BIT > message_severity) {
-            std::cout << "Info [";
+            os_ << "Info [";
         } else if (XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT > message_severity) {
-            std::cout << "Warning [";
+            os_ << "Warning [";
         } else {
-            std::cout << "Error [";
+            os_ << "Error [";
         }
         switch (message_type) {
             case XR_LOADER_LOG_MESSAGE_TYPE_GENERAL_BIT:
-                std::cout << "GENERAL";
+                os_ << "GENERAL";
                 break;
             case XR_LOADER_LOG_MESSAGE_TYPE_SPECIFICATION_BIT:
-                std::cout << "SPEC";
+                os_ << "SPEC";
                 break;
             case XR_LOADER_LOG_MESSAGE_TYPE_PERFORMANCE_BIT:
-                std::cout << "PERF";
+                os_ << "PERF";
                 break;
             default:
-                std::cout << "UNKNOWN";
+                os_ << "UNKNOWN";
                 break;
         }
-        std::cout << " | " << callback_data->command_name << " | " << callback_data->message_id << "] : " << callback_data->message
-                  << std::endl;
+        os_ << " | " << callback_data->command_name << " | " << callback_data->message_id << "] : " << callback_data->message
+            << std::endl;
 
         for (uint32_t obj = 0; obj < callback_data->object_count; ++obj) {
-            std::cout << "    Object[" << obj << "] = " << callback_data->objects[obj].ToString();
-            std::cout << std::endl;
+            os_ << "    Object[" << obj << "] = " << callback_data->objects[obj].ToString();
+            os_ << std::endl;
         }
         for (uint32_t label = 0; label < callback_data->session_labels_count; ++label) {
-            std::cout << "    SessionLabel[" << std::to_string(label) << "] = " << callback_data->session_labels[label].labelName;
-            std::cout << std::endl;
+            os_ << "    SessionLabel[" << std::to_string(label) << "] = " << callback_data->session_labels[label].labelName;
+            os_ << std::endl;
         }
     }
 
@@ -218,11 +168,12 @@ bool DebugUtilsLogRecorder::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlag
 }  // namespace
 
 std::unique_ptr<LoaderLogRecorder> MakeStdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags) {
-    std::unique_ptr<LoaderLogRecorder> recorder(new StdOutLoaderLogRecorder(user_data, flags));
+    std::unique_ptr<LoaderLogRecorder> recorder(new OstreamLoaderLogRecorder(std::cout, user_data, flags));
     return recorder;
 }
 std::unique_ptr<LoaderLogRecorder> MakeStdErrLoaderLogRecorder(void* user_data) {
-    std::unique_ptr<LoaderLogRecorder> recorder(new StdErrLoaderLogRecorder(user_data));
+    std::unique_ptr<LoaderLogRecorder> recorder(
+        new OstreamLoaderLogRecorder(std::cerr, user_data, XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT));
     return recorder;
 }
 std::unique_ptr<LoaderLogRecorder> MakeDebugUtilsLoaderLogRecorder(const XrDebugUtilsMessengerCreateInfoEXT* create_info,
