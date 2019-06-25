@@ -47,6 +47,17 @@ struct XrLoaderLogObjectInfo {
     std::string name;
 };
 
+//! True if the two object infos have the same handle value and handle type
+static inline bool Equivalent(XrLoaderLogObjectInfo const& a, XrLoaderLogObjectInfo const& b) {
+    return a.handle == b.handle && a.type == b.type;
+}
+//! @overload
+static inline bool Equivalent(XrDebugUtilsObjectNameInfoEXT const& a, XrLoaderLogObjectInfo const& b) {
+    return a.objectHandle == b.handle && a.objectType == b.type;
+}
+//! @overload
+static inline bool Equivalent(XrLoaderLogObjectInfo const& a, XrDebugUtilsObjectNameInfoEXT const& b) { return Equivalent(b, a); }
+
 struct XrLoaderLogMessengerCallbackData {
     const char* message_id;
     const char* command_name;
