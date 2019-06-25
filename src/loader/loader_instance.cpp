@@ -47,15 +47,14 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
     XrResult last_error = XR_SUCCESS;
     try {
         LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering LoaderInstance::CreateInstance");
-        LoaderInstance* loader_instance;
 
         // Topmost means "closest to the application"
         PFN_xrCreateInstance topmost_ci_fp = LoaderXrTermCreateInstance;
         PFN_xrCreateApiLayerInstance topmost_cali_fp = LoaderXrTermCreateApiLayerInstance;
 
         // Create the loader instance
-        loader_instance = new LoaderInstance(api_layer_interfaces);
-        *instance = reinterpret_cast<XrInstance>(loader_instance);
+        std::unique_ptr<LoaderInstance> loader_instance(new LoaderInstance(api_layer_interfaces));
+        *instance = reinterpret_cast<XrInstance>(loader_instance.get());
 
         // Only start the xrCreateApiLayerInstance stack if we have layers.
         std::vector<std::unique_ptr<ApiLayerInterface>>& layer_interfaces = loader_instance->LayerInterfaces();
@@ -103,7 +102,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             api_layer_ci.structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_CREATE_INFO;
             api_layer_ci.structVersion = XR_API_LAYER_CREATE_INFO_STRUCT_VERSION;
             api_layer_ci.structSize = sizeof(XrApiLayerCreateInfo);
-            api_layer_ci.loaderInstance = reinterpret_cast<void*>(loader_instance);
+            api_layer_ci.loaderInstance = reinterpret_cast<void*>(loader_instance.get());
             api_layer_ci.settings_file_location[0] = '\0';
             api_layer_ci.nextInfo = next_info_list;
             last_error = topmost_cali_fp(info, &api_layer_ci, instance);
@@ -170,10 +169,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             }
         }
 
-        if (XR_FAILED(last_error)) {
-            delete loader_instance;
-            loader_instance = nullptr;
-        } else {
+        if (XR_SUCCEEDED(last_error)) {
             std::string info_message = "LoaderInstance::CreateInstance succeeded with ";
             info_message += std::to_string(loader_instance->LayerInterfaces().size());
             info_message += " layers enabled and runtime interface - created instance = 0x";
@@ -181,6 +177,8 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             oss << std::hex << reinterpret_cast<uintptr_t>(loader_instance);
             info_message += oss.str();
             LoaderLogger::LogInfoMessage("xrCreateInstance", info_message);
+            // Make the unique_ptr no longer delete this.
+            loader_instance.release();
         }
     } catch (std::bad_alloc&) {
         LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateInstance - failed to allocate memory");
