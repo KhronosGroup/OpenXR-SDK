@@ -41,6 +41,16 @@ typedef XrFlags64 XrLoaderLogMessageSeverityFlags;
 typedef XrFlags64 XrLoaderLogMessageTypeFlagBits;
 typedef XrFlags64 XrLoaderLogMessageTypeFlags;
 
+//! Turns a uint64_t into a string formatted as hex.
+//!
+//! The core of the HandleToString implementation is in here.
+std::string Uint64ToHexString(uint64_t val);
+
+template <typename T>
+static inline std::string HandleToString(T handle) {
+    return Uint64ToHexString(reinterpret_cast<uint64_t>(handle));
+}
+
 struct XrLoaderLogObjectInfo {
     uint64_t handle;
     XrObjectType type;

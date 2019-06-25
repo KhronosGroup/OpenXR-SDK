@@ -17,10 +17,12 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>
@@ -40,6 +42,12 @@ StdErrLoaderLogRecorder::StdErrLoaderLogRecorder(void* user_data)
     Start();
 }
 
+std::string Uint64ToHexString(uint64_t val) {
+    std::ostringstream oss;
+    oss << "0x";
+    oss << std::hex << std::setw(16) << std::setfill('0') << val;
+    return oss.str();
+}
 bool StdErrLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity,
                                          XrLoaderLogMessageTypeFlags message_type,
                                          const XrLoaderLogMessengerCallbackData* callback_data) {
