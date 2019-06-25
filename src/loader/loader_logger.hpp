@@ -21,10 +21,11 @@
 
 #include <memory>
 #include <mutex>
-#include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include <openxr/openxr.h>
 
 // Use internal versions of flags similar to XR_EXT_debug_utils so that
 // we're not tightly coupled to that extension.  This way, if the extension
