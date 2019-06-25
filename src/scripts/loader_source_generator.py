@@ -175,6 +175,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include <thread>\n'
             preamble += '#include <mutex>\n\n'
             preamble += '#include "loader_interfaces.h"\n\n'
+            preamble += '#include "loader_instance.hpp"\n\n'
 
         elif self.genOpts.filename == 'xr_generated_loader.cpp':
             preamble += '#include <ios>\n'
@@ -241,7 +242,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
             for cur_cmd in commands:
                 if (cur_cmd.name in MANUAL_LOADER_INSTANCE_FUNCS or cur_cmd.name in MANUAL_LOADER_NONINSTANCE_FUNCS or
-                    cur_cmd.name in MANUAL_LOADER_INSTANCE_TERMINATOR_FUNCS or cur_cmd.has_instance):
+                        cur_cmd.name in MANUAL_LOADER_INSTANCE_TERMINATOR_FUNCS or cur_cmd.has_instance):
                     if cur_cmd.ext_name != cur_extension_name:
                         if self.isCoreExtensionName(cur_cmd.ext_name):
                             manual_funcs += '\n// ---- Core %s loader manual functions\n' % cur_cmd.ext_name[11:].replace(
@@ -313,15 +314,14 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle.protect_value:
                 map_externs += '#if %s\n' % handle.protect_string
             base_handle_name = undecorate(handle.name)
-            map_externs += 'extern std::unordered_map<%s, class LoaderInstance*> g_%s_map;\n' % (
+            map_externs += 'extern HandleLoaderMap<%s> g_%s_map;\n' % (
                 handle.name, base_handle_name)
-            map_externs += 'extern std::mutex g_%s_mutex;\n' % base_handle_name
             if handle.protect_value:
                 map_externs += '#endif // %s\n' % handle.protect_string
         map_externs += '\n'
         map_externs += '// Function used to clean up any residual map values that point to an instance prior to that\n'
         map_externs += '// instance being deleted.\n'
-        map_externs += 'void LoaderCleanUpMapsForInstance(class LoaderInstance *instance);\n'
+        map_externs += 'void LoaderCleanUpMapsForInstance(LoaderInstance *instance);\n'
         map_externs += '\n'
         return map_externs
 
@@ -383,63 +383,23 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
             base_handle_name = undecorate(handle.name)
             if handle.protect_value:
                 map_defines += '#if %s\n' % handle.protect_string
-            map_defines += 'std::unordered_map<%s, class LoaderInstance*> g_%s_map;\n' % (
+            map_defines += 'HandleLoaderMap<%s> g_%s_map;\n' % (
                 handle.name, base_handle_name)
-            map_defines += 'std::mutex g_%s_mutex;\n' % base_handle_name
             if handle.protect_value:
                 map_defines += '#endif // %s\n' % handle.protect_string
         map_defines += '\n'
-        map_defines += '// Template function to reduce duplicating the map locking, searching, and deleting.`\n'
-        map_defines += 'template <typename MapType>\n'
-        map_defines += 'void EraseAllInstanceMapElements(MapType &search_map, std::mutex &mutex, LoaderInstance *search_value) {\n'
-        map_defines += '    try {\n'
-        map_defines += '        std::unique_lock<std::mutex> lock(mutex);\n'
-        map_defines += '        for (auto it = search_map.begin(); it != search_map.end();) {\n'
-        map_defines += '            if (it->second == search_value) {\n'
-        map_defines += '                search_map.erase(it++);\n'
-        map_defines += '            } else {\n'
-        map_defines += '                ++it;\n'
-        map_defines += '            }\n'
-        map_defines += '        }\n'
-        map_defines += '    } catch (...) {\n'
-        map_defines += '        // Log a message, but don\'t throw an exception outside of this so we continue to erase the\n'
-        map_defines += '        // remaining items in the remaining maps.\n'
-        map_defines += '        LoaderLogger::LogErrorMessage("xrDestroyInstance", "EraseAllInstanceMapElements encountered an exception.  Ignoring it for now.");\n'
-        map_defines += '    }\n'
-        map_defines += '}\n'
-        map_defines += '\n'
         map_defines += '// Function used to clean up any residual map values that point to an instance prior to that\n'
         map_defines += '// instance being deleted.\n'
-        map_defines += 'void LoaderCleanUpMapsForInstance(class LoaderInstance *instance) {\n'
+        map_defines += 'void LoaderCleanUpMapsForInstance(LoaderInstance *instance) {\n'
         for handle in self.api_handles:
             if handle.protect_value:
                 map_defines += '#if %s\n' % handle.protect_string
             base_handle_name = undecorate(handle.name)
-            map_defines += '    EraseAllInstanceMapElements<std::unordered_map<%s, class LoaderInstance*>>' % handle.name
-            map_defines += '(g_%s_map, g_%s_mutex, instance);\n' % (
-                base_handle_name, base_handle_name)
+            map_defines += '    g_%s_map.RemoveHandlesForLoader(*instance);\n' % base_handle_name
             if handle.protect_value:
                 map_defines += '#endif // %s\n' % handle.protect_string
         map_defines += '}\n\n'
 
-        map_defines += 'LoaderInstance* TryLookupLoaderInstance(XrInstance instance) {\n'
-        map_defines += self.writeIndent(1)
-        map_defines += 'std::unique_lock<std::mutex> instance_lock(g_instance_mutex);\n'
-        map_defines += self.writeIndent(1)
-        map_defines += 'auto instance_iter = g_instance_map.find(instance);\n'
-        map_defines += self.writeIndent(1)
-        map_defines += 'if (instance_iter != g_instance_map.end()) {\n'
-        map_defines += self.writeIndent(2)
-        map_defines += 'return instance_iter->second;\n'
-        map_defines += self.writeIndent(1)
-        map_defines += '}\n'
-        map_defines += self.writeIndent(1)
-        map_defines += 'else {\n'
-        map_defines += self.writeIndent(2)
-        map_defines += 'return nullptr;\n'
-        map_defines += self.writeIndent(1)
-        map_defines += '}\n'
-        map_defines += '}\n'
 
         return map_defines
 
@@ -485,8 +445,6 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 tramp_param_replace = []
                 func_follow_up = ''
                 base_handle_name = ''
-                primary_mutex_name = ''
-                secondary_mutex_name = ''
 
                 for count, param in enumerate(cur_cmd.params):
                     param_cdecl = param.cdecl
@@ -519,17 +477,12 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                         param.pointer_count_var, param.name, first_handle_name,
                                         self.genXrObjectType(param.type))
                                     tramp_variable_defines += '        }\n'
-                            secondary_mutex_name = 'g_%s_mutex' % base_handle_name
-                            tramp_variable_defines += '        std::unique_lock<std::mutex> secondary_lock(%s);\n' % secondary_mutex_name
-                            tramp_variable_defines += '        auto map_iter = g_%s_map.find(%s);\n' % (base_handle_name, first_handle_name)
-                            tramp_variable_defines += '        LoaderInstance *loader_instance = nullptr;\n'
-                            tramp_variable_defines += '        if (map_iter != g_%s_map.end()) {\n' % base_handle_name
-                            tramp_variable_defines += '            loader_instance = map_iter->second;\n'
-                            tramp_variable_defines += '        }\n'
+                            tramp_variable_defines += '        LoaderInstance *loader_instance = g_%s_map.Get(%s);\n' % (
+                                base_handle_name, first_handle_name)
                             if cur_cmd.is_destroy_disconnect:
                                 tramp_variable_defines += '        // Destroy the mapping entry for this item if it was valid.\n'
                                 tramp_variable_defines += '        if (nullptr != loader_instance) {\n'
-                                tramp_variable_defines += '                g_%s_map.erase(%s);\n' % (
+                                tramp_variable_defines += '                g_%s_map.Erase(%s);\n' % (
                                     base_handle_name, first_handle_name)
                                 tramp_variable_defines += '        }\n'
                             # These should be mutually exclusive - verify it.
@@ -539,11 +492,8 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                             if pointer_count == 1:
                                 # NOTE - @ 10-June-2019 this stanza is never exercised in loader code-gen. Consider whether necessary. DJH
                                 tramp_variable_defines += '        for (uint32_t i = 1; i < %s; ++i) {\n' % param.pointer_count_var
-                                tramp_variable_defines += '            LoaderInstance *elt_loader_instance = nullptr;\n'
-                                tramp_variable_defines += '            auto map_iter = g_%s_map.find(%s[i]);\n' % (base_handle_name, param.name)
-                                tramp_variable_defines += '            if (map_iter != g_%s_map.end()) {\n' % base_handle_name
-                                tramp_variable_defines += '                elt_loader_instance = map_iter->second;\n'
-                                tramp_variable_defines += '            }\n'
+                                tramp_variable_defines += '            LoaderInstance *elt_loader_instance = g_%s_map.Get(%s[i]);\n' % (
+                                    base_handle_name, param.name)
                                 tramp_variable_defines += '            if (elt_loader_instance == nullptr || elt_loader_instance != loader_instance) {\n'
                                 tramp_variable_defines += '                auto elt_name = "%s[" + std::to_string(i) + "]";\n' % param.name
                                 loader_objects = '{XrLoaderLogObjectInfo{%s[i], %s} }' % (first_handle_name,
@@ -563,7 +513,6 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                     tramp_variable_defines += '                return XR_ERROR_HANDLE_INVALID;\n'
                                 tramp_variable_defines += '            }\n'
                                 tramp_variable_defines += '        }\n'
-                            tramp_variable_defines += '        secondary_lock.unlock();\n\n'
                             loader_objects = '{XrLoaderLogObjectInfo{%s, %s} }' % (first_handle_name,
                                                                                    self.genXrObjectType(param.type))
                             tramp_variable_defines += '        if (nullptr == loader_instance) {\n'
@@ -606,12 +555,12 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                             base_handle_name = undecorate(param.type)
                             if cur_cmd.is_create_connect:
                                 func_follow_up += '        if (XR_SUCCESS == result && nullptr != %s) {\n' % param.name
-                                func_follow_up += '            std::unique_lock<std::mutex> %s_lock(g_%s_mutex);\n' % (base_handle_name, base_handle_name)
-                                func_follow_up += '            auto exists = g_%s_map.find(*%s);\n' % (
+                                func_follow_up += '            XrResult insert_result = g_%s_map.Insert(*%s, *loader_instance);\n' % (
                                     base_handle_name, param.name)
-                                func_follow_up += '            if (exists == g_%s_map.end()) {\n' % base_handle_name
-                                func_follow_up += '                g_%s_map[*%s] = loader_instance;\n' % (
-                                    base_handle_name, param.name)
+                                func_follow_up += '            if (XR_FAILED(insert_result)) {\n'
+                                func_follow_up += '                LoaderLogger::LogErrorMessage(\n'
+                                func_follow_up += '                    "%s",\n' % cur_cmd.name
+                                func_follow_up += '                    "Failed inserting new %s into map: may be null or not unique");\n' % base_handle_name
                                 func_follow_up += '            }\n'
                                 func_follow_up += '        }\n'
                     count = count + 1
@@ -791,7 +740,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += self.writeIndent(indent)
         export_funcs += 'std::string func_name = &name[2];\n'
         export_funcs += self.writeIndent(indent)
-        export_funcs += 'LoaderInstance * const loader_instance = TryLookupLoaderInstance(instance);\n'
+        export_funcs += 'LoaderInstance * const loader_instance = g_instance_map.Get(instance);\n'
         export_funcs += self.writeIndent(indent)
         export_funcs += 'if (loader_instance == nullptr) {\n'
         indent = indent + 1

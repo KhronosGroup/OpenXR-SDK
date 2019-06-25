@@ -161,10 +161,11 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
                 LoaderLogger::LogErrorMessage("xrCreateInstance",
                                               "LoaderInstance::CreateInstance failed creating top-level dispatch table");
             } else {
-                std::unique_lock<std::mutex> lock(g_instance_mutex);
-                auto exists = g_instance_map.find(*instance);
-                if (exists == g_instance_map.end()) {
-                    g_instance_map[*instance] = loader_instance;
+                last_error = g_instance_map.Insert(*instance, *loader_instance);
+                if (XR_FAILED(last_error)) {
+                    LoaderLogger::LogErrorMessage(
+                        "xrCreateInstance",
+                        "LoaderInstance::CreateInstance failed inserting new instance into map: may be null or not unique");
                 }
             }
         }

@@ -27,6 +27,51 @@
 #include "runtime_interface.hpp"
 #include "api_layer_interface.hpp"
 #include "xr_generated_dispatch_table.h"
+class LoaderInstance;
+
+typedef std::unique_lock<std::mutex> UniqueLock;
+template <typename HandleType>
+class HandleLoaderMap {
+   public:
+    using handle_t = HandleType;
+    using map_t = std::unordered_map<HandleType, LoaderInstance*>;
+    using value_t = typename map_t::value_type;
+
+    /// Lookup a handle.
+    /// Returns nullptr if not found.
+    LoaderInstance* Get(HandleType handle);
+
+    /// Insert an info for the supplied handle.
+    /// Returns XR_ERROR_RUNTIME_FAILURE if it's null or already there.
+    XrResult Insert(HandleType handle, LoaderInstance& loader);
+
+    /// Remove the info associated with the supplied handle.
+    /// Returns XR_ERROR_RUNTIME_FAILURE if it's null or not there.
+    XrResult Erase(HandleType handle);
+
+    /// Removes handles associated with a loader instance.
+    void RemoveHandlesForLoader(LoaderInstance& loader);
+
+   protected:
+    map_t instance_map_;
+    std::mutex mutex_;
+};
+
+/// Like std::remove_if, except it works on associative containers and it actually removes this.
+///
+/// The iterator stuff in here is subtle - .erase() invalidates only that iterator, so we must advance first.
+template <typename T, typename Pred>
+inline void map_erase_if(T& container, Pred&& predicate) {
+    for (auto it = container.begin(); it != container.end();) {
+        if (predicate(*it)) {
+            auto here = it;
+            ++it;
+            container.erase(here);
+        } else {
+            ++it;
+        }
+    }
+}
 
 class LoaderInstance {
    public:
@@ -61,3 +106,56 @@ class LoaderInstance {
     // Internal debug messenger created during xrCreateInstance
     XrDebugUtilsMessengerEXT _messenger;
 };
+
+template <typename HandleType>
+inline LoaderInstance* HandleLoaderMap<HandleType>::Get(HandleType handle) {
+    if (handle == XR_NULL_HANDLE) {
+        return nullptr;
+    }
+    // Try to find the handle in the appropriate map
+    UniqueLock lock(mutex_);
+    auto entry_returned = instance_map_.find(handle);
+    if (entry_returned == instance_map_.end()) {
+        return nullptr;
+    }
+    return entry_returned->second;
+}
+
+template <typename HandleType>
+inline XrResult HandleLoaderMap<HandleType>::Insert(HandleType handle, LoaderInstance& loader) {
+    if (handle == XR_NULL_HANDLE) {
+        // Internal error in loader or runtime.
+        return XR_ERROR_RUNTIME_FAILURE;
+    }
+    UniqueLock lock(mutex_);
+    auto entry_returned = instance_map_.find(handle);
+    if (entry_returned != instance_map_.end()) {
+        // Internal error in loader or runtime.
+        return XR_ERROR_RUNTIME_FAILURE;
+    }
+    instance_map_[handle] = &loader;
+    return XR_SUCCESS;
+}
+
+template <typename HandleType>
+inline XrResult HandleLoaderMap<HandleType>::Erase(HandleType handle) {
+    if (handle == XR_NULL_HANDLE) {
+        // Internal error in loader or runtime.
+        return XR_ERROR_RUNTIME_FAILURE;
+    }
+    UniqueLock lock(mutex_);
+    auto entry_returned = instance_map_.find(handle);
+    if (entry_returned == instance_map_.end()) {
+        // Internal error in loader or runtime.
+        return XR_ERROR_RUNTIME_FAILURE;
+    }
+    instance_map_.erase(handle);
+    return XR_SUCCESS;
+}
+
+template <typename HandleType>
+inline void HandleLoaderMap<HandleType>::RemoveHandlesForLoader(LoaderInstance& loader) {
+    UniqueLock lock(mutex_);
+    auto search_value = &loader;
+    map_erase_if(instance_map_, [=](value_t const& data) { return data.second && data.second == search_value; });
+}

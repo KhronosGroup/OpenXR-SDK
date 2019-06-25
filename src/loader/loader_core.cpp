@@ -263,17 +263,12 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
 
         // Create the loader instance (only send down first runtime interface)
         XrInstance created_instance = XR_NULL_HANDLE;
-        result = LoaderInstance::CreateInstance(api_layer_interfaces, info, &created_instance);
+        result = LoaderInstance::CreateInstance(std::move(api_layer_interfaces), info, &created_instance);
 
         if (XR_SUCCEEDED(result)) {
             *instance = created_instance;
 
-            LoaderInstance *loader_instance = nullptr;
-            {
-                std::unique_lock<std::mutex> lock(g_instance_mutex);
-                // Unguarded RHS bracket operator ok here - we know it was just successfully found or inserted above
-                loader_instance = g_instance_map[created_instance];
-            }
+            LoaderInstance *loader_instance = g_instance_map.Get(created_instance);
 
             // Create a debug utils messenger if the create structure is in the "next" chain
             const XrBaseInStructure *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
@@ -319,7 +314,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
             return XR_SUCCESS;
         }
 
-        LoaderInstance *const loader_instance = TryLookupLoaderInstance(instance);
+        LoaderInstance *const loader_instance = g_instance_map.Get(instance);
         if (loader_instance == nullptr) {
             LoaderLogger::LogErrorMessage("xrDestroyInstance", "VUID-xrDestroyInstance-instance-parameter: invalid instance");
             return XR_ERROR_HANDLE_INVALID;
@@ -437,14 +432,11 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instanc
     try {
         LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Entering loader trampoline");
 
-        LoaderInstance *loader_instance = nullptr;
-        {
-            std::unique_lock<std::mutex> lock(g_instance_mutex);
-            auto map_iter = g_instance_map.find(instance);
-            if (map_iter == g_instance_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+        LoaderInstance *loader_instance = g_instance_map.Get(instance);
+        if (loader_instance == nullptr) {
+            LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
+                                          "VUID-xrCreateDebugUtilsMessengerEXT-instance-parameter: invalid instance");
+            return XR_ERROR_HANDLE_INVALID;
         }
 
         if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
@@ -460,10 +452,11 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instanc
         XrResult result = XR_SUCCESS;
         result = dispatch_table->CreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
         if (XR_SUCCESS == result && nullptr != messenger) {
-            auto exists = g_debugutilsmessengerext_map.find(*messenger);
-            if (exists == g_debugutilsmessengerext_map.end()) {
-                std::unique_lock<std::mutex> debugutilsmessengerlock(g_debugutilsmessengerext_mutex);
-                g_debugutilsmessengerext_map[*messenger] = loader_instance;
+            result = g_debugutilsmessengerext_map.Insert(*messenger, *loader_instance);
+            if (XR_FAILED(result)) {
+                LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
+                                              "Failed inserting new messenger into map: may be null or not unique");
+                return result;
             }
         }
         LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Completed loader trampoline");
@@ -489,19 +482,12 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
             return XR_SUCCESS;
         }
 
-        auto exists = g_debugutilsmessengerext_map.find(messenger);
-        if (exists == g_debugutilsmessengerext_map.end()) {
-            return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
-        }
+        LoaderInstance *loader_instance = g_debugutilsmessengerext_map.Get(messenger);
+        if (loader_instance == nullptr) {
+            LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT",
+                                          "VUID-xrDestroyDebugUtilsMessengerEXT-messenger-parameter: invalid messenger");
 
-        LoaderInstance *loader_instance = nullptr;
-        {
-            std::unique_lock<std::mutex> lock(g_debugutilsmessengerext_mutex);
-            auto map_iter = g_debugutilsmessengerext_map.find(messenger);
-            if (map_iter == g_debugutilsmessengerext_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
+            return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
         }
 
         if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
@@ -518,13 +504,10 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
         LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Completed loader trampoline");
         return result;
     } catch (...) {
-        std::string error_message =
-            "xrDestroyDebugUtilsMessengerEXT trampoline encountered an unknown error.  Likely XrDebugUtilsMessengerEXT 0x";
-        std::ostringstream oss;
-        oss << std::hex << reinterpret_cast<const void *>(messenger);
-        error_message += oss.str();
-        error_message += " is invalid";
-        LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT", error_message);
+        LoaderLogger::LogErrorMessage(
+            "xrDestroyDebugUtilsMessengerEXT",
+            "xrDestroyDebugUtilsMessengerEXT trampoline encountered an unknown error.  Likely XrDebugUtilsMessengerEXT " +
+                HandleToString(messenger) + " is invalid");
         return XR_ERROR_HANDLE_INVALID;
     }
 }
@@ -537,6 +520,8 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstan
     try {
         LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Entering loader terminator");
         if (nullptr == messenger) {
+            LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
+                                          "VUID-xrCreateDebugUtilsMessengerEXT-messenger-parameter: invalid messenger pointer");
             return XR_ERROR_VALIDATION_FAILURE;
         }
         const XrGeneratedDispatchTable *dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);
@@ -583,12 +568,9 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(XrDebug
         RuntimeInterface::GetRuntime().ForgetDebugMessenger(messenger);
         return result;
     } catch (...) {
-        std::string error_message = "Terminator encountered an unknown error.  Likely XrDebugUtilsMessengerEXT 0x";
-        std::ostringstream oss;
-        oss << std::hex << reinterpret_cast<const void *>(messenger);
-        error_message += oss.str();
-        error_message += " is invalid";
-        LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT", error_message);
+        LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT",
+                                      "Terminator encountered an unknown error.  Likely XrDebugUtilsMessengerEXT " +
+                                          HandleToString(messenger) + " is invalid");
         return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
     }
 }
@@ -611,12 +593,9 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSubmitDebugUtilsMessageEXT(XrInstance
         LoaderLogger::LogVerboseMessage("xrSubmitDebugUtilsMessageEXT", "Completed loader terminator");
         return result;
     } catch (...) {
-        std::string error_message = "xrSubmitDebugUtilsMessageEXT terminator encountered an unknown error.  Likely XrInstance 0x";
-        std::ostringstream oss;
-        oss << std::hex << reinterpret_cast<const void *>(instance);
-        error_message += oss.str();
-        error_message += " is invalid";
-        LoaderLogger::LogErrorMessage("xrSubmitDebugUtilsMessageEXT", error_message);
+        LoaderLogger::LogErrorMessage("xrSubmitDebugUtilsMessageEXT",
+                                      "xrSubmitDebugUtilsMessageEXT terminator encountered an unknown error.  Likely XrInstance " +
+                                          HandleToString(instance) + " is invalid");
         return XR_ERROR_HANDLE_INVALID;
     }
 }
@@ -634,28 +613,16 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSetDebugUtilsObjectNameEXT(XrInstance
         LoaderLogger::LogVerboseMessage("xrSetDebugUtilsObjectNameEXT", "Completed loader terminator");
         return result;
     } catch (...) {
-        std::string error_message = "xrSetDebugUtilsObjectNameEXT terminator encountered an unknown error.  Likely XrInstance 0x";
-        std::ostringstream oss;
-        oss << std::hex << reinterpret_cast<const void *>(instance);
-        error_message += oss.str();
-        error_message += " is invalid";
-        LoaderLogger::LogErrorMessage("xrSetDebugUtilsObjectNameEXT", error_message);
+        LoaderLogger::LogErrorMessage("xrSetDebugUtilsObjectNameEXT",
+                                      "xrSetDebugUtilsObjectNameEXT terminator encountered an unknown error.  Likely XrInstance " +
+                                          HandleToString(instance) + "is invalid");
         return XR_ERROR_HANDLE_INVALID;
     }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession session, const XrDebugUtilsLabelEXT *labelInfo) {
     try {
-        LoaderInstance *loader_instance = nullptr;
-        {
-            std::unique_lock<std::mutex> lock(g_session_mutex);
-            auto map_iter = g_session_map.find(session);
-            if (map_iter == g_session_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
-        }
-
+        LoaderInstance *loader_instance = g_session_map.Get(session);
         if (nullptr == loader_instance) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionBeginDebugUtilsLabelRegionEXT-session-parameter",
                                                     "xrSessionBeginDebugUtilsLabelRegionEXT", "session is not a valid XrSession",
@@ -689,16 +656,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession 
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession session) {
     try {
-        LoaderInstance *loader_instance = nullptr;
-        {
-            std::unique_lock<std::mutex> lock(g_session_mutex);
-            auto map_iter = g_session_map.find(session);
-            if (map_iter == g_session_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
-        }
-
+        LoaderInstance *loader_instance = g_session_map.Get(session);
         if (nullptr == loader_instance) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionEndDebugUtilsLabelRegionEXT-session-parameter",
                                                     "xrSessionEndDebugUtilsLabelRegionEXT", "session is not a valid XrSession",
@@ -722,16 +680,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession se
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession session, const XrDebugUtilsLabelEXT *labelInfo) {
     try {
-        LoaderInstance *loader_instance = nullptr;
-        {
-            std::unique_lock<std::mutex> lock(g_session_mutex);
-            auto map_iter = g_session_map.find(session);
-            if (map_iter == g_session_map.end()) {
-                return XR_ERROR_VALIDATION_FAILURE;
-            }
-            loader_instance = map_iter->second;
-        }
-
+        LoaderInstance *loader_instance = g_session_map.Get(session);
         if (nullptr == loader_instance) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionInsertDebugUtilsLabelEXT-session-parameter",
                                                     "xrSessionInsertDebugUtilsLabelEXT", "session is not a valid XrSession",
