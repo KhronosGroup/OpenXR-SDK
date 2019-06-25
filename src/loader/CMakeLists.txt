@@ -46,34 +46,34 @@ SET(LOADER_EXTERNAL_GEN_FILES
     ${CMAKE_BINARY_DIR}/src/xr_generated_dispatch_table.c
     ${CMAKE_BINARY_DIR}/src/xr_generated_utilities.c
 )
+run_xr_xml_generate(loader_source_generator.py xr_generated_loader.hpp)
+run_xr_xml_generate(loader_source_generator.py xr_generated_loader.cpp)
 
 if(DYNAMIC_LOADER)
     add_definitions(-DXRAPI_DLL_EXPORT)
-	add_library(${LOADER_NAME} SHARED
-		api_layer_interface.cpp
-		loader_core.cpp
-		loader_instance.cpp
-		loader_logger.cpp
-		manifest_file.cpp
-		runtime_interface.cpp
-		${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
-		${LOADER_EXTERNAL_GEN_FILES}
-		${openxr_loader_RESOURCE_FILE}
-#		${openxr_loader_EXPORTS_FILE}
-	)
+    set(LIBRARY_TYPE SHARED)
 else() # build static lib
-	add_library(${LOADER_NAME} STATIC
-		api_layer_interface.cpp
-		loader_core.cpp
-		loader_instance.cpp
-		loader_logger.cpp
-		manifest_file.cpp
-		runtime_interface.cpp
-		${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
-		${LOADER_EXTERNAL_GEN_FILES}
-		${openxr_loader_RESOURCE_FILE}
-	)
+    set(LIBRARY_TYPE STATIC)
 endif()
+
+add_library(${LOADER_NAME} ${LIBRARY_TYPE}
+    api_layer_interface.cpp
+    api_layer_interface.hpp
+    loader_core.cpp
+    loader_instance.cpp
+    loader_instance.hpp
+    loader_logger.cpp
+    loader_logger.hpp
+    manifest_file.cpp
+    manifest_file.hpp
+    runtime_interface.cpp
+    runtime_interface.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/xr_generated_loader.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/xr_generated_loader.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
+    ${LOADER_EXTERNAL_GEN_FILES}
+    ${openxr_loader_RESOURCE_FILE}
+)
 set_source_files_properties(
     ${LOADER_EXTERNAL_GEN_FILES}
     PROPERTIES GENERATED TRUE
@@ -81,7 +81,6 @@ set_source_files_properties(
 add_dependencies(${LOADER_NAME}
     generate_openxr_header
     xr_global_generated_files
-    loader_gen_files
     jsoncppAmalgamatedFiles
 )
 target_include_directories(${LOADER_NAME}
@@ -175,13 +174,4 @@ endif()
 
 install(TARGETS ${LOADER_NAME} DESTINATION lib)
 
-# Custom target for generated helper sources
-add_custom_target(loader_gen_files
-    DEPENDS
-        xr_generated_loader.hpp
-        xr_generated_loader.cpp
-)
-
 # Custom commands to build dependencies for above targets
-run_xr_xml_generate(utility_source_generator.py xr_generated_loader.hpp)
-run_xr_xml_generate(utility_source_generator.py xr_generated_loader.cpp)

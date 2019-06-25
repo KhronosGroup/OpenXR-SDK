@@ -32,7 +32,7 @@
 
 #include "loader_logger.hpp"
 #include "loader_instance.hpp"
-#include "xr_generated_loader.cpp"
+#include "xr_generated_loader.hpp"
 
 // Flag to cause the one time to init to only occur one time.
 std::once_flag g_one_time_init_flag;
