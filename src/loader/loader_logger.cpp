@@ -386,14 +386,7 @@ bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severit
         // If this is a session, see if there are any labels associated with it for us to add
         // to the callback content.
         if (XR_OBJECT_TYPE_SESSION == obj.type) {
-            XrSession session = obj.GetTypedHandle<XrSession>();
-            auto session_label_iterator = _session_labels.find(session);
-            if (session_label_iterator != _session_labels.end()) {
-                auto& internalSessionLabels = *session_label_iterator->second;
-                // Copy the debug utils labels in reverse order in the the labels vector.
-                std::transform(internalSessionLabels.rbegin(), internalSessionLabels.rend(), std::back_inserter(labels),
-                               [](InternalSessionLabel* label) { return label->debug_utils_label; });
-            }
+            LookUpSessionLabels(obj.GetTypedHandle<XrSession>(), labels);
         }
     }
     callback_data.objects = object_vector.empty() ? nullptr : object_vector.data();
@@ -410,6 +403,16 @@ bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severit
         }
     }
     return exit_app;
+}
+
+void LoaderLogger::LookUpSessionLabels(XrSession session, std::vector<XrDebugUtilsLabelEXT>& labels) const {
+    auto session_label_iterator = _session_labels.find(session);
+    if (session_label_iterator != _session_labels.end()) {
+        auto& internalSessionLabels = *session_label_iterator->second;
+        // Copy the debug utils labels in reverse order in the the labels vector.
+        std::transform(internalSessionLabels.rbegin(), internalSessionLabels.rend(), std::back_inserter(labels),
+                       [](InternalSessionLabel* label) { return label->debug_utils_label; });
+    }
 }
 
 // Extension-specific logging functions
@@ -439,13 +442,7 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
                     // to the callback content.
                     if (XR_OBJECT_TYPE_SESSION == callback_data->objects[obj].objectType) {
                         XrSession session = reinterpret_cast<XrSession&>(callback_data->objects[obj].objectHandle);
-                        auto session_label_iterator = _session_labels.find(session);
-                        if (session_label_iterator != _session_labels.end()) {
-                            auto rev_iter = session_label_iterator->second->rbegin();
-                            for (; rev_iter != session_label_iterator->second->rend(); ++rev_iter) {
-                                labels.push_back((*rev_iter)->debug_utils_label);
-                            }
-                        }
+                        LookUpSessionLabels(session, labels);
                     }
                 }
             }

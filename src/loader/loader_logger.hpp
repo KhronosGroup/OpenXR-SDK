@@ -287,6 +287,9 @@ class LoaderLogger {
     LoaderLogger(const LoaderLogger&) = delete;
     LoaderLogger& operator=(const LoaderLogger&) = delete;
 
+    /// Retrieve labels for the given session, if any, and push them in reverse order on the vector.
+    void LookUpSessionLabels(XrSession session, std::vector<XrDebugUtilsLabelEXT>& labels) const;
+
     void RemoveIndividualLabel(std::vector<InternalSessionLabel*>* label_vec);
 
     static std::unique_ptr<LoaderLogger> _instance;
