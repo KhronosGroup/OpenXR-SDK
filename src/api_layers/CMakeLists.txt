@@ -183,6 +183,7 @@ else()
         "API Layer to record api calls as they occur"
         ""
     )
+    install(TARGETS XrApiLayer_api_dump DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
     # Linux core_validation-specific information
     target_compile_options(XrApiLayer_core_validation PRIVATE -Wpointer-arith -Wno-unused-function -Wno-sign-compare)
@@ -195,6 +196,7 @@ else()
         "API Layer to record api calls as they occur"
         ""
     )
+    install(TARGETS XrApiLayer_core_validation DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # Final bits for api_dump API Layer
