@@ -42,7 +42,7 @@ static const XrExtensionProperties g_debug_utils_props = {XR_TYPE_EXTENSION_PROP
 const std::vector<XrExtensionProperties> LoaderInstance::_loader_supported_extensions = {g_debug_utils_props};
 
 // Factory method
-XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>& api_layer_interfaces,
+XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces,
                                         const XrInstanceCreateInfo* info, XrInstance* instance) {
     XrResult last_error = XR_SUCCESS;
     try {
@@ -53,7 +53,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         PFN_xrCreateApiLayerInstance topmost_cali_fp = LoaderXrTermCreateApiLayerInstance;
 
         // Create the loader instance
-        std::unique_ptr<LoaderInstance> loader_instance(new LoaderInstance(api_layer_interfaces));
+        std::unique_ptr<LoaderInstance> loader_instance(new LoaderInstance(std::move(api_layer_interfaces)));
         *instance = reinterpret_cast<XrInstance>(loader_instance.get());
 
         // Only start the xrCreateApiLayerInstance stack if we have layers.
@@ -194,18 +194,15 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
     return last_error;
 }
 
-LoaderInstance::LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>& api_layer_interfaces)
-    : _unique_id(0xDECAFBAD), _api_version(XR_CURRENT_API_VERSION), _dispatch_valid(false), _messenger(XR_NULL_HANDLE) {
-    try {
-        for (auto l_iter = api_layer_interfaces.begin(); api_layer_interfaces.size() > 0 && l_iter != api_layer_interfaces.end();
-             /* No iterate */) {
-            _api_layer_interfaces.push_back(std::move(*l_iter));
-            api_layer_interfaces.erase(l_iter);
-        }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::LoaderInstance - Unknown error occurred");
-        throw;
-    }
+LoaderInstance::LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces) try
+    : _unique_id(0xDECAFBAD),
+      _api_version(XR_CURRENT_API_VERSION),
+      _api_layer_interfaces(std::move(api_layer_interfaces)),
+      _dispatch_valid(false),
+      _messenger(XR_NULL_HANDLE) {
+} catch (...) {
+    LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::LoaderInstance - Unknown error occurred");
+    throw;
 }
 
 LoaderInstance::~LoaderInstance() {

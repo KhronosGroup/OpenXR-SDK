@@ -76,10 +76,10 @@ inline void map_erase_if(T& container, Pred&& predicate) {
 class LoaderInstance {
    public:
     // Factory method
-    static XrResult CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>& layer_interfaces,
+    static XrResult CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& layer_interfaces,
                                    const XrInstanceCreateInfo* info, XrInstance* instance);
 
-    LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>& api_layer_interfaces);
+    LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces);
     virtual ~LoaderInstance();
 
     bool IsValid() { return _unique_id == 0xDECAFBAD; }
