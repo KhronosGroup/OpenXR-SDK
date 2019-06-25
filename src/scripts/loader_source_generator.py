@@ -513,16 +513,11 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                 if not param.is_optional:
                                     # Check we have at least 1 in the array.
                                     tramp_variable_defines += '        if (0 == %s) {\n' % param.pointer_count_var
-                                    tramp_variable_defines += '            XrLoaderLogObjectInfo bad_object = {};\n'
-                                    tramp_variable_defines += '            bad_object.type = %s;\n' % self.genXrObjectType(
-                                        param.type)
-                                    tramp_variable_defines += '            bad_object.handle = reinterpret_cast<uint64_t const&>(%s);\n' % first_handle_name
-                                    tramp_variable_defines += '            std::vector<XrLoaderLogObjectInfo> loader_objects;\n'
-                                    tramp_variable_defines += '            loader_objects.push_back(bad_object);\n'
                                     tramp_variable_defines += '            LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
                                         cur_cmd.name, param.pointer_count_var, cur_cmd.name)
-                                    tramp_variable_defines += '                                                    "%s is 0, but %s is not optional", std::vector<XrLoaderLogObjectInfo>{});\n' % (
-                                        param.pointer_count_var, param.name)
+                                    tramp_variable_defines += '                                                    "%s is 0, but %s is not optional", {XrLoaderLogObjectInfo{%s, %s} });\n' % (
+                                        param.pointer_count_var, param.name, first_handle_name,
+                                        self.genXrObjectType(param.type))
                                     tramp_variable_defines += '        }\n'
                             secondary_mutex_name = 'g_%s_mutex' % base_handle_name
                             tramp_variable_defines += '        std::unique_lock<std::mutex> secondary_lock(%s);\n' % secondary_mutex_name
@@ -540,6 +535,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                             # These should be mutually exclusive - verify it.
                             assert((not cur_cmd.is_destroy_disconnect)
                                    or (pointer_count == 0))
+
                             if pointer_count == 1:
                                 # NOTE - @ 10-June-2019 this stanza is never exercised in loader code-gen. Consider whether necessary. DJH
                                 tramp_variable_defines += '        for (uint32_t i = 1; i < %s; ++i) {\n' % param.pointer_count_var
@@ -549,39 +545,32 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                 tramp_variable_defines += '                elt_loader_instance = map_iter->second;\n'
                                 tramp_variable_defines += '            }\n'
                                 tramp_variable_defines += '            if (elt_loader_instance == nullptr || elt_loader_instance != loader_instance) {\n'
-                                tramp_variable_defines += '                XrLoaderLogObjectInfo bad_object = {};\n'
-                                tramp_variable_defines += '                bad_object.type = %s;\n' % self.genXrObjectType(
-                                    param.type)
-                                tramp_variable_defines += '                bad_object.handle = reinterpret_cast<uint64_t const&>(%s[i]);\n' % param.name
-                                tramp_variable_defines += '                std::vector<XrLoaderLogObjectInfo> loader_objects;\n'
-                                tramp_variable_defines += '                loader_objects.push_back(bad_object);\n'
+                                tramp_variable_defines += '                auto elt_name = "%s[" + std::to_string(i) + "]";\n' % param.name
+                                loader_objects = '{XrLoaderLogObjectInfo{%s[i], %s} }' % (first_handle_name,
+                                                                                          self.genXrObjectType(param.type))
                                 tramp_variable_defines += '                if (elt_loader_instance == nullptr) {\n'
                                 tramp_variable_defines += '                    LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
                                     cur_cmd.name, param.name, cur_cmd.name)
-                                tramp_variable_defines += '                                                    "%s[" + std::to_string(i) + "] is not a valid %s", loader_objects);\n' % (
-                                    param.name, param.type)
+                                tramp_variable_defines += '                                                    elt_name + " is not a valid %s", %s);\n' % (
+                                    param.name, param.type, loader_objects)
                                 tramp_variable_defines += '                } else {\n'
                                 tramp_variable_defines += '                    LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
                                     cur_cmd.name, param.name, cur_cmd.name)
-                                tramp_variable_defines += '                                                            "%s[" + std::to_string(i) + "] belongs to a different instance than %s[0]", loader_objects);\n' % (
-                                    param.name, param.name)
+                                tramp_variable_defines += '                                                            "%s[" + std::to_string(i) + "] belongs to a different instance than %s[0]", %s);\n' % (
+                                    param.name, param.name, loader_objects)
                                 tramp_variable_defines += '                }\n'
                                 if has_return:
                                     tramp_variable_defines += '                return XR_ERROR_HANDLE_INVALID;\n'
                                 tramp_variable_defines += '            }\n'
                                 tramp_variable_defines += '        }\n'
                             tramp_variable_defines += '        secondary_lock.unlock();\n\n'
+                            loader_objects = '{XrLoaderLogObjectInfo{%s, %s} }' % (first_handle_name,
+                                                                                   self.genXrObjectType(param.type))
                             tramp_variable_defines += '        if (nullptr == loader_instance) {\n'
-                            tramp_variable_defines += '            XrLoaderLogObjectInfo bad_object = {};\n'
-                            tramp_variable_defines += '            bad_object.type = %s;\n' % self.genXrObjectType(
-                                param.type)
-                            tramp_variable_defines += '            bad_object.handle = reinterpret_cast<uint64_t const&>(%s);\n' % first_handle_name
-                            tramp_variable_defines += '            std::vector<XrLoaderLogObjectInfo> loader_objects;\n'
-                            tramp_variable_defines += '            loader_objects.push_back(bad_object);\n'
                             tramp_variable_defines += '            LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
                                 cur_cmd.name, param.name, cur_cmd.name)
-                            tramp_variable_defines += '                                                    "%s is not a valid %s", loader_objects);\n' % (
-                                first_handle_name, param.type)
+                            tramp_variable_defines += '                                                    "%s is not a valid %s", %s);\n' % (
+                                first_handle_name, param.type, loader_objects)
                             if has_return:
                                 tramp_variable_defines += '            return XR_ERROR_HANDLE_INVALID;\n'
                             tramp_variable_defines += '        }\n'

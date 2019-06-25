@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>
@@ -443,29 +444,26 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
 void LoaderLogger::AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name) {
     // If name is empty, we should erase it
     if (object_name.empty()) {
-        auto it = _object_info.begin();
-        while (it != _object_info.end()) {
-            if (it->handle == object_handle) {
-                it = _object_info.erase(it);
-            }
-        }
-        // Otherwise, add it or update the name
-    } else {
-        bool add_obj = true;
+        auto new_end = std::remove_if(_object_info.begin(), _object_info.end(),
+                                      [=](XrLoaderLogObjectInfo const& info) { return info.handle == object_handle; });
+        _object_info.erase(new_end);
+        return;
+    }
+    // Otherwise, add it or update the name
 
-        // If it already exists, update the name
-        for (auto obj_info : _object_info) {
-            if (obj_info.handle == object_handle && obj_info.type == object_type) {
-                add_obj = false;
-                obj_info.name = object_name;
-            }
-        }
-        // It doesn't exist, so add a new info block
-        if (add_obj) {
-            XrLoaderLogObjectInfo new_object_info = {object_handle, object_type, object_name};
-            _object_info.push_back(new_object_info);
+    XrLoaderLogObjectInfo new_obj = {object_handle, object_type};
+
+    // If it already exists, update the name
+    for (auto& obj_info : _object_info) {
+        if (Equivalent(obj_info, new_obj)) {
+            obj_info.name = object_name;
+            return;
         }
     }
+
+    // It doesn't exist, so add a new info block
+    new_obj.name = object_name;
+    _object_info.push_back(new_obj);
 }
 
 // We always want to remove the old individual label before we do anything else.

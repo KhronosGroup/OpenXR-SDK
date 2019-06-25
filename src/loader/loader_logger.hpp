@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include <mutex>
 #include <memory>
-#include <vector>
-#include <unordered_map>
+#include <mutex>
 #include <stack>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 // Use internal versions of flags similar to XR_EXT_debug_utils so that
 // we're not tightly coupled to that extension.  This way, if the extension
@@ -52,9 +53,18 @@ static inline std::string HandleToString(T handle) {
 }
 
 struct XrLoaderLogObjectInfo {
+    //! Type-erased handle value
     uint64_t handle;
+
+    //! Kind of object this handle refers to
     XrObjectType type;
+
+    //! To be assigned by the application - not part of this object's identity
     std::string name;
+    XrLoaderLogObjectInfo() = default;
+
+    template <typename T>
+    XrLoaderLogObjectInfo(T h, XrObjectType t) : handle(reinterpret_cast<uint64_t>(h)), type(t) {}
 };
 
 //! True if the two object infos have the same handle value and handle type

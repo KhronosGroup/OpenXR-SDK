@@ -655,26 +655,21 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession 
             loader_instance = map_iter->second;
         }
 
-        std::vector<XrLoaderLogObjectInfo> loader_objects;
-        XrLoaderLogObjectInfo object_info = {};
-        object_info.type = XR_OBJECT_TYPE_SESSION;
-        object_info.handle = reinterpret_cast<uint64_t &>(session);
-        loader_objects.push_back(object_info);
         if (nullptr == loader_instance) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionBeginDebugUtilsLabelRegionEXT-session-parameter",
                                                     "xrSessionBeginDebugUtilsLabelRegionEXT", "session is not a valid XrSession",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_HANDLE_INVALID;
         }
         if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
             LoaderLogger::LogValidationErrorMessage("TBD", "xrSessionBeginDebugUtilsLabelRegionEXT",
                                                     "Extension entrypoint called without enabling appropriate extension",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_FUNCTION_UNSUPPORTED;
         } else if (nullptr == labelInfo) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionBeginDebugUtilsLabelRegionEXT-labelInfo-parameter",
                                                     "xrSessionBeginDebugUtilsLabelRegionEXT", "labelInfo must be non-NULL",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_VALIDATION_FAILURE;
         }
 
@@ -704,14 +699,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession se
         }
 
         if (nullptr == loader_instance) {
-            XrLoaderLogObjectInfo bad_object = {};
-            bad_object.type = XR_OBJECT_TYPE_SESSION;
-            bad_object.handle = reinterpret_cast<uint64_t &>(session);
-            std::vector<XrLoaderLogObjectInfo> loader_objects;
-            loader_objects.push_back(bad_object);
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionEndDebugUtilsLabelRegionEXT-session-parameter",
                                                     "xrSessionEndDebugUtilsLabelRegionEXT", "session is not a valid XrSession",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_HANDLE_INVALID;
         } else if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
             return XR_ERROR_FUNCTION_UNSUPPORTED;
@@ -741,26 +731,21 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession sessi
             loader_instance = map_iter->second;
         }
 
-        XrLoaderLogObjectInfo object_info = {};
-        object_info.type = XR_OBJECT_TYPE_SESSION;
-        object_info.handle = reinterpret_cast<uint64_t &>(session);
-        std::vector<XrLoaderLogObjectInfo> loader_objects;
-        loader_objects.push_back(object_info);
         if (nullptr == loader_instance) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionInsertDebugUtilsLabelEXT-session-parameter",
                                                     "xrSessionInsertDebugUtilsLabelEXT", "session is not a valid XrSession",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_HANDLE_INVALID;
         }
         if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
             LoaderLogger::LogValidationErrorMessage("TBD", "xrSessionInsertDebugUtilsLabelEXT",
                                                     "Extension entrypoint called without enabling appropriate extension",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_FUNCTION_UNSUPPORTED;
         } else if (nullptr == labelInfo) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionInsertDebugUtilsLabelEXT-labelInfo-parameter",
                                                     "xrSessionInsertDebugUtilsLabelEXT", "labelInfo must be non-NULL",
-                                                    loader_objects);
+                                                    {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_VALIDATION_FAILURE;
         }
 
