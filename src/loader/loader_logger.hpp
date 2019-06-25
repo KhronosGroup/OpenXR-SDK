@@ -79,8 +79,12 @@ struct XrLoaderLogObjectInfo {
 
     XrLoaderLogObjectInfo() = default;
 
+    //! Create from a typed handle and object type
     template <typename T>
     XrLoaderLogObjectInfo(T h, XrObjectType t) : handle(reinterpret_cast<uint64_t>(h)), type(t) {}
+
+    //! Create from an untyped handle value (integer) and object type
+    XrLoaderLogObjectInfo(uint64_t h, XrObjectType t) : handle(h), type(t) {}
 
     std::string ToString() const;
 };
