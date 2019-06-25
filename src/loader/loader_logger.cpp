@@ -17,13 +17,14 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <memory>
-#include <vector>
-#include <string>
 #include <sstream>
-#include <algorithm>
+#include <string>
+#include <vector>
 
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>
@@ -141,6 +142,66 @@ bool StdOutLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits mess
 
     // Return of "true" means that we should exit the application after the logged message.  We
     // don't want to do that for our internal logging.  Only let a user return true.
+    return false;
+}
+
+void ObjectInfoCollection::AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name) {
+    // If name is empty, we should erase it
+    if (object_name.empty()) {
+        auto new_end = std::remove_if(_object_info.begin(), _object_info.end(),
+                                      [=](XrLoaderLogObjectInfo const& info) { return info.handle == object_handle; });
+        _object_info.erase(new_end);
+        return;
+    }
+    // Otherwise, add it or update the name
+
+    XrLoaderLogObjectInfo new_obj = {object_handle, object_type};
+
+    // If it already exists, update the name
+    auto lookup_info = LookUpStoredObjectInfo(new_obj);
+    if (lookup_info != nullptr) {
+        lookup_info->name = object_name;
+        return;
+    }
+
+    // It doesn't exist, so add a new info block
+    new_obj.name = object_name;
+    _object_info.push_back(new_obj);
+}
+
+XrLoaderLogObjectInfo const* ObjectInfoCollection::LookUpStoredObjectInfo(XrLoaderLogObjectInfo const& info) const {
+    auto e = _object_info.end();
+    auto it = std::find_if(_object_info.begin(), e, [&](XrLoaderLogObjectInfo const& stored) { return Equivalent(stored, info); });
+    if (it != e) {
+        return &(*it);
+    }
+    return nullptr;
+}
+
+XrLoaderLogObjectInfo* ObjectInfoCollection::LookUpStoredObjectInfo(XrLoaderLogObjectInfo const& info) {
+    auto e = _object_info.end();
+    auto it = std::find_if(_object_info.begin(), e, [&](XrLoaderLogObjectInfo const& stored) { return Equivalent(stored, info); });
+    if (it != e) {
+        return &(*it);
+    }
+    return nullptr;
+}
+
+bool ObjectInfoCollection::LookUpObjectName(XrDebugUtilsObjectNameInfoEXT& info) const {
+    auto info_lookup = LookUpStoredObjectInfo(info.objectHandle, info.objectType);
+    if (info_lookup != nullptr) {
+        info.objectName = info_lookup->name.c_str();
+        return true;
+    }
+    return false;
+}
+
+bool ObjectInfoCollection::LookUpObjectName(XrLoaderLogObjectInfo& info) const {
+    auto info_lookup = LookUpStoredObjectInfo(info);
+    if (info_lookup != nullptr) {
+        info.name = info_lookup->name;
+        return true;
+    }
     return false;
 }
 
@@ -306,54 +367,42 @@ void LoaderLogger::RemoveLogRecorder(uint64_t unique_id) {
         }
     }
 }
+
 bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                               const std::string& message_id, const std::string& command_name, const std::string& message,
                               const std::vector<XrLoaderLogObjectInfo>& objects) {
-    bool exit_app = false;
     XrLoaderLogMessengerCallbackData callback_data = {};
-    std::vector<XrLoaderLogObjectInfo> object_vector;
-
     callback_data.message_id = message_id.c_str();
     callback_data.command_name = command_name.c_str();
     callback_data.message = message.c_str();
-    callback_data.object_count = static_cast<uint8_t>(objects.size());
+
     std::vector<XrDebugUtilsLabelEXT> labels;
-    if (!objects.empty()) {
-        object_vector.resize(objects.size());
-        for (uint32_t obj = 0; obj < objects.size(); ++obj) {
-            object_vector[obj] = objects[obj];
-            // Check for any names that have been associated with the objects and set them up here
-            for (auto obj_info : _object_info) {
-                if (object_vector[obj].type == obj_info.type && object_vector[obj].handle == obj_info.handle) {
-                    object_vector[obj].name = obj_info.name;
-                    break;
-                }
-            }
-            // If this is a session, see if there are any labels associated with it for us to add
-            // to the callback content.
-            if (XR_OBJECT_TYPE_SESSION == object_vector[obj].type) {
-                XrSession session = reinterpret_cast<XrSession&>(object_vector[obj].handle);
-                auto session_label_iterator = _session_labels.find(session);
-                if (session_label_iterator != _session_labels.end()) {
-                    auto rev_iter = session_label_iterator->second->rbegin();
-                    for (; rev_iter != session_label_iterator->second->rend(); ++rev_iter) {
-                        labels.push_back((*rev_iter)->debug_utils_label);
-                    }
-                }
+
+    // Copy objects into a vector we can modify and will keep around past the callback.
+    std::vector<XrLoaderLogObjectInfo> object_vector = objects;
+    for (auto& obj : object_vector) {
+        // Check for any names that have been associated with the objects and set them up here
+        _object_names.LookUpObjectName(obj);
+        // If this is a session, see if there are any labels associated with it for us to add
+        // to the callback content.
+        if (XR_OBJECT_TYPE_SESSION == obj.type) {
+            XrSession session = obj.GetTypedHandle<XrSession>();
+            auto session_label_iterator = _session_labels.find(session);
+            if (session_label_iterator != _session_labels.end()) {
+                auto& internalSessionLabels = *session_label_iterator->second;
+                // Copy the debug utils labels in reverse order in the the labels vector.
+                std::transform(internalSessionLabels.rbegin(), internalSessionLabels.rend(), std::back_inserter(labels),
+                               [](InternalSessionLabel* label) { return label->debug_utils_label; });
             }
         }
-        callback_data.objects = object_vector.data();
-        callback_data.session_labels_count = static_cast<uint8_t>(labels.size());
-        if (!labels.empty()) {
-            callback_data.session_labels = labels.data();
-        } else {
-            callback_data.session_labels = nullptr;
-        }
-    } else {
-        callback_data.objects = nullptr;
-        callback_data.session_labels_count = 0;
-        callback_data.session_labels = nullptr;
     }
+    callback_data.objects = object_vector.empty() ? nullptr : object_vector.data();
+    callback_data.object_count = static_cast<uint8_t>(object_vector.size());
+
+    callback_data.session_labels = labels.empty() ? nullptr : labels.data();
+    callback_data.session_labels_count = static_cast<uint8_t>(labels.size());
+
+    bool exit_app = false;
     for (std::unique_ptr<LoaderLogRecorder>& recorder : _recorders) {
         if ((recorder->MessageSeverities() & message_severity) == message_severity &&
             (recorder->MessageTypes() & message_type) == message_type) {
@@ -379,14 +428,12 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
             DebugUtilsLogRecorder* debug_utils_recorder = reinterpret_cast<DebugUtilsLogRecorder*>(recorder.get());
             bool obj_name_found = false;
             std::vector<XrDebugUtilsLabelEXT> labels;
-            if (!_object_info.empty() && callback_data->objectCount > 0) {
+            if (!_object_names.Empty() && callback_data->objectCount > 0) {
                 for (uint32_t obj = 0; obj < callback_data->objectCount; ++obj) {
-                    for (auto obj_info : _object_info) {
-                        if ((obj_info.handle == callback_data->objects[obj].objectHandle) &&
-                            (obj_info.type == callback_data->objects[obj].objectType)) {
-                            obj_name_found = true;
-                            break;
-                        }
+                    auto& current_obj = callback_data->objects[obj];
+                    auto stored_info = _object_names.LookUpStoredObjectInfo(current_obj.objectHandle, current_obj.objectType);
+                    if (stored_info != nullptr) {
+                        obj_name_found = true;
                     }
                     // If this is a session, see if there are any labels associated with it for us to add
                     // to the callback content.
@@ -402,33 +449,21 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
                     }
                 }
             }
+            XrDebugUtilsMessengerCallbackDataEXT new_callback_data = *callback_data;
+            std::vector<XrDebugUtilsObjectNameInfoEXT> new_objects;
+
             // If a name or a label has been found, we should update it in a new version of the callback
             if (obj_name_found || !labels.empty()) {
-                XrDebugUtilsMessengerCallbackDataEXT new_callback_data = {};
-                new_callback_data.type = XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT;
-                new_callback_data.messageId = callback_data->messageId;
-                new_callback_data.functionName = callback_data->functionName;
-                new_callback_data.message = callback_data->message;
-                std::vector<XrDebugUtilsObjectNameInfoEXT> new_objects;
-                new_objects.resize(callback_data->objectCount);
-                for (uint8_t obj = 0; obj < callback_data->objectCount; ++obj) {
-                    new_objects[obj] = callback_data->objects[obj];
-                    for (auto obj_info : _object_info) {
-                        if ((obj_info.handle == callback_data->objects[obj].objectHandle) &&
-                            (obj_info.type == callback_data->objects[obj].objectType)) {
-                        }
-                        new_objects[obj].objectName = obj_info.name.c_str();
-                        break;
-                    }
+                // Copy objects
+                new_objects = std::vector<XrDebugUtilsObjectNameInfoEXT>(callback_data->objects,
+                                                                         callback_data->objects + callback_data->objectCount);
+                for (auto& obj : new_objects) {
+                    // Check for any names that have been associated with the objects and set them up here
+                    _object_names.LookUpObjectName(obj);
                 }
-                new_callback_data.objectCount = callback_data->objectCount;
                 new_callback_data.objects = new_objects.data();
                 new_callback_data.sessionLabelCount = static_cast<uint32_t>(labels.size());
-                if (!labels.empty()) {
-                    new_callback_data.sessionLabels = labels.data();
-                } else {
-                    new_callback_data.sessionLabels = nullptr;
-                }
+                new_callback_data.sessionLabels = labels.empty() ? nullptr : labels.data();
                 exit_app |= debug_utils_recorder->LogDebugUtilsMessage(message_severity, message_type, &new_callback_data);
                 dumped = true;
             }
@@ -442,28 +477,7 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
 }
 
 void LoaderLogger::AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name) {
-    // If name is empty, we should erase it
-    if (object_name.empty()) {
-        auto new_end = std::remove_if(_object_info.begin(), _object_info.end(),
-                                      [=](XrLoaderLogObjectInfo const& info) { return info.handle == object_handle; });
-        _object_info.erase(new_end);
-        return;
-    }
-    // Otherwise, add it or update the name
-
-    XrLoaderLogObjectInfo new_obj = {object_handle, object_type};
-
-    // If it already exists, update the name
-    for (auto& obj_info : _object_info) {
-        if (Equivalent(obj_info, new_obj)) {
-            obj_info.name = object_name;
-            return;
-        }
-    }
-
-    // It doesn't exist, so add a new info block
-    new_obj.name = object_name;
-    _object_info.push_back(new_obj);
+    _object_names.AddObjectName(object_handle, object_type, object_name);
 }
 
 // We always want to remove the old individual label before we do anything else.

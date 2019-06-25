@@ -61,6 +61,21 @@ struct XrLoaderLogObjectInfo {
 
     //! To be assigned by the application - not part of this object's identity
     std::string name;
+
+    /// Un-erase the type of the handle and get it properly typed again.
+    ///
+    /// Note: Does not check the type before doing it!
+    template <typename HandleType>
+    HandleType& GetTypedHandle() {
+        return reinterpret_cast<HandleType&>(handle);
+    }
+
+    //! @overload
+    template <typename HandleType>
+    HandleType const& GetTypedHandle() const {
+        return reinterpret_cast<HandleType&>(handle);
+    }
+
     XrLoaderLogObjectInfo() = default;
 
     template <typename T>
@@ -172,6 +187,39 @@ class DebugUtilsLogRecorder : public LoaderLogRecorder {
 //  - FileLoaderLogRecorder     - During/after xrCreateInstance
 //  - PipeLoaderLogRecorder?    - During/after xrCreateInstance
 
+class ObjectInfoCollection {
+   public:
+    //! Called from LoaderXrTermSetDebugUtilsObjectNameEXT - an empty name means remove
+    void AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name);
+
+    //! Find the stored object info, if any, matching handle and type.
+    //! Return nullptr if not found.
+    XrLoaderLogObjectInfo const* LookUpStoredObjectInfo(XrLoaderLogObjectInfo const& info) const;
+    //! Find the stored object info, if any, matching handle and type.
+    //! Return nullptr if not found.
+    XrLoaderLogObjectInfo* LookUpStoredObjectInfo(XrLoaderLogObjectInfo const& info);
+
+    //! Find the stored object info, if any.
+    //! Return nullptr if not found.
+    XrLoaderLogObjectInfo const* LookUpStoredObjectInfo(uint64_t handle, XrObjectType type) const {
+        return LookUpStoredObjectInfo({handle, type});
+    }
+
+    //! Find the object name, if any, and update debug utils info accordingly.
+    //! Return true if found and updated.
+    bool LookUpObjectName(XrDebugUtilsObjectNameInfoEXT& info) const;
+
+    //! Find the object name, if any, and update logging info accordingly.
+    //! Return true if found and updated.
+    bool LookUpObjectName(XrLoaderLogObjectInfo& info) const;
+
+    //! Is the collection empty?
+    bool Empty() const { return _object_info.empty(); }
+
+   private:
+    // Object names that have been set for given objects
+    std::vector<XrLoaderLogObjectInfo> _object_info;
+};
 class LoaderLogger {
    public:
     static LoaderLogger& GetInstance() {
@@ -182,11 +230,13 @@ class LoaderLogger {
     void AddLogRecorder(std::unique_ptr<LoaderLogRecorder>& recorder);
     void RemoveLogRecorder(uint64_t unique_id);
 
+    //! Called from LoaderXrTermSetDebugUtilsObjectNameEXT - an empty name means remove
     void AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name);
     void BeginLabelRegion(XrSession session, const XrDebugUtilsLabelEXT* label_info);
     void EndLabelRegion(XrSession session);
     void InsertLabel(XrSession session, const XrDebugUtilsLabelEXT* label_info);
     void DeleteSessionLabels(XrSession session);
+
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const std::string& message_id, const std::string& command_name, const std::string& message,
@@ -245,9 +295,7 @@ class LoaderLogger {
     // List of available recorder objects
     std::vector<std::unique_ptr<LoaderLogRecorder>> _recorders;
 
-    // Object names that have been set for given objects
-    std::vector<XrLoaderLogObjectInfo> _object_info;
-
+    ObjectInfoCollection _object_names;
     // Session labels
     std::unordered_map<XrSession, std::vector<InternalSessionLabel*>*> _session_labels;
 };
