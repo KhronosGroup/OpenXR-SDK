@@ -681,13 +681,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     generated_funcs += '        return XR_ERROR_INITIALIZATION_FAILED;\n'
                 elif cur_cmd.params[0].type == 'XrInstance':
                     generated_funcs += '    } catch (...) {\n'
-                    generated_funcs += '        std::string error_message = "%s trampoline encountered an unknown error.  Likely XrInstance 0x";\n' % cur_cmd.name
-                    generated_funcs += '        std::ostringstream oss;\n'
-                    generated_funcs += '        oss << std::hex << reinterpret_cast<const void*>(%s);\n' % cur_cmd.params[
-                        0].name
-                    generated_funcs += '        error_message += oss.str();\n'
-                    generated_funcs += '        error_message += " is invalid";\n'
-                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", error_message);\n' % cur_cmd.name
+                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s trampoline encountered an unknown error.  Likely XrInstance "\n' % (
+                        cur_cmd.name, cur_cmd.name)
+                    generated_funcs += '            + HandleToString(%s) + " is invalid");\n' % cur_cmd.params[0].name
                     if has_return:
                         generated_funcs += '        return XR_ERROR_HANDLE_INVALID;\n'
                 elif has_return:

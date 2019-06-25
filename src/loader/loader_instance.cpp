@@ -170,13 +170,12 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         }
 
         if (XR_SUCCEEDED(last_error)) {
-            std::string info_message = "LoaderInstance::CreateInstance succeeded with ";
-            info_message += std::to_string(loader_instance->LayerInterfaces().size());
-            info_message += " layers enabled and runtime interface - created instance = 0x";
             std::ostringstream oss;
-            oss << std::hex << reinterpret_cast<uintptr_t>(loader_instance);
-            info_message += oss.str();
-            LoaderLogger::LogInfoMessage("xrCreateInstance", info_message);
+            oss << "LoaderInstance::CreateInstance succeeded with ";
+            oss << loader_instance->LayerInterfaces().size();
+            oss << " layers enabled and runtime interface - created instance = ";
+            oss << HandleToString(*instance);
+            LoaderLogger::LogInfoMessage("xrCreateInstance", oss.str());
             // Make the unique_ptr no longer delete this.
             loader_instance.release();
         }
@@ -209,11 +208,10 @@ LoaderInstance::LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>& 
 }
 
 LoaderInstance::~LoaderInstance() {
-    std::string info_message = "Destroying LoaderInstance = 0x";
     std::ostringstream oss;
-    oss << std::hex << reinterpret_cast<uintptr_t>(this);
-    info_message += oss.str();
-    LoaderLogger::LogInfoMessage("xrDestroyInstance", info_message);
+    oss << "Destroying LoaderInstance = ";
+    oss << Uint64ToHexString(reinterpret_cast<uintptr_t>(this));
+    LoaderLogger::LogInfoMessage("xrDestroyInstance", oss.str());
 }
 
 XrResult LoaderInstance::CreateDispatchTable(XrInstance instance) {
