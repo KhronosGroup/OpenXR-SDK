@@ -259,7 +259,7 @@ void LoaderLogger::LookUpSessionLabels(XrSession session, std::vector<XrDebugUti
         auto& internalSessionLabels = *session_label_iterator->second;
         // Copy the debug utils labels in reverse order in the the labels vector.
         std::transform(internalSessionLabels.rbegin(), internalSessionLabels.rend(), std::back_inserter(labels),
-                       [](InternalSessionLabel* label) { return label->debug_utils_label; });
+                       [](InternalSessionLabelPtr const& label) { return label->debug_utils_label; });
     }
 }
 
@@ -330,91 +330,81 @@ void LoaderLogger::AddObjectName(uint64_t object_handle, XrObjectType object_typ
 
 // We always want to remove the old individual label before we do anything else.
 // So, do that in it's own method
-void LoaderLogger::RemoveIndividualLabel(std::vector<InternalSessionLabel*>* label_vec) {
-    if (!label_vec->empty()) {
-        InternalSessionLabel* cur_label = label_vec->back();
-        if (cur_label->is_individual_label) {
-            label_vec->pop_back();
-            delete cur_label;
-        }
+void LoaderLogger::RemoveIndividualLabel(InternalSessionLabelList& label_vec) {
+    if (!label_vec.empty() && label_vec.back()->is_individual_label) {
+        label_vec.pop_back();
     }
 }
 
-void LoaderLogger::BeginLabelRegion(XrSession session, const XrDebugUtilsLabelEXT* label_info) {
-    std::vector<InternalSessionLabel*>* vec_ptr = nullptr;
+InternalSessionLabelList* LoaderLogger::GetSessionLabelList(XrSession session) {
     auto session_label_iterator = _session_labels.find(session);
     if (session_label_iterator == _session_labels.end()) {
-        vec_ptr = new std::vector<InternalSessionLabel*>;
-        _session_labels[session] = vec_ptr;
-    } else {
-        vec_ptr = session_label_iterator->second;
+        return nullptr;
     }
+    return session_label_iterator->second.get();
+}
+
+InternalSessionLabelList& LoaderLogger::GetOrCreateSessionLabelList(XrSession session) {
+    InternalSessionLabelList* vec_ptr = GetSessionLabelList(session);
+    if (vec_ptr == nullptr) {
+        std::unique_ptr<InternalSessionLabelList> vec(new InternalSessionLabelList);
+        vec_ptr = vec.get();
+        _session_labels[session] = std::move(vec);
+    }
+    return *vec_ptr;
+}
+
+void LoaderLogger::BeginLabelRegion(XrSession session, const XrDebugUtilsLabelEXT* label_info) {
+    auto& vec = GetOrCreateSessionLabelList(session);
 
     // Individual labels do not stay around in the transition into a new label region
-    RemoveIndividualLabel(vec_ptr);
+    RemoveIndividualLabel(vec);
 
     // Start the new label region
-    InternalSessionLabel* new_session_label = new InternalSessionLabel;
+    InternalSessionLabelPtr new_session_label(new InternalSessionLabel);
     new_session_label->label_name = label_info->labelName;
     new_session_label->debug_utils_label = *label_info;
     new_session_label->debug_utils_label.labelName = new_session_label->label_name.c_str();
     new_session_label->is_individual_label = false;
-    vec_ptr->push_back(new_session_label);
+    vec.emplace_back(std::move(new_session_label));
 }
 
 void LoaderLogger::EndLabelRegion(XrSession session) {
-    auto session_label_iterator = _session_labels.find(session);
-    if (session_label_iterator == _session_labels.end()) {
+    InternalSessionLabelList* vec_ptr = GetSessionLabelList(session);
+    if (vec_ptr == nullptr) {
         return;
     }
 
-    std::vector<InternalSessionLabel*>* vec_ptr = session_label_iterator->second;
-
     // Individual labels do not stay around in the transition out of label region
-    RemoveIndividualLabel(vec_ptr);
+    RemoveIndividualLabel(*vec_ptr);
 
     // Remove the last label region
     if (!vec_ptr->empty()) {
-        InternalSessionLabel* cur_label = vec_ptr->back();
         vec_ptr->pop_back();
-        delete cur_label;
     }
 }
 
 void LoaderLogger::InsertLabel(XrSession session, const XrDebugUtilsLabelEXT* label_info) {
-    std::vector<InternalSessionLabel*>* vec_ptr = nullptr;
-    auto session_label_iterator = _session_labels.find(session);
-    if (session_label_iterator == _session_labels.end()) {
-        vec_ptr = new std::vector<InternalSessionLabel*>;
-        _session_labels[session] = vec_ptr;
-    } else {
-        vec_ptr = session_label_iterator->second;
-    }
+    //! @todo only difference from BeginLabelRegion is value of is_individual_label
+    auto& vec = GetOrCreateSessionLabelList(session);
 
     // Remove any individual layer that might already be there
-    RemoveIndividualLabel(vec_ptr);
+    RemoveIndividualLabel(vec);
 
     // Insert a new individual label
-    InternalSessionLabel* new_session_label = new InternalSessionLabel;
+    InternalSessionLabelPtr new_session_label(new InternalSessionLabel);
     new_session_label->label_name = label_info->labelName;
     new_session_label->debug_utils_label = *label_info;
     new_session_label->debug_utils_label.labelName = new_session_label->label_name.c_str();
     new_session_label->is_individual_label = true;
-    vec_ptr->push_back(new_session_label);
+    vec.emplace_back(std::move(new_session_label));
 }
 
 // Called during xrDestroySession.  We need to delete all session related labels.
 void LoaderLogger::DeleteSessionLabels(XrSession session) {
-    std::vector<InternalSessionLabel*>* vec_ptr = nullptr;
-    auto session_label_iterator = _session_labels.find(session);
-    if (session_label_iterator == _session_labels.end()) {
+    InternalSessionLabelList* vec_ptr = GetSessionLabelList(session);
+    if (vec_ptr == nullptr) {
         return;
     }
-    vec_ptr = session_label_iterator->second;
-    while (!vec_ptr->empty()) {
-        delete vec_ptr->back();
-        vec_ptr->pop_back();
-    }
-    delete vec_ptr;
     _session_labels.erase(session);
 }

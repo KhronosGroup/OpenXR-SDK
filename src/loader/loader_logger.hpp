@@ -193,6 +193,16 @@ class ObjectInfoCollection {
     // Object names that have been set for given objects
     std::vector<XrLoaderLogObjectInfo> _object_info;
 };
+
+struct InternalSessionLabel {
+    XrDebugUtilsLabelEXT debug_utils_label;
+    std::string label_name;
+    bool is_individual_label;
+};
+
+using InternalSessionLabelPtr = std::unique_ptr<InternalSessionLabel>;
+using InternalSessionLabelList = std::vector<InternalSessionLabelPtr>;
+
 class LoaderLogger {
    public:
     static LoaderLogger& GetInstance() {
@@ -250,12 +260,6 @@ class LoaderLogger {
                               const XrDebugUtilsMessengerCallbackDataEXT* callback_data);
 
    private:
-    struct InternalSessionLabel {
-        XrDebugUtilsLabelEXT debug_utils_label;
-        std::string label_name;
-        bool is_individual_label;
-    };
-
     LoaderLogger();
     LoaderLogger(const LoaderLogger&) = delete;
     LoaderLogger& operator=(const LoaderLogger&) = delete;
@@ -263,7 +267,9 @@ class LoaderLogger {
     /// Retrieve labels for the given session, if any, and push them in reverse order on the vector.
     void LookUpSessionLabels(XrSession session, std::vector<XrDebugUtilsLabelEXT>& labels) const;
 
-    void RemoveIndividualLabel(std::vector<InternalSessionLabel*>* label_vec);
+    void RemoveIndividualLabel(InternalSessionLabelList& label_vec);
+    InternalSessionLabelList* GetSessionLabelList(XrSession session);
+    InternalSessionLabelList& GetOrCreateSessionLabelList(XrSession session);
 
     static std::unique_ptr<LoaderLogger> _instance;
     static std::once_flag _once_flag;
@@ -273,7 +279,7 @@ class LoaderLogger {
 
     ObjectInfoCollection _object_names;
     // Session labels
-    std::unordered_map<XrSession, std::vector<InternalSessionLabel*>*> _session_labels;
+    std::unordered_map<XrSession, std::unique_ptr<InternalSessionLabelList>> _session_labels;
 };
 
 // Utility functions for converting to/from XR_EXT_debug_utils values
