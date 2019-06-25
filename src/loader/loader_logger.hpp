@@ -80,6 +80,8 @@ struct XrLoaderLogObjectInfo {
 
     template <typename T>
     XrLoaderLogObjectInfo(T h, XrObjectType t) : handle(reinterpret_cast<uint64_t>(h)), type(t) {}
+
+    std::string ToString() const;
 };
 
 //! True if the two object infos have the same handle value and handle type

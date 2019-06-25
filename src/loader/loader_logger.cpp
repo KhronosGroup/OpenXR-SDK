@@ -50,6 +50,16 @@ std::string Uint64ToHexString(uint64_t val) {
     oss << std::hex << std::setw(16) << std::setfill('0') << val;
     return oss.str();
 }
+
+std::string XrLoaderLogObjectInfo::ToString() const {
+    std::ostringstream oss;
+    oss << Uint64ToHexString(handle);
+    if (!name.empty()) {
+        oss << " (" << name << ")";
+    }
+    return oss.str();
+}
+
 bool StdErrLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity,
                                          XrLoaderLogMessageTypeFlags message_type,
                                          const XrLoaderLogMessengerCallbackData* callback_data) {
@@ -73,10 +83,7 @@ bool StdErrLoaderLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits mess
                   << std::endl;
 
         for (uint32_t obj = 0; obj < callback_data->object_count; ++obj) {
-            std::cerr << "    Object[" << std::to_string(obj) << "] = " << std::to_string(callback_data->objects[obj].handle);
-            if (!callback_data->objects[obj].name.empty()) {
-                std::cerr << " (" << callback_data->objects[obj].name << ")";
-            }
+            std::cerr << "    Object[" << obj << "] = " << callback_data->objects[obj].ToString();
             std::cerr << std::endl;
         }
         for (uint32_t label = 0; label < callback_data->session_labels_count; ++label) {
