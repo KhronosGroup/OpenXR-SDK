@@ -629,7 +629,6 @@ void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::u
                     LoaderLogger::LogErrorMessage("", error_message);
                     return;
                 }
-                lib_path = lib_path;
             } else {
                 // Otherwise, treat the library path as a relative path based on the JSON file.
                 std::string combined_path;
@@ -894,7 +893,6 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
                     LoaderLogger::LogErrorMessage("", error_message);
                     return;
                 }
-                library_path = library_path;
             } else {
                 // Otherwise, treat the library path as a relative path based on the JSON file.
                 std::string combined_path;
