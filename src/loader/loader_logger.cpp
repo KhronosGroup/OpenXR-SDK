@@ -367,12 +367,11 @@ LoaderLogger::LoaderLogger() {
 void LoaderLogger::AddLogRecorder(std::unique_ptr<LoaderLogRecorder>& recorder) { _recorders.push_back(std::move(recorder)); }
 
 void LoaderLogger::RemoveLogRecorder(uint64_t unique_id) {
-    for (uint32_t index = 0; index < _recorders.size(); ++index) {
-        if (_recorders[index]->UniqueId() == unique_id) {
-            _recorders.erase(_recorders.begin() + index);
-            break;
-        }
-    }
+    auto e = _recorders.end();
+    auto new_end = std::remove_if(_recorders.begin(), e, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) {
+        return recorder->UniqueId() == unique_id;
+    });
+    _recorders.erase(new_end);
 }
 
 bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
