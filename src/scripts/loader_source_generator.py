@@ -346,7 +346,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         result_to_str += self.writeIndent(indent)
         result_to_str += '// If we did not find it in the generated code, ask the runtime.\n'
         result_to_str += self.writeIndent(indent)
-        result_to_str += 'const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);\n'
+        result_to_str += 'const auto* dispatch_table = RuntimeInterface::GetDispatchTable(instance);\n'
         return result_to_str
 
     # A special-case handling of the "StructureTypeToString" command.  Since we can actually
@@ -370,7 +370,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         struct_to_str += self.writeIndent(indent)
         struct_to_str += '// If we did not find it in the generated code, ask the runtime.\n'
         struct_to_str += self.writeIndent(indent)
-        struct_to_str += 'const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);\n'
+        struct_to_str += 'const auto* dispatch_table = RuntimeInterface::GetDispatchTable(instance);\n'
         return struct_to_str
 
     # Instantiate the unordered_maps and mutexes for each of the object types.  Also, output a utility
