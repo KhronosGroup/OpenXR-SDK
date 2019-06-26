@@ -148,9 +148,7 @@ class LoaderLogRecorder {
     // Extension-specific logging functions - defaults to do nothing.
     virtual bool LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT message_severity,
                                       XrDebugUtilsMessageTypeFlagsEXT message_type,
-                                      const XrDebugUtilsMessengerCallbackDataEXT* callback_data) {
-        return false;
-    }
+                                      const XrDebugUtilsMessengerCallbackDataEXT* callback_data);
 
    protected:
     bool _active;

@@ -26,6 +26,8 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <algorithm>
+#include <cmath>
 
 #include "filesystem_utils.hpp"
 #include "loader_platform.hpp"
@@ -496,33 +498,29 @@ bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
     return true;
 }
 
+static void GetExtensionProperties(std::vector<ExtensionListing> const &extensions, std::vector<XrExtensionProperties> &props) {
+    for (const auto &ext : extensions) {
+        auto it =
+            std::find_if(props.begin(), props.end(), [&](XrExtensionProperties &prop) { return prop.extensionName == ext.name; });
+        if (it != props.end()) {
+            it->specVersion = std::max(it->specVersion, ext.spec_version);
+        } else {
+            XrExtensionProperties prop = {};
+            prop.type = XR_TYPE_EXTENSION_PROPERTIES;
+            prop.next = nullptr;
+            strncpy(prop.extensionName, ext.name.c_str(), XR_MAX_EXTENSION_NAME_SIZE - 1);
+            prop.extensionName[XR_MAX_EXTENSION_NAME_SIZE - 1] = '\0';
+            prop.specVersion = ext.spec_version;
+            props.push_back(prop);
+        }
+    }
+}
+
 // Return any instance extensions found in the manifest files in the proper form for
 // OpenXR (XrExtensionProperties).
 void ManifestFile::GetInstanceExtensionProperties(std::vector<XrExtensionProperties> &props) {
     try {
-        size_t ext_count = _instance_extensions.size();
-        size_t props_count = props.size();
-        bool found = false;
-        for (size_t ext = 0; ext < ext_count; ++ext) {
-            for (size_t prop = 0; prop < props_count; ++prop) {
-                if (!strcmp(props[prop].extensionName, _instance_extensions[ext].name.c_str())) {
-                    if (props[prop].specVersion < _instance_extensions[ext].spec_version) {
-                        props[prop].specVersion = _instance_extensions[ext].spec_version;
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found) {
-                XrExtensionProperties prop = {};
-                prop.type = XR_TYPE_EXTENSION_PROPERTIES;
-                prop.next = nullptr;
-                strncpy(prop.extensionName, _instance_extensions[ext].name.c_str(), XR_MAX_EXTENSION_NAME_SIZE - 1);
-                prop.extensionName[XR_MAX_EXTENSION_NAME_SIZE - 1] = '\0';
-                prop.specVersion = _instance_extensions[ext].spec_version;
-                props.push_back(prop);
-            }
-        }
+        GetExtensionProperties(_instance_extensions, props);
     } catch (...) {
         LoaderLogger::LogErrorMessage("", "ManifestFile::GetInstanceExtensionProperties - unknown error occurred");
         throw;
@@ -533,29 +531,7 @@ void ManifestFile::GetInstanceExtensionProperties(std::vector<XrExtensionPropert
 // OpenXR (XrExtensionProperties).
 void ManifestFile::GetDeviceExtensionProperties(std::vector<XrExtensionProperties> &props) {
     try {
-        size_t ext_count = _device_extensions.size();
-        size_t props_count = props.size();
-        bool found = false;
-        for (size_t ext = 0; ext < ext_count; ++ext) {
-            for (size_t prop = 0; prop < props_count; ++prop) {
-                if (!strcmp(props[prop].extensionName, _device_extensions[ext].name.c_str())) {
-                    if (props[prop].specVersion < _device_extensions[ext].spec_version) {
-                        props[prop].specVersion = _device_extensions[ext].spec_version;
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found) {
-                XrExtensionProperties prop = {};
-                prop.type = XR_TYPE_EXTENSION_PROPERTIES;
-                prop.next = nullptr;
-                strncpy(prop.extensionName, _device_extensions[ext].name.c_str(), XR_MAX_EXTENSION_NAME_SIZE - 1);
-                prop.extensionName[XR_MAX_EXTENSION_NAME_SIZE - 1] = '\0';
-                prop.specVersion = _device_extensions[ext].spec_version;
-                props.push_back(prop);
-            }
-        }
+        GetExtensionProperties(_device_extensions, props);
     } catch (...) {
         LoaderLogger::LogErrorMessage("", "ManifestFile::GetDeviceExtensionProperties - unknown error occurred");
         throw;

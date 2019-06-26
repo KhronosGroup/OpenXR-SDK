@@ -49,6 +49,12 @@ std::string XrLoaderLogObjectInfo::ToString() const {
     return oss.str();
 }
 
+bool LoaderLogRecorder::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT /*message_severity*/,
+                                             XrDebugUtilsMessageTypeFlagsEXT /*message_type*/,
+                                             const XrDebugUtilsMessengerCallbackDataEXT* /*callback_data*/) {
+    return false;
+}
+
 void ObjectInfoCollection::AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name) {
     // If name is empty, we should erase it
     if (object_name.empty()) {

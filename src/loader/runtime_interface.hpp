@@ -25,6 +25,8 @@
 #include <mutex>
 #include <memory>
 
+#include <openxr/openxr.h>
+
 #include "loader_platform.hpp"
 #include "xr_generated_dispatch_table.h"
 
@@ -47,11 +49,15 @@ class RuntimeInterface {
     bool TrackDebugMessenger(XrInstance instance, XrDebugUtilsMessengerEXT messenger);
     void ForgetDebugMessenger(XrDebugUtilsMessengerEXT messenger);
 
-   private:
+    // No default construction
     RuntimeInterface() = delete;
+
+    // Non-copyable
     RuntimeInterface(const RuntimeInterface&) = delete;
-    RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr);
     RuntimeInterface& operator=(const RuntimeInterface&) = delete;
+
+   private:
+    RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr);
     void SetSupportedExtensions(std::vector<std::string>& supported_extensions);
 
     static std::unique_ptr<RuntimeInterface> _single_runtime_interface;

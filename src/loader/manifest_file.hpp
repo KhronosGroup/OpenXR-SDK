@@ -87,8 +87,9 @@ class RuntimeManifestFile : public ManifestFile {
     ~RuntimeManifestFile() override;
     static void CreateIfValid(std::string const &filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
 
-    // We don't want any copy constructors
-    RuntimeManifestFile &operator=(const RuntimeManifestFile &manifest_file) = delete;
+    // Non-copyable
+    RuntimeManifestFile(const RuntimeManifestFile &) = delete;
+    RuntimeManifestFile &operator=(const RuntimeManifestFile &) = delete;
 };
 
 // ApiLayerManifestFile class -
@@ -105,11 +106,12 @@ class ApiLayerManifestFile : public ManifestFile {
     static void CreateIfValid(ManifestFileType type, std::string const &filename,
                               std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files);
 
-    // We don't want any copy constructors
-    ApiLayerManifestFile &operator=(const ApiLayerManifestFile &manifest_file) = delete;
-
     std::string LayerName() { return _layer_name; }
     XrApiLayerProperties GetApiLayerProperties();
+
+    // Non-copyable
+    ApiLayerManifestFile(const ApiLayerManifestFile &) = delete;
+    ApiLayerManifestFile &operator=(const ApiLayerManifestFile &) = delete;
 
    private:
     JsonVersion _api_version;
