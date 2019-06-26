@@ -196,14 +196,13 @@ class HandleInfo : public HandleInfoBase<HandleType, GenValidUsageXrHandleInfo> 
 
 /// Like std::remove_if, except it works on associative containers and it actually removes this.
 ///
-/// The iterator stuff in here is subtle - .erase() invalidates only that iterator, so we must advance first.
+/// The iterator stuff in here is subtle - .erase() invalidates only that iterator, but it returns a non-invalidated iterator to the
+/// next valid element which we can use instead of incrementing.
 template <typename T, typename Pred>
 inline void map_erase_if(T &container, Pred &&predicate) {
     for (auto it = container.begin(); it != container.end();) {
         if (predicate(*it)) {
-            auto here = it;
-            ++it;
-            container.erase(here);
+            it = container.erase(it);
         } else {
             ++it;
         }
