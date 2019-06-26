@@ -44,7 +44,8 @@ class HandleLoaderMap {
     LoaderInstance* Get(HandleType handle);
 
     /// Insert an info for the supplied handle.
-    /// Returns XR_ERROR_RUNTIME_FAILURE if it's null or already there.
+    /// Returns XR_ERROR_RUNTIME_FAILURE if it's null.
+    /// Does not error if already there, because the loader is not currently very good at cleaning up handles.
     XrResult Insert(HandleType handle, LoaderInstance& loader);
 
     /// Remove the info associated with the supplied handle.
@@ -114,11 +115,15 @@ inline XrResult HandleLoaderMap<HandleType>::Insert(HandleType handle, LoaderIns
         return XR_ERROR_RUNTIME_FAILURE;
     }
     UniqueLock lock(mutex_);
+    //! @todo This check is currently disabled, because the loader is not good at cleaning up handles when their parent handles are
+    //! destroyed.
+#if 0
     auto entry_returned = instance_map_.find(handle);
     if (entry_returned != instance_map_.end()) {
         // Internal error in loader or runtime.
         return XR_ERROR_RUNTIME_FAILURE;
     }
+#endif
     instance_map_[handle] = &loader;
     return XR_SUCCESS;
 }
