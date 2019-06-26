@@ -33,6 +33,7 @@
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
 
+#include "extra_algorithms.h"
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"
 #include "loader_logger.hpp"
@@ -53,9 +54,7 @@ std::string XrLoaderLogObjectInfo::ToString() const {
 void ObjectInfoCollection::AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name) {
     // If name is empty, we should erase it
     if (object_name.empty()) {
-        auto new_end = std::remove_if(_object_info.begin(), _object_info.end(),
-                                      [=](XrLoaderLogObjectInfo const& info) { return info.handle == object_handle; });
-        _object_info.erase(new_end);
+        vector_remove_if_and_erase(_object_info, [=](XrLoaderLogObjectInfo const& info) { return info.handle == object_handle; });
         return;
     }
     // Otherwise, add it or update the name
@@ -205,11 +204,8 @@ LoaderLogger::LoaderLogger() {
 void LoaderLogger::AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder) { _recorders.push_back(std::move(recorder)); }
 
 void LoaderLogger::RemoveLogRecorder(uint64_t unique_id) {
-    auto e = _recorders.end();
-    auto new_end = std::remove_if(_recorders.begin(), e, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) {
-        return recorder->UniqueId() == unique_id;
-    });
-    _recorders.erase(new_end);
+    vector_remove_if_and_erase(
+        _recorders, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) { return recorder->UniqueId() == unique_id; });
 }
 
 bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
