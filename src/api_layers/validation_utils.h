@@ -23,6 +23,7 @@
 #define VALIDATION_UTILS_H_ 1
 
 #include "api_layer_platform_defines.h"
+#include "xr_utils.h"
 
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
@@ -32,20 +33,6 @@
 #include <string>
 #include <mutex>
 #include <memory>
-
-// Handle information for easy conversion
-#if (defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__)) || defined(_M_X64) || defined(__ia64) || \
-     defined(_M_IA64) || defined(__aarch64__) || defined(__powerpc64__))
-#define XR_VALIDATION_GENERIC_HANDLE_TYPE uint64_t
-#define CONVERT_HANDLE_TO_GENERIC(handle) reinterpret_cast<uint64_t>(handle)
-#define CONVERT_GENERIC_TO_HANDLE(type, handle) reinterpret_cast<type>(handle)
-#define CHECK_FOR_NULL_HANDLE(handle) (XR_NULL_HANDLE == reinterpret_cast<void *>(handle))
-#else
-#define XR_VALIDATION_GENERIC_HANDLE_TYPE uint64_t
-#define CONVERT_HANDLE_TO_GENERIC(handle) (handle)
-#define CONVERT_GENERIC_TO_HANDLE(type, handle) (handle)
-#define CHECK_FOR_NULL_HANDLE(handle) (XR_NULL_HANDLE == handle)
-#endif
 
 /// Prints a message to stderr then throws an exception.
 ///
@@ -98,7 +85,7 @@ struct GenValidUsageXrInstanceInfo {
 struct GenValidUsageXrHandleInfo {
     GenValidUsageXrInstanceInfo *instance_info;
     XrObjectType direct_parent_type;
-    XR_VALIDATION_GENERIC_HANDLE_TYPE direct_parent_handle;
+    uint64_t direct_parent_handle;
 };
 
 // Structure used for storing session label information
@@ -123,11 +110,11 @@ extern void CoreValidationDeleteSessionLabels(XrSession session);
 
 // Object information used for logging.
 struct GenValidUsageXrObjectInfo {
-    XR_VALIDATION_GENERIC_HANDLE_TYPE handle;
+    uint64_t handle;
     XrObjectType type;
     GenValidUsageXrObjectInfo() = default;
     template <typename T>
-    GenValidUsageXrObjectInfo(T h, XrObjectType t) : handle(CONVERT_HANDLE_TO_GENERIC(h)), type(t) {}
+    GenValidUsageXrObjectInfo(T h, XrObjectType t) : handle(MakeHandleGeneric(h)), type(t) {}
 };
 
 // Debug message severity levels for logging.
@@ -222,6 +209,16 @@ inline void map_erase_if(T &container, Pred &&predicate) {
         }
     }
 }
+
+/// Function to record all the core validation information
+void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::string &message_id,
+                         GenValidUsageDebugSeverity message_severity, const std::string &command_name,
+                         std::vector<GenValidUsageXrObjectInfo> objects_info, const std::string &message);
+
+void InvalidStructureType(GenValidUsageXrInstanceInfo *instance_info, const std::string &command_name,
+                          std::vector<GenValidUsageXrObjectInfo> &objects_info, const char *structure_name, XrStructureType type,
+                          const char *vuid = nullptr, XrStructureType expected = XrStructureType(0),
+                          const char *expected_name = "");
 
 // -- Only implementations of templates follow --//
 

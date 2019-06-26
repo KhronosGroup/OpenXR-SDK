@@ -33,6 +33,7 @@
 #include "loader_interfaces.h"
 #include "platform_utils.hpp"
 #include "xr_generated_dispatch_table.h"
+#include "xr_utils.h"
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LAYER_EXPORT __attribute__((visibility("default")))
@@ -245,7 +246,7 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                     obj_name_info.objectHandle = objects_info[obj].handle;
                     // If there's a session in the list, see if it has labels
                     if (XR_OBJECT_TYPE_SESSION == objects_info[obj].type) {
-                        XrSession session = reinterpret_cast<XrSession &>(objects_info[obj].handle);
+                        XrSession session = TreatIntegerAsHandle<XrSession>(objects_info[obj].handle);
                         auto session_label_iterator = g_xr_session_labels.find(session);
                         if (session_label_iterator != g_xr_session_labels.end()) {
                             auto rev_iter = session_label_iterator->second->rbegin();
@@ -311,9 +312,8 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                     for (auto object_info : objects_info) {
                         std::string object_type = GenValidUsageXrObjectTypeToString(object_info.type);
                         std::ostringstream oss_object_handle;
-                        oss_object_handle << std::hex << reinterpret_cast<const void *>(object_info.handle);
-                        std::cout << "   [" << std::to_string(count++) << "] - " << object_type << " (" << oss_object_handle.str()
-                                  << ")";
+                        std::cout << "   [" << std::to_string(count++) << "] - " << object_type << " ("
+                                  << Uint64ToHexString(object_info.handle) << ")";
                         std::cout << std::endl;
                     }
                 }
@@ -337,10 +337,8 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                     uint32_t count = 0;
                     for (auto object_info : objects_info) {
                         std::string object_type = GenValidUsageXrObjectTypeToString(object_info.type);
-                        std::ostringstream oss_object_handle;
-                        oss_object_handle << std::hex << reinterpret_cast<const void *>(object_info.handle);
-                        text_file << "   [" << std::to_string(count++) << "] - " << object_type << " (" << oss_object_handle.str()
-                                  << ")";
+                        text_file << "   [" << std::to_string(count++) << "] - " << object_type << " ("
+                                  << Uint64ToHexString(object_info.handle) << ")";
                         text_file << std::endl;
                     }
                 }
@@ -395,17 +393,10 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                     uint32_t count = 0;
                     for (auto object_info : objects_info) {
                         std::string object_type = GenValidUsageXrObjectTypeToString(object_info.type);
-                        std::ostringstream oss_object_handle;
-                        oss_object_handle << std::hex << reinterpret_cast<const void *>(object_info.handle);
                         text_file << "         <div class='data'>\n";
                         text_file << "             <div class='var'>[" << count++ << "]</div>\n";
                         text_file << "             <div class='type'>" << object_type << "</div>\n";
-                        if (oss_object_handle.str() == "0") {
-                            // For some reason, nullptr never has 0x prefix added
-                            text_file << "             <div class='val'>0x" << oss_object_handle.str() << "</div>\n";
-                        } else {
-                            text_file << "             <div class='val'>" << oss_object_handle.str() << "</div>\n";
-                        }
+                        text_file << "             <div class='val'>" << Uint64ToHexString(object_info.handle) << "</div>\n";
                         text_file << "         </div>\n";
                     }
                     text_file << "      </details>\n";
@@ -438,6 +429,24 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
 void reportInternalError(std::string const &message) {
     std::cerr << "INTERNAL VALIDATION LAYER ERROR: " << message << std::endl;
     throw std::runtime_error("Internal validation layer error: " + message);
+}
+
+void InvalidStructureType(GenValidUsageXrInstanceInfo *instance_info, const std::string &command_name,
+                          std::vector<GenValidUsageXrObjectInfo> &objects_info, const char *structure_name, XrStructureType type,
+                          const char *vuid, XrStructureType expected, const char *expected_name) {
+    std::ostringstream oss_type;
+    oss_type << structure_name << " has an invalid XrStructureType ";
+    oss_type << Uint32ToHexString(static_cast<uint32_t>(type));
+    if (expected != 0) {
+        oss_type << ", expected " << Uint32ToHexString(static_cast<uint32_t>(type));
+        oss_type << " (" << expected_name << ")";
+    }
+    if (vuid != nullptr) {
+        CoreValidLogMessage(instance_info, vuid, VALID_USAGE_DEBUG_SEVERITY_ERROR, command_name, objects_info, oss_type.str());
+    } else {
+        CoreValidLogMessage(instance_info, "VUID-" + std::string(structure_name) + "-type-type", VALID_USAGE_DEBUG_SEVERITY_ERROR,
+                            command_name, objects_info, oss_type.str());
+    }
 }
 
 // NOTE: Can't validate the following VUIDs since the command never enters a layer:

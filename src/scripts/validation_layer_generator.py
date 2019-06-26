@@ -405,9 +405,9 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             if handle.protect_value:
                 validation_internal_protos += '#endif // %s\n' % handle.protect_string
         validation_internal_protos += '\n// Write out prototypes for handle parent verification functions\n'
-        validation_internal_protos += 'bool VerifyXrParent(XrObjectType handle1_type, const XR_VALIDATION_GENERIC_HANDLE_TYPE handle1,\n'
-        validation_internal_protos += '                               XrObjectType handle2_type, const XR_VALIDATION_GENERIC_HANDLE_TYPE handle2,\n'
-        validation_internal_protos += '                               bool check_this);\n'
+        validation_internal_protos += 'bool VerifyXrParent(XrObjectType handle1_type, const uint64_t handle1,\n'
+        validation_internal_protos += '                    XrObjectType handle2_type, const uint64_t handle2,\n'
+        validation_internal_protos += '                    bool check_this);\n'
         validation_internal_protos += '\n// Function to check if an extension has been enabled\n'
         validation_internal_protos += 'bool ExtensionEnabled(std::vector<std::string> &extensions, const char* const check_extension_name);\n'
         validation_internal_protos += '\n// Functions to validate structures\n'
@@ -850,8 +850,8 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
     #   self            the ValidationSourceOutputGenerator object
     def writeValidateHandleParent(self):
         verify_parent = '// Implementation function to get parent handle information\n'
-        verify_parent += 'bool GetXrParent(const XrObjectType inhandle_type, const XR_VALIDATION_GENERIC_HANDLE_TYPE inhandle,\n'
-        verify_parent += '                            XrObjectType& outhandle_type, XR_VALIDATION_GENERIC_HANDLE_TYPE& outhandle) {\n'
+        verify_parent += 'bool GetXrParent(const XrObjectType inhandle_type, const uint64_t inhandle,\n'
+        verify_parent += '                 XrObjectType& outhandle_type, uint64_t& outhandle) {\n'
         indent = 1
         for handle in self.api_handles:
             if handle.name == 'XrInstance':
@@ -862,7 +862,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 verify_parent += self.writeIndent(indent)
                 verify_parent += '}\n'
             else:
-                handle_info = '%s.get(CONVERT_GENERIC_TO_HANDLE(%s, inhandle))' % (self.makeInfoName(handle), handle.name)
+                handle_info = '%s.get(TreatIntegerAsHandle<%s>(inhandle))' % (self.makeInfoName(handle), handle.name)
 
                 verify_parent += self.writeIndent(indent)
                 verify_parent += 'if (inhandle_type == %s) {\n' % self.genXrObjectType(
@@ -884,12 +884,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         verify_parent += '    return false;\n'
         verify_parent += '}\n\n'
         verify_parent += '// Implementation of VerifyXrParent function\n'
-        verify_parent += 'bool VerifyXrParent(XrObjectType handle1_type, const XR_VALIDATION_GENERIC_HANDLE_TYPE handle1,\n'
-        verify_parent += '                               XrObjectType handle2_type, const XR_VALIDATION_GENERIC_HANDLE_TYPE handle2,\n'
-        verify_parent += '                               bool check_this) {\n'
+        verify_parent += 'bool VerifyXrParent(XrObjectType handle1_type, const uint64_t handle1,\n'
+        verify_parent += '                    XrObjectType handle2_type, const uint64_t handle2,\n'
+        verify_parent += '                    bool check_this) {\n'
         indent = 1
         verify_parent += self.writeIndent(indent)
-        verify_parent += 'if (CHECK_FOR_NULL_HANDLE(handle1) || CHECK_FOR_NULL_HANDLE(handle2)) {\n'
+        verify_parent += 'if (IsIntegerNullHandle(handle1) || IsIntegerNullHandle(handle2)) {\n'
         verify_parent += self.writeIndent(indent + 1)
         verify_parent += 'return false;\n'
         verify_parent += self.writeIndent(indent)
@@ -904,7 +904,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         verify_parent += self.writeIndent(indent)
         verify_parent += 'XrObjectType parent_type;\n'
         verify_parent += self.writeIndent(indent)
-        verify_parent += 'XR_VALIDATION_GENERIC_HANDLE_TYPE parent_handle;\n'
+        verify_parent += 'uint64_t parent_handle;\n'
         verify_parent += self.writeIndent(indent)
         verify_parent += 'if (!GetXrParent(handle2_type, handle2, parent_type, parent_handle)) {\n'
         verify_parent += self.writeIndent(indent + 1)
@@ -920,7 +920,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         verify_parent += self.writeIndent(indent)
         verify_parent += 'XrObjectType parent_type;\n'
         verify_parent += self.writeIndent(indent)
-        verify_parent += 'XR_VALIDATION_GENERIC_HANDLE_TYPE parent_handle;\n'
+        verify_parent += 'uint64_t parent_handle;\n'
         verify_parent += self.writeIndent(indent)
         verify_parent += 'if (!GetXrParent(handle1_type, handle1, parent_type, parent_handle)) {\n'
         verify_parent += self.writeIndent(indent + 1)
@@ -936,12 +936,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         verify_parent += self.writeIndent(indent)
         verify_parent += 'XrObjectType parent1_type;\n'
         verify_parent += self.writeIndent(indent)
-        verify_parent += 'XR_VALIDATION_GENERIC_HANDLE_TYPE parent1_handle;\n'
+        verify_parent += 'uint64_t parent1_handle;\n'
         verify_parent += self.writeIndent(indent)
         verify_parent += self.writeIndent(indent)
         verify_parent += 'XrObjectType parent2_type;\n'
         verify_parent += self.writeIndent(indent)
-        verify_parent += 'XR_VALIDATION_GENERIC_HANDLE_TYPE parent2_handle;\n'
+        verify_parent += 'uint64_t parent2_handle;\n'
         verify_parent += self.writeIndent(indent)
         verify_parent += 'if (!GetXrParent(handle1_type, handle1, parent1_type, parent1_handle)) {\n'
         verify_parent += self.writeIndent(indent + 1)
@@ -1179,14 +1179,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         inline_enum_str += self.writeIndent(int_indent)
         inline_enum_str += 'std::ostringstream oss_enum;\n'
         inline_enum_str += self.writeIndent(int_indent)
-        inline_enum_str += 'oss_enum << std::hex << static_cast<int32_t>(%s%s);\n' % (pointer_string,
-                                                                                      full_param_name)
+        inline_enum_str += 'oss_enum << "%s %s \\"%s\\" enum value ";\n' % (error_prefix,
+                                                                            param_type,
+                                                                            param_name)
         inline_enum_str += self.writeIndent(int_indent)
-        inline_enum_str += 'std::string error_str = "%s %s \\"%s\\" enum value 0x";\n' % (error_prefix,
-                                                                                          param_type,
-                                                                                          param_name)
-        inline_enum_str += self.writeIndent(int_indent)
-        inline_enum_str += 'error_str += oss_enum.str();\n'
+        inline_enum_str += 'oss_enum << Uint32ToHexString(static_cast<uint32_t>(%s%s));\n' % (pointer_string,
+                                                                                              full_param_name)
         inline_enum_str += self.writeIndent(int_indent)
         inline_enum_str += 'CoreValidLogMessage(%s, "VUID-%s-%s-parameter",\n' % (instance_info_string,
                                                                                   cmd_struct_name,
@@ -1194,7 +1192,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         inline_enum_str += self.writeIndent(int_indent)
         inline_enum_str += '                    VALID_USAGE_DEBUG_SEVERITY_ERROR, %s,\n' % cmd_name_param
         inline_enum_str += self.writeIndent(int_indent)
-        inline_enum_str += '                    objects_info, error_str);\n'
+        inline_enum_str += '                    objects_info, oss_enum.str());\n'
         inline_enum_str += self.writeIndent(int_indent)
         inline_enum_str += 'return XR_ERROR_VALIDATION_FAILURE;\n'
         int_indent = int_indent - 1
@@ -1273,16 +1271,14 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             inline_flag_str += self.writeIndent(int_indent)
             inline_flag_str += 'std::ostringstream oss_enum;\n'
             inline_flag_str += self.writeIndent(int_indent)
-            inline_flag_str += 'oss_enum << std::hex << static_cast<int32_t>(%s%s);\n' % (pointer_string,
-                                                                                          full_param_name)
+            inline_flag_str += 'oss_enum << "%s %s \\"%s\\" flag value ";\n' % (error_prefix,
+                                                                                param_type,
+                                                                                param_name)
             inline_flag_str += self.writeIndent(int_indent)
-            inline_flag_str += 'std::string error_str = "%s %s \\"%s\\" flag value 0x";\n' % (error_prefix,
-                                                                                              param_type,
-                                                                                              param_name)
+            inline_flag_str += 'oss_enum << Uint32ToHexString(static_cast<uint32_t>(%s%s));\n' % (pointer_string,
+                                                                                                  full_param_name)
             inline_flag_str += self.writeIndent(int_indent)
-            inline_flag_str += 'error_str += oss_enum.str();\n'
-            inline_flag_str += self.writeIndent(int_indent)
-            inline_flag_str += 'error_str += " contains illegal bit";\n'
+            inline_flag_str += 'oss_enum <<" contains illegal bit";\n'
             inline_flag_str += self.writeIndent(int_indent)
             inline_flag_str += 'CoreValidLogMessage(%s, "VUID-%s-%s-parameter",\n' % (instance_info_string,
                                                                                       cmd_struct_name,
@@ -1290,7 +1286,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             inline_flag_str += self.writeIndent(int_indent)
             inline_flag_str += '                    VALID_USAGE_DEBUG_SEVERITY_ERROR, %s,\n' % cmd_name_param
             inline_flag_str += self.writeIndent(int_indent)
-            inline_flag_str += '                    objects_info, error_str);\n'
+            inline_flag_str += '                    objects_info, oss_enum.str());\n'
             inline_flag_str += self.writeIndent(int_indent)
             inline_flag_str += 'return XR_ERROR_VALIDATION_FAILURE;\n'
             int_indent = int_indent - 1
@@ -1376,10 +1372,10 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             inline_validate_handle += self.writeIndent(indent)
             inline_validate_handle += 'std::ostringstream oss;\n'
             inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += 'oss << "Invalid %s handle \\"%s\\" 0x";\n' % (member_param.type,
-                                                                                                      member_param.name)
+            inline_validate_handle += 'oss << "Invalid %s handle \\"%s\\" ";\n' % (member_param.type,
+                                                                                   member_param.name)
             inline_validate_handle += self.writeIndent(indent)
-            inline_validate_handle += 'oss << std::hex << reinterpret_cast<const void*>(%s);\n' % mem_par_desc_name
+            inline_validate_handle += 'oss << HandleToHexString(%s);\n' % mem_par_desc_name
             inline_validate_handle += self.writeIndent(indent)
             inline_validate_handle += 'CoreValidLogMessage(%s, "VUID-%s-%s-parameter",\n' % (instance_info_name,
                                                                                              vuid_name,
@@ -1940,21 +1936,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     struct_check += '}\n'
                     if child_struct.protect_value:
                         struct_check += '#endif // %s\n' % child_struct.protect_string
+                
                 struct_check += self.writeIndent(indent)
-                struct_check += 'std::ostringstream oss_type;\n'
+                struct_check += 'InvalidStructureType(instance_info, command_name, objects_info, "%s",\n' % xr_struct.name
                 struct_check += self.writeIndent(indent)
-                struct_check += 'oss_type << std::hex << value->type;\n'
-                struct_check += self.writeIndent(indent)
-                struct_check += 'std::string error_str = "%s has an invalid XrStructureType 0x";\n' % xr_struct.name
-                struct_check += self.writeIndent(indent)
-                struct_check += 'error_str += oss_type.str();\n'
-                struct_check += self.writeIndent(indent)
-                struct_check += 'CoreValidLogMessage(instance_info, "VUID-%s-type-type",\n' % (
-                    xr_struct.name)
-                struct_check += self.writeIndent(indent)
-                struct_check += '                    VALID_USAGE_DEBUG_SEVERITY_ERROR, command_name,\n'
-                struct_check += self.writeIndent(indent)
-                struct_check += '                    objects_info, error_str);\n'
+                struct_check += '                     value->type, "VUID-%s-type-type");\n' % xr_struct.name
                 struct_check += self.writeIndent(indent)
                 struct_check += 'return XR_ERROR_VALIDATION_FAILURE;\n'
                 struct_check += '}\n\n'
@@ -1977,24 +1963,12 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     struct_check += 'if (value->type != %s) {\n' % self.genXrStructureType(
                         xr_struct.name)
                     indent = indent + 1
+                    expected = self.genXrStructureType(xr_struct.name)
                     struct_check += self.writeIndent(indent)
-                    struct_check += 'std::ostringstream oss_type;\n'
+                    struct_check += 'InvalidStructureType(instance_info, command_name, objects_info, "%s",\n' % xr_struct.name
                     struct_check += self.writeIndent(indent)
-                    struct_check += 'oss_type << std::hex << value->type;\n'
-                    struct_check += self.writeIndent(indent)
-                    struct_check += 'std::string error_str = "%s has an invalid XrStructureType 0x";\n' % xr_struct.name
-                    struct_check += self.writeIndent(indent)
-                    struct_check += 'error_str += oss_type.str();\n'
-                    struct_check += self.writeIndent(indent)
-                    struct_check += 'error_str += ", expected %s";\n' % self.genXrStructureType(
-                        xr_struct.name)
-                    struct_check += self.writeIndent(indent)
-                    struct_check += 'CoreValidLogMessage(instance_info, "VUID-%s-%s-type",\n' % (
-                        xr_struct.name, member.name)
-                    struct_check += self.writeIndent(indent)
-                    struct_check += '                    VALID_USAGE_DEBUG_SEVERITY_ERROR, command_name,\n'
-                    struct_check += self.writeIndent(indent)
-                    struct_check += '                    objects_info, error_str);\n'
+                    struct_check += '                     value->type, "VUID-%s-type-type", %s, "%s");\n' % (
+                        xr_struct.name, expected, expected)
                     struct_check += self.writeIndent(indent)
                     struct_check += 'xr_result = XR_ERROR_VALIDATION_FAILURE;\n'
                     indent = indent - 1
@@ -2101,11 +2075,11 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
             parent_check_string += self.writeIndent(indent)
             parent_check_string += '// it is not XR_NULL_HANDLE\n'
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'if (!CHECK_FOR_NULL_HANDLE(%s) && !VerifyXrParent(%s, CONVERT_HANDLE_TO_GENERIC(%s),\n' % (
+            parent_check_string += 'if (!IsIntegerNullHandle(%s) && !VerifyXrParent(%s, MakeHandleGeneric(%s),\n' % (
                 cur_handle_desc_name,
                 self.genXrObjectType(first_handle_mem_param.type),
                 first_handle_desc_name)
-            parent_check_string += '                                                                                  %s,  CONVERT_HANDLE_TO_GENERIC(%s%s), %s)) {\n' % (
+            parent_check_string += '                                                                                  %s,  MakeHandleGeneric(%s%s), %s)) {\n' % (
                 self.genXrObjectType(cur_handle_mem_param.type),
                 pointer_deref,
                 cur_handle_desc_name,
@@ -2113,41 +2087,33 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         else:
             parent_check_string += '// Verify that the handles share a common ancestry\n'
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'if (!VerifyXrParent(%s,  CONVERT_HANDLE_TO_GENERIC(%s),\n' % (
+            parent_check_string += 'if (!VerifyXrParent(%s,  MakeHandleGeneric(%s),\n' % (
                 self.genXrObjectType(first_handle_mem_param.type), first_handle_desc_name)
-            parent_check_string += '                             %s,  CONVERT_HANDLE_TO_GENERIC(%s%s), %s)) {\n' % (
+            parent_check_string += '                    %s,  MakeHandleGeneric(%s%s), %s)) {\n' % (
                 self.genXrObjectType(cur_handle_mem_param.type), pointer_deref, cur_handle_desc_name, compare_flag)
         indent = indent + 1
         parent_check_string += self.writeIndent(indent)
-        parent_check_string += 'std::ostringstream oss_handle_1;\n'
+        parent_check_string += 'std::ostringstream oss_error;\n'
         parent_check_string += self.writeIndent(indent)
-        parent_check_string += 'oss_handle_1 << std::hex << reinterpret_cast<const void*>(%s);\n' % first_handle_desc_name
-        parent_check_string += self.writeIndent(indent)
-        parent_check_string += 'std::ostringstream oss_handle_2;\n'
-        parent_check_string += self.writeIndent(indent)
-        parent_check_string += 'oss_handle_2 << std::hex << reinterpret_cast<const void*>(%s%s);\n' % (
-            pointer_deref, cur_handle_desc_name)
-        parent_check_string += self.writeIndent(indent)
-        parent_check_string += 'std::string error_str = "%s ";\n' % first_handle_mem_param.type
-        parent_check_string += self.writeIndent(indent)
-        parent_check_string += 'error_str += oss_handle_1.str();\n'
+        parent_check_string += 'oss_error << "%s " << HandleToHexString(%s);\n' % (
+            first_handle_mem_param.type, first_handle_desc_name)
         if first_handle_tuple.name == cur_handle_tuple.parent:
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += " must be a parent to %s ";\n' % cur_handle_mem_param.type
+            parent_check_string += 'oss_error << " must be a parent to %s ";\n' % cur_handle_mem_param.type
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += oss_handle_2.str();\n'
+            parent_check_string += 'oss_error << HandleToHexString(%s);\n' % cur_handle_desc_name
         elif cur_handle_tuple.name == first_handle_tuple.parent:
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += " must be a child of %s ";\n' % cur_handle_mem_param.type
+            parent_check_string += 'oss_error << " must be a child of %s ";\n' % cur_handle_mem_param.type
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += oss_handle_2.str();\n'
+            parent_check_string += 'oss_error << HandleToHexString(%s);\n' % cur_handle_desc_name
         else:
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += " and %s ";\n' % cur_handle_mem_param.type
+            parent_check_string += 'oss_error <<  " and %s ";\n' % cur_handle_mem_param.type
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += oss_handle_2.str();\n'
+            parent_check_string += 'oss_error << HandleToHexString(%s);\n' % cur_handle_desc_name
             parent_check_string += self.writeIndent(indent)
-            parent_check_string += 'error_str += " must share a parent";\n'
+            parent_check_string += 'oss_error <<  " must share a parent";\n'
         parent_check_string += self.writeIndent(indent)
         parent_check_string += 'CoreValidLogMessage(%s, "VUID-%s-%s",\n' % (instance_info_string,
                                                                             vuid_name,
@@ -2155,7 +2121,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         parent_check_string += self.writeIndent(indent)
         parent_check_string += '                    VALID_USAGE_DEBUG_SEVERITY_ERROR, %s,\n' % cmd_name_param
         parent_check_string += self.writeIndent(indent)
-        parent_check_string += '                    objects_info, error_str);\n'
+        parent_check_string += '                    objects_info, oss_error.str());\n'
         parent_check_string += self.writeIndent(indent)
         parent_check_string += 'return XR_ERROR_VALIDATION_FAILURE;\n'
         indent = indent - 1
@@ -2498,7 +2464,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 next_validate_func += '            handle_info->instance_info = gen_instance_info;\n'
                 next_validate_func += '            handle_info->direct_parent_type = %s;\n' % self.genXrObjectType(
                     first_param.type)
-                next_validate_func += '            handle_info->direct_parent_handle = CONVERT_HANDLE_TO_GENERIC(%s);\n' % first_param.name
+                next_validate_func += '            handle_info->direct_parent_handle = MakeHandleGeneric(%s);\n' % first_param.name
                 next_validate_func += '            %s.insert(*%s, std::move(handle_info));\n' % (self.makeInfoName(last_handle_tuple), last_handle_name)
 
                 # If this object contains a state that needs tracking, allocate it
@@ -2752,7 +2718,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         validation_source_funcs += '            // Make sure the instance is valid if it is not XR_NULL_HANDLE\n'
         validation_source_funcs += '            std::vector<GenValidUsageXrObjectInfo> objects;\n'
         validation_source_funcs += '            objects.resize(1);\n'
-        validation_source_funcs += '            objects[0].handle = CONVERT_HANDLE_TO_GENERIC(instance);\n'
+        validation_source_funcs += '            objects[0].handle = MakeHandleGeneric(instance);\n'
         validation_source_funcs += '            objects[0].type = XR_OBJECT_TYPE_INSTANCE;\n'
         validation_source_funcs += '            CoreValidLogMessage(nullptr, "VUID-xrGetInstanceProcAddr-instance-parameter",\n'
         validation_source_funcs += '                                VALID_USAGE_DEBUG_SEVERITY_ERROR, "xrGetInstanceProcAddr", objects,\n'
