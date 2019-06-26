@@ -679,34 +679,34 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
 // ---- XR_EXT_debug_utils extension commands
 XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const XrDebugUtilsObjectNameInfoEXT *nameInfo) {
     try {
-        if (!GenValidUsageInputsXrSetDebugUtilsObjectNameEXT(instance, nameInfo)) {
-            return XR_ERROR_VALIDATION_FAILURE;
+        XrResult result = GenValidUsageInputsXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
-        XrResult result = GenValidUsageNextXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
-        if (XR_SUCCESS == result) {
-            auto info_with_lock = g_instance_info.getWithLock(instance);
-            GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
-            if (nullptr != gen_instance_info) {
-                // Create a copy of the base object name info (no next items)
-                char *name_string = new char[strlen(nameInfo->objectName) + 1];
-                strcpy(name_string, nameInfo->objectName);
-                bool found = false;
-                for (uint32_t name_index = 0; name_index < gen_instance_info->object_names.size(); ++name_index) {
-                    if (gen_instance_info->object_names[name_index]->objectHandle == nameInfo->objectHandle &&
-                        gen_instance_info->object_names[name_index]->objectType == nameInfo->objectType) {
-                        delete[] gen_instance_info->object_names[name_index]->objectName;
-                        gen_instance_info->object_names[name_index]->objectName = name_string;
-                        found = true;
-                        break;
-                    }
+        result = GenValidUsageNextXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
+        }
+        auto info_with_lock = g_instance_info.getWithLock(instance);
+        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
+        if (nullptr != gen_instance_info) {
+            // Create a copy of the base object name info (no next items)
+            char *name_string = new char[strlen(nameInfo->objectName) + 1];
+            strcpy(name_string, nameInfo->objectName);
+            bool found = false;
+            for (auto &object_name : gen_instance_info->object_names) {
+                if (object_name->objectHandle == nameInfo->objectHandle && object_name->objectType == nameInfo->objectType) {
+                    delete[] object_name->objectName;
+                    object_name->objectName = name_string;
+                    found = true;
+                    break;
                 }
-                if (!found) {
-                    UniqueXrDebugUtilsObjectNameInfoEXT new_object_name(new XrDebugUtilsObjectNameInfoEXT);
-                    *new_object_name = *nameInfo;
-                    new_object_name->next = nullptr;
-                    new_object_name->objectName = name_string;
-                    gen_instance_info->object_names.push_back(std::move(new_object_name));
-                }
+            }
+            if (!found) {
+                UniqueXrDebugUtilsObjectNameInfoEXT new_object_name(new XrDebugUtilsObjectNameInfoEXT(*nameInfo));
+                new_object_name->next = nullptr;
+                new_object_name->objectName = name_string;
+                gen_instance_info->object_names.push_back(std::move(new_object_name));
             }
         }
         return result;
@@ -717,48 +717,50 @@ XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const X
 
 XrResult CoreValidationXrCreateDebugUtilsMessengerEXT(XrInstance instance, const XrDebugUtilsMessengerCreateInfoEXT *createInfo,
                                                       XrDebugUtilsMessengerEXT *messenger) {
-    XrResult result = XR_SUCCESS;
     try {
-        if (!GenValidUsageInputsXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger)) {
-            return XR_ERROR_VALIDATION_FAILURE;
+        XrResult result = GenValidUsageInputsXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
         result = GenValidUsageNextXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
-        if (XR_SUCCESS == result) {
-            auto info_with_lock = g_instance_info.getWithLock(instance);
-            GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
-            if (nullptr != gen_instance_info) {
-                XrDebugUtilsMessengerCreateInfoEXT *new_create_info = new XrDebugUtilsMessengerCreateInfoEXT;
-                *new_create_info = *createInfo;
-                new_create_info->next = nullptr;
-                UniqueCoreValidationMessengerInfo new_messenger_info(new CoreValidationMessengerInfo);
-                new_messenger_info->messenger = *messenger;
-                new_messenger_info->create_info = new_create_info;
-                gen_instance_info->debug_messengers.push_back(std::move(new_messenger_info));
-            }
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
+        auto info_with_lock = g_instance_info.getWithLock(instance);
+        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
+        if (nullptr != gen_instance_info) {
+            auto *new_create_info = new XrDebugUtilsMessengerCreateInfoEXT(*createInfo);
+            new_create_info->next = nullptr;
+            UniqueCoreValidationMessengerInfo new_messenger_info(new CoreValidationMessengerInfo);
+            new_messenger_info->messenger = *messenger;
+            new_messenger_info->create_info = new_create_info;
+            gen_instance_info->debug_messengers.push_back(std::move(new_messenger_info));
+        }
+        return result;
     } catch (...) {
         return XR_ERROR_VALIDATION_FAILURE;
     }
-    return result;
 }
 
 XrResult CoreValidationXrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMessengerEXT messenger) {
     try {
-        if (!GenValidUsageInputsXrDestroyDebugUtilsMessengerEXT(messenger)) {
-            return XR_ERROR_VALIDATION_FAILURE;
+        XrResult result = GenValidUsageInputsXrDestroyDebugUtilsMessengerEXT(messenger);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
-        XrResult result = GenValidUsageNextXrDestroyDebugUtilsMessengerEXT(messenger);
-        if (XR_NULL_HANDLE != messenger) {
-            auto info_with_lock = g_debugutilsmessengerext_info.getWithLock(messenger);
-            GenValidUsageXrHandleInfo *gen_handle_info = info_with_lock.second;
-            if (nullptr != gen_handle_info) {
-                auto &debug_messengers = gen_handle_info->instance_info->debug_messengers;
-                vector_remove_if_and_erase(
-                    debug_messengers, [=](UniqueCoreValidationMessengerInfo const &msg) { return msg->messenger == messenger; });
-
-            } else {
-                return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
-            }
+        result = GenValidUsageNextXrDestroyDebugUtilsMessengerEXT(messenger);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
+        }
+        if (XR_NULL_HANDLE == messenger) {
+            return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
+        }
+        auto info_with_lock = g_debugutilsmessengerext_info.getWithLock(messenger);
+        GenValidUsageXrHandleInfo *gen_handle_info = info_with_lock.second;
+        if (nullptr != gen_handle_info) {
+            auto &debug_messengers = gen_handle_info->instance_info->debug_messengers;
+            vector_remove_if_and_erase(debug_messengers,
+                                       [=](UniqueCoreValidationMessengerInfo const &msg) { return msg->messenger == messenger; });
         }
         return result;
     } catch (...) {
