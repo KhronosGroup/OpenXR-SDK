@@ -292,8 +292,8 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                     XrDebugUtilsMessengerCreateInfoEXT *messenger_create_info = validation_messenger_info->create_info;
                     // If a callback exists, and the message is of a type this callback cares about, call it.
                     if (nullptr != messenger_create_info->userCallback &&
-                        0 != (messenger_create_info->messageSeverities | debug_utils_severity) &&
-                        0 != (messenger_create_info->messageTypes | XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)) {
+                        0 != (messenger_create_info->messageSeverities & debug_utils_severity) &&
+                        0 != (messenger_create_info->messageTypes & XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)) {
                         XrBool32 ret_val = messenger_create_info->userCallback(debug_utils_severity,
                                                                                XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
                                                                                &callback_data, messenger_create_info->userData);
