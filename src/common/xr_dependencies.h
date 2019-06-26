@@ -27,13 +27,12 @@
 #if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM))
 // Enable desktop partition APIs, such as RegOpenKeyEx, LoadLibraryEx, PathFileExists etc.
 #undef WINAPI_PARTITION_DESKTOP
-#define WINAPI_PARTITION_DESKTOP 1  // Enable desktop partition apis, such as RegOpenKeyEx, LoadLibraryEx etc.
+#define WINAPI_PARTITION_DESKTOP 1
 #endif
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 
 #endif  // XR_USE_PLATFORM_WIN32
 

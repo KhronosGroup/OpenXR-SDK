@@ -376,6 +376,7 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
 
         const std::wstring full_registry_location_w = utf8_to_wide(full_registry_location);
         const std::wstring default_runtime_value_name_w = utf8_to_wide(default_runtime_value_name);
+
         // Use 64 bit regkey for 64bit application, and use 32 bit regkey in WOW for 32bit application.
         access_flags = KEY_QUERY_VALUE;
         LONG open_value = RegOpenKeyExW(HKEY_LOCAL_MACHINE, full_registry_location_w.c_str(), 0, access_flags, &hkey);

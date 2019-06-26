@@ -116,36 +116,45 @@ static inline int32_t xr_snprintf(char *result_buffer, size_t buffer_size, const
 
 static std::string DescribeError(uint32_t code, bool prefixErrorCode = true) {
     std::string str;
+
     if (prefixErrorCode) {
         char prefixBuffer[64];
         snprintf(prefixBuffer, sizeof(prefixBuffer), "0x%llx (%lld): ", (uint64_t)code, (int64_t)code);
         str = prefixBuffer;
     }
+
+    // Could use FORMAT_MESSAGE_FROM_HMODULE to specify an error source.
     WCHAR errorBufferW[1024]{};
     const DWORD errorBufferWCapacity = sizeof(errorBufferW) / sizeof(errorBufferW[0]);
     const DWORD length = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, (DWORD)code,
                                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), errorBufferW, errorBufferWCapacity, nullptr);
+
     if (length) {  // If errorBufferW contains what we are looking for...
         str += wide_to_utf8(errorBufferW);
     } else {
         str = "(unknown)";
     }
+
     return str;
 }
+
 // Dynamic Loading:
 typedef HMODULE LoaderPlatformLibraryHandle;
 static LoaderPlatformLibraryHandle LoaderPlatformLibraryOpen(const std::string &path) {
     const std::wstring pathW = utf8_to_wide(path);
+
     // Try loading the library the original way first.
     LoaderPlatformLibraryHandle handle = LoadLibraryW(pathW.c_str());
+
     if (handle == NULL && GetLastError() == ERROR_MOD_NOT_FOUND) {
         const DWORD dwAttrib = GetFileAttributesW(pathW.c_str());
         const bool fileExists = (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
         if (fileExists) {
-        // If that failed, then try loading it with broader search folders.
+            // If that failed, then try loading it with broader search folders.
             handle = LoadLibraryExW(pathW.c_str(), NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR);
         }
     }
+
     return handle;
 }
 
