@@ -753,13 +753,10 @@ XrResult CoreValidationXrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMessengerEXT 
             auto info_with_lock = g_debugutilsmessengerext_info.getWithLock(messenger);
             GenValidUsageXrHandleInfo *gen_handle_info = info_with_lock.second;
             if (nullptr != gen_handle_info) {
-                GenValidUsageXrInstanceInfo *gen_instance_info = gen_handle_info->instance_info;
-                for (uint32_t msg_index = 0; msg_index < gen_instance_info->debug_messengers.size(); ++msg_index) {
-                    if (gen_instance_info->debug_messengers[msg_index]->messenger == messenger) {
-                        gen_instance_info->debug_messengers.erase(gen_instance_info->debug_messengers.begin() + msg_index);
-                        break;
-                    }
-                }
+                auto &debug_messengers = gen_handle_info->instance_info->debug_messengers;
+                vector_remove_if_and_erase(
+                    debug_messengers, [=](UniqueCoreValidationMessengerInfo const &msg) { return msg->messenger == messenger; });
+
             } else {
                 return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
             }
