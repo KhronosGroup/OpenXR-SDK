@@ -691,8 +691,9 @@ XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const X
         GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
         if (nullptr != gen_instance_info) {
             // Create a copy of the base object name info (no next items)
-            char *name_string = new char[strlen(nameInfo->objectName) + 1];
-            strcpy(name_string, nameInfo->objectName);
+            auto len = strlen(nameInfo->objectName);
+            char *name_string = new char[len + 1];
+            strncpy(name_string, nameInfo->objectName, len);
             bool found = false;
             for (auto &object_name : gen_instance_info->object_names) {
                 if (object_name->objectHandle == nameInfo->objectHandle && object_name->objectType == nameInfo->objectType) {
