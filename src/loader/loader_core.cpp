@@ -558,6 +558,8 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(XrDebug
         LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Entering loader terminator");
         const auto *dispatch_table = RuntimeInterface::GetDebugUtilsMessengerDispatchTable(messenger);
         XrResult result = XR_SUCCESS;
+        LoaderLogger::GetInstance().RemoveLogRecorder(MakeHandleGeneric(messenger));
+        RuntimeInterface::GetRuntime().ForgetDebugMessenger(messenger);
         // This extension is supported entirely by the loader which means the runtime may or may not support it.
         if (nullptr != dispatch_table->DestroyDebugUtilsMessengerEXT) {
             result = dispatch_table->DestroyDebugUtilsMessengerEXT(messenger);
@@ -566,8 +568,6 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(XrDebug
             delete (reinterpret_cast<char *>(MakeHandleGeneric(messenger)));
         }
         LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Completed loader terminator");
-        LoaderLogger::GetInstance().RemoveLogRecorder(MakeHandleGeneric(messenger));
-        RuntimeInterface::GetRuntime().ForgetDebugMessenger(messenger);
         return result;
     } catch (...) {
         LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT",
