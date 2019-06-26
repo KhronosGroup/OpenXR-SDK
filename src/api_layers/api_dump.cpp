@@ -17,6 +17,8 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
+#define XR_UTILS_INCLUDE_IMPLEMENTATION
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -31,6 +33,7 @@
 #include "xr_generated_dispatch_table.h"
 #include "loader_interfaces.h"
 #include "platform_utils.hpp"
+#include "xr_utils.h"
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LAYER_EXPORT __attribute__((visibility("default")))
@@ -460,9 +463,7 @@ XrResult ApiDumpLayerXrCreateApiLayerInstance(const XrInstanceCreateInfo *info, 
         // Generate output for this command as if it were the standard xrCreateInstance
         std::vector<std::tuple<std::string, std::string, std::string>> contents;
         contents.push_back(std::make_tuple("XrResult", "xrCreateInstance", ""));
-        std::ostringstream oss_info;
-        oss_info << std::hex << reinterpret_cast<const void *>(info);
-        contents.push_back(std::make_tuple("const XrInstanceCreateInfo*", "info", oss_info.str()));
+        contents.push_back(std::make_tuple("const XrInstanceCreateInfo*", "info", PointerToHexString(info)));
         if (nullptr != info) {
             std::string prefix = "info->";
             contents.push_back(std::make_tuple("XrStructureType", "info->type", std::to_string(info->type)));
@@ -527,11 +528,7 @@ XrResult ApiDumpLayerXrCreateApiLayerInstance(const XrInstanceCreateInfo *info, 
             }
         }
 
-        std::ostringstream oss_instance;
-        oss_instance << std::hex << reinterpret_cast<uintptr_t>(instance);
-        std::string hex_instance = "0x";
-        hex_instance += oss_instance.str();
-        contents.push_back(std::make_tuple("XrInstance*", "instance", hex_instance));
+        contents.push_back(std::make_tuple("XrInstance*", "instance", PointerToHexString(instance)));
         ApiDumpLayerRecordContent(contents);
 
         // Copy the contents of the layer info struct, but then move the next info up by
@@ -565,11 +562,7 @@ XrResult ApiDumpLayerXrDestroyInstance(XrInstance instance) {
     // Generate output for this command
     std::vector<std::tuple<std::string, std::string, std::string>> contents;
     contents.push_back(std::make_tuple("XrResult", "xrDestroyInstance", ""));
-    std::ostringstream oss_instance;
-    oss_instance << std::hex << reinterpret_cast<const void *>(instance);
-    std::string hex_instance = "0x";
-    hex_instance += oss_instance.str();
-    contents.push_back(std::make_tuple("XrInstance", "instance", hex_instance));
+    contents.push_back(std::make_tuple("XrInstance", "instance", HandleToHexString(instance)));
     ApiDumpLayerRecordContent(contents);
 
     std::unique_lock<std::mutex> mlock(g_instance_dispatch_mutex);

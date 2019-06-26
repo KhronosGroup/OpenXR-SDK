@@ -119,6 +119,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include <iomanip>\n'
             preamble += '#include <unordered_map>\n\n'
             preamble += '#include "xr_generated_api_dump.hpp"\n'
+            preamble += '#include "xr_utils.h"\n'
         write(preamble, file=self.outFile)
 
     # Write out all the information for the appropriate file,
@@ -928,11 +929,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             struct_union_check += self.writeIndent(1)
             struct_union_check += 'try {\n'
             struct_union_check += self.writeIndent(2)
-            struct_union_check += 'std::ostringstream oss_union;\n'
-            struct_union_check += self.writeIndent(2)
-            struct_union_check += 'oss_union << std::hex << reinterpret_cast<const void*>(value);\n'
-            struct_union_check += self.writeIndent(2)
-            struct_union_check += 'contents.push_back(std::make_tuple(type_string, prefix, oss_union.str()));\n'
+            struct_union_check += 'contents.push_back(std::make_tuple(type_string, prefix, PointerToHexString(value)));\n'
             struct_union_check += self.writeIndent(2)
             struct_union_check += 'if (is_pointer) {\n'
             struct_union_check += self.writeIndent(3)
@@ -995,11 +992,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 struct_union_check += self.writeIndent(indent)
                 struct_union_check += '// Fallback path - Just output generic information about the base struct\n'
             struct_union_check += self.writeIndent(indent)
-            struct_union_check += 'std::ostringstream oss_struct;\n'
-            struct_union_check += self.writeIndent(indent)
-            struct_union_check += 'oss_struct << std::hex << reinterpret_cast<const void*>(value);\n'
-            struct_union_check += self.writeIndent(indent)
-            struct_union_check += 'contents.push_back(std::make_tuple(type_string, prefix, oss_struct.str()));\n'
+            struct_union_check += 'contents.push_back(std::make_tuple(type_string, prefix, PointerToHexString(value)));\n'
             struct_union_check += self.writeIndent(indent)
             struct_union_check += 'if (is_pointer) {\n'
             struct_union_check += self.writeIndent(indent + 1)
@@ -1028,9 +1021,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         struct_union_check += 'bool ApiDumpDecodeNextChain(XrGeneratedDispatchTable* gen_dispatch_table, const void* value, std::string prefix,\n'
         struct_union_check += '                            std::vector<std::tuple<std::string, std::string, std::string>> &contents) {\n'
         struct_union_check += '    try {\n'
-        struct_union_check += '        std::ostringstream oss_next;\n'
-        struct_union_check += '        oss_next << std::hex << reinterpret_cast<const void*>(value);\n'
-        struct_union_check += '        contents.push_back(std::make_tuple("const void *", prefix, oss_next.str()));\n'
+        struct_union_check += '        contents.push_back(std::make_tuple("const void *", prefix, PointerToHexString(value)));\n'
         struct_union_check += '        if (nullptr == value) {\n'
         struct_union_check += '            return true;\n'
         struct_union_check += '        }\n'
@@ -1241,13 +1232,9 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         generated_commands += '        // Generate output for this command\n'
         generated_commands += '        std::vector<std::tuple<std::string, std::string, std::string>> contents;\n'
         generated_commands += '        contents.push_back(std::make_tuple("XrResult", "xrGetInstanceProcAddr", ""));\n'
-        generated_commands += '        std::ostringstream oss_instance;\n'
-        generated_commands += '        oss_instance << std::hex << reinterpret_cast<const void*>(instance);\n'
-        generated_commands += '        contents.push_back(std::make_tuple("XrInstance", "instance", oss_instance.str()));\n'
+        generated_commands += '        contents.push_back(std::make_tuple("XrInstance", "instance", HandleToHexString(instance)));\n'
         generated_commands += '        contents.push_back(std::make_tuple("const char*", "name", name));\n'
-        generated_commands += '        std::ostringstream oss_function;\n'
-        generated_commands += '        oss_function << std::hex << reinterpret_cast<const void*>(function);\n'
-        generated_commands += '        contents.push_back(std::make_tuple("PFN_xrVoidFunction*", "function", oss_function.str()));\n'
+        generated_commands += '        contents.push_back(std::make_tuple("PFN_xrVoidFunction*", "function", PointerToHexString(reinterpret_cast<const void*>(function))));\n'
         generated_commands += '        ApiDumpLayerRecordContent(contents);\n'
 
         count = 0
