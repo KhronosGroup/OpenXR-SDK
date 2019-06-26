@@ -177,7 +177,8 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             oss << HandleToHexString(*instance);
             LoaderLogger::LogInfoMessage("xrCreateInstance", oss.str());
             // Make the unique_ptr no longer delete this.
-            loader_instance.release();
+            // Don't need to save the return value because we already set *instance
+            (void)loader_instance.release();
         }
     } catch (std::bad_alloc&) {
         LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateInstance - failed to allocate memory");
