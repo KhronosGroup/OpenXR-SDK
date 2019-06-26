@@ -61,7 +61,7 @@ static CoreValidationRecordInfo g_record_info = {};
 static std::mutex g_record_mutex = {};
 
 // HTML utilities
-bool CoreValidationWriteHtmlHeader(void) {
+bool CoreValidationWriteHtmlHeader() {
     try {
         std::unique_lock<std::mutex> mlock(g_record_mutex);
         std::ofstream html_file;
@@ -180,7 +180,7 @@ bool CoreValidationWriteHtmlHeader(void) {
     }
 }
 
-bool CoreValidationWriteHtmlFooter(void) {
+bool CoreValidationWriteHtmlFooter() {
     try {
         std::unique_lock<std::mutex> mlock(g_record_mutex);
         std::ofstream html_file;
@@ -238,15 +238,15 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
         // If we have instance information, see if we need to log this information out to a debug messenger
         // callback.
         if (nullptr != instance_info) {
-            if (objects_info.size() > 0) {
-                for (uint32_t obj = 0; obj < objects_info.size(); ++obj) {
+            if (!objects_info.empty()) {
+                for (auto &obj : objects_info) {
                     XrDebugUtilsObjectNameInfoEXT obj_name_info = {};
                     obj_name_info.next = nullptr;
-                    obj_name_info.objectType = objects_info[obj].type;
-                    obj_name_info.objectHandle = objects_info[obj].handle;
+                    obj_name_info.objectType = obj.type;
+                    obj_name_info.objectHandle = obj.handle;
                     // If there's a session in the list, see if it has labels
-                    if (XR_OBJECT_TYPE_SESSION == objects_info[obj].type) {
-                        XrSession session = TreatIntegerAsHandle<XrSession>(objects_info[obj].handle);
+                    if (XR_OBJECT_TYPE_SESSION == obj.type) {
+                        XrSession session = TreatIntegerAsHandle<XrSession>(obj.handle);
                         auto session_label_iterator = g_xr_session_labels.find(session);
                         if (session_label_iterator != g_xr_session_labels.end()) {
                             auto rev_iter = session_label_iterator->second->rbegin();
@@ -256,17 +256,16 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                         }
                     }
                     // Loop through all object names and see if any match
-                    for (uint32_t name_index = 0; name_index < instance_info->object_names.size(); ++name_index) {
-                        if (instance_info->object_names[name_index]->objectType == objects_info[obj].type &&
-                            instance_info->object_names[name_index]->objectHandle == objects_info[obj].handle) {
-                            obj_name_info.objectName = instance_info->object_names[name_index]->objectName;
+                    for (auto &object_name : instance_info->object_names) {
+                        if (object_name->objectType == obj.type && object_name->objectHandle == obj.handle) {
+                            obj_name_info.objectName = object_name->objectName;
                             break;
                         }
                     }
                     debug_utils_objects.push_back(obj_name_info);
                 }
             }
-            if (instance_info->debug_messengers.size() > 0) {
+            if (!instance_info->debug_messengers.empty()) {
                 // Setup our callback data once
                 XrDebugUtilsMessengerCallbackDataEXT callback_data = {};
                 callback_data.type = XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT;
@@ -287,8 +286,8 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                 }
 
                 // Loop through all active messengers and give each a chance to output information
-                for (uint32_t msg_index = 0; msg_index < instance_info->debug_messengers.size(); ++msg_index) {
-                    CoreValidationMessengerInfo *validation_messenger_info = instance_info->debug_messengers[msg_index].get();
+                for (auto &debug_messenger : instance_info->debug_messengers) {
+                    CoreValidationMessengerInfo *validation_messenger_info = debug_messenger.get();
                     XrDebugUtilsMessengerCreateInfoEXT *messenger_create_info = validation_messenger_info->create_info;
                     // If a callback exists, and the message is of a type this callback cares about, call it.
                     if (nullptr != messenger_create_info->userCallback &&
@@ -458,7 +457,7 @@ void InvalidStructureType(GenValidUsageXrInstanceInfo *instance_info, const std:
 //              "VUID-xrEnumerateInstanceExtensionProperties-propertyCountOutput-parameter"
 //              "VUID-xrEnumerateInstanceExtensionProperties-properties-parameter"
 
-XrResult CoreValidationXrCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) {
+XrResult CoreValidationXrCreateInstance(const XrInstanceCreateInfo * /*info*/, XrInstance * /*instance*/) {
     // Shouldn't be called, coreValidationXrCreateApiLayerInstance should called instead
     return XR_SUCCESS;
 }
@@ -504,7 +503,7 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
             std::cerr << "Core Validation output type: " << string_export_type << ", first time = " << std::to_string(first_time)
                       << std::endl;
             if (string_export_type == "text") {
-                if (g_record_info.file_name.size() > 0) {
+                if (!g_record_info.file_name.empty()) {
                     g_record_info.type = RECORD_TEXT_FILE;
                 } else {
                     g_record_info.type = RECORD_TEXT_COUT;
@@ -549,7 +548,7 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
         // See if a debug utils messenger is supposed to be created as part of the instance
         // NOTE: We have to wait until after the instance info is added to the map for this
         //       to work properly.
-        const XrBaseInStructure *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
+        const auto *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
         const XrDebugUtilsMessengerCreateInfoEXT *dbg_utils_create_info = nullptr;
         while (next_header != nullptr) {
             if (next_header->type == XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
@@ -569,9 +568,9 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
 
         if (XR_SUCCESS == validation_result) {
             return next_result;
-        } else {
-            return validation_result;
         }
+        return validation_result;
+
     } catch (std::bad_alloc &) {
         return XR_ERROR_OUT_OF_MEMORY;
     } catch (...) {
@@ -616,7 +615,7 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
 
         // Check the next chain for a graphics binding structure, we need at least one.
         uint32_t num_graphics_bindings_found = 0;
-        const XrBaseInStructure *cur_ptr = reinterpret_cast<const XrBaseInStructure *>(createInfo->next);
+        const auto *cur_ptr = reinterpret_cast<const XrBaseInStructure *>(createInfo->next);
         while (nullptr != cur_ptr) {
             switch (cur_ptr->type) {
                 default:
@@ -793,7 +792,7 @@ void CoreValidationBeginLabelRegion(XrSession session, const XrDebugUtilsLabelEX
     CoreValidationRemoveIndividualLabel(vec_ptr);
 
     // Start the new label region
-    GenValidUsageXrInternalSessionLabel *new_session_label = new GenValidUsageXrInternalSessionLabel;
+    auto *new_session_label = new GenValidUsageXrInternalSessionLabel;
     new_session_label->label_name = label_info->labelName;
     new_session_label->debug_utils_label = *label_info;
     new_session_label->debug_utils_label.labelName = new_session_label->label_name.c_str();
@@ -834,7 +833,7 @@ void CoreValidationInsertLabel(XrSession session, const XrDebugUtilsLabelEXT *la
     CoreValidationRemoveIndividualLabel(vec_ptr);
 
     // Insert a new individual label
-    GenValidUsageXrInternalSessionLabel *new_session_label = new GenValidUsageXrInternalSessionLabel;
+    auto *new_session_label = new GenValidUsageXrInternalSessionLabel;
     new_session_label->label_name = label_info->labelName;
     new_session_label->debug_utils_label = *label_info;
     new_session_label->debug_utils_label.labelName = new_session_label->label_name.c_str();
@@ -893,7 +892,7 @@ extern "C" {
 
 // Function used to negotiate an interface betewen the loader and an API layer.  Each library exposing one or
 // more API layers needs to expose at least this function.
-LAYER_EXPORT XrResult xrNegotiateLoaderApiLayerInterface(const XrNegotiateLoaderInfo *loaderInfo, const char *apiLayerName,
+LAYER_EXPORT XrResult xrNegotiateLoaderApiLayerInterface(const XrNegotiateLoaderInfo *loaderInfo, const char * /*apiLayerName*/,
                                                          XrNegotiateApiLayerRequest *apiLayerRequest) {
     if (nullptr == loaderInfo || nullptr == apiLayerRequest || loaderInfo->structType != XR_LOADER_INTERFACE_STRUCT_LOADER_INFO ||
         loaderInfo->structVersion != XR_LOADER_INFO_STRUCT_VERSION || loaderInfo->structSize != sizeof(XrNegotiateLoaderInfo) ||

@@ -71,7 +71,7 @@ static inline void LoaderPlatformLibraryClose(LoaderPlatformLibraryHandle librar
 
 static inline void *LoaderPlatformLibraryGetProcAddr(LoaderPlatformLibraryHandle library, const std::string &name) {
     assert(library);
-    assert(name.size() > 0);
+    assert(!name.empty());
     return dlsym(library, name.c_str());
 }
 

@@ -29,7 +29,7 @@ namespace {
 class OstreamLoaderLogRecorder : public LoaderLogRecorder {
    public:
     OstreamLoaderLogRecorder(std::ostream& os, void* user_data, XrLoaderLogMessageSeverityFlags flags);
-    ~OstreamLoaderLogRecorder() {}
+    ~OstreamLoaderLogRecorder() override = default;
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const XrLoaderLogMessengerCallbackData* callback_data) override;
@@ -42,7 +42,7 @@ class OstreamLoaderLogRecorder : public LoaderLogRecorder {
 class DebugUtilsLogRecorder : public LoaderLogRecorder {
    public:
     DebugUtilsLogRecorder(const XrDebugUtilsMessengerCreateInfoEXT* create_info, XrDebugUtilsMessengerEXT debug_messenger);
-    ~DebugUtilsLogRecorder() {}
+    ~DebugUtilsLogRecorder() override = default;
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const XrLoaderLogMessengerCallbackData* callback_data) override;

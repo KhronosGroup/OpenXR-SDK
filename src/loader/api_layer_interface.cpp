@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "platform_utils.hpp"
 #include "manifest_file.hpp"
@@ -112,7 +113,8 @@ XrResult ApiLayerInterface::GetApiLayerProperties(const std::string& openxr_comm
                 LoaderLogger::LogErrorMessage(openxr_command,
                                               "VUID-xrEnumerateApiLayerProperties-properties-parameter: invalid properties");
                 return XR_ERROR_VALIDATION_FAILURE;
-            } else if (nullptr != outgoing_count) {
+            }
+            if (nullptr != outgoing_count) {
                 *outgoing_count = prop;
             }
         }
@@ -142,7 +144,7 @@ XrResult ApiLayerInterface::GetInstanceExtensionProperties(const std::string& op
                 }
 
                 bool found = false;
-                uint32_t num_files = static_cast<uint32_t>(manifest_files.size());
+                auto num_files = static_cast<uint32_t>(manifest_files.size());
                 for (uint32_t man_file = 0; man_file < num_files; ++man_file) {
                     // If a layer with the provided name exists, get it's instance extension information.
                     if (manifest_files[man_file]->LayerName() == layer_name) {
@@ -165,12 +167,12 @@ XrResult ApiLayerInterface::GetInstanceExtensionProperties(const std::string& op
                 // since we know that they're going to be enabled.
                 std::vector<std::string> env_enabled_layers;
                 AddEnvironmentApiLayers(openxr_command, env_enabled_layers);
-                if (env_enabled_layers.size() > 0) {
+                if (!env_enabled_layers.empty()) {
                     std::vector<std::unique_ptr<ApiLayerManifestFile>> exp_layer_man_files = {};
                     result = ApiLayerManifestFile::FindManifestFiles(MANIFEST_TYPE_EXPLICIT_API_LAYER, exp_layer_man_files);
                     if (XR_SUCCESS == result) {
                         for (auto l_iter = exp_layer_man_files.begin();
-                             exp_layer_man_files.size() > 0 && l_iter != exp_layer_man_files.end();
+                             !exp_layer_man_files.empty() && l_iter != exp_layer_man_files.end();
                              /* No iterate */) {
                             for (std::string& enabled_layer : env_enabled_layers) {
                                 // If this is an enabled layer, transfer it over to the manifest list.
@@ -186,7 +188,7 @@ XrResult ApiLayerInterface::GetInstanceExtensionProperties(const std::string& op
             }
 
             // Grab the layer instance extensions information
-            uint32_t num_files = static_cast<uint32_t>(manifest_files.size());
+            auto num_files = static_cast<uint32_t>(manifest_files.size());
             for (uint32_t man_file = 0; man_file < num_files; ++man_file) {
                 manifest_files[man_file]->GetInstanceExtensionProperties(extension_properties);
             }
@@ -226,7 +228,7 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
                     "xrCreateInstance", "VUID-xrCreateInstance-info-parameter: something wrong with XrInstanceCreateInfo contents");
                 return XR_ERROR_VALIDATION_FAILURE;
             }
-            uint32_t num_env_api_layers = static_cast<uint32_t>(enabled_api_layers.size());
+            auto num_env_api_layers = static_cast<uint32_t>(enabled_api_layers.size());
             uint32_t total_api_layers = num_env_api_layers + enabled_api_layer_count;
             enabled_api_layers.resize(total_api_layers);
             for (uint32_t layer = 0; layer < enabled_api_layer_count; ++layer) {
@@ -236,8 +238,8 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
 
         // Initialize the layer found vector to false
         layer_found.resize(enabled_api_layers.size());
-        for (uint32_t layer = 0; layer < layer_found.size(); ++layer) {
-            layer_found[layer] = false;
+        for (auto&& layer : layer_found) {
+            layer = false;
         }
 
         for (std::unique_ptr<ApiLayerManifestFile>& manifest_file : layer_manifest_files) {
@@ -280,7 +282,7 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
 
             // Get and settle on an layer interface version (using any provided name if required).
             std::string function_name = manifest_file->GetFunctionName("xrNegotiateLoaderApiLayerInterface");
-            PFN_xrNegotiateLoaderApiLayerInterface negotiate = reinterpret_cast<PFN_xrNegotiateLoaderApiLayerInterface>(
+            auto negotiate = reinterpret_cast<PFN_xrNegotiateLoaderApiLayerInterface>(
                 LoaderPlatformLibraryGetProcAddr(layer_library, function_name));
 
             // Loader info for negotiation
@@ -334,8 +336,9 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
             std::vector<std::string> supported_extensions;
             std::vector<XrExtensionProperties> extension_properties;
             manifest_file->GetInstanceExtensionProperties(extension_properties);
+            supported_extensions.reserve(extension_properties.size());
             for (XrExtensionProperties& ext_prop : extension_properties) {
-                supported_extensions.push_back(ext_prop.extensionName);
+                supported_extensions.emplace_back(ext_prop.extensionName);
             }
 
             // Add this runtime to the vector
@@ -380,7 +383,7 @@ ApiLayerInterface::ApiLayerInterface(std::string layer_name, LoaderPlatformLibra
                                      std::vector<std::string>& supported_extensions,
                                      PFN_xrGetInstanceProcAddr get_instant_proc_addr,
                                      PFN_xrCreateApiLayerInstance create_api_layer_instance)
-    : _layer_name(layer_name),
+    : _layer_name(std::move(layer_name)),
       _layer_library(layer_library),
       _get_instant_proc_addr(get_instant_proc_addr),
       _create_api_layer_instance(create_api_layer_instance),
@@ -396,7 +399,7 @@ ApiLayerInterface::~ApiLayerInterface() {
 bool ApiLayerInterface::SupportsExtension(const std::string& extension_name) {
     bool found_prop = false;
     try {
-        for (std::string supported_extension : _supported_extensions) {
+        for (const std::string& supported_extension : _supported_extensions) {
             if (supported_extension == extension_name) {
                 found_prop = true;
                 break;

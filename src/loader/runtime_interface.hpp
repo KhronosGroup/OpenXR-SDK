@@ -40,7 +40,7 @@ class RuntimeInterface {
     static const XrGeneratedDispatchTable* GetDispatchTable(XrInstance instance);
     static const XrGeneratedDispatchTable* GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger);
 
-    void GetInstanceExtensionProperties(std::vector<XrExtensionProperties>& props);
+    void GetInstanceExtensionProperties(std::vector<XrExtensionProperties>& extension_properties);
     bool SupportsExtension(const std::string& extension_name);
     XrResult CreateInstance(const XrInstanceCreateInfo* info, XrInstance* instance);
     XrResult DestroyInstance(XrInstance instance);
@@ -48,7 +48,7 @@ class RuntimeInterface {
     void ForgetDebugMessenger(XrDebugUtilsMessengerEXT messenger);
 
    private:
-    RuntimeInterface();
+    RuntimeInterface() = delete;
     RuntimeInterface(const RuntimeInterface&) = delete;
     RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr);
     RuntimeInterface& operator=(const RuntimeInterface&) = delete;

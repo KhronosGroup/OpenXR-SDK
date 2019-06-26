@@ -66,7 +66,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 
                 // Get and settle on an runtime interface version (using any provided name if required).
                 std::string function_name = manifest_file->GetFunctionName("xrNegotiateLoaderRuntimeInterface");
-                PFN_xrNegotiateLoaderRuntimeInterface negotiate = reinterpret_cast<PFN_xrNegotiateLoaderRuntimeInterface>(
+                auto negotiate = reinterpret_cast<PFN_xrNegotiateLoaderRuntimeInterface>(
                     LoaderPlatformLibraryGetProcAddr(runtime_library, function_name));
 
                 // Loader info for negotiation
@@ -145,8 +145,9 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
                 std::vector<std::string> supported_extensions;
                 std::vector<XrExtensionProperties> extension_properties;
                 _single_runtime_interface->GetInstanceExtensionProperties(extension_properties);
+                supported_extensions.reserve(extension_properties.size());
                 for (XrExtensionProperties ext_prop : extension_properties) {
-                    supported_extensions.push_back(ext_prop.extensionName);
+                    supported_extensions.emplace_back(ext_prop.extensionName);
                 }
                 _single_runtime_interface->SetSupportedExtensions(supported_extensions);
 
@@ -255,7 +256,7 @@ void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionPro
             for (size_t prop = 0; prop < props_count; ++prop) {
                 // If we find it, then make sure the spec version matches that of the runtime instead of the
                 // layer.
-                if (!strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName)) {
+                if (strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName) == 0) {
                     // Make sure the spec version used is the runtime's
                     extension_properties[prop].specVersion = runtime_extension_properties[ext].specVersion;
                     found = true;
@@ -354,7 +355,7 @@ void RuntimeInterface::SetSupportedExtensions(std::vector<std::string>& supporte
 bool RuntimeInterface::SupportsExtension(const std::string& extension_name) {
     bool found_prop = false;
     try {
-        for (std::string supported_extension : _supported_extensions) {
+        for (const std::string& supported_extension : _supported_extensions) {
             if (supported_extension == extension_name) {
                 found_prop = true;
                 break;

@@ -59,9 +59,9 @@ static inline bool StringEndsWith(std::string const &value, std::string const &e
 }
 
 // If the file found is a manifest file name, add it to the out_files manifest list.
-static void AddIfJson(ManifestFileType type, const std::string &full_file, std::vector<std::string> &manifest_files) {
+static void AddIfJson(const std::string &full_file, std::vector<std::string> &manifest_files) {
     try {
-        if (0 == full_file.size() || !StringEndsWith(full_file, ".json")) {
+        if (full_file.empty() || !StringEndsWith(full_file, ".json")) {
             return;
         }
         manifest_files.push_back(full_file);
@@ -74,7 +74,7 @@ static void AddIfJson(ManifestFileType type, const std::string &full_file, std::
 // Check the current path for any manifest files.  If the provided search_path is a directory, look for
 // all included JSON files in that directory.  Otherwise, just check the provided search_path which should
 // be a single filename.
-static void CheckAllFilesInThePath(ManifestFileType type, const std::string &search_path, bool is_directory_list,
+static void CheckAllFilesInThePath(const std::string &search_path, bool is_directory_list,
                                    std::vector<std::string> &manifest_files) {
     try {
         if (FileSysUtilsPathExists(search_path)) {
@@ -83,7 +83,7 @@ static void CheckAllFilesInThePath(ManifestFileType type, const std::string &sea
                 // If the file exists, try to add it
                 if (FileSysUtilsIsRegularFile(search_path)) {
                     FileSysUtilsGetAbsolutePath(search_path, absolute_path);
-                    AddIfJson(type, absolute_path, manifest_files);
+                    AddIfJson(absolute_path, manifest_files);
                 }
             } else {
                 std::vector<std::string> files;
@@ -94,7 +94,7 @@ static void CheckAllFilesInThePath(ManifestFileType type, const std::string &sea
                         if (!FileSysUtilsGetAbsolutePath(relative_path, absolute_path)) {
                             continue;
                         }
-                        AddIfJson(type, absolute_path, manifest_files);
+                        AddIfJson(absolute_path, manifest_files);
                     }
                 }
             }
@@ -108,8 +108,7 @@ static void CheckAllFilesInThePath(ManifestFileType type, const std::string &sea
 // Add all manifest files in the provided paths to the manifest_files list.  If search_path
 // is made up of directory listings (versus direct manifest file names) search each path for
 // any manifest files.
-static void AddFilesInPath(ManifestFileType type, const std::string &search_path, bool is_directory_list,
-                           std::vector<std::string> &manifest_files) {
+static void AddFilesInPath(const std::string &search_path, bool is_directory_list, std::vector<std::string> &manifest_files) {
     std::size_t last_found = 0;
     std::size_t found = search_path.find_first_of(PATH_SEPARATOR);
     std::string cur_search;
@@ -121,7 +120,7 @@ static void AddFilesInPath(ManifestFileType type, const std::string &search_path
             std::size_t length = found - last_found;
             cur_search = search_path.substr(last_found, length);
 
-            CheckAllFilesInThePath(type, cur_search, is_directory_list, manifest_files);
+            CheckAllFilesInThePath(cur_search, is_directory_list, manifest_files);
 
             // This works around issue if multiple path separator follow each other directly.
             last_found = found;
@@ -134,7 +133,7 @@ static void AddFilesInPath(ManifestFileType type, const std::string &search_path
         // If there's something remaining in the string, copy it over
         if (last_found < search_path.size()) {
             cur_search = search_path.substr(last_found);
-            CheckAllFilesInThePath(type, cur_search, is_directory_list, manifest_files);
+            CheckAllFilesInThePath(cur_search, is_directory_list, manifest_files);
         }
     } catch (...) {
         LoaderLogger::LogErrorMessage("", "AddFilesInPath - unknown error occurred");
@@ -145,7 +144,7 @@ static void AddFilesInPath(ManifestFileType type, const std::string &search_path
 // Copy all paths listed in the cur_path string into output_path and append the appropriate relative_path onto the end of each.
 static void CopyIncludedPaths(bool is_directory_list, const std::string &cur_path, const std::string &relative_path,
                               std::string &output_path) {
-    if (0 != cur_path.size()) {
+    if (!cur_path.empty()) {
         std::size_t last_found = 0;
         std::size_t found = cur_path.find_first_of(PATH_SEPARATOR);
 
@@ -187,11 +186,11 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
     bool is_directory_list = true;
     bool is_runtime = (type == MANIFEST_TYPE_RUNTIME);
     char *override_env = nullptr;
-    std::string override_path = "";
-    std::string search_path = "";
+    std::string override_path;
+    std::string search_path;
 
     try {
-        if (override_env_var.size() != 0) {
+        if (!override_env_var.empty()) {
 #ifndef XR_OS_WINDOWS
             if (geteuid() != getuid() || getegid() != getgid()) {
                 // Don't allow setuid apps to use the env var:
@@ -210,7 +209,7 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
             }
         }
 
-        if (nullptr != override_env && override_path.size() != 0) {
+        if (nullptr != override_env && !override_path.empty()) {
             CopyIncludedPaths(is_directory_list, override_path, "", search_path);
             PlatformUtilsFreeEnv(override_env);
             override_active = true;
@@ -276,7 +275,7 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
         }
 
         // Now, parse the paths and add any manifest files found in them.
-        AddFilesInPath(type, search_path, is_directory_list, manifest_files);
+        AddFilesInPath(search_path, is_directory_list, manifest_files);
     } catch (...) {
         LoaderLogger::LogErrorMessage("", "ReadDataFilesInSearchPaths - unknown error occurred");
         throw;
@@ -292,27 +291,27 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
 static std::string GetXDGEnv(const char *name, const char *fallback_env, const char *fallback_path) {
     char *path = PlatformUtilsGetSecureEnv(name);
     std::string result;
-    if (path) {
+    if (path != nullptr) {
         result = path;
         PlatformUtilsFreeEnv(path);
         if (!result.empty()) {
             return result;
         }
     }
-    if (fallback_env) {
+    if (fallback_env != nullptr) {
         char *path = PlatformUtilsGetSecureEnv(fallback_env);
-        if (path) {
+        if (path != nullptr) {
             result = path;
             PlatformUtilsFreeEnv(path);
         }
         if (result.empty()) {
             return "";
         }
-        if (fallback_path) {
+        if (fallback_path != nullptr) {
             result += "/";
         }
     }
-    if (fallback_path) {
+    if (fallback_path != nullptr) {
         result += fallback_path;
     }
     return result;
@@ -325,29 +324,39 @@ static bool FindXDGConfigFile(const std::string &relative_path, std::string &out
     if (!out.empty()) {
         out += "/";
         out += relative_path;
-        if (FileSysUtilsPathExists(out)) return true;
+        if (FileSysUtilsPathExists(out)) {
+            return true;
+        }
     }
 
     std::istringstream iss(GetXDGEnv("XDG_CONFIG_DIRS", nullptr, FALLBACK_CONFIG_DIRS));
-    std::string path;    
+    std::string path;
     while (std::getline(iss, path, PATH_SEPARATOR)) {
-        if (path.empty()) continue;
+        if (path.empty()) {
+            continue;
+        }
         out = path;
         out += "/";
         out += relative_path;
-        if (FileSysUtilsPathExists(out)) return true;
+        if (FileSysUtilsPathExists(out)) {
+            return true;
+        }
     }
 
     out = SYSCONFDIR;
     out += "/";
     out += relative_path;
-    if (FileSysUtilsPathExists(out)) return true;
+    if (FileSysUtilsPathExists(out)) {
+        return true;
+    }
 
 #if defined(EXTRASYSCONFDIR)
     out = EXTRASYSCONFDIR;
     out += "/";
     out += relative_path;
-    if (FileSysUtilsPathExists(out)) return true;
+    if (FileSysUtilsPathExists(out)) {
+        return true;
+    }
 #endif
 
     out.clear();
@@ -392,7 +401,7 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
             warning_message += default_runtime_value_name;
             LoaderLogger::LogWarningMessage("", warning_message);
         } else {
-            AddFilesInPath(type, wide_to_utf8(value_w), false, manifest_files);
+            AddFilesInPath(wide_to_utf8(value_w), false, manifest_files);
         }
     } catch (...) {
         LoaderLogger::LogErrorMessage("", "ReadLayerDataFilesInRegistry - unknown error occurred");
@@ -438,7 +447,7 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
                    (rtn_value = RegEnumValueW(hkey, key_index++, name_w, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
                 if (value_size == sizeof(value) && value == 0) {
                     const std::string filename = wide_to_utf8(name_w);
-                    AddFilesInPath(type, filename, false, manifest_files);
+                    AddFilesInPath(filename, false, manifest_files);
                 }
                 // Reset some items for the next loop
                 name_size = 1023;
@@ -455,7 +464,7 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
 ManifestFile::ManifestFile(ManifestFileType type, const std::string &filename, const std::string &library_path)
     : _filename(filename), _type(type), _library_path(library_path) {}
 
-ManifestFile::~ManifestFile() {}
+ManifestFile::~ManifestFile() = default;
 
 bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
     try {
@@ -555,7 +564,7 @@ void ManifestFile::GetDeviceExtensionProperties(std::vector<XrExtensionPropertie
 
 const std::string &ManifestFile::GetFunctionName(const std::string &func_name) {
     try {
-        if (_functions_renamed.size() > 0) {
+        if (!_functions_renamed.empty()) {
             auto found = _functions_renamed.find(func_name);
             if (found != _functions_renamed.end()) {
                 return found->second;
@@ -571,9 +580,10 @@ const std::string &ManifestFile::GetFunctionName(const std::string &func_name) {
 RuntimeManifestFile::RuntimeManifestFile(const std::string &filename, const std::string &library_path)
     : ManifestFile(MANIFEST_TYPE_RUNTIME, filename, library_path) {}
 
-RuntimeManifestFile::~RuntimeManifestFile() {}
+RuntimeManifestFile::~RuntimeManifestFile() = default;
 
-void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
+void RuntimeManifestFile::CreateIfValid(std::string const &filename,
+                                        std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
     try {
         std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
         if (!json_stream.is_open()) {
@@ -617,7 +627,7 @@ void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::u
 
         // If the library_path variable has no directory symbol, it's just a file name and should be accessible on the
         // global library path.
-        if (lib_path.find("\\") != lib_path.npos || lib_path.find("/") != lib_path.npos) {
+        if (lib_path.find('\\') != std::string::npos || lib_path.find('/') != std::string::npos) {
             // If the library_path is an absolute path, just use that if it exists
             if (FileSysUtilsIsAbsolutePath(lib_path)) {
                 if (!FileSysUtilsPathExists(lib_path)) {
@@ -785,19 +795,14 @@ ApiLayerManifestFile::ApiLayerManifestFile(ManifestFileType type, const std::str
       _description(description),
       _implementation_version(implementation_version) {}
 
-ApiLayerManifestFile::~ApiLayerManifestFile() {}
+ApiLayerManifestFile::~ApiLayerManifestFile() = default;
 
-void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string filename,
+void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string const &filename,
                                          std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files) {
     try {
         std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
         Json::Reader reader;
         Json::Value root_node = Json::nullValue;
-        JsonVersion file_version = {};
-        JsonVersion api_version = {};
-        std::string layer_name = "";
-        std::string library_path = "";
-        std::string description = "";
         if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
             std::string error_message = "ApiLayerManifestFile::CreateIfValid failed to parse ";
             error_message += filename;
@@ -805,6 +810,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
             LoaderLogger::LogErrorMessage("", error_message);
             return;
         }
+        JsonVersion file_version = {};
         if (!ManifestFile::IsValidJson(root_node, file_version)) {
             std::string error_message = "ApiLayerManifestFile::CreateIfValid isValidJson indicates ";
             error_message += filename;
@@ -841,7 +847,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
             if (!layer_root_node["enable_environment"].isNull() && layer_root_node["enable_environment"].isString()) {
                 char *enable_val = PlatformUtilsGetEnv(layer_root_node["enable_environment"].asString().c_str());
                 // If it's not set in the environment, disable the layer
-                if (NULL == enable_val) {
+                if (nullptr == enable_val) {
                     enabled = false;
                 }
                 PlatformUtilsFreeEnv(enable_val);
@@ -849,7 +855,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
             // Check for the disable environment variable, which must be provided in the JSON
             char *disable_val = PlatformUtilsGetEnv(layer_root_node["disable_environment"].asString().c_str());
             // If the envar is set, disable the layer. Disable envar overrides enable above
-            if (NULL != disable_val) {
+            if (nullptr != disable_val) {
                 enabled = false;
             }
             PlatformUtilsFreeEnv(disable_val);
@@ -863,8 +869,9 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
                 return;
             }
         }
-        layer_name = layer_root_node["name"].asString();
+        std::string layer_name = layer_root_node["name"].asString();
         std::string api_version_string = layer_root_node["api_version"].asString();
+        JsonVersion api_version = {};
         sscanf(api_version_string.c_str(), "%d.%d", &api_version.major, &api_version.minor);
         api_version.patch = 0;
 
@@ -877,11 +884,11 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
         }
 
         uint32_t implementation_version = atoi(layer_root_node["implementation_version"].asString().c_str());
-        library_path = layer_root_node["library_path"].asString();
+        std::string library_path = layer_root_node["library_path"].asString();
 
         // If the library_path variable has no directory symbol, it's just a file name and should be accessible on the
         // global library path.
-        if (library_path.find("\\") != library_path.npos || library_path.find("/") != library_path.npos) {
+        if (library_path.find('\\') != std::string::npos || library_path.find('/') != std::string::npos) {
             // If the library_path is an absolute path, just use that if it exists
             if (FileSysUtilsIsAbsolutePath(library_path)) {
                 if (!FileSysUtilsPathExists(library_path)) {
@@ -911,6 +918,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
             }
         }
 
+        std::string description;
         if (!layer_root_node["description"].isNull() && layer_root_node["description"].isString()) {
             description = layer_root_node["description"].asString();
         }
@@ -1008,7 +1016,7 @@ XrResult ApiLayerManifestFile::FindManifestFiles(ManifestFileType type,
     try {
         std::string relative_path;
         std::string override_env_var;
-        std::string registry_location = "";
+        std::string registry_location;
 
         // Add the appropriate top-level folders for the relative path.  These should be
         // the string "openxr/" followed by the API major version as a string.

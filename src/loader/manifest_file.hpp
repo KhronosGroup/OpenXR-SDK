@@ -84,8 +84,8 @@ class RuntimeManifestFile : public ManifestFile {
     static XrResult FindManifestFiles(ManifestFileType type, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
 
     RuntimeManifestFile(const std::string &filename, const std::string &library_path);
-    virtual ~RuntimeManifestFile();
-    static void CreateIfValid(std::string filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
+    ~RuntimeManifestFile() override;
+    static void CreateIfValid(std::string const &filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
 
     // We don't want any copy constructors
     RuntimeManifestFile &operator=(const RuntimeManifestFile &manifest_file) = delete;
@@ -101,8 +101,8 @@ class ApiLayerManifestFile : public ManifestFile {
     ApiLayerManifestFile(ManifestFileType type, const std::string &filename, const std::string &layer_name,
                          const std::string &description, const JsonVersion &api_version, const uint32_t &implementation_version,
                          const std::string &library_path);
-    virtual ~ApiLayerManifestFile();
-    static void CreateIfValid(ManifestFileType type, std::string filename,
+    ~ApiLayerManifestFile() override;
+    static void CreateIfValid(ManifestFileType type, std::string const &filename,
                               std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files);
 
     // We don't want any copy constructors

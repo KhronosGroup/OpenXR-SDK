@@ -149,7 +149,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionPropert
             }
         }
 
-        uint32_t num_extension_properties = static_cast<uint32_t>(extension_properties.size());
+        auto num_extension_properties = static_cast<uint32_t>(extension_properties.size());
         if (propertyCapacityInput == 0) {
             *propertyCountOutput = num_extension_properties;
         } else if (nullptr != properties) {
@@ -185,7 +185,8 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionPropert
                 LoaderLogger::LogValidationErrorMessage("VUID-xrEnumerateInstanceExtensionProperties-properties-parameter",
                                                         "xrEnumerateInstanceExtensionProperties", "invalid properties");
                 return XR_ERROR_VALIDATION_FAILURE;
-            } else if (nullptr != propertyCountOutput) {
+            }
+            if (nullptr != propertyCountOutput) {
                 *propertyCountOutput = num_to_copy;
             }
         }
@@ -205,21 +206,21 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
         if (nullptr == info) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance", "must be non-NULL");
             return XR_ERROR_VALIDATION_FAILURE;
-        } else {
-            // If application requested OpenXR API version is higher than the loader version, then we need to throw
-            // an error.
-            uint16_t app_major = XR_VERSION_MAJOR(info->applicationInfo.apiVersion);
-            uint16_t app_minor = XR_VERSION_MINOR(info->applicationInfo.apiVersion);
-            uint16_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
-            uint16_t loader_minor = XR_VERSION_MINOR(XR_CURRENT_API_VERSION);
-            if (app_major > loader_major || (app_major == loader_major && app_minor > loader_minor)) {
-                std::ostringstream oss;
-                oss << "xrCreateInstance called with invalid API version " << app_major << "." << app_minor
-                    << ".  Max supported version is " << loader_major << "." << loader_minor;
-                LoaderLogger::LogErrorMessage("xrCreateInstance", oss.str());
-                return XR_ERROR_DRIVER_INCOMPATIBLE;
-            }
         }
+        // If application requested OpenXR API version is higher than the loader version, then we need to throw
+        // an error.
+        uint16_t app_major = XR_VERSION_MAJOR(info->applicationInfo.apiVersion);
+        uint16_t app_minor = XR_VERSION_MINOR(info->applicationInfo.apiVersion);
+        uint16_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
+        uint16_t loader_minor = XR_VERSION_MINOR(XR_CURRENT_API_VERSION);
+        if (app_major > loader_major || (app_major == loader_major && app_minor > loader_minor)) {
+            std::ostringstream oss;
+            oss << "xrCreateInstance called with invalid API version " << app_major << "." << app_minor
+                << ".  Max supported version is " << loader_major << "." << loader_minor;
+            LoaderLogger::LogErrorMessage("xrCreateInstance", oss.str());
+            return XR_ERROR_DRIVER_INCOMPATIBLE;
+        }
+
         if (nullptr == instance) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-instance-parameter", "xrCreateInstance",
                                                     "must be non-NULL");
@@ -266,7 +267,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
             LoaderInstance *loader_instance = g_instance_map.Get(created_instance);
 
             // Create a debug utils messenger if the create structure is in the "next" chain
-            const XrBaseInStructure *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
+            const auto *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
             const XrDebugUtilsMessengerCreateInfoEXT *dbg_utils_create_info = nullptr;
             while (next_header != nullptr) {
                 if (next_header->type == XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
@@ -384,7 +385,7 @@ static bool ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const Xr
         return false;
     }
     // VUID-XrInstanceCreateInfo-enabledApiLayerNames-parameter already tested in LoadApiLayers()
-    if (info->enabledExtensionCount && nullptr == info->enabledExtensionNames) {
+    if ((info->enabledExtensionCount != 0u) && nullptr == info->enabledExtensionNames) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-enabledExtensionNames-parameter", "xrCreateInstance",
                                                 "enabledExtensionCount is non-0 but array is NULL");
         return false;
@@ -394,7 +395,7 @@ static bool ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const Xr
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) {
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader terminator");
-    LoaderInstance *loader_instance = reinterpret_cast<LoaderInstance *>(*instance);
+    auto *loader_instance = reinterpret_cast<LoaderInstance *>(*instance);
     if (!ValidateInstanceCreateInfo(loader_instance, info)) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance",
                                                 "something wrong with XrInstanceCreateInfo contents");
@@ -407,7 +408,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(const XrInstanceCreate
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateApiLayerInstance(const XrInstanceCreateInfo *info,
-                                                                  const struct XrApiLayerCreateInfo *apiLayerInfo,
+                                                                  const struct XrApiLayerCreateInfo * /*apiLayerInfo*/,
                                                                   XrInstance *instance) {
     return LoaderXrTermCreateInstance(info, instance);
 }
@@ -629,7 +630,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession 
                                                     "Extension entrypoint called without enabling appropriate extension",
                                                     {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_FUNCTION_UNSUPPORTED;
-        } else if (nullptr == labelInfo) {
+        }
+        if (nullptr == labelInfo) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionBeginDebugUtilsLabelRegionEXT-labelInfo-parameter",
                                                     "xrSessionBeginDebugUtilsLabelRegionEXT", "labelInfo must be non-NULL",
                                                     {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
@@ -657,7 +659,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession se
                                                     "xrSessionEndDebugUtilsLabelRegionEXT", "session is not a valid XrSession",
                                                     {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_HANDLE_INVALID;
-        } else if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
+        }
+        if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
             return XR_ERROR_FUNCTION_UNSUPPORTED;
         }
         LoaderLogger::GetInstance().EndLabelRegion(session);
@@ -687,7 +690,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession sessi
                                                     "Extension entrypoint called without enabling appropriate extension",
                                                     {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
             return XR_ERROR_FUNCTION_UNSUPPORTED;
-        } else if (nullptr == labelInfo) {
+        }
+        if (nullptr == labelInfo) {
             LoaderLogger::LogValidationErrorMessage("VUID-xrSessionInsertDebugUtilsLabelEXT-labelInfo-parameter",
                                                     "xrSessionInsertDebugUtilsLabelEXT", "labelInfo must be non-NULL",
                                                     {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});

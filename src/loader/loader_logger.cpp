@@ -113,16 +113,16 @@ bool ObjectInfoCollection::LookUpObjectName(XrLoaderLogObjectInfo& info) const {
 XrLoaderLogMessageSeverityFlags DebugUtilsSeveritiesToLoaderLogMessageSeverities(
     XrDebugUtilsMessageSeverityFlagsEXT utils_severities) {
     XrLoaderLogMessageSeverityFlags log_severities = 0UL;
-    if (utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+    if ((utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) != 0u) {
         log_severities |= XR_LOADER_LOG_MESSAGE_SEVERITY_VERBOSE_BIT;
     }
-    if (utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+    if ((utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) != 0u) {
         log_severities |= XR_LOADER_LOG_MESSAGE_SEVERITY_INFO_BIT;
     }
-    if (utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+    if ((utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) != 0u) {
         log_severities |= XR_LOADER_LOG_MESSAGE_SEVERITY_WARNING_BIT;
     }
-    if (utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+    if ((utils_severities & XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) != 0u) {
         log_severities |= XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT;
     }
     return log_severities;
@@ -131,16 +131,16 @@ XrLoaderLogMessageSeverityFlags DebugUtilsSeveritiesToLoaderLogMessageSeverities
 XrDebugUtilsMessageSeverityFlagsEXT LoaderLogMessageSeveritiesToDebugUtilsMessageSeverities(
     XrLoaderLogMessageSeverityFlags log_severities) {
     XrDebugUtilsMessageSeverityFlagsEXT utils_severities = 0UL;
-    if (log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_VERBOSE_BIT) {
+    if ((log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_VERBOSE_BIT) != 0u) {
         utils_severities |= XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
     }
-    if (log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_INFO_BIT) {
+    if ((log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_INFO_BIT) != 0u) {
         utils_severities |= XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
     }
-    if (log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_WARNING_BIT) {
+    if ((log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_WARNING_BIT) != 0u) {
         utils_severities |= XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
     }
-    if (log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT) {
+    if ((log_severities & XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT) != 0u) {
         utils_severities |= XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
     }
     return utils_severities;
@@ -148,13 +148,13 @@ XrDebugUtilsMessageSeverityFlagsEXT LoaderLogMessageSeveritiesToDebugUtilsMessag
 
 XrLoaderLogMessageTypeFlagBits DebugUtilsMessageTypesToLoaderLogMessageTypes(XrDebugUtilsMessageTypeFlagsEXT utils_types) {
     XrLoaderLogMessageTypeFlagBits log_types = 0UL;
-    if (utils_types & XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
+    if ((utils_types & XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) != 0u) {
         log_types |= XR_LOADER_LOG_MESSAGE_TYPE_GENERAL_BIT;
     }
-    if (utils_types & XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
+    if ((utils_types & XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) != 0u) {
         log_types |= XR_LOADER_LOG_MESSAGE_TYPE_SPECIFICATION_BIT;
     }
-    if (utils_types & XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+    if ((utils_types & XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) != 0u) {
         log_types |= XR_LOADER_LOG_MESSAGE_TYPE_PERFORMANCE_BIT;
     }
     return log_types;
@@ -162,13 +162,13 @@ XrLoaderLogMessageTypeFlagBits DebugUtilsMessageTypesToLoaderLogMessageTypes(XrD
 
 XrDebugUtilsMessageTypeFlagsEXT LoaderLogMessageTypesToDebugUtilsMessageTypes(XrLoaderLogMessageTypeFlagBits log_types) {
     XrDebugUtilsMessageTypeFlagsEXT utils_types = 0UL;
-    if (log_types & XR_LOADER_LOG_MESSAGE_TYPE_GENERAL_BIT) {
+    if ((log_types & XR_LOADER_LOG_MESSAGE_TYPE_GENERAL_BIT) != 0u) {
         utils_types |= XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
     }
-    if (log_types & XR_LOADER_LOG_MESSAGE_TYPE_SPECIFICATION_BIT) {
+    if ((log_types & XR_LOADER_LOG_MESSAGE_TYPE_SPECIFICATION_BIT) != 0u) {
         utils_types |= XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
     }
-    if (log_types & XR_LOADER_LOG_MESSAGE_TYPE_PERFORMANCE_BIT) {
+    if ((log_types & XR_LOADER_LOG_MESSAGE_TYPE_PERFORMANCE_BIT) != 0u) {
         utils_types |= XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     }
     return utils_types;

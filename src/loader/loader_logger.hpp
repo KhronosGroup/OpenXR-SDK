@@ -120,7 +120,7 @@ class LoaderLogRecorder {
         _message_severities = message_severities;
         _message_types = message_types;
     }
-    virtual ~LoaderLogRecorder() {}
+    virtual ~LoaderLogRecorder() = default;
 
     XrLoaderLogType Type() { return _type; }
     uint64_t UniqueId() { return _unique_id; }
