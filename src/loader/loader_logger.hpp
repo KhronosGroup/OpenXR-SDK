@@ -27,6 +27,8 @@
 
 #include <openxr/openxr.h>
 
+#include "xr_utils.h"
+
 // Use internal versions of flags similar to XR_EXT_debug_utils so that
 // we're not tightly coupled to that extension.  This way, if the extension
 // changes or gets replaced, we can be flexible in the loader.
@@ -43,16 +45,6 @@ typedef XrFlags64 XrLoaderLogMessageSeverityFlags;
 typedef XrFlags64 XrLoaderLogMessageTypeFlagBits;
 typedef XrFlags64 XrLoaderLogMessageTypeFlags;
 
-//! Turns a uint64_t into a string formatted as hex.
-//!
-//! The core of the HandleToString implementation is in here.
-std::string Uint64ToHexString(uint64_t val);
-
-template <typename T>
-static inline std::string HandleToString(T handle) {
-    return Uint64ToHexString(reinterpret_cast<uint64_t>(handle));
-}
-
 struct XrLoaderLogObjectInfo {
     //! Type-erased handle value
     uint64_t handle;
@@ -68,20 +60,20 @@ struct XrLoaderLogObjectInfo {
     /// Note: Does not check the type before doing it!
     template <typename HandleType>
     HandleType& GetTypedHandle() {
-        return reinterpret_cast<HandleType&>(handle);
+        return TreatIntegerAsHandle<HandleType&>(handle);
     }
 
     //! @overload
     template <typename HandleType>
     HandleType const& GetTypedHandle() const {
-        return reinterpret_cast<HandleType&>(handle);
+        return TreatIntegerAsHandle<HandleType&>(handle);
     }
 
     XrLoaderLogObjectInfo() = default;
 
     //! Create from a typed handle and object type
     template <typename T>
-    XrLoaderLogObjectInfo(T h, XrObjectType t) : handle(reinterpret_cast<uint64_t>(h)), type(t) {}
+    XrLoaderLogObjectInfo(T h, XrObjectType t) : handle(MakeHandleGeneric(h)), type(t) {}
 
     //! Create from an untyped handle value (integer) and object type
     XrLoaderLogObjectInfo(uint64_t h, XrObjectType t) : handle(h), type(t) {}
@@ -219,7 +211,6 @@ class LoaderLogger {
     void EndLabelRegion(XrSession session);
     void InsertLabel(XrSession session, const XrDebugUtilsLabelEXT* label_info);
     void DeleteSessionLabels(XrSession session);
-
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const std::string& message_id, const std::string& command_name, const std::string& message,

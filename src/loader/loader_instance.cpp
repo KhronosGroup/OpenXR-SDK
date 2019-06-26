@@ -175,7 +175,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             oss << "LoaderInstance::CreateInstance succeeded with ";
             oss << loader_instance->LayerInterfaces().size();
             oss << " layers enabled and runtime interface - created instance = ";
-            oss << HandleToString(*instance);
+            oss << HandleToHexString(*instance);
             LoaderLogger::LogInfoMessage("xrCreateInstance", oss.str());
             // Make the unique_ptr no longer delete this.
             loader_instance.release();
@@ -208,7 +208,7 @@ LoaderInstance::LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&&
 LoaderInstance::~LoaderInstance() {
     std::ostringstream oss;
     oss << "Destroying LoaderInstance = ";
-    oss << Uint64ToHexString(reinterpret_cast<uintptr_t>(this));
+    oss << PointerToHexString(this);
     LoaderLogger::LogInfoMessage("xrDestroyInstance", oss.str());
 }
 

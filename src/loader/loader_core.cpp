@@ -503,7 +503,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
         LoaderLogger::LogErrorMessage(
             "xrDestroyDebugUtilsMessengerEXT",
             "xrDestroyDebugUtilsMessengerEXT trampoline encountered an unknown error.  Likely XrDebugUtilsMessengerEXT " +
-                HandleToString(messenger) + " is invalid");
+                HandleToHexString(messenger) + " is invalid");
         return XR_ERROR_HANDLE_INVALID;
     }
 }
@@ -556,16 +556,16 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(XrDebug
             result = dispatch_table->DestroyDebugUtilsMessengerEXT(messenger);
         } else {
             // Delete the character we would've created
-            delete (reinterpret_cast<char *>(reinterpret_cast<uint64_t &>(messenger)));
+            delete (reinterpret_cast<char *>(MakeHandleGeneric(messenger)));
         }
         LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Completed loader terminator");
-        LoaderLogger::GetInstance().RemoveLogRecorder(reinterpret_cast<uint64_t &>(messenger));
+        LoaderLogger::GetInstance().RemoveLogRecorder(MakeHandleGeneric(messenger));
         RuntimeInterface::GetRuntime().ForgetDebugMessenger(messenger);
         return result;
     } catch (...) {
         LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT",
                                       "Terminator encountered an unknown error.  Likely XrDebugUtilsMessengerEXT " +
-                                          HandleToString(messenger) + " is invalid");
+                                          HandleToHexString(messenger) + " is invalid");
         return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
     }
 }
@@ -590,7 +590,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSubmitDebugUtilsMessageEXT(XrInstance
     } catch (...) {
         LoaderLogger::LogErrorMessage("xrSubmitDebugUtilsMessageEXT",
                                       "xrSubmitDebugUtilsMessageEXT terminator encountered an unknown error.  Likely XrInstance " +
-                                          HandleToString(instance) + " is invalid");
+                                          HandleToHexString(instance) + " is invalid");
         return XR_ERROR_HANDLE_INVALID;
     }
 }
@@ -610,7 +610,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSetDebugUtilsObjectNameEXT(XrInstance
     } catch (...) {
         LoaderLogger::LogErrorMessage("xrSetDebugUtilsObjectNameEXT",
                                       "xrSetDebugUtilsObjectNameEXT terminator encountered an unknown error.  Likely XrInstance " +
-                                          HandleToString(instance) + "is invalid");
+                                          HandleToHexString(instance) + "is invalid");
         return XR_ERROR_HANDLE_INVALID;
     }
 }

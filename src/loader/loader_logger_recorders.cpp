@@ -116,7 +116,7 @@ DebugUtilsLogRecorder::DebugUtilsLogRecorder(const XrDebugUtilsMessengerCreateIn
                         DebugUtilsMessageTypesToLoaderLogMessageTypes(create_info->messageTypes)),
       _user_callback(create_info->userCallback) {
     // Use the debug messenger value to uniquely identify this logger with that messenger
-    _unique_id = reinterpret_cast<uint64_t&>(debug_messenger);
+    _unique_id = MakeHandleGeneric(debug_messenger);
     Start();
 }
 

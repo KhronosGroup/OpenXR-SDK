@@ -632,7 +632,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     generated_funcs += '    } catch (...) {\n'
                     generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s trampoline encountered an unknown error.  Likely XrInstance "\n' % (
                         cur_cmd.name, cur_cmd.name)
-                    generated_funcs += '            + HandleToString(%s) + " is invalid");\n' % cur_cmd.params[0].name
+                    generated_funcs += '            + HandleToHexString(%s) + " is invalid");\n' % cur_cmd.params[0].name
                     if has_return:
                         generated_funcs += '        return XR_ERROR_HANDLE_INVALID;\n'
                 elif has_return:

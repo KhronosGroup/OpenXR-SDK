@@ -17,6 +17,9 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
+#define XR_UTILS_INCLUDE_IMPLEMENTATION
+#include "xr_utils.h"
+
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
@@ -37,13 +40,6 @@
 
 std::unique_ptr<LoaderLogger> LoaderLogger::_instance;
 std::once_flag LoaderLogger::_once_flag;
-
-std::string Uint64ToHexString(uint64_t val) {
-    std::ostringstream oss;
-    oss << "0x";
-    oss << std::hex << std::setw(16) << std::setfill('0') << val;
-    return oss.str();
-}
 
 std::string XrLoaderLogObjectInfo::ToString() const {
     std::ostringstream oss;
@@ -284,7 +280,7 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
             // If this is a session, see if there are any labels associated with it for us to add
             // to the callback content.
             if (XR_OBJECT_TYPE_SESSION == current_obj.objectType) {
-                XrSession session = reinterpret_cast<XrSession&>(current_obj.objectHandle);
+                XrSession session = TreatIntegerAsHandle<XrSession>(current_obj.objectHandle);
                 LookUpSessionLabels(session, labels);
             }
         }
