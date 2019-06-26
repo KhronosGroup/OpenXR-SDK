@@ -25,18 +25,15 @@
 
 #include <winapifamily.h>
 #if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM))
-#pragma push_macro("WINAPI_PARTITION_DESKTOP")
+// Enable desktop partition APIs, such as RegOpenKeyEx, LoadLibraryEx, PathFileExists etc.
 #undef WINAPI_PARTITION_DESKTOP
 #define WINAPI_PARTITION_DESKTOP 1  // Enable desktop partition apis, such as RegOpenKeyEx, LoadLibraryEx etc.
-#define CHANGED_WINAPI_PARTITION_DESKTOP_VALUE
 #endif
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#if defined(CHANGED_WINAPI_PARTITION_DESKTOP_VALUE)
-#pragma pop_macro("WINAPI_PARTITION_DESKTOP")
-#endif
 
 #endif  // XR_USE_PLATFORM_WIN32
 

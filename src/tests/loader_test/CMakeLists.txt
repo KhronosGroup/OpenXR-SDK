@@ -27,6 +27,7 @@ add_dependencies(loader_test
 )
 target_include_directories(loader_test
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+    PRIVATE ${CMAKE_BINARY_DIR}/src
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_SOURCE_DIR}/external/include

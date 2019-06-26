@@ -366,26 +366,32 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
     try {
         HKEY hkey;
         DWORD access_flags;
-        char value[1024];
-        DWORD value_size = 1023;
+        wchar_t value_w[1024];
+        DWORD value_size_w = sizeof(value_w);  // byte size of the buffer.
 
         // Generate the full registry location for the registry information
         std::string full_registry_location = OPENXR_REGISTRY_LOCATION;
         full_registry_location += std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION));
         full_registry_location += runtime_registry_location;
 
+        const std::wstring full_registry_location_w = utf8_to_wide(full_registry_location);
+        const std::wstring default_runtime_value_name_w = utf8_to_wide(default_runtime_value_name);
         // Use 64 bit regkey for 64bit application, and use 32 bit regkey in WOW for 32bit application.
         access_flags = KEY_QUERY_VALUE;
-        LONG open_value = RegOpenKeyExA(HKEY_LOCAL_MACHINE, full_registry_location.c_str(), 0, access_flags, &hkey);
+        LONG open_value = RegOpenKeyExW(HKEY_LOCAL_MACHINE, full_registry_location_w.c_str(), 0, access_flags, &hkey);
 
         if (ERROR_SUCCESS != open_value) {
-            std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
+            std::string warning_message = "ReadLayerDataFilesInRegistry - failed to open registry key ";
             warning_message += full_registry_location;
             LoaderLogger::LogWarningMessage("", warning_message);
-        } else if (ERROR_SUCCESS == RegQueryValueExA(hkey, default_runtime_value_name.c_str(), NULL, NULL,
-                                                     reinterpret_cast<LPBYTE>(&value), &value_size) &&
-                   value_size < 1024) {
-            AddFilesInPath(type, value, false, manifest_files);
+        } else if (ERROR_SUCCESS != RegGetValueW(hkey, nullptr, default_runtime_value_name_w.c_str(),
+                                                 RRF_RT_REG_SZ | REG_EXPAND_SZ | RRF_ZEROONFAILURE, NULL,
+                                                 reinterpret_cast<LPBYTE>(&value_w), &value_size_w)) {
+            std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry value ";
+            warning_message += default_runtime_value_name;
+            LoaderLogger::LogWarningMessage("", warning_message);
+        } else {
+            AddFilesInPath(type, wide_to_utf8(value_w), false, manifest_files);
         }
     } catch (...) {
         LoaderLogger::LogErrorMessage("", "ReadLayerDataFilesInRegistry - unknown error occurred");
@@ -403,7 +409,7 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
         HKEY hkey;
         DWORD access_flags;
         LONG rtn_value;
-        char name[1024];
+        wchar_t name_w[1024]{};
         DWORD value;
         DWORD name_size = 1023;
         DWORD value_size = sizeof(value);
@@ -415,7 +421,8 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
             full_registry_location += registry_location;
 
             access_flags = KEY_QUERY_VALUE;
-            LONG open_value = RegOpenKeyExA(hive[hive_index], full_registry_location.c_str(), 0, access_flags, &hkey);
+            std::wstring full_registry_location_w = utf8_to_wide(full_registry_location);
+            LONG open_value = RegOpenKeyExW(hive[hive_index], full_registry_location_w.c_str(), 0, access_flags, &hkey);
             if (ERROR_SUCCESS != open_value) {
                 if (hive_index == 1 && !found[0]) {
                     std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
@@ -427,9 +434,9 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
             }
             found[hive_index] = true;
             while (ERROR_SUCCESS ==
-                   (rtn_value = RegEnumValueA(hkey, key_index++, name, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
+                   (rtn_value = RegEnumValueW(hkey, key_index++, name_w, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
                 if (value_size == sizeof(value) && value == 0) {
-                    std::string filename = name;
+                    const std::string filename = wide_to_utf8(name_w);
                     AddFilesInPath(type, filename, false, manifest_files);
                 }
                 // Reset some items for the next loop

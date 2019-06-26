@@ -20,6 +20,7 @@
 #pragma once
 
 #include "xr_dependencies.h"
+#include <string>
 
 #if defined(XR_OS_LINUX)
 #include <unistd.h>
@@ -96,11 +97,53 @@ static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std:
 
 #elif defined(XR_OS_WINDOWS)
 
+#if defined(_DEBUG)
+inline void LogError(const std::string& error) { OutputDebugStringA(error.c_str()); }
+#else
+#define LogError(x)
+#endif
+inline std::wstring utf8_to_wide(const std::string& utf8Text) {
+    if (utf8Text.empty()) {
+        return {};
+    }
+    std::wstring wideText;
+    const int wideLength = ::MultiByteToWideChar(CP_UTF8, 0, utf8Text.data(), (int)utf8Text.size(), nullptr, 0);
+    if (wideLength == 0) {
+        LogError("utf8_to_wide convert string error: " + std::to_string(::GetLastError()));
+        return {};
+    }
+    wideText.resize(wideLength, 0);
+    wchar_t* wideString = const_cast<wchar_t*>(wideText.data());  // mutable data() only exists in c++17
+    const int length = ::MultiByteToWideChar(CP_UTF8, 0, utf8Text.data(), (int)utf8Text.size(), wideString, wideLength);
+    if (length != wideLength) {
+        LogError("utf8_to_wide convert string error: " + std::to_string(::GetLastError()));
+        return {};
+    }
+    return wideText;
+}
+inline std::string wide_to_utf8(const std::wstring& wideText) {
+    if (wideText.empty()) {
+        return {};
+    }
+    std::string narrowText;
+    int narrowLength = ::WideCharToMultiByte(CP_UTF8, 0, wideText.data(), (int)wideText.size(), nullptr, 0, nullptr, nullptr);
+    if (narrowLength == 0) {
+        LogError("wide_to_utf8 get size error: " + std::to_string(::GetLastError()));
+        return {};
+    }
+    narrowText.resize(narrowLength, 0);
+    char* narrowString = const_cast<char*>(narrowText.data());  // mutable data() only exists in c++17
+    const int length =
+        ::WideCharToMultiByte(CP_UTF8, 0, wideText.data(), (int)wideText.size(), narrowString, narrowLength, nullptr, nullptr);
+    if (length != narrowLength) {
+        LogError("wide_to_utf8 convert string error: " + std::to_string(::GetLastError()));
+        return {};
+    }
+    return narrowText;
+}
 static inline char *PlatformUtilsGetEnv(const char *name) {
-    char *retVal;
-    DWORD valSize;
-
-    valSize = GetEnvironmentVariableA(name, nullptr, 0);
+    const std::wstring wname = utf8_to_wide(name);
+    const DWORD valSize = ::GetEnvironmentVariableW(wname.c_str(), nullptr, 0);
 
     // valSize DOES include the null terminator, so for any set variable
     // will always be at least 1. If it's 0, the variable wasn't set.
@@ -108,9 +151,17 @@ static inline char *PlatformUtilsGetEnv(const char *name) {
         return nullptr;
     }
 
+    std::wstring wValue(valSize, 0);
+    wchar_t* wValueData = const_cast<wchar_t*>(wValue.data());  // mutable data() only exists in c++17
+    const int length = ::GetEnvironmentVariableW(wname.c_str(), wValueData, (DWORD)wValue.size());
+    if (!length) {
+        LogError("GetEnvironmentVariable get value error: " + std::to_string(::GetLastError()));
+        return nullptr;
+    }
+    const std::string value = wide_to_utf8(wValue);
     // Allocate the space necessary for the registry entry
-    retVal = new char[valSize + 1];
-    GetEnvironmentVariableA(name, retVal, valSize);
+    char* retVal = new char[value.size() + 1]{};
+    value.copy(retVal, value.size());
     return retVal;
 }
 

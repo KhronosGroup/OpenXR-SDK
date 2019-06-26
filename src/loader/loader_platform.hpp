@@ -21,7 +21,10 @@
 #pragma once
 
 #include <cassert>
+#include <string>
+#include <sstream>
 #include "xr_dependencies.h"
+#include "platform_utils.hpp"
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LOADER_EXPORT __attribute__((visibility("default")))
@@ -79,10 +82,6 @@ static inline const char *LoaderPlatformLibraryGetProcAddrError(const std::strin
 
 #elif defined(XR_OS_WINDOWS)
 
-static inline bool PathFileExists(LPCSTR szPath) {
-    DWORD dwAttrib = GetFileAttributesA(szPath);
-    return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-}
 
 #define PATH_SEPARATOR ';'
 #define DIRECTORY_SYMBOL '\\'
@@ -115,22 +114,47 @@ static inline int32_t xr_snprintf(char *result_buffer, size_t buffer_size, const
 
 #endif
 
+static std::string DescribeError(uint32_t code, bool prefixErrorCode = true) {
+    std::string str;
+    if (prefixErrorCode) {
+        char prefixBuffer[64];
+        snprintf(prefixBuffer, sizeof(prefixBuffer), "0x%llx (%lld): ", (uint64_t)code, (int64_t)code);
+        str = prefixBuffer;
+    }
+    WCHAR errorBufferW[1024]{};
+    const DWORD errorBufferWCapacity = sizeof(errorBufferW) / sizeof(errorBufferW[0]);
+    const DWORD length = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, (DWORD)code,
+                                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), errorBufferW, errorBufferWCapacity, nullptr);
+    if (length) {  // If errorBufferW contains what we are looking for...
+        str += wide_to_utf8(errorBufferW);
+    } else {
+        str = "(unknown)";
+    }
+    return str;
+}
 // Dynamic Loading:
 typedef HMODULE LoaderPlatformLibraryHandle;
 static LoaderPlatformLibraryHandle LoaderPlatformLibraryOpen(const std::string &path) {
+    const std::wstring pathW = utf8_to_wide(path);
     // Try loading the library the original way first.
-    LoaderPlatformLibraryHandle handle = LoadLibraryA(path.c_str());
-    if (handle == NULL && GetLastError() == ERROR_MOD_NOT_FOUND && PathFileExists(path.c_str())) {
+    LoaderPlatformLibraryHandle handle = LoadLibraryW(pathW.c_str());
+    if (handle == NULL && GetLastError() == ERROR_MOD_NOT_FOUND) {
+        const DWORD dwAttrib = GetFileAttributesW(pathW.c_str());
+        const bool fileExists = (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+        if (fileExists) {
         // If that failed, then try loading it with broader search folders.
-        handle = LoadLibraryExA(path.c_str(), NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR);
+            handle = LoadLibraryExW(pathW.c_str(), NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR);
+        }
     }
     return handle;
 }
 
-static char *LoaderPlatformLibraryOpenError(const std::string &path) {
-    static char errorMsg[164];
-    (void)snprintf(errorMsg, 163, "Failed to open dynamic library \"%s\" with error %d", path.c_str(), GetLastError());
-    return errorMsg;
+static std::string LoaderPlatformLibraryOpenError(const std::string &path) {
+    std::stringstream ss;
+    const DWORD dwLastError = GetLastError();
+    const std::string strError = DescribeError(dwLastError);
+    ss << "Failed to open dynamic library " << path << " with error " << dwLastError << ": " << strError;
+    return ss.str();
 }
 
 static void LoaderPlatformLibraryClose(LoaderPlatformLibraryHandle library) { FreeLibrary(library); }
@@ -141,10 +165,10 @@ static void *LoaderPlatformLibraryGetProcAddr(LoaderPlatformLibraryHandle librar
     return GetProcAddress(library, name.c_str());
 }
 
-static char *LoaderPlatformLibraryGetProcAddrAddrError(const std::string &name) {
-    static char errorMsg[120];
-    (void)snprintf(errorMsg, 119, "Failed to find function \"%s\" in dynamic library", name.c_str());
-    return errorMsg;
+static std::string LoaderPlatformLibraryGetProcAddrAddrError(const std::string &name) {
+    std::stringstream ss;
+    ss << "Failed to find function " << name << " in dynamic library";
+    return ss.str();
 }
 
 #else  // Not Linux or Windows
