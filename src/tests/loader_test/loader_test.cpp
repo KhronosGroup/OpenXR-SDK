@@ -25,9 +25,14 @@
 #include "filesystem_utils.hpp"
 #include "loader_test_utils.hpp"
 
+#include "xr_utils.h"
+
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
+
+#include <type_traits>
+static_assert(sizeof(XrStructureType) == 4, "This should be a 32-bit enum");
 
 // Filter out the loader's messages to std::cerr if this is defined to 1.  This allows a
 // clean output for the test.
@@ -1615,7 +1620,7 @@ DEFINE_TEST(TestDebugUtils) {
             TEST_NOT_EQUAL(pfn_set_debug_utils_object_name_ext, nullptr,
                            "TestDebugUtils invalid xrSetDebugUtilsObjectNameEXT function pointer");
             strcpy(object_name, "My Instance Obj");
-            object_handle = reinterpret_cast<uint64_t&>(instance);
+            object_handle = MakeHandleGeneric(instance);
             objects[0].type = XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
             objects[0].next = nullptr;
             objects[0].objectType = XR_OBJECT_TYPE_INSTANCE;
@@ -1795,12 +1800,12 @@ DEFINE_TEST(TestDebugUtils) {
                 objects[0].type = XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
                 objects[0].next = nullptr;
                 objects[0].objectType = XR_OBJECT_TYPE_INSTANCE;
-                objects[0].objectHandle = reinterpret_cast<uint64_t&>(instance);
+                objects[0].objectHandle = MakeHandleGeneric(instance);
                 objects[0].objectName = nullptr;
                 objects[1].type = XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
                 objects[1].next = nullptr;
                 objects[1].objectType = XR_OBJECT_TYPE_SESSION;
-                objects[1].objectHandle = reinterpret_cast<uint64_t&>(session);
+                objects[1].objectHandle = MakeHandleGeneric(session);
                 objects[1].objectName = nullptr;
                 debug_utils_callback_data.objects = &objects[0];
 
