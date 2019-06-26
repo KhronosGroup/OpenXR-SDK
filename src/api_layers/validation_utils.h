@@ -24,6 +24,7 @@
 
 #include "api_layer_platform_defines.h"
 #include "xr_utils.h"
+#include "extra_algorithms.h"
 
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
@@ -193,21 +194,6 @@ class HandleInfo : public HandleInfoBase<HandleType, GenValidUsageXrHandleInfo> 
     /// Removes handles associated  with an instance.
     void removeHandlesForInstance(GenValidUsageXrInstanceInfo *search_value);
 };
-
-/// Like std::remove_if, except it works on associative containers and it actually removes this.
-///
-/// The iterator stuff in here is subtle - .erase() invalidates only that iterator, but it returns a non-invalidated iterator to the
-/// next valid element which we can use instead of incrementing.
-template <typename T, typename Pred>
-inline void map_erase_if(T &container, Pred &&predicate) {
-    for (auto it = container.begin(); it != container.end();) {
-        if (predicate(*it)) {
-            it = container.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
 
 /// Function to record all the core validation information
 void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::string &message_id,

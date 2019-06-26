@@ -24,9 +24,11 @@
 
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"
+#include "extra_algorithms.h"
 #include "runtime_interface.hpp"
 #include "api_layer_interface.hpp"
 #include "xr_generated_dispatch_table.h"
+
 class LoaderInstance;
 
 typedef std::unique_lock<std::mutex> UniqueLock;
@@ -56,21 +58,6 @@ class HandleLoaderMap {
     map_t instance_map_;
     std::mutex mutex_;
 };
-
-/// Like std::remove_if, except it works on associative containers and it actually removes this.
-///
-/// The iterator stuff in here is subtle - .erase() invalidates only that iterator, but it returns a non-invalidated iterator to the
-/// next valid element which we can use instead of incrementing.
-template <typename T, typename Pred>
-inline void map_erase_if(T& container, Pred&& predicate) {
-    for (auto it = container.begin(); it != container.end();) {
-        if (predicate(*it)) {
-            it = container.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
 
 class LoaderInstance {
    public:
