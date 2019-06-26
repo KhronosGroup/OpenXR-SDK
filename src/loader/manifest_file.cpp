@@ -701,7 +701,7 @@ void RuntimeManifestFile::CreateIfValid(std::string const &filename,
         }
 
         Json::Value funcs_renamed = runtime_root_node["functions"];
-        if (!funcs_renamed.isNull() && funcs_renamed.size() > 0) {
+        if (!funcs_renamed.isNull() && !funcs_renamed.empty()) {
             for (Json::ValueIterator func_it = funcs_renamed.begin(); func_it != funcs_renamed.end(); ++func_it) {
                 if (!(*func_it).isString()) {
                     std::string warning_message = "RuntimeManifestFile::CreateIfValid ";
@@ -967,7 +967,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string cons
         }
 
         Json::Value funcs_renamed = layer_root_node["functions"];
-        if (!funcs_renamed.isNull() && funcs_renamed.size() > 0) {
+        if (!funcs_renamed.isNull() && !funcs_renamed.empty()) {
             for (Json::ValueIterator func_it = funcs_renamed.begin(); func_it != funcs_renamed.end(); ++func_it) {
                 if (!(*func_it).isString()) {
                     std::string warning_message = "ApiLayerManifestFile::CreateIfValid ";
