@@ -17,8 +17,6 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#define XR_UTILS_INCLUDE_IMPLEMENTATION
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -33,7 +31,7 @@
 #include "xr_generated_dispatch_table.h"
 #include "loader_interfaces.h"
 #include "platform_utils.hpp"
-#include "xr_utils.h"
+#include "hex_and_handles.h"
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LAYER_EXPORT __attribute__((visibility("default")))

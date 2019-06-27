@@ -25,7 +25,7 @@
 #include "filesystem_utils.hpp"
 #include "loader_test_utils.hpp"
 
-#include "xr_utils.h"
+#include "hex_and_handles.h"
 
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>

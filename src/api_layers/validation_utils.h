@@ -23,7 +23,7 @@
 #define VALIDATION_UTILS_H_ 1
 
 #include "api_layer_platform_defines.h"
-#include "xr_utils.h"
+#include "hex_and_handles.h"
 #include "extra_algorithms.h"
 
 #include <openxr/openxr.h>

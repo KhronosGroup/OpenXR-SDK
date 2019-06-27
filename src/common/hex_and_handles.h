@@ -25,14 +25,7 @@
  *
  * Most are trivial and inlined by default, but a few involve some non-trivial standard headers:
  * the various `...ToHexString`functions.
- * If you want those, you have two ways of using this header:
- *
- * - Out-of-line implementation: Just include this header where you need it, then
- *   in one .cpp file, define XR_UTILS_INCLUDE_IMPLEMENTATION before you include it
- *   to compile the implementation in that file.
- * - Inline implementation: Increases the number of includes, but you don't have to
- *   worry about how many files have defined XR_UTILS_INCLUDE_IMPLEMENTATION.
- *   Define XR_UTILS_INLINE_IMPLEMENTATION in every file before including this.
+ * If you want those, make sure your build includes the corresponding hex_and_handles.cpp file.
  */
 
 #pragma once
@@ -40,10 +33,6 @@
 #include <openxr/openxr.h>
 
 #include <string>
-
-#if defined(XR_UTILS_INLINE_IMPLEMENTATION) && defined(XR_UTILS_INCLUDE_IMPLEMENTATION)
-#error "Cannot define both XR_UTILS_INLINE_IMPLEMENTATION and XR_UTILS_INCLUDE_IMPLEMENTATION"
-#endif
 
 #if XR_PTR_SIZE == 8
 /// Convert a handle into a same-sized integer.
@@ -89,19 +78,13 @@ static inline bool IsIntegerNullHandle(uint64_t handle) { return XR_NULL_HANDLE 
 
 #endif
 
-#ifdef XR_UTILS_INLINE_IMPLEMENTATION
-#define XR_UTILS_STATIC_INLINE static inline
-#else
-#define XR_UTILS_STATIC_INLINE
-#endif
-
 /// Turns a uint64_t into a string formatted as hex.
 ///
 /// The core of the HandleToHexString implementation is in here.
-XR_UTILS_STATIC_INLINE std::string Uint64ToHexString(uint64_t val);
+std::string Uint64ToHexString(uint64_t val);
 
 /// Turns a uint32_t into a string formatted as hex.
-XR_UTILS_STATIC_INLINE std::string Uint32ToHexString(uint32_t val);
+std::string Uint32ToHexString(uint32_t val);
 
 /// Turns an OpenXR handle into a string formatted as hex.
 template <typename T>
@@ -122,25 +105,3 @@ template <typename T>
 static inline std::string PointerToHexString(T const* ptr) {
     return UintptrToHexString(reinterpret_cast<uintptr_t>(ptr));
 }
-
-// Define this only once in your project, in a non-header-file, to include the implementation.
-#if defined(XR_UTILS_INCLUDE_IMPLEMENTATION) || defined(XR_UTILS_INLINE_IMPLEMENTATION)
-
-#include <sstream>
-#include <iomanip>
-
-XR_UTILS_STATIC_INLINE std::string Uint64ToHexString(uint64_t val) {
-    std::ostringstream oss;
-    oss << "0x";
-    oss << std::hex << std::setw(16) << std::setfill('0') << val;
-    return oss.str();
-}
-
-XR_UTILS_STATIC_INLINE std::string Uint32ToHexString(uint32_t val) {
-    std::ostringstream oss;
-    oss << "0x";
-    oss << std::hex << std::setw(8) << std::setfill('0') << val;
-    return oss.str();
-}
-
-#endif  // defined(XR_UTILS_INCLUDE_IMPLEMENTATION) || defined(XR_UTILS_INLINE_IMPLEMENTATION)

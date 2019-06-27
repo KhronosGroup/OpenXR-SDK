@@ -33,7 +33,7 @@
 #include "loader_interfaces.h"
 #include "platform_utils.hpp"
 #include "xr_generated_dispatch_table.h"
-#include "xr_utils.h"
+#include "hex_and_handles.h"
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LAYER_EXPORT __attribute__((visibility("default")))

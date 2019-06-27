@@ -27,7 +27,7 @@
 
 #include <openxr/openxr.h>
 
-#include "xr_utils.h"
+#include "hex_and_handles.h"
 
 // Use internal versions of flags similar to XR_EXT_debug_utils so that
 // we're not tightly coupled to that extension.  This way, if the extension

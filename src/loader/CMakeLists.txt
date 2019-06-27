@@ -74,7 +74,8 @@ add_library(${LOADER_NAME} ${LIBRARY_TYPE}
     ${CMAKE_CURRENT_BINARY_DIR}/xr_generated_loader.cpp
     ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
     ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.hpp
-    ${CMAKE_SOURCE_DIR}/src/common/xr_utils.h
+    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.h
     ${LOADER_EXTERNAL_GEN_FILES}
     ${openxr_loader_RESOURCE_FILE}
 )

@@ -119,7 +119,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include <iomanip>\n'
             preamble += '#include <unordered_map>\n\n'
             preamble += '#include "xr_generated_api_dump.hpp"\n'
-            preamble += '#include "xr_utils.h"\n'
+            preamble += '#include "hex_and_handles.h"\n'
         write(preamble, file=self.outFile)
 
     # Write out all the information for the appropriate file,

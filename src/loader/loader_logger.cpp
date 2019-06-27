@@ -17,8 +17,6 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#define XR_UTILS_INCLUDE_IMPLEMENTATION
-#include "xr_utils.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -33,6 +31,7 @@
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
 
+#include "hex_and_handles.h"
 #include "extra_algorithms.h"
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"

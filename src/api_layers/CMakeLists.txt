@@ -36,6 +36,8 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api_layer_platform_defines
 # Basics for api_dump API Layer
 add_library(XrApiLayer_api_dump SHARED
     api_dump.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.h
     ${CMAKE_BINARY_DIR}/src/xr_generated_dispatch_table.c
     ${CMAKE_BINARY_DIR}/src/api_layers/xr_generated_api_dump.cpp
 )
@@ -62,6 +64,8 @@ endif()
 # Basics for core_validation API Layer
 add_library(XrApiLayer_core_validation SHARED
     core_validation.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.h
     ${CMAKE_BINARY_DIR}/src/xr_generated_dispatch_table.c 
     ${CMAKE_BINARY_DIR}/src/api_layers/xr_generated_core_validation.cpp
 )
