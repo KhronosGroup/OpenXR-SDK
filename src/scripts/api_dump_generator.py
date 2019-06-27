@@ -411,8 +411,8 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             write_string += self.writeIndent(indent)
             write_string += 'oss_%s << std::nouppercase;\n' % int_short_param_name
             write_string += self.writeIndent(indent)
-            write_string += 'contents.push_back(std::make_tuple("%s", %s' % (full_type, description)
-            write_string += ', oss_%s.str()));\n' % int_short_param_name
+            write_string += 'contents.emplace_back("%s", %s' % (full_type, description)
+            write_string += ', oss_%s.str());\n' % int_short_param_name
             indent = indent - 1
             write_string += self.writeIndent(indent)
             write_string += '}\n'
@@ -433,8 +433,8 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             write_string += self.writeIndent(indent)
             write_string += 'oss_%s << std::nouppercase;\n' % int_short_param_name
             write_string += self.writeIndent(indent)
-            write_string += 'contents.push_back(std::make_tuple("%s", %s' % (full_type, description)
-            write_string += ', oss_%s.str()));\n' % int_short_param_name
+            write_string += 'contents.emplace_back("%s", %s' % (full_type, description)
+            write_string += ', oss_%s.str());\n' % int_short_param_name
             indent = indent - 1
             write_string += self.writeIndent(indent)
             write_string += '}\n'
@@ -449,8 +449,8 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 write_string += '*' * pointer_count
             write_string += '%s).QuadPart );\n' % full_name
             write_string += self.writeIndent(indent)
-            write_string += 'contents.push_back(std::make_tuple("%s", %s' % (full_type, description)
-            write_string += ', oss_%s.str()));\n' % int_short_param_name
+            write_string += 'contents.emplace_back("%s", %s' % (full_type, description)
+            write_string += ', oss_%s.str());\n' % int_short_param_name
         elif base_type == 'timespec':
             # Unbeknownst to XR, this is actually a struct.
             write_string += self.writeIndent(indent)
@@ -470,9 +470,9 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             write_string += '%s).tv_nsec << "s";\n' % full_name
 
             write_string += self.writeIndent(indent)
-            write_string += 'contents.push_back(std::make_tuple("%s", %s' % (
+            write_string += 'contents.emplace_back("%s", %s' % (
                 full_type, description)
-            write_string += ', oss_%s.str()));\n' % int_short_param_name
+            write_string += ', oss_%s.str());\n' % int_short_param_name
         else:
             if base_type == 'XrResult':
                 write_string += self.writeIndent(indent)
@@ -485,7 +485,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 write_string += self.writeIndent(indent)
                 write_string += '                                   %s, %s_string);\n' % (full_name, int_short_param_name)
                 write_string += self.writeIndent(indent)
-                write_string += 'contents.push_back(std::make_tuple("%s", %s, %s_string));\n' % (full_type, description, int_short_param_name)
+                write_string += 'contents.emplace_back("%s", %s, %s_string);\n' % (full_type, description, int_short_param_name)
                 write_string += self.writeIndent(indent - 1)
                 write_string += '} else {\n'
                 write_string += self.writeIndent(indent)
@@ -500,7 +500,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 write_string += self.writeIndent(indent)
                 write_string += '                                          %s, %s_string);\n' % (full_name, int_short_param_name)
                 write_string += self.writeIndent(indent)
-                write_string += 'contents.push_back(std::make_tuple("%s", %s, %s_string));\n' % (full_type, description, int_short_param_name)
+                write_string += 'contents.emplace_back("%s", %s, %s_string);\n' % (full_type, description, int_short_param_name)
                 write_string += self.writeIndent(indent - 1)
                 write_string += '} else {\n'
                 write_string += self.writeIndent(indent)
@@ -535,12 +535,12 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                     write_string += '*' * pointer_count
                 write_string += '%s);\n' % full_name
                 write_string += self.writeIndent(indent)
-                write_string += 'contents.push_back(std::make_tuple("%s", %s' % (full_type, description)
-                write_string += ', oss_%s.str()));\n' % int_short_param_name
+                write_string += 'contents.emplace_back("%s", %s' % (full_type, description)
+                write_string += ', oss_%s.str());\n' % int_short_param_name
 
             else:
                 write_string += self.writeIndent(indent)
-                write_string += 'contents.push_back(std::make_tuple("%s", %s, ' % (full_type, description)
+                write_string += 'contents.emplace_back("%s", %s, ' % (full_type, description)
                 if not is_char:
                     write_string += 'std::to_string('
                 if can_dereference:
@@ -549,7 +549,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 # Close std::to_string
                 if not is_char:
                     write_string += ')'
-                write_string += '));\n'
+                write_string += ');\n'
 
             if base_type == 'XrResult' or base_type == 'XrStructureType':
                 indent = indent - 1
@@ -929,7 +929,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
             struct_union_check += self.writeIndent(1)
             struct_union_check += 'try {\n'
             struct_union_check += self.writeIndent(2)
-            struct_union_check += 'contents.push_back(std::make_tuple(type_string, prefix, PointerToHexString(value)));\n'
+            struct_union_check += 'contents.emplace_back(type_string, prefix, PointerToHexString(value));\n'
             struct_union_check += self.writeIndent(2)
             struct_union_check += 'if (is_pointer) {\n'
             struct_union_check += self.writeIndent(3)
@@ -992,7 +992,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
                 struct_union_check += self.writeIndent(indent)
                 struct_union_check += '// Fallback path - Just output generic information about the base struct\n'
             struct_union_check += self.writeIndent(indent)
-            struct_union_check += 'contents.push_back(std::make_tuple(type_string, prefix, PointerToHexString(value)));\n'
+            struct_union_check += 'contents.emplace_back(type_string, prefix, PointerToHexString(value));\n'
             struct_union_check += self.writeIndent(indent)
             struct_union_check += 'if (is_pointer) {\n'
             struct_union_check += self.writeIndent(indent + 1)
@@ -1021,7 +1021,7 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         struct_union_check += 'bool ApiDumpDecodeNextChain(XrGeneratedDispatchTable* gen_dispatch_table, const void* value, std::string prefix,\n'
         struct_union_check += '                            std::vector<std::tuple<std::string, std::string, std::string>> &contents) {\n'
         struct_union_check += '    try {\n'
-        struct_union_check += '        contents.push_back(std::make_tuple("const void *", prefix, PointerToHexString(value)));\n'
+        struct_union_check += '        contents.emplace_back("const void *", prefix, PointerToHexString(value));\n'
         struct_union_check += '        if (nullptr == value) {\n'
         struct_union_check += '            return true;\n'
         struct_union_check += '        }\n'
@@ -1150,10 +1150,10 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
 
                 # Print out a tuple for the header
                 if has_return:
-                    generated_commands += '        contents.push_back(std::make_tuple("%s", "%s", ""));\n' % (
+                    generated_commands += '        contents.emplace_back("%s", "%s", "");\n' % (
                         cur_cmd.return_type.text, cur_cmd.name)
                 else:
-                    generated_commands += '        contents.push_back(std::make_tuple("void", "%s", ""));\n' % cur_cmd.name
+                    generated_commands += '        contents.emplace_back("void", "%s", "");\n' % cur_cmd.name
                 # Print out information for each parameter
                 for param in cur_cmd.params:
                     can_expand = False
@@ -1231,10 +1231,10 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         generated_commands += '        std::string func_name = name;\n\n'
         generated_commands += '        // Generate output for this command\n'
         generated_commands += '        std::vector<std::tuple<std::string, std::string, std::string>> contents;\n'
-        generated_commands += '        contents.push_back(std::make_tuple("XrResult", "xrGetInstanceProcAddr", ""));\n'
-        generated_commands += '        contents.push_back(std::make_tuple("XrInstance", "instance", HandleToHexString(instance)));\n'
-        generated_commands += '        contents.push_back(std::make_tuple("const char*", "name", name));\n'
-        generated_commands += '        contents.push_back(std::make_tuple("PFN_xrVoidFunction*", "function", PointerToHexString(reinterpret_cast<const void*>(function))));\n'
+        generated_commands += '        contents.emplace_back("XrResult", "xrGetInstanceProcAddr", "");\n'
+        generated_commands += '        contents.emplace_back("XrInstance", "instance", HandleToHexString(instance));\n'
+        generated_commands += '        contents.emplace_back("const char*", "name", name);\n'
+        generated_commands += '        contents.emplace_back("PFN_xrVoidFunction*", "function", PointerToHexString(reinterpret_cast<const void*>(function)));\n'
         generated_commands += '        ApiDumpLayerRecordContent(contents);\n'
 
         count = 0
