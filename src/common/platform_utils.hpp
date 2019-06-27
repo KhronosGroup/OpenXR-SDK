@@ -111,7 +111,7 @@ inline std::wstring utf8_to_wide(const std::string& utf8Text) {
     std::wstring wideText;
     const int wideLength = ::MultiByteToWideChar(CP_UTF8, 0, utf8Text.data(), (int)utf8Text.size(), nullptr, 0);
     if (wideLength == 0) {
-        LogError("utf8_to_wide convert string error: " + std::to_string(::GetLastError()));
+        LogError("utf8_to_wide get size error: " + std::to_string(::GetLastError()));
         return {};
     }
 
