@@ -445,8 +445,7 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
     try {
         DIR* dir = opendir(path.c_str());
         if (dir == nullptr) {
-            //! @todo is this right?
-            return true;
+            return false;
         }
         struct dirent* entry;
         while ((entry = readdir(dir)) != nullptr) {
