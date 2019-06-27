@@ -18,9 +18,15 @@
 //          Nat Brown <natb@valvesoftware.com>
 //
 
-#include <cstring>
-#include "xr_dependencies.h"
+#include "filesystem_utils.hpp"
+
 #include "platform_utils.hpp"
+
+#ifdef _WIN32
+#include "xr_dependencies.h"
+#endif
+
+#include <cstring>
 
 #if defined DISABLE_STD_FILESYSTEM
 #define USE_EXPERIMENTAL_FS 0
@@ -76,14 +82,11 @@
 #else
 // Linux/Apple fallback includes
 #include <sys/stat.h>
-#include <sys/param.h>
 #include <unistd.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <dirent.h>
 #endif
-
-#include "filesystem_utils.hpp"
 
 #if defined(XR_USE_PLATFORM_WIN32)
 #define PATH_SEPARATOR ';'
@@ -325,12 +328,6 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 }
 
 #else  // XR_OS_LINUX/XR_OS_APPLE fallback
-
-#include <sys/stat.h>
-#include <sys/param.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <dirent.h>
 
 // simple POSIX-compatible implementation of the <filesystem> pieces used by OpenXR
 

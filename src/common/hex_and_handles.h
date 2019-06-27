@@ -33,6 +33,7 @@
 #include <openxr/openxr.h>
 
 #include <string>
+#include <stdint.h>
 
 #if XR_PTR_SIZE == 8
 /// Convert a handle into a same-sized integer.

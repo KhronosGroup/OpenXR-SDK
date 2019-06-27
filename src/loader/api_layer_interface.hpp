@@ -21,9 +21,14 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
+#include <openxr/openxr.h>
 
 #include "loader_platform.hpp"
 #include "loader_interfaces.h"
+
+struct XrGeneratedDispatchTable;
 
 class ApiLayerInterface {
    public:

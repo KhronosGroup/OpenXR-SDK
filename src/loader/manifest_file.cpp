@@ -21,21 +21,28 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-#include <cmath>
+#include "manifest_file.hpp"
 
 #include "filesystem_utils.hpp"
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"
-#include "manifest_file.hpp"
 #include "loader_logger.hpp"
-#include "loader_instance.hpp"
-#include "xr_generated_loader.hpp"
+
+#include <json/json.h>
+#include <openxr/openxr.h>
+
+#include <algorithm>
+#include <cstring>
+#include <fstream>
+#include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 // OpenXR paths and registry key locations
 #define OPENXR_RELATIVE_PATH "openxr/"

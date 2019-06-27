@@ -17,21 +17,27 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <string>
-#include <mutex>
-#include <unordered_map>
-#include <algorithm>
-#include <cctype>
-
-#include "xr_generated_api_dump.hpp"
-#include "xr_generated_dispatch_table.h"
+#include "hex_and_handles.h"
 #include "loader_interfaces.h"
 #include "platform_utils.hpp"
-#include "hex_and_handles.h"
+#include "xr_generated_api_dump.hpp"
+#include "xr_generated_dispatch_table.h"
+
+#include <openxr/openxr.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LAYER_EXPORT __attribute__((visibility("default")))

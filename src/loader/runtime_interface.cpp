@@ -16,16 +16,24 @@
 //
 // Author: Mark Young <marky@lunarg.com>
 //
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+
+#include "runtime_interface.hpp"
 
 #include "manifest_file.hpp"
-#include "runtime_interface.hpp"
-#include "xr_generated_loader.hpp"
 #include "loader_interfaces.h"
 #include "loader_logger.hpp"
+#include "loader_platform.hpp"
+#include "xr_generated_dispatch_table.h"
+
+#include <openxr/openxr.h>
+
+#include <cstring>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 std::unique_ptr<RuntimeInterface> RuntimeInterface::_single_runtime_interface;
 uint32_t RuntimeInterface::_single_runtime_count = 0;

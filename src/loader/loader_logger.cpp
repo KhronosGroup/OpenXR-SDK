@@ -17,25 +17,29 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
+#include "loader_logger.hpp"
+
+#include "extra_algorithms.h"
+#include "hex_and_handles.h"
+#include "loader_logger_recorders.hpp"
+#include "platform_utils.hpp"
+
+//! @todo can we remove this? Everything but Windows is using it only for includes that aren't needed in this file.
+#ifdef _WIN32
+#include "xr_dependencies.h"
+#endif
+
+#include <openxr/openxr.h>
+
 #include <algorithm>
-#include <iomanip>
-#include <iostream>
 #include <iterator>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
-
-#include "xr_dependencies.h"
-#include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
-
-#include "hex_and_handles.h"
-#include "extra_algorithms.h"
-#include "loader_platform.hpp"
-#include "platform_utils.hpp"
-#include "loader_logger.hpp"
-#include "loader_logger_recorders.hpp"
 
 std::unique_ptr<LoaderLogger> LoaderLogger::_instance;
 std::once_flag LoaderLogger::_once_flag;

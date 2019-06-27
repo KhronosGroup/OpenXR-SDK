@@ -17,10 +17,17 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#include <sstream>
-#include <iostream>
-
 #include "loader_logger_recorders.hpp"
+
+#include "hex_and_handles.h"
+#include "loader_logger.hpp"
+
+#include <openxr/openxr.h>
+
+#include <memory>
+#include <string>
+#include <vector>
+#include <iostream>
 
 // Anonymous namespace to keep these types private
 namespace {

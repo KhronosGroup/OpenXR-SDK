@@ -21,20 +21,30 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <cstring>
-#include <string>
-#include <mutex>
-#include <memory>
-#include <sstream>
-
-#include "xr_dependencies.h"
-#include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
-
-#include "loader_logger.hpp"
-#include "loader_logger_recorders.hpp"
+#include "api_layer_interface.hpp"
+#include "hex_and_handles.h"
 #include "loader_instance.hpp"
+#include "loader_logger_recorders.hpp"
+#include "loader_logger.hpp"
+#include "loader_platform.hpp"
+#include "runtime_interface.hpp"
+#include "xr_generated_dispatch_table.h"
 #include "xr_generated_loader.hpp"
+
+//! @todo can we remove this? Everything but Windows is using it only for includes that aren't needed in this file.
+#ifdef _WIN32
+#include "xr_dependencies.h"
+#endif
+
+#include <openxr/openxr.h>
+
+#include <cstring>
+#include <memory>
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 // Flag to cause the one time to init to only occur one time.
 std::once_flag g_one_time_init_flag;

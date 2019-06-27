@@ -43,6 +43,6 @@
 #define XR_USE_GRAPHICS_API_METAL 1   // Metal exists
 #endif                                // XR_OS_APPLE_MACOS
 
-#include "xr_dependencies.h"
+#include "xr_dependencies.h" // IWYU pragma: export
 
 #endif  // API_LAYER_PLATFORM_DEFINES_H_

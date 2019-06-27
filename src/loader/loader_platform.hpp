@@ -21,8 +21,9 @@
 #pragma once
 
 #include <cassert>
-#include <string>
 #include <sstream>
+#include <string>
+
 #include "xr_dependencies.h"
 #include "platform_utils.hpp"
 

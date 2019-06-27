@@ -16,18 +16,23 @@
 //
 // Author: Mark Young <marky@lunarg.com>
 //
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <utility>
 
-#include "platform_utils.hpp"
-#include "manifest_file.hpp"
-#include "xr_generated_dispatch_table.h"
 #include "api_layer_interface.hpp"
+
 #include "loader_interfaces.h"
 #include "loader_logger.hpp"
+#include "loader_platform.hpp"
+#include "manifest_file.hpp"
+#include "platform_utils.hpp"
+
+#include <openxr/openxr.h>
+
+#include <cstring>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #define OPENXR_ENABLE_LAYERS_ENV_VAR "XR_ENABLE_API_LAYERS"
 

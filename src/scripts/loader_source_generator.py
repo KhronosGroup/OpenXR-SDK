@@ -174,23 +174,32 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include <unordered_map>\n'
             preamble += '#include <thread>\n'
             preamble += '#include <mutex>\n\n'
+            preamble += '#include "xr_dependencies.h"\n'
+            preamble += '#include "openxr/openxr.h"\n'
+            preamble += '#include "openxr/openxr_platform.h"\n\n'
             preamble += '#include "loader_interfaces.h"\n\n'
             preamble += '#include "loader_instance.hpp"\n\n'
 
         elif self.genOpts.filename == 'xr_generated_loader.cpp':
-            preamble += '#include <ios>\n'
-            preamble += '#include <sstream>\n'
-            preamble += '#include <cstring>\n'
-            preamble += '#include <string>\n\n'
-            preamble += '#include <algorithm>\n\n'
+            preamble += '#include "xr_generated_loader.hpp"\n\n'
+            preamble += '#include "api_layer_interface.hpp"\n'
+            preamble += '#include "hex_and_handles.h"\n'
+            preamble += '#include "loader_instance.hpp"\n'
+            preamble += '#include "loader_logger.hpp"\n'
+            preamble += '#include "loader_platform.hpp"\n'
+            preamble += '#include "runtime_interface.hpp"\n'
+            preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '#include "xr_generated_utilities.h"\n\n'
+
             preamble += '#include "xr_dependencies.h"\n'
             preamble += '#include <openxr/openxr.h>\n'
             preamble += '#include <openxr/openxr_platform.h>\n\n'
-            preamble += '#include "loader_logger.hpp"\n'
-            preamble += '#include "xr_generated_loader.hpp"\n'
-            preamble += '#include "xr_generated_dispatch_table.h"\n'
-            preamble += '#include "xr_generated_utilities.h"\n'
-            preamble += '#include "api_layer_interface.hpp"\n'
+
+            preamble += '#include <cstring>\n'
+            preamble += '#include <memory>\n'
+            preamble += '#include <new>\n'
+            preamble += '#include <string>\n'
+            preamble += '#include <unordered_map>\n'
 
         write(preamble, file=self.outFile)
 

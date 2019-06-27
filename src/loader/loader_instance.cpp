@@ -21,19 +21,28 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include "loader_instance.hpp"
+
+#include "api_layer_interface.hpp"
+#include "hex_and_handles.h"
+#include "loader_interfaces.h"
+#include "loader_logger.hpp"
+#include "runtime_interface.hpp"
+#include "xr_generated_dispatch_table.h"
+#include "xr_generated_loader.hpp"
+
+//! @todo can we remove this? Everything but Windows is using it only for includes that aren't needed in this file.
+#ifdef _WIN32
+#include "xr_dependencies.h"
+#endif
+#include <openxr/openxr.h>
+
 #include <cstring>
 #include <memory>
 #include <sstream>
-#include <stack>
-
-#include "xr_dependencies.h"
-#include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
-
-#include "loader_instance.hpp"
-#include "xr_generated_dispatch_table.h"
-#include "xr_generated_loader.hpp"
-#include "loader_logger.hpp"
+#include <string>
+#include <utility>
+#include <vector>
 
 // Extensions that are supported by the loader, but may not be supported
 // the the runtime.

@@ -19,16 +19,16 @@
 
 #pragma once
 
+#include <openxr/openxr.h>
+
 #include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-#include "xr_dependencies.h"
-#include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
-
-#include <json/json.h>
+namespace Json {
+class Value;
+}
 
 enum ManifestFileType {
     MANIFEST_TYPE_UNDEFINED = 0,

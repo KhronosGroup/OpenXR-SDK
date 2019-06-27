@@ -105,21 +105,24 @@ class ApiDumpOutputGenerator(AutomaticSourceOutputGenerator):
         preamble = ''
         if self.genOpts.filename == 'xr_generated_api_dump.hpp':
             preamble += '#pragma once\n\n'
-            preamble += '#include <string>\n'
-            preamble += '#include <vector>\n'
-            preamble += '#include <tuple>\n\n'
             preamble += '#include "api_layer_platform_defines.h"\n'
             preamble += '#include <openxr/openxr.h>\n'
             preamble += '#include <openxr/openxr_platform.h>\n\n'
-            preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '#include <mutex>\n'
+            preamble += '#include <string>\n'
+            preamble += '#include <tuple>\n'
+            preamble += '#include <unordered_map>\n'
+            preamble += '#include <vector>\n\n'
+            preamble += 'struct XrGeneratedDispatchTable;\n\n'
         elif self.genOpts.filename == 'xr_generated_api_dump.cpp':
+            preamble += '#include "xr_generated_api_dump.hpp"\n'
+            preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '#include "hex_and_handles.h"\n\n'
             preamble += '#include <cstring>\n'
             preamble += '#include <mutex>\n'
             preamble += '#include <sstream>\n'
             preamble += '#include <iomanip>\n'
             preamble += '#include <unordered_map>\n\n'
-            preamble += '#include "xr_generated_api_dump.hpp"\n'
-            preamble += '#include "hex_and_handles.h"\n'
         write(preamble, file=self.outFile)
 
     # Write out all the information for the appropriate file,

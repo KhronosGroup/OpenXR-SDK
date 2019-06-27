@@ -19,16 +19,17 @@
 
 #pragma once
 
+#include "loader_platform.hpp"
+
+#include <openxr/openxr.h>
+
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <mutex>
 #include <memory>
 
-#include <openxr/openxr.h>
-
-#include "loader_platform.hpp"
-#include "xr_generated_dispatch_table.h"
+struct XrGeneratedDispatchTable;
 
 class RuntimeInterface {
    public:
