@@ -34,131 +34,131 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
     XrResult last_error = XR_SUCCESS;
     bool any_loaded = false;
     try {
-        // If something's already loaded, we're done here.
-        if (_single_runtime_interface != nullptr) {
-            _single_runtime_count++;
-            return XR_SUCCESS;
-        }
+    // If something's already loaded, we're done here.
+    if (_single_runtime_interface != nullptr) {
+        _single_runtime_count++;
+        return XR_SUCCESS;
+    }
 
-        std::vector<std::unique_ptr<RuntimeManifestFile>> runtime_manifest_files = {};
+    std::vector<std::unique_ptr<RuntimeManifestFile>> runtime_manifest_files = {};
 
-        // Find the available runtimes which we may need to report information for.
-        last_error = RuntimeManifestFile::FindManifestFiles(MANIFEST_TYPE_RUNTIME, runtime_manifest_files);
-        if (XR_SUCCESS != last_error) {
-            LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - unknown error");
-            last_error = XR_ERROR_FILE_ACCESS_ERROR;
-        } else {
-            for (std::unique_ptr<RuntimeManifestFile>& manifest_file : runtime_manifest_files) {
-                LoaderPlatformLibraryHandle runtime_library = LoaderPlatformLibraryOpen(manifest_file->LibraryPath());
-                if (nullptr == runtime_library) {
-                    if (!any_loaded) {
-                        last_error = XR_ERROR_INSTANCE_LOST;
-                    }
-                    std::string library_message = LoaderPlatformLibraryOpenError(manifest_file->LibraryPath());
-                    std::string warning_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
-                    warning_message += manifest_file->Filename();
-                    warning_message += ", failed to load with message \"";
-                    warning_message += library_message;
-                    warning_message += "\"";
-                    LoaderLogger::LogErrorMessage(openxr_command, warning_message);
-                    continue;
+    // Find the available runtimes which we may need to report information for.
+    last_error = RuntimeManifestFile::FindManifestFiles(MANIFEST_TYPE_RUNTIME, runtime_manifest_files);
+    if (XR_SUCCESS != last_error) {
+        LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - unknown error");
+        last_error = XR_ERROR_FILE_ACCESS_ERROR;
+    } else {
+        for (std::unique_ptr<RuntimeManifestFile>& manifest_file : runtime_manifest_files) {
+            LoaderPlatformLibraryHandle runtime_library = LoaderPlatformLibraryOpen(manifest_file->LibraryPath());
+            if (nullptr == runtime_library) {
+                if (!any_loaded) {
+                    last_error = XR_ERROR_INSTANCE_LOST;
                 }
-
-                // Get and settle on an runtime interface version (using any provided name if required).
-                std::string function_name = manifest_file->GetFunctionName("xrNegotiateLoaderRuntimeInterface");
-                PFN_xrNegotiateLoaderRuntimeInterface negotiate = reinterpret_cast<PFN_xrNegotiateLoaderRuntimeInterface>(
-                    LoaderPlatformLibraryGetProcAddr(runtime_library, function_name));
-
-                // Loader info for negotiation
-                XrNegotiateLoaderInfo loader_info = {};
-                loader_info.structType = XR_LOADER_INTERFACE_STRUCT_LOADER_INFO;
-                loader_info.structVersion = XR_LOADER_INFO_STRUCT_VERSION;
-                loader_info.structSize = sizeof(XrNegotiateLoaderInfo);
-                loader_info.minInterfaceVersion = 1;
-                loader_info.maxInterfaceVersion = XR_CURRENT_LOADER_RUNTIME_VERSION;
-                loader_info.minXrVersion = XR_MAKE_VERSION(0, 1, 0);
-                loader_info.maxXrVersion = XR_MAKE_VERSION(1, 0, 0);
-
-                // Set up the runtime return structure
-                XrNegotiateRuntimeRequest runtime_info = {};
-                runtime_info.structType = XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST;
-                runtime_info.structVersion = XR_RUNTIME_INFO_STRUCT_VERSION;
-                runtime_info.structSize = sizeof(XrNegotiateRuntimeRequest);
-
-                XrResult res = negotiate(&loader_info, &runtime_info);
-                // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
-                // then something still went wrong, so return with an error.
-                if (XR_SUCCESS == res) {
-                    uint32_t runtime_major = XR_VERSION_MAJOR(runtime_info.runtimeXrVersion);
-                    uint32_t runtime_minor = XR_VERSION_MINOR(runtime_info.runtimeXrVersion);
-                    uint32_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
-                    if (nullptr == runtime_info.getInstanceProcAddr) {
-                        std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
-                        error_message += manifest_file->Filename();
-                        error_message += ", negotiation succeeded but returned NULL getInstanceProcAddr";
-                        LoaderLogger::LogErrorMessage(openxr_command, error_message);
-                        res = XR_ERROR_FILE_CONTENTS_INVALID;
-                    } else if (0 >= runtime_info.runtimeInterfaceVersion ||
-                               XR_CURRENT_LOADER_RUNTIME_VERSION < runtime_info.runtimeInterfaceVersion) {
-                        std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
-                        error_message += manifest_file->Filename();
-                        error_message += ", negotiation succeeded but returned invalid interface version";
-                        LoaderLogger::LogErrorMessage(openxr_command, error_message);
-                        res = XR_ERROR_FILE_CONTENTS_INVALID;
-                    } else if (runtime_major != loader_major || (runtime_major == 0 && runtime_minor == 0)) {
-                        std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
-                        error_message += manifest_file->Filename();
-                        error_message += ", OpenXR version returned not compatible with this loader";
-                        LoaderLogger::LogErrorMessage(openxr_command, error_message);
-                        res = XR_ERROR_FILE_CONTENTS_INVALID;
-                    }
-                }
-                if (XR_SUCCESS != res) {
-                    if (!any_loaded) {
-                        last_error = res;
-                    }
-                    std::string warning_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
-                    warning_message += manifest_file->Filename();
-                    warning_message += ", negotiation failed with error ";
-                    warning_message += std::to_string(res);
-                    LoaderLogger::LogErrorMessage(openxr_command, warning_message);
-                    LoaderPlatformLibraryClose(runtime_library);
-                    continue;
-                }
-
-                std::string info_message = "RuntimeInterface::LoadRuntime succeeded loading runtime defined in manifest file ";
-                info_message += manifest_file->Filename();
-                info_message += " using interface version ";
-                info_message += std::to_string(runtime_info.runtimeInterfaceVersion);
-                info_message += " and OpenXR API version ";
-                info_message += std::to_string(XR_VERSION_MAJOR(runtime_info.runtimeXrVersion));
-                info_message += ".";
-                info_message += std::to_string(XR_VERSION_MINOR(runtime_info.runtimeXrVersion));
-                LoaderLogger::LogInfoMessage(openxr_command, info_message);
-
-                // Use this runtime
-                _single_runtime_interface.reset(new RuntimeInterface(runtime_library, runtime_info.getInstanceProcAddr));
-                _single_runtime_count++;
-
-                // Grab the list of extensions this runtime supports for easy filtering after the
-                // xrCreateInstance call
-                std::vector<std::string> supported_extensions;
-                std::vector<XrExtensionProperties> extension_properties;
-                _single_runtime_interface->GetInstanceExtensionProperties(extension_properties);
-                for (XrExtensionProperties ext_prop : extension_properties) {
-                    supported_extensions.push_back(ext_prop.extensionName);
-                }
-                _single_runtime_interface->SetSupportedExtensions(supported_extensions);
-
-                // If we load one, clear all errors.
-                any_loaded = true;
-                last_error = XR_SUCCESS;
-                break;
+                std::string library_message = LoaderPlatformLibraryOpenError(manifest_file->LibraryPath());
+                std::string warning_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
+                warning_message += manifest_file->Filename();
+                warning_message += ", failed to load with message \"";
+                warning_message += library_message;
+                warning_message += "\"";
+                LoaderLogger::LogErrorMessage(openxr_command, warning_message);
+                continue;
             }
-        }
 
-        // Always clear the manifest file list.  Either we use them or we don't.
-        runtime_manifest_files.clear();
+            // Get and settle on an runtime interface version (using any provided name if required).
+            std::string function_name = manifest_file->GetFunctionName("xrNegotiateLoaderRuntimeInterface");
+            PFN_xrNegotiateLoaderRuntimeInterface negotiate = reinterpret_cast<PFN_xrNegotiateLoaderRuntimeInterface>(
+                LoaderPlatformLibraryGetProcAddr(runtime_library, function_name));
+
+            // Loader info for negotiation
+            XrNegotiateLoaderInfo loader_info = {};
+            loader_info.structType = XR_LOADER_INTERFACE_STRUCT_LOADER_INFO;
+            loader_info.structVersion = XR_LOADER_INFO_STRUCT_VERSION;
+            loader_info.structSize = sizeof(XrNegotiateLoaderInfo);
+            loader_info.minInterfaceVersion = 1;
+            loader_info.maxInterfaceVersion = XR_CURRENT_LOADER_RUNTIME_VERSION;
+            loader_info.minXrVersion = XR_MAKE_VERSION(0, 1, 0);
+            loader_info.maxXrVersion = XR_MAKE_VERSION(1, 0, 0);
+
+            // Set up the runtime return structure
+            XrNegotiateRuntimeRequest runtime_info = {};
+            runtime_info.structType = XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST;
+            runtime_info.structVersion = XR_RUNTIME_INFO_STRUCT_VERSION;
+            runtime_info.structSize = sizeof(XrNegotiateRuntimeRequest);
+
+            XrResult res = negotiate(&loader_info, &runtime_info);
+            // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
+            // then something still went wrong, so return with an error.
+            if (XR_SUCCESS == res) {
+                uint32_t runtime_major = XR_VERSION_MAJOR(runtime_info.runtimeXrVersion);
+                uint32_t runtime_minor = XR_VERSION_MINOR(runtime_info.runtimeXrVersion);
+                uint32_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
+                if (nullptr == runtime_info.getInstanceProcAddr) {
+                    std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
+                    error_message += manifest_file->Filename();
+                    error_message += ", negotiation succeeded but returned NULL getInstanceProcAddr";
+                    LoaderLogger::LogErrorMessage(openxr_command, error_message);
+                    res = XR_ERROR_FILE_CONTENTS_INVALID;
+                } else if (0 >= runtime_info.runtimeInterfaceVersion ||
+                            XR_CURRENT_LOADER_RUNTIME_VERSION < runtime_info.runtimeInterfaceVersion) {
+                    std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
+                    error_message += manifest_file->Filename();
+                    error_message += ", negotiation succeeded but returned invalid interface version";
+                    LoaderLogger::LogErrorMessage(openxr_command, error_message);
+                    res = XR_ERROR_FILE_CONTENTS_INVALID;
+                } else if (runtime_major != loader_major || (runtime_major == 0 && runtime_minor == 0)) {
+                    std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
+                    error_message += manifest_file->Filename();
+                    error_message += ", OpenXR version returned not compatible with this loader";
+                    LoaderLogger::LogErrorMessage(openxr_command, error_message);
+                    res = XR_ERROR_FILE_CONTENTS_INVALID;
+                }
+            }
+            if (XR_SUCCESS != res) {
+                if (!any_loaded) {
+                    last_error = res;
+                }
+                std::string warning_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
+                warning_message += manifest_file->Filename();
+                warning_message += ", negotiation failed with error ";
+                warning_message += std::to_string(res);
+                LoaderLogger::LogErrorMessage(openxr_command, warning_message);
+                LoaderPlatformLibraryClose(runtime_library);
+                continue;
+            }
+
+            std::string info_message = "RuntimeInterface::LoadRuntime succeeded loading runtime defined in manifest file ";
+            info_message += manifest_file->Filename();
+            info_message += " using interface version ";
+            info_message += std::to_string(runtime_info.runtimeInterfaceVersion);
+            info_message += " and OpenXR API version ";
+            info_message += std::to_string(XR_VERSION_MAJOR(runtime_info.runtimeXrVersion));
+            info_message += ".";
+            info_message += std::to_string(XR_VERSION_MINOR(runtime_info.runtimeXrVersion));
+            LoaderLogger::LogInfoMessage(openxr_command, info_message);
+
+            // Use this runtime
+            _single_runtime_interface.reset(new RuntimeInterface(runtime_library, runtime_info.getInstanceProcAddr));
+            _single_runtime_count++;
+
+            // Grab the list of extensions this runtime supports for easy filtering after the
+            // xrCreateInstance call
+            std::vector<std::string> supported_extensions;
+            std::vector<XrExtensionProperties> extension_properties;
+            _single_runtime_interface->GetInstanceExtensionProperties(extension_properties);
+            for (XrExtensionProperties ext_prop : extension_properties) {
+                supported_extensions.push_back(ext_prop.extensionName);
+            }
+            _single_runtime_interface->SetSupportedExtensions(supported_extensions);
+
+            // If we load one, clear all errors.
+            any_loaded = true;
+            last_error = XR_SUCCESS;
+            break;
+        }
+    }
+
+    // Always clear the manifest file list.  Either we use them or we don't.
+    runtime_manifest_files.clear();
     } catch (std::bad_alloc&) {
         LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - failed to allocate memory");
         last_error = XR_ERROR_OUT_OF_MEMORY;
@@ -202,15 +202,15 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance in
 
 const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger) {
     try {
-        XrInstance runtime_instance = XR_NULL_HANDLE;
-        {
-            std::lock_guard<std::mutex> mlock(_single_runtime_interface->_messenger_to_instance_mutex);
-            auto it = _single_runtime_interface->_messenger_to_instance_map.find(messenger);
-            if (it != _single_runtime_interface->_messenger_to_instance_map.end()) {
-                runtime_instance = it->second;
-            }
+    XrInstance runtime_instance = XR_NULL_HANDLE;
+    {
+        std::lock_guard<std::mutex> mlock(_single_runtime_interface->_messenger_to_instance_mutex);
+        auto it = _single_runtime_interface->_messenger_to_instance_map.find(messenger);
+        if (it != _single_runtime_interface->_messenger_to_instance_map.end()) {
+            runtime_instance = it->second;
         }
-        return GetDispatchTable(runtime_instance);
+    }
+    return GetDispatchTable(runtime_instance);
     } catch (...) {
         return nullptr;
     }
@@ -231,41 +231,41 @@ RuntimeInterface::~RuntimeInterface() {
 
 void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionProperties>& extension_properties) {
     try {
-        std::vector<XrExtensionProperties> runtime_extension_properties;
-        PFN_xrEnumerateInstanceExtensionProperties rt_xrEnumerateInstanceExtensionProperties;
-        _get_instant_proc_addr(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
-                               reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrEnumerateInstanceExtensionProperties));
-        uint32_t count = 0;
-        uint32_t count_output = 0;
-        // Get the count from the runtime
-        rt_xrEnumerateInstanceExtensionProperties(nullptr, count, &count_output, nullptr);
-        if (count_output > 0) {
-            runtime_extension_properties.resize(count_output);
-            count = count_output;
-            for (XrExtensionProperties& ext_prop : runtime_extension_properties) {
-                ext_prop.type = XR_TYPE_EXTENSION_PROPERTIES;
-                ext_prop.next = nullptr;
-            }
-            rt_xrEnumerateInstanceExtensionProperties(nullptr, count, &count_output, runtime_extension_properties.data());
+    std::vector<XrExtensionProperties> runtime_extension_properties;
+    PFN_xrEnumerateInstanceExtensionProperties rt_xrEnumerateInstanceExtensionProperties;
+    _get_instant_proc_addr(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
+                            reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrEnumerateInstanceExtensionProperties));
+    uint32_t count = 0;
+    uint32_t count_output = 0;
+    // Get the count from the runtime
+    rt_xrEnumerateInstanceExtensionProperties(nullptr, count, &count_output, nullptr);
+    if (count_output > 0) {
+        runtime_extension_properties.resize(count_output);
+        count = count_output;
+        for (XrExtensionProperties& ext_prop : runtime_extension_properties) {
+            ext_prop.type = XR_TYPE_EXTENSION_PROPERTIES;
+            ext_prop.next = nullptr;
         }
-        size_t ext_count = runtime_extension_properties.size();
-        size_t props_count = extension_properties.size();
-        for (size_t ext = 0; ext < ext_count; ++ext) {
-            bool found = false;
-            for (size_t prop = 0; prop < props_count; ++prop) {
-                // If we find it, then make sure the spec version matches that of the runtime instead of the
-                // layer.
-                if (!strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName)) {
-                    // Make sure the spec version used is the runtime's
-                    extension_properties[prop].specVersion = runtime_extension_properties[ext].specVersion;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                extension_properties.push_back(runtime_extension_properties[ext]);
+        rt_xrEnumerateInstanceExtensionProperties(nullptr, count, &count_output, runtime_extension_properties.data());
+    }
+    size_t ext_count = runtime_extension_properties.size();
+    size_t props_count = extension_properties.size();
+    for (size_t ext = 0; ext < ext_count; ++ext) {
+        bool found = false;
+        for (size_t prop = 0; prop < props_count; ++prop) {
+            // If we find it, then make sure the spec version matches that of the runtime instead of the
+            // layer.
+            if (!strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName)) {
+                // Make sure the spec version used is the runtime's
+                extension_properties[prop].specVersion = runtime_extension_properties[ext].specVersion;
+                found = true;
+                break;
             }
         }
+        if (!found) {
+            extension_properties.push_back(runtime_extension_properties[ext]);
+        }
+    }
 
     } catch (...) {
         LoaderLogger::LogErrorMessage("xrEnumerateInstanceExtensionProperties",
@@ -278,16 +278,16 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
     XrResult res = XR_SUCCESS;
     bool create_succeeded = false;
     try {
-        PFN_xrCreateInstance rt_xrCreateInstance;
-        _get_instant_proc_addr(XR_NULL_HANDLE, "xrCreateInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrCreateInstance));
-        res = rt_xrCreateInstance(info, instance);
-        if (XR_SUCCESS == res) {
-            create_succeeded = true;
-            std::unique_ptr<XrGeneratedDispatchTable> dispatch_table(new XrGeneratedDispatchTable());
-            GeneratedXrPopulateDispatchTable(dispatch_table.get(), *instance, _get_instant_proc_addr);
-            std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
-            _dispatch_table_map[*instance] = std::move(dispatch_table);
-        }
+    PFN_xrCreateInstance rt_xrCreateInstance;
+    _get_instant_proc_addr(XR_NULL_HANDLE, "xrCreateInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrCreateInstance));
+    res = rt_xrCreateInstance(info, instance);
+    if (XR_SUCCESS == res) {
+        create_succeeded = true;
+        std::unique_ptr<XrGeneratedDispatchTable> dispatch_table(new XrGeneratedDispatchTable());
+        GeneratedXrPopulateDispatchTable(dispatch_table.get(), *instance, _get_instant_proc_addr);
+        std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
+        _dispatch_table_map[*instance] = std::move(dispatch_table);
+    }
     } catch (std::bad_alloc&) {
         LoaderLogger::LogErrorMessage("xrCreateInstance", "RuntimeInterface::CreateInstance - failed to allocate memory");
         res = XR_ERROR_OUT_OF_MEMORY;
@@ -309,20 +309,20 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
 
 XrResult RuntimeInterface::DestroyInstance(XrInstance instance) {
     try {
-        if (XR_NULL_HANDLE != instance) {
-            // Destroy the dispatch table for this instance first
-            {
-                std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
-                auto map_iter = _dispatch_table_map.find(instance);
-                if (map_iter != _dispatch_table_map.end()) {
-                    _dispatch_table_map.erase(map_iter);
-                }
+    if (XR_NULL_HANDLE != instance) {
+        // Destroy the dispatch table for this instance first
+        {
+            std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
+            auto map_iter = _dispatch_table_map.find(instance);
+            if (map_iter != _dispatch_table_map.end()) {
+                _dispatch_table_map.erase(map_iter);
             }
-            // Now delete the instance
-            PFN_xrDestroyInstance rt_xrDestroyInstance;
-            _get_instant_proc_addr(instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
-            rt_xrDestroyInstance(instance);
         }
+        // Now delete the instance
+        PFN_xrDestroyInstance rt_xrDestroyInstance;
+        _get_instant_proc_addr(instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
+        rt_xrDestroyInstance(instance);
+    }
     } catch (...) {
         LoaderLogger::LogErrorMessage("xrDestroyInstance", "RuntimeInterface::DestroyInstance - unknown error");
         // Can't return anything but success
@@ -332,9 +332,9 @@ XrResult RuntimeInterface::DestroyInstance(XrInstance instance) {
 
 bool RuntimeInterface::TrackDebugMessenger(XrInstance instance, XrDebugUtilsMessengerEXT messenger) {
     try {
-        std::lock_guard<std::mutex> mlock(_messenger_to_instance_mutex);
-        _messenger_to_instance_map[messenger] = instance;
-        return true;
+    std::lock_guard<std::mutex> mlock(_messenger_to_instance_mutex);
+    _messenger_to_instance_map[messenger] = instance;
+    return true;
     } catch (...) {
         return false;
     }
@@ -354,12 +354,12 @@ void RuntimeInterface::SetSupportedExtensions(std::vector<std::string>& supporte
 bool RuntimeInterface::SupportsExtension(const std::string& extension_name) {
     bool found_prop = false;
     try {
-        for (std::string supported_extension : _supported_extensions) {
-            if (supported_extension == extension_name) {
-                found_prop = true;
-                break;
-            }
+    for (std::string supported_extension : _supported_extensions) {
+        if (supported_extension == extension_name) {
+            found_prop = true;
+            break;
         }
+    }
     } catch (...) {
     }
     return found_prop;
