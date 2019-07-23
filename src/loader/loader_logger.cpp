@@ -24,11 +24,6 @@
 #include "loader_logger_recorders.hpp"
 #include "platform_utils.hpp"
 
-//! @todo can we remove this? Everything but Windows is using it only for includes that aren't needed in this file.
-#ifdef _WIN32
-#include "xr_dependencies.h"
-#endif
-
 #include <openxr/openxr.h>
 
 #include <algorithm>

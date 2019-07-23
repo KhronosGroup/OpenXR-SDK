@@ -31,11 +31,6 @@
 #include "xr_generated_dispatch_table.h"
 #include "xr_generated_loader.hpp"
 
-//! @todo can we remove this? Everything but Windows is using it only for includes that aren't needed in this file.
-#ifdef _WIN32
-#include "xr_dependencies.h"
-#endif
-
 #include <openxr/openxr.h>
 
 #include <cstring>
