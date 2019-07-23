@@ -219,10 +219,10 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
         }
         // If application requested OpenXR API version is higher than the loader version, then we need to throw
         // an error.
-        uint16_t app_major = XR_VERSION_MAJOR(info->applicationInfo.apiVersion);
-        uint16_t app_minor = XR_VERSION_MINOR(info->applicationInfo.apiVersion);
-        uint16_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
-        uint16_t loader_minor = XR_VERSION_MINOR(XR_CURRENT_API_VERSION);
+        uint16_t app_major = XR_VERSION_MAJOR(info->applicationInfo.apiVersion);  // NOLINT
+        uint16_t app_minor = XR_VERSION_MINOR(info->applicationInfo.apiVersion);  // NOLINT
+        uint16_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);         // NOLINT
+        uint16_t loader_minor = XR_VERSION_MINOR(XR_CURRENT_API_VERSION);         // NOLINT
         if (app_major > loader_major || (app_major == loader_major && app_minor > loader_minor)) {
             std::ostringstream oss;
             oss << "xrCreateInstance called with invalid API version " << app_major << "." << app_minor
