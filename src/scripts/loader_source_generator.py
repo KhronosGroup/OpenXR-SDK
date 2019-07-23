@@ -883,11 +883,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += self.writeIndent(indent + 1)
         export_funcs += 'return XR_ERROR_FUNCTION_UNSUPPORTED;\n'
         export_funcs += self.writeIndent(indent)
-        export_funcs += '} else {\n'
-        export_funcs += self.writeIndent(indent + 1)
-        export_funcs += 'return XR_SUCCESS;\n'
-        export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'return XR_SUCCESS;\n'
         export_funcs += '}\n'
 
         export_funcs += '\n// Terminator GetInstanceProcAddr function\n'
