@@ -22,6 +22,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # All options defined here
 option(BUILD_LOADER "Build loader" ON)
+option(BUILD_LOADER_WITH_EXCEPTION_HANDLING "Enable exception handling in the loader. Leave this on unless your standard library is built to not throw." ON)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     option(DYNAMIC_LOADER "Build the loader as a .dll library" OFF)
 else()
@@ -79,6 +80,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
 endif()
 
+if(BUILD_LOADER_WITH_EXCEPTION_HANDLING)
+    set(XRLOADER_ENABLE_EXCEPTION_HANDLING TRUE)
+endif()
 # Check for the existence of the secure_getenv or __secure_getenv commands
 include(CheckFunctionExists)
 CHECK_FUNCTION_EXISTS(secure_getenv HAVE_SECURE_GETENV)

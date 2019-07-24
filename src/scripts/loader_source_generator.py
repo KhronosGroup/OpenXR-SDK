@@ -191,6 +191,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include "xr_generated_dispatch_table.h"\n'
             preamble += '#include "xr_generated_utilities.h"\n'
             preamble += '#include "api_layer_interface.hpp"\n'
+            preamble += '#include "exception_handling.hpp"\n'
 
         write(preamble, file=self.outFile)
 
@@ -400,7 +401,6 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 map_defines += '#endif // %s\n' % handle.protect_string
         map_defines += '}\n\n'
 
-
         return map_defines
 
     # Output loader generated functions.  This has special cases for create and destroy commands
@@ -578,7 +578,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 if cur_cmd.protect_value:
                     generated_funcs += '#if %s\n' % cur_cmd.protect_string
 
-                generated_funcs += cur_cmd.cdecl.replace(";", " {\n")
+                generated_funcs += cur_cmd.cdecl.replace(";", " XRLOADER_ABI_TRY {\n")
                 generated_funcs += tramp_variable_defines
 
                 # If this is not core, but an extension, check to make sure the extension is enabled.
@@ -619,7 +619,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                 if has_return and not just_return_call:
                     generated_funcs += '    return result;\n'
 
-                generated_funcs += '}\n\n'
+                generated_funcs += '}\nXRLOADER_ABI_CATCH_FALLBACK\n\n'
 
                 # If this is a function that needs a terminator, provide the call to it, not the runtime.
                 # Only a few items need a terminator.  Usually something we want to be able to return information
@@ -685,7 +685,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
         export_funcs = '\n'
         export_funcs += 'LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance instance, const char* name,\n'
-        export_funcs += '                                                                   PFN_xrVoidFunction* function) {\n'
+        export_funcs += '                                                                   PFN_xrVoidFunction* function) XRLOADER_ABI_TRY {\n'
         indent = 1
         export_funcs += self.writeIndent(indent)
         export_funcs += 'if (nullptr == function) {\n'
@@ -819,10 +819,11 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
         export_funcs += '}\n'
+        export_funcs += 'XRLOADER_ABI_CATCH_FALLBACK\n'
 
         export_funcs += '\n// Terminator GetInstanceProcAddr function\n'
         export_funcs += 'XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermGetInstanceProcAddr(XrInstance instance, const char* name,\n'
-        export_funcs += '                                                               PFN_xrVoidFunction* function) {\n'
+        export_funcs += '                                                               PFN_xrVoidFunction* function) XRLOADER_ABI_TRY {\n'
 
         count = 0
         for x in range(0, 2):
@@ -871,7 +872,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += '        return XR_SUCCESS;\n'
         export_funcs += '    }\n'
         export_funcs += '    return RuntimeInterface::GetInstanceProcAddr(instance, name, function);\n'
-        export_funcs += '}\n\n'
+        export_funcs += '}\n'
+        export_funcs += 'XRLOADER_ABI_CATCH_FALLBACK\n\n'
+
         export_funcs += '// Instance Init Dispatch Table (put all terminators in first)\n'
         export_funcs += 'void LoaderGenInitInstanceDispatchTable(XrInstance instance, std::unique_ptr<XrGeneratedDispatchTable>& table) {\n'
 
@@ -935,9 +938,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     else:
                         export_funcs += '    _get_instant_proc_addr(instance, "%s", &cur_func_ptr);\n' % cur_cmd.name
                         export_funcs += '    if (nullptr != cur_func_ptr) {\n'
-                        export_funcs += '        table->%s = reinterpret_cast<PFN_%s>(cur_func_ptr);\n' % (base_name, cur_cmd.name)
+                        export_funcs += '        table->%s = reinterpret_cast<PFN_%s>(cur_func_ptr);\n' % (
+                            base_name, cur_cmd.name)
                         export_funcs += '    }\n'
-
 
                     if cur_cmd.protect_value:
                         export_funcs += '#endif // %s\n' % cur_cmd.protect_string
