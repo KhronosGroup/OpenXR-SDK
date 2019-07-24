@@ -85,7 +85,12 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
                 runtime_info.structVersion = XR_RUNTIME_INFO_STRUCT_VERSION;
                 runtime_info.structSize = sizeof(XrNegotiateRuntimeRequest);
 
-                XrResult res = negotiate(&loader_info, &runtime_info);
+                // Skip calling the negotiate function and fail if the function pointer
+                // could not get loaded
+                XrResult res = XR_ERROR_RUNTIME_FAILURE;
+                if (nullptr != negotiate) {
+                    res = negotiate(&loader_info, &runtime_info);
+                }
                 // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
                 // then something still went wrong, so return with an error.
                 if (XR_SUCCESS == res) {

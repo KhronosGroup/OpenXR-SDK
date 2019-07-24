@@ -350,58 +350,65 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
 // ---- Core 0.1 manual loader terminator functions
 
 // Validate that the applicationInfo structure in the XrInstanceCreateInfo is valid.
-static bool ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApplicationInfo &info) {
+static XrResult ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApplicationInfo &info) {
     if (IsMissingNullTerminator<XR_MAX_APPLICATION_NAME_SIZE>(info.applicationName)) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrApplicationInfo-applicationName-parameter", "xrCreateInstance",
                                                 "application name missing NULL terminator.");
-        return false;
+        return XR_ERROR_NAME_INVALID;
     }
     if (IsMissingNullTerminator<XR_MAX_ENGINE_NAME_SIZE>(info.engineName)) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrApplicationInfo-engineName-parameter", "xrCreateInstance",
                                                 "engine name missing NULL terminator.");
-        return false;
+        return XR_ERROR_NAME_INVALID;
     }
-    return true;
+    if (strlen(info.applicationName) == 0) {
+        LoaderLogger::LogErrorMessage("xrCreateInstance",
+                                      "VUID-XrApplicationInfo-engineName-parameter: application name can not be empty.");
+        return XR_ERROR_NAME_INVALID;
+    }
+    return XR_SUCCESS;
 }
 
 // Validate that the XrInstanceCreateInfo is valid
-static bool ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const XrInstanceCreateInfo *info) {
+static XrResult ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const XrInstanceCreateInfo *info) {
     // Should have a valid 'type'
     if (XR_TYPE_INSTANCE_CREATE_INFO != info->type) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-type-type", "xrCreateInstance",
                                                 "expected XR_TYPE_INSTANCE_CREATE_INFO.");
-        return false;
+        return XR_ERROR_VALIDATION_FAILURE;
     }
     // Flags must be 0
     if (0 != info->createFlags) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-createFlags-zerobitmask", "xrCreateInstance",
                                                 "flags must be 0.");
-        return false;
+        return XR_ERROR_VALIDATION_FAILURE;
     }
     // ApplicationInfo struct must be valid
-    if (!ValidateApplicationInfo(loader_instance, info->applicationInfo)) {
+    XrResult result = ValidateApplicationInfo(loader_instance, info->applicationInfo);
+    if (XR_SUCCESS != result) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-applicationInfo-parameter", "xrCreateInstance",
                                                 "info->applicationInfo is not valid.");
-        return false;
+        return result;
     }
     // VUID-XrInstanceCreateInfo-enabledApiLayerNames-parameter already tested in LoadApiLayers()
     if ((info->enabledExtensionCount != 0u) && nullptr == info->enabledExtensionNames) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-enabledExtensionNames-parameter", "xrCreateInstance",
                                                 "enabledExtensionCount is non-0 but array is NULL");
-        return false;
+        return XR_ERROR_VALIDATION_FAILURE;
     }
-    return true;
+    return XR_SUCCESS;
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) {
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader terminator");
-    auto *loader_instance = reinterpret_cast<LoaderInstance *>(*instance);
-    if (!ValidateInstanceCreateInfo(loader_instance, info)) {
+    LoaderInstance *loader_instance = reinterpret_cast<LoaderInstance *>(*instance);
+    XrResult result = ValidateInstanceCreateInfo(loader_instance, info);
+    if (XR_SUCCESS != result) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance",
                                                 "something wrong with XrInstanceCreateInfo contents");
-        return XR_ERROR_VALIDATION_FAILURE;
+        return result;
     }
-    XrResult result = RuntimeInterface::GetRuntime().CreateInstance(info, instance);
+    result = RuntimeInterface::GetRuntime().CreateInstance(info, instance);
     loader_instance->SetRuntimeInstance(*instance);
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Completed loader terminator");
     return result;

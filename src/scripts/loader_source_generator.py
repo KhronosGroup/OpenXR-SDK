@@ -731,6 +731,16 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
         export_funcs += self.writeIndent(indent)
+        export_funcs += 'if (nullptr == name) {\n'
+        export_funcs += self.writeIndent(indent + 1)
+        export_funcs += 'LoaderLogger::LogValidationErrorMessage("VUID-xrGetInstanceProcAddr-function-parameter",\n'
+        export_funcs += self.writeIndent(indent + 1)
+        export_funcs += '                                        "xrGetInstanceProcAddr", "Invalid Name pointer");\n'
+        export_funcs += self.writeIndent(indent + 1)
+        export_funcs += '    return XR_ERROR_VALIDATION_FAILURE;\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '}\n'
+        export_funcs += self.writeIndent(indent)
         export_funcs += '// Initialize the function to nullptr in case it does not get caught in a known case\n'
         export_funcs += self.writeIndent(indent)
         export_funcs += '*function = nullptr;\n'
@@ -768,6 +778,24 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         indent = indent - 1
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
+        indent = indent - 1
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '}\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'else if (loader_instance == nullptr) {\n'
+        indent = indent + 1
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'std::string error_str = "Invalid handle for instance (query for ";\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'error_str += name;\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'error_str += " )";\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'LoaderLogger::LogValidationErrorMessage("VUID-xrGetInstanceProcAddr-instance-parameter",\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '                                        "xrGetInstanceProcAddr", error_str);\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'return XR_ERROR_HANDLE_INVALID;\n'
         indent = indent - 1
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
