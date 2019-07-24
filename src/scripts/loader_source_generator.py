@@ -491,7 +491,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                             if cur_cmd.is_destroy_disconnect:
                                 tramp_variable_defines += '        // Destroy the mapping entry for this item if it was valid.\n'
                                 tramp_variable_defines += '        if (nullptr != loader_instance) {\n'
-                                tramp_variable_defines += '                g_%s_map.Erase(%s);\n' % (
+                                tramp_variable_defines += '            g_%s_map.Erase(%s);\n' % (
                                     base_handle_name, first_handle_name)
                                 tramp_variable_defines += '        }\n'
                             # These should be mutually exclusive - verify it.
