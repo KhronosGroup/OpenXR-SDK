@@ -33,7 +33,7 @@ uint32_t RuntimeInterface::_single_runtime_count = 0;
 XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
     XrResult last_error = XR_SUCCESS;
     bool any_loaded = false;
-    try {
+
     // If something's already loaded, we're done here.
     if (_single_runtime_interface != nullptr) {
         _single_runtime_count++;
@@ -159,13 +159,6 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 
     // Always clear the manifest file list.  Either we use them or we don't.
     runtime_manifest_files.clear();
-    } catch (std::bad_alloc&) {
-        LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - failed to allocate memory");
-        last_error = XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - unknown error");
-        last_error = XR_ERROR_FILE_ACCESS_ERROR;
-    }
 
     // We found no valid runtimes, throw the initialization failed message
     if (!any_loaded) {
@@ -201,7 +194,6 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance in
 }
 
 const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger) {
-    try {
     XrInstance runtime_instance = XR_NULL_HANDLE;
     {
         std::lock_guard<std::mutex> mlock(_single_runtime_interface->_messenger_to_instance_mutex);
@@ -211,9 +203,6 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatch
         }
     }
     return GetDispatchTable(runtime_instance);
-    } catch (...) {
-        return nullptr;
-    }
 }
 
 RuntimeInterface::RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr)
@@ -230,7 +219,6 @@ RuntimeInterface::~RuntimeInterface() {
 }
 
 void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionProperties>& extension_properties) {
-    try {
     std::vector<XrExtensionProperties> runtime_extension_properties;
     PFN_xrEnumerateInstanceExtensionProperties rt_xrEnumerateInstanceExtensionProperties;
     _get_instant_proc_addr(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
@@ -266,18 +254,11 @@ void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionPro
             extension_properties.push_back(runtime_extension_properties[ext]);
         }
     }
-
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrEnumerateInstanceExtensionProperties",
-                                      "RuntimeInterface::GetInstanceExtensionProperties - unknown error");
-        throw;
-    }
 }
 
 XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrInstance* instance) {
     XrResult res = XR_SUCCESS;
     bool create_succeeded = false;
-    try {
     PFN_xrCreateInstance rt_xrCreateInstance;
     _get_instant_proc_addr(XR_NULL_HANDLE, "xrCreateInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrCreateInstance));
     res = rt_xrCreateInstance(info, instance);
@@ -287,13 +268,6 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
         GeneratedXrPopulateDispatchTable(dispatch_table.get(), *instance, _get_instant_proc_addr);
         std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
         _dispatch_table_map[*instance] = std::move(dispatch_table);
-    }
-    } catch (std::bad_alloc&) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "RuntimeInterface::CreateInstance - failed to allocate memory");
-        res = XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "RuntimeInterface::CreateInstance - unknown error");
-        res = XR_ERROR_INSTANCE_LOST;
     }
 
     // If the failure occurred during the populate, clean up the instance we had picked up from the runtime
@@ -308,7 +282,6 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
 }
 
 XrResult RuntimeInterface::DestroyInstance(XrInstance instance) {
-    try {
     if (XR_NULL_HANDLE != instance) {
         // Destroy the dispatch table for this instance first
         {
@@ -323,21 +296,13 @@ XrResult RuntimeInterface::DestroyInstance(XrInstance instance) {
         _get_instant_proc_addr(instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
         rt_xrDestroyInstance(instance);
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrDestroyInstance", "RuntimeInterface::DestroyInstance - unknown error");
-        // Can't return anything but success
-    }
     return XR_SUCCESS;
 }
 
 bool RuntimeInterface::TrackDebugMessenger(XrInstance instance, XrDebugUtilsMessengerEXT messenger) {
-    try {
     std::lock_guard<std::mutex> mlock(_messenger_to_instance_mutex);
     _messenger_to_instance_map[messenger] = instance;
     return true;
-    } catch (...) {
-        return false;
-    }
 }
 
 void RuntimeInterface::ForgetDebugMessenger(XrDebugUtilsMessengerEXT messenger) {
@@ -353,14 +318,11 @@ void RuntimeInterface::SetSupportedExtensions(std::vector<std::string>& supporte
 
 bool RuntimeInterface::SupportsExtension(const std::string& extension_name) {
     bool found_prop = false;
-    try {
     for (std::string supported_extension : _supported_extensions) {
         if (supported_extension == extension_name) {
             found_prop = true;
             break;
         }
-    }
-    } catch (...) {
     }
     return found_prop;
 }

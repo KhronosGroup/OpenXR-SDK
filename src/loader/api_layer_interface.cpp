@@ -32,7 +32,6 @@
 
 // Add any layers defined in the loader layer environment variable.
 static void AddEnvironmentApiLayers(const std::string& openxr_command, std::vector<std::string>& enabled_layers) {
-    try {
     char* layer_environment_variable = PlatformUtilsGetEnv(OPENXR_ENABLE_LAYERS_ENV_VAR);
     if (nullptr != layer_environment_variable) {
         std::string layers = layer_environment_variable;
@@ -56,15 +55,10 @@ static void AddEnvironmentApiLayers(const std::string& openxr_command, std::vect
             enabled_layers.push_back(cur_search);
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage(openxr_command, "AddEnvironmentApiLayers - unknown error occurred");
-        throw;
-    }
 }
 
 XrResult ApiLayerInterface::GetApiLayerProperties(const std::string& openxr_command, uint32_t incoming_count,
                                                   uint32_t* outgoing_count, XrApiLayerProperties* api_layer_properties) {
-    try {
     std::vector<std::unique_ptr<ApiLayerManifestFile>> manifest_files;
     uint32_t manifest_count = 0;
 
@@ -118,15 +112,10 @@ XrResult ApiLayerInterface::GetApiLayerProperties(const std::string& openxr_comm
         }
     }
     return XR_SUCCESS;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage(openxr_command, "ApiLayerInterface::GetApiLayerProperties - unknown error occurred");
-        return XR_ERROR_VALIDATION_FAILURE;
-    }
 }
 
 XrResult ApiLayerInterface::GetInstanceExtensionProperties(const std::string& openxr_command, const char* layer_name,
                                                            std::vector<XrExtensionProperties>& extension_properties) {
-    try {
     std::vector<std::unique_ptr<ApiLayerManifestFile>> manifest_files;
 
     // If a layer name is supplied, only use the information out of that one layer
@@ -193,17 +182,12 @@ XrResult ApiLayerInterface::GetInstanceExtensionProperties(const std::string& op
         }
     }
     return XR_SUCCESS;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage(openxr_command, "ApiLayerInterface::GetInstanceExtensionProperties - unknown error occurred");
-        return XR_ERROR_INITIALIZATION_FAILED;
-    }
 }
 
 XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uint32_t enabled_api_layer_count,
                                           const char* const* enabled_api_layer_names,
                                           std::vector<std::unique_ptr<ApiLayerInterface>>& api_layer_interfaces) {
     XrResult last_error = XR_SUCCESS;
-    try {
     bool any_loaded = false;
     std::vector<bool> layer_found;
     std::vector<std::unique_ptr<ApiLayerManifestFile>> layer_manifest_files = {};
@@ -361,13 +345,6 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
 
     // Always clear the manifest file list.  Either we use them or we don't.
     layer_manifest_files.clear();
-    } catch (std::bad_alloc&) {
-        LoaderLogger::LogErrorMessage(openxr_command, "ApiLayerInterface::LoadApiLayers - failed to allocate memory");
-        last_error = XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage(openxr_command, "ApiLayerInterface::LoadApiLayers - unknown error");
-        last_error = XR_ERROR_FILE_ACCESS_ERROR;
-    }
 
     // If we failed catastrophically for some reason, clean up everything.
     if (XR_SUCCESS != last_error) {
@@ -396,14 +373,11 @@ ApiLayerInterface::~ApiLayerInterface() {
 
 bool ApiLayerInterface::SupportsExtension(const std::string& extension_name) {
     bool found_prop = false;
-    try {
     for (std::string supported_extension : _supported_extensions) {
         if (supported_extension == extension_name) {
             found_prop = true;
             break;
         }
-    }
-    } catch (...) {
     }
     return found_prop;
 }

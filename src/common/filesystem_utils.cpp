@@ -97,81 +97,48 @@
 // We can use one of the C++ filesystem packages
 
 bool FileSysUtilsIsRegularFile(const std::string& path) {
-    try {
     return FS_PREFIX::is_regular_file(path);
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsIsDirectory(const std::string& path) {
-    try {
     return FS_PREFIX::is_directory(path);
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsPathExists(const std::string& path) {
-    try {
     return FS_PREFIX::exists(path);
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsIsAbsolutePath(const std::string& path) {
-    try {
     FS_PREFIX::path file_path(path);
     return file_path.is_absolute();
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsGetCurrentPath(std::string& path) {
-    try {
     FS_PREFIX::path cur_path = FS_PREFIX::current_path();
     path = cur_path.string();
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent_path) {
-    try {
     FS_PREFIX::path path_var(file_path);
     parent_path = path_var.parent_path().string();
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute) {
-    try {
     absolute = FS_PREFIX::absolute(path).string();
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& child, std::string& combined) {
-    try {
     FS_PREFIX::path parent_path(parent);
     FS_PREFIX::path child_path(child);
     FS_PREFIX::path full_path = parent_path / child_path;
     combined = full_path.string();
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>& paths) {
-    try {
     std::string::size_type start = 0;
     std::string::size_type location = path_list.find(PATH_SEPARATOR);
     while (location != std::string::npos) {
@@ -181,20 +148,13 @@ bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>&
     }
     paths.push_back(path_list.substr(start, location));
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::string>& files) {
-    try {
     for (auto& dir_iter : FS_PREFIX::directory_iterator(path)) {
         files.push_back(dir_iter.path().filename().string());
     }
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 #elif defined(XR_OS_WINDOWS)
@@ -203,78 +163,53 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 #include <shlwapi.h>
 
 bool FileSysUtilsIsRegularFile(const std::string& path) {
-    try {
     return (1 != PathIsDirectoryW(utf8_to_wide(path).c_str()));
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsIsDirectory(const std::string& path) {
-    try {
     return (1 == PathIsDirectoryW(utf8_to_wide(path).c_str()));
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsPathExists(const std::string& path) {
-    try {
     return (1 == PathFileExistsW(utf8_to_wide(path).c_str()));
-    } catch (...) {
-        return false;
-    }
 }
 
 bool FileSysUtilsIsAbsolutePath(const std::string& path) {
-    try {
     if ((path[0] == '\\') || (path[1] == ':' && (path[2] == '\\' || path[2] == '/'))) {
         return true;
-    }
-    } catch (...) {
     }
     return false;
 }
 
 bool FileSysUtilsGetCurrentPath(std::string& path) {
-    try {
     wchar_t tmp_path[MAX_PATH];
     if (nullptr != _wgetcwd(tmp_path, MAX_PATH - 1)) {
         path = wide_to_utf8(tmp_path);
         return true;
     }
-    } catch (...) {
-    }
     return false;
 }
 
 bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent_path) {
-    try {
     std::string full_path;
     if (FileSysUtilsGetAbsolutePath(file_path, full_path)) {
         std::string::size_type lastSeperator = full_path.find_last_of(DIRECTORY_SYMBOL);
         parent_path = (lastSeperator == 0) ? full_path : full_path.substr(0, lastSeperator);
         return true;
     }
-    } catch (...) {
-    }
     return false;
 }
 
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute) {
-    try {
     wchar_t tmp_path[MAX_PATH];
     if (0 != GetFullPathNameW(utf8_to_wide(path).c_str(), MAX_PATH, tmp_path, NULL)) {
         absolute = wide_to_utf8(tmp_path);
         return true;
     }
-    } catch (...) {
-    }
     return false;
 }
 
 bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& child, std::string& combined) {
-    try {
     std::string::size_type parent_len = parent.length();
     if (0 == parent_len || "." == parent || ".\\" == parent || "./" == parent) {
         combined = child;
@@ -286,13 +221,9 @@ bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& chil
     }
     combined = parent.substr(0, parent_len) + DIRECTORY_SYMBOL + child;
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>& paths) {
-    try {
     std::string::size_type start = 0;
     std::string::size_type location = path_list.find(PATH_SEPARATOR);
     while (location != std::string::npos) {
@@ -302,13 +233,9 @@ bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>&
     }
     paths.push_back(path_list.substr(start, location));
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::string>& files) {
-    try {
     WIN32_FIND_DATAW file_data;
     HANDLE file_handle = FindFirstFileW(utf8_to_wide(path).c_str(), &file_data);
     if (file_handle != INVALID_HANDLE_VALUE) {
@@ -318,8 +245,6 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
             }
         } while (FindNextFileW(file_handle, &file_data));
         return true;
-    }
-    } catch (...) {
     }
     return false;
 }
@@ -335,80 +260,54 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 // simple POSIX-compatible implementation of the <filesystem> pieces used by OpenXR
 
 bool FileSysUtilsIsRegularFile(const std::string& path) {
-    try {
     struct stat path_stat;
     stat(path.c_str(), &path_stat);
     return S_ISREG(path_stat.st_mode);
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsIsDirectory(const std::string& path) {
-    try {
     struct stat path_stat;
     stat(path.c_str(), &path_stat);
     return S_ISDIR(path_stat.st_mode);
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsPathExists(const std::string& path) {
-    try {
     return (access(path.c_str(), F_OK) != -1);
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsIsAbsolutePath(const std::string& path) {
-    try {
     return (path[0] == DIRECTORY_SYMBOL);
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsGetCurrentPath(std::string& path) {
-    try {
     char tmp_path[PATH_MAX];
     if (nullptr != getcwd(tmp_path, PATH_MAX - 1)) {
         path = tmp_path;
         return true;
     }
-    } catch (...) {
-    }
     return false;
 }
 
 bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent_path) {
-    try {
     std::string full_path;
     if (FileSysUtilsGetAbsolutePath(file_path, full_path)) {
         std::string::size_type lastSeperator = full_path.find_last_of(DIRECTORY_SYMBOL);
         parent_path = (lastSeperator == 0) ? full_path : full_path.substr(0, lastSeperator - 1);
         return true;
     }
-    } catch (...) {
-    }
     return false;
 }
 
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute) {
-    try {
     char buf[PATH_MAX];
     if (nullptr != realpath(path.c_str(), buf)) {
         absolute = buf;
         return true;
     }
-    } catch (...) {
-    }
     return false;
 }
 
 bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& child, std::string& combined) {
-    try {
     std::string::size_type parent_len = parent.length();
     if (0 == parent_len || "." == parent || "./" == parent) {
         combined = child;
@@ -420,13 +319,9 @@ bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& chil
     }
     combined = parent.substr(0, parent_len) + DIRECTORY_SYMBOL + child;
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>& paths) {
-    try {
     std::string::size_type start = 0;
     std::string::size_type location = path_list.find(PATH_SEPARATOR);
     while (location != std::string::npos) {
@@ -436,13 +331,9 @@ bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>&
     }
     paths.push_back(path_list.substr(start, location));
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::string>& files) {
-    try {
     DIR* dir = opendir(path.c_str());
     if (dir == nullptr) {
         return false;
@@ -453,9 +344,6 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
     }
     closedir(dir);
     return true;
-    } catch (...) {
-    }
-    return false;
 }
 
 #endif

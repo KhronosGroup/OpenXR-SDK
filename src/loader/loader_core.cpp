@@ -64,7 +64,6 @@ extern "C" {
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
                                                                            uint32_t *propertyCountOutput,
                                                                            XrApiLayerProperties *properties) {
-    try {
     LoaderLogger::LogVerboseMessage("xrEnumerateApiLayerProperties", "Entering loader trampoline");
 
     // Make sure only one thread is attempting to read the JSON files at a time.
@@ -77,19 +76,12 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint3
     }
 
     return result;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrEnumerateApiLayerProperties", "Unknown error occurred");
-        return XR_ERROR_VALIDATION_FAILURE;
-    }
-
-    return XR_SUCCESS;
 }
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionProperties(const char *layerName,
                                                                                     uint32_t propertyCapacityInput,
                                                                                     uint32_t *propertyCountOutput,
                                                                                     XrExtensionProperties *properties) {
-    try {
     bool just_layer_properties = false;
     LoaderLogger::LogVerboseMessage("xrEnumerateInstanceExtensionProperties", "Entering loader trampoline");
 
@@ -191,16 +183,11 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionPropert
     }
     LoaderLogger::LogVerboseMessage("xrEnumerateInstanceExtensionProperties", "Completed loader trampoline");
     return XR_SUCCESS;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrEnumerateInstanceExtensionProperties", "Unknown error occurred");
-        return XR_ERROR_INITIALIZATION_FAILED;
-    }
 }
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) {
     bool runtime_loaded = false;
 
-    try {
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader trampoline");
     if (nullptr == info) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance", "must be non-NULL");
@@ -285,23 +272,9 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
 
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Completed loader trampoline");
     return result;
-    } catch (std::bad_alloc &) {
-        if (runtime_loaded) {
-            RuntimeInterface::UnloadRuntime("xrCreateInstance");
-        }
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "Failed to allocate memory");
-        return XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        if (runtime_loaded) {
-            RuntimeInterface::UnloadRuntime("xrCreateInstance");
-        }
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "Unknown error occurred");
-        return XR_ERROR_INITIALIZATION_FAILED;
-    }
 }
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instance) {
-    try {
     LoaderLogger::LogVerboseMessage("xrDestroyInstance", "Entering loader trampoline");
     // XR_NULL_HANDLE is ignored, but valid, in a delete operation.
     if (XR_NULL_HANDLE == instance) {
@@ -335,9 +308,6 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
     std::unique_lock<std::mutex> loader_instance_lock(g_loader_instance_mutex);
     delete loader_instance;
     LoaderLogger::LogVerboseMessage("xrDestroyInstance", "Completed loader trampoline");
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrDestroyInstance", "Unknown error occurred");
-    }
 
     // Finally, unload the runtime if necessary
     RuntimeInterface::UnloadRuntime("xrDestroyInstance");
@@ -424,7 +394,6 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyInstance(XrInstance instance) 
 XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instance,
                                                               const XrDebugUtilsMessengerCreateInfoEXT *createInfo,
                                                               XrDebugUtilsMessengerEXT *messenger) {
-    try {
     LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Entering loader trampoline");
 
     LoaderInstance *loader_instance = g_instance_map.Get(instance);
@@ -456,21 +425,11 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instanc
     }
     LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Completed loader trampoline");
     return result;
-    } catch (std::bad_alloc &) {
-        LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
-                                      "xrCreateDebugUtilsMessengerEXT trampoline failed allocating memory");
-        return XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
-                                      "xrCreateDebugUtilsMessengerEXT trampoline encountered an unknown error");
-        return XR_ERROR_INITIALIZATION_FAILED;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMessengerEXT messenger) {
     // TODO: get instance from messenger in loader
     // Also, is the loader really doing all this every call?
-    try {
     LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Entering loader trampoline");
 
     if (XR_NULL_HANDLE == messenger) {
@@ -498,13 +457,6 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
     XrResult result = dispatch_table->DestroyDebugUtilsMessengerEXT(messenger);
     LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Completed loader trampoline");
     return result;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage(
-            "xrDestroyDebugUtilsMessengerEXT",
-            "xrDestroyDebugUtilsMessengerEXT trampoline encountered an unknown error.  Likely XrDebugUtilsMessengerEXT " +
-                HandleToHexString(messenger) + " is invalid");
-        return XR_ERROR_HANDLE_INVALID;
-    }
 }
 
 // ---- Extension manual loader terminator functions
@@ -512,7 +464,6 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMesse
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstance instance,
                                                                         const XrDebugUtilsMessengerCreateInfoEXT *createInfo,
                                                                         XrDebugUtilsMessengerEXT *messenger) {
-    try {
     LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Entering loader terminator");
     if (nullptr == messenger) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrCreateDebugUtilsMessengerEXT-messenger-parameter",
@@ -535,17 +486,9 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstan
     }
     LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Completed loader terminator");
     return result;
-    } catch (std::bad_alloc &) {
-        LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT", "Terminator failed allocating memory");
-        return XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT", "Terminator encountered an unknown error");
-        return XR_ERROR_INITIALIZATION_FAILED;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(XrDebugUtilsMessengerEXT messenger) {
-    try {
     LoaderLogger::LogVerboseMessage("xrDestroyDebugUtilsMessengerEXT", "Entering loader terminator");
     const XrGeneratedDispatchTable *dispatch_table = RuntimeInterface::GetRuntime().GetDebugUtilsMessengerDispatchTable(messenger);
     XrResult result = XR_SUCCESS;
@@ -560,19 +503,12 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(XrDebug
     LoaderLogger::GetInstance().RemoveLogRecorder(MakeHandleGeneric(messenger));
     RuntimeInterface::GetRuntime().ForgetDebugMessenger(messenger);
     return result;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrDestroyDebugUtilsMessengerEXT",
-                                      "Terminator encountered an unknown error.  Likely XrDebugUtilsMessengerEXT " +
-                                          HandleToHexString(messenger) + " is invalid");
-        return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSubmitDebugUtilsMessageEXT(XrInstance instance,
                                                                       XrDebugUtilsMessageSeverityFlagsEXT messageSeverity,
                                                                       XrDebugUtilsMessageTypeFlagsEXT messageTypes,
                                                                       const XrDebugUtilsMessengerCallbackDataEXT *callbackData) {
-    try {
     LoaderLogger::LogVerboseMessage("xrSubmitDebugUtilsMessageEXT", "Entering loader terminator");
     const XrGeneratedDispatchTable *dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);
     XrResult result = XR_SUCCESS;
@@ -585,17 +521,10 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSubmitDebugUtilsMessageEXT(XrInstance
     }
     LoaderLogger::LogVerboseMessage("xrSubmitDebugUtilsMessageEXT", "Completed loader terminator");
     return result;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrSubmitDebugUtilsMessageEXT",
-                                      "xrSubmitDebugUtilsMessageEXT terminator encountered an unknown error.  Likely XrInstance " +
-                                          HandleToHexString(instance) + " is invalid");
-        return XR_ERROR_HANDLE_INVALID;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSetDebugUtilsObjectNameEXT(XrInstance instance,
                                                                       const XrDebugUtilsObjectNameInfoEXT *nameInfo) {
-    try {
     LoaderLogger::LogVerboseMessage("xrSetDebugUtilsObjectNameEXT", "Entering loader terminator");
     const XrGeneratedDispatchTable *dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);
     XrResult result = XR_SUCCESS;
@@ -605,16 +534,9 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSetDebugUtilsObjectNameEXT(XrInstance
     LoaderLogger::GetInstance().AddObjectName(nameInfo->objectHandle, nameInfo->objectType, nameInfo->objectName);
     LoaderLogger::LogVerboseMessage("xrSetDebugUtilsObjectNameEXT", "Completed loader terminator");
     return result;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrSetDebugUtilsObjectNameEXT",
-                                      "xrSetDebugUtilsObjectNameEXT terminator encountered an unknown error.  Likely XrInstance " +
-                                          HandleToHexString(instance) + "is invalid");
-        return XR_ERROR_HANDLE_INVALID;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession session, const XrDebugUtilsLabelEXT *labelInfo) {
-    try {
     LoaderInstance *loader_instance = g_session_map.Get(session);
     if (nullptr == loader_instance) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrSessionBeginDebugUtilsLabelRegionEXT-session-parameter",
@@ -640,15 +562,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(XrSession 
         return dispatch_table->SessionBeginDebugUtilsLabelRegionEXT(session, labelInfo);
     }
     return XR_SUCCESS;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrSessionBeginDebugUtilsLabelRegionEXT",
-                                      "xrSessionBeginDebugUtilsLabelRegionEXT trampoline encountered an unknown error");
-        return XR_ERROR_VALIDATION_FAILURE;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession session) {
-    try {
     LoaderInstance *loader_instance = g_session_map.Get(session);
     if (nullptr == loader_instance) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrSessionEndDebugUtilsLabelRegionEXT-session-parameter",
@@ -664,15 +580,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(XrSession se
         return dispatch_table->SessionEndDebugUtilsLabelRegionEXT(session);
     }
     return XR_SUCCESS;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrSessionEndDebugUtilsLabelRegionEXT",
-                                      "xrSessionEndDebugUtilsLabelRegionEXT trampoline encountered an unknown error");
-        return XR_ERROR_VALIDATION_FAILURE;
-    }
 }
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession session, const XrDebugUtilsLabelEXT *labelInfo) {
-    try {
     LoaderInstance *loader_instance = g_session_map.Get(session);
     if (nullptr == loader_instance) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrSessionInsertDebugUtilsLabelEXT-session-parameter",
@@ -698,11 +608,6 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession sessi
         return dispatch_table->SessionInsertDebugUtilsLabelEXT(session, labelInfo);
     }
     return XR_SUCCESS;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrSessionInsertDebugUtilsLabelEXT",
-                                      "xrSessionInsertDebugUtilsLabelEXT trampoline encountered an unknown error");
-        return XR_ERROR_VALIDATION_FAILURE;
-    }
 }
 
 }  // extern "C"

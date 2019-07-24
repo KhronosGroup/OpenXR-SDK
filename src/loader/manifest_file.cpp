@@ -60,15 +60,10 @@ static inline bool StringEndsWith(std::string const &value, std::string const &e
 
 // If the file found is a manifest file name, add it to the out_files manifest list.
 static void AddIfJson(ManifestFileType type, const std::string &full_file, std::vector<std::string> &manifest_files) {
-    try {
     if (0 == full_file.size() || !StringEndsWith(full_file, ".json")) {
         return;
     }
     manifest_files.push_back(full_file);
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "AddIfJson - unknown error occurred");
-        throw;
-    }
 }
 
 // Check the current path for any manifest files.  If the provided search_path is a directory, look for
@@ -76,7 +71,6 @@ static void AddIfJson(ManifestFileType type, const std::string &full_file, std::
 // be a single filename.
 static void CheckAllFilesInThePath(ManifestFileType type, const std::string &search_path, bool is_directory_list,
                                    std::vector<std::string> &manifest_files) {
-    try {
     if (FileSysUtilsPathExists(search_path)) {
         std::string absolute_path;
         if (!is_directory_list) {
@@ -99,10 +93,6 @@ static void CheckAllFilesInThePath(ManifestFileType type, const std::string &sea
             }
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "CheckAllFilesInThePath - unknown error occurred");
-        throw;
-    }
 }
 
 // Add all manifest files in the provided paths to the manifest_files list.  If search_path
@@ -114,7 +104,6 @@ static void AddFilesInPath(ManifestFileType type, const std::string &search_path
     std::size_t found = search_path.find_first_of(PATH_SEPARATOR);
     std::string cur_search;
 
-    try {
     // Handle any path listings in the string (separated by the appropriate path separator)
     while (found != std::string::npos) {
         // substr takes a start index and length.
@@ -136,10 +125,6 @@ static void AddFilesInPath(ManifestFileType type, const std::string &search_path
         cur_search = search_path.substr(last_found);
         CheckAllFilesInThePath(type, cur_search, is_directory_list, manifest_files);
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "AddFilesInPath - unknown error occurred");
-        throw;
-    }
 }
 
 // Copy all paths listed in the cur_path string into output_path and append the appropriate relative_path onto the end of each.
@@ -149,7 +134,6 @@ static void CopyIncludedPaths(bool is_directory_list, const std::string &cur_pat
         std::size_t last_found = 0;
         std::size_t found = cur_path.find_first_of(PATH_SEPARATOR);
 
-        try {
         // Handle any path listings in the string (separated by the appropriate path separator)
         while (found != std::string::npos) {
             std::size_t length = found - last_found;
@@ -174,10 +158,6 @@ static void CopyIncludedPaths(bool is_directory_list, const std::string &cur_pat
             output_path += relative_path;
             output_path += PATH_SEPARATOR;
         }
-        } catch (...) {
-            LoaderLogger::LogErrorMessage("", "CopyIncludedPaths - unknown error occurred");
-            throw;
-        }
     }
 }
 
@@ -190,7 +170,6 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
     std::string override_path = "";
     std::string search_path = "";
 
-    try {
     if (override_env_var.size() != 0) {
 #ifndef XR_OS_WINDOWS
         if (geteuid() != getuid() || getegid() != getgid()) {
@@ -277,10 +256,6 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
 
     // Now, parse the paths and add any manifest files found in them.
     AddFilesInPath(type, search_path, is_directory_list, manifest_files);
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ReadDataFilesInSearchPaths - unknown error occurred");
-        throw;
-    }
 }
 
 #ifdef XR_OS_LINUX
@@ -363,7 +338,6 @@ static bool FindXDGConfigFile(const std::string &relative_path, std::string &out
 static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::string &runtime_registry_location,
                                            const std::string &default_runtime_value_name,
                                            std::vector<std::string> &manifest_files) {
-    try {
     HKEY hkey;
     DWORD access_flags;
     wchar_t value_w[1024];
@@ -394,17 +368,12 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
     } else {
         AddFilesInPath(type, wide_to_utf8(value_w), false, manifest_files);
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ReadLayerDataFilesInRegistry - unknown error occurred");
-        throw;
-    }
 }
 
 // Look for layer data files in the provided paths, but first check the environment override to determine
 // if we should use that instead.
 static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::string &registry_location,
                                          std::vector<std::string> &manifest_files) {
-    try {
     HKEY hive[2] = {HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER};
     bool found[2] = {false, false};
     HKEY hkey;
@@ -444,10 +413,6 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
             name_size = 1023;
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ReadLayerDataFilesInRegistry - unknown error occurred");
-        throw;
-    }
 }
 
 #endif  // XR_OS_WINDOWS
@@ -458,7 +423,6 @@ ManifestFile::ManifestFile(ManifestFileType type, const std::string &filename, c
 ManifestFile::~ManifestFile() {}
 
 bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
-    try {
     if (root_node["file_format_version"].isNull() || !root_node["file_format_version"].isString()) {
         LoaderLogger::LogErrorMessage("", "ManifestFile::IsValidJson - JSON file missing \"file_format_version\"");
         return false;
@@ -479,10 +443,6 @@ bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
         LoaderLogger::LogErrorMessage("", error_message);
         return false;
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ManifestFile::IsValidJson - unknown error occurred");
-        throw;
-    }
 
     return true;
 }
@@ -490,7 +450,6 @@ bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
 // Return any instance extensions found in the manifest files in the proper form for
 // OpenXR (XrExtensionProperties).
 void ManifestFile::GetInstanceExtensionProperties(std::vector<XrExtensionProperties> &props) {
-    try {
     size_t ext_count = _instance_extensions.size();
     size_t props_count = props.size();
     bool found = false;
@@ -514,16 +473,11 @@ void ManifestFile::GetInstanceExtensionProperties(std::vector<XrExtensionPropert
             props.push_back(prop);
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ManifestFile::GetInstanceExtensionProperties - unknown error occurred");
-        throw;
-    }
 }
 
 // Return any device extensions found in the manifest files in the proper form for
 // OpenXR (XrExtensionProperties).
 void ManifestFile::GetDeviceExtensionProperties(std::vector<XrExtensionProperties> &props) {
-    try {
     size_t ext_count = _device_extensions.size();
     size_t props_count = props.size();
     bool found = false;
@@ -547,23 +501,14 @@ void ManifestFile::GetDeviceExtensionProperties(std::vector<XrExtensionPropertie
             props.push_back(prop);
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ManifestFile::GetDeviceExtensionProperties - unknown error occurred");
-        throw;
-    }
 }
 
 const std::string &ManifestFile::GetFunctionName(const std::string &func_name) {
-    try {
     if (_functions_renamed.size() > 0) {
         auto found = _functions_renamed.find(func_name);
         if (found != _functions_renamed.end()) {
             return found->second;
         }
-    }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ManifestFile::GetFunctionName - unknown error occurred");
-        throw;
     }
     return func_name;
 }
@@ -574,7 +519,6 @@ RuntimeManifestFile::RuntimeManifestFile(const std::string &filename, const std:
 RuntimeManifestFile::~RuntimeManifestFile() {}
 
 void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
-    try {
     std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
     if (!json_stream.is_open()) {
         std::string error_message = "RuntimeManifestFile::createIfValid failed to open ";
@@ -705,17 +649,12 @@ void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::u
             manifest_files.back()->_functions_renamed.insert(std::make_pair(original_name, new_name));
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::CreateIfValid - unknown error occurred");
-        throw;
-    }
 }
 
 // Find all manifest files in the appropriate search paths/registries for the given type.
 XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
                                                 std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
     XrResult result = XR_SUCCESS;
-    try {
     if (MANIFEST_TYPE_RUNTIME != type) {
         LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - unknown manifest file requested");
         return XR_ERROR_FILE_ACCESS_ERROR;
@@ -766,13 +705,6 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
         LoaderLogger::LogInfoMessage("", info_message);
     }
     RuntimeManifestFile::CreateIfValid(filename, manifest_files);
-    } catch (std::bad_alloc &) {
-        LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - failed to allocate memory");
-        return XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - unknown error occurred");
-        return XR_ERROR_FILE_ACCESS_ERROR;
-    }
     return result;
 }
 
@@ -789,7 +721,6 @@ ApiLayerManifestFile::~ApiLayerManifestFile() {}
 
 void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string filename,
                                          std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files) {
-    try {
     std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
     Json::Reader reader;
     Json::Value root_node = Json::nullValue;
@@ -974,14 +905,9 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
             manifest_files.back()->_functions_renamed.insert(std::make_pair(original_name, new_name));
         }
     }
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ApiLayerManifestFile::CreateIfValid - unknown error occurred");
-        throw;
-    }
 }
 
 XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() {
-    try {
     XrApiLayerProperties props = {};
     props.type = XR_TYPE_API_LAYER_PROPERTIES;
     props.next = nullptr;
@@ -996,16 +922,11 @@ XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() {
         props.description[XR_MAX_API_LAYER_DESCRIPTION_SIZE - 1] = '\0';
     }
     return props;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ApiLayerManifestFile::GetApiLayerProperties - unknown error occurred");
-        throw;
-    }
 }
 
 // Find all layer manifest files in the appropriate search paths/registries for the given type.
 XrResult ApiLayerManifestFile::FindManifestFiles(ManifestFileType type,
                                                  std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files) {
-    try {
     std::string relative_path;
     std::string override_env_var;
     std::string registry_location = "";
@@ -1057,12 +978,5 @@ XrResult ApiLayerManifestFile::FindManifestFiles(ManifestFileType type,
             break;
     }
 
-    } catch (std::bad_alloc &) {
-        LoaderLogger::LogErrorMessage("", "ApiLayerManifestFile::FindManifestFiles - memory allocation failed");
-        return XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("", "ApiLayerManifestFile::FindManifestFiles - unknown error occurred");
-        return XR_ERROR_FILE_ACCESS_ERROR;
-    }
     return XR_SUCCESS;
 }

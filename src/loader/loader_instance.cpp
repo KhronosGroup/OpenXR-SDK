@@ -45,7 +45,6 @@ const std::vector<XrExtensionProperties> LoaderInstance::_loader_supported_exten
 XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces,
                                         const XrInstanceCreateInfo* info, XrInstance* instance) {
     XrResult last_error = XR_SUCCESS;
-    try {
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering LoaderInstance::CreateInstance");
 
     // Topmost means "closest to the application"
@@ -180,13 +179,6 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         // Make the unique_ptr no longer delete this.
         loader_instance.release();
     }
-    } catch (std::bad_alloc&) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateInstance - failed to allocate memory");
-        last_error = XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateInstance - unknown error occurred");
-        last_error = XR_ERROR_INITIALIZATION_FAILED;
-    }
 
     // Always clear the input lists.  Either we use them or we don't.
     api_layer_interfaces.clear();
@@ -194,16 +186,12 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
     return last_error;
 }
 
-LoaderInstance::LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces) try
+LoaderInstance::LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces)
     : _unique_id(0xDECAFBAD),
       _api_version(XR_CURRENT_API_VERSION),
       _api_layer_interfaces(std::move(api_layer_interfaces)),
       _dispatch_valid(false),
-      _messenger(XR_NULL_HANDLE) {
-} catch (...) {
-    LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::LoaderInstance - Unknown error occurred");
-    throw;
-}
+      _messenger(XR_NULL_HANDLE) {}
 
 LoaderInstance::~LoaderInstance() {
     std::ostringstream oss;
@@ -214,7 +202,6 @@ LoaderInstance::~LoaderInstance() {
 
 XrResult LoaderInstance::CreateDispatchTable(XrInstance instance) {
     XrResult res = XR_SUCCESS;
-    try {
     // Create the top-level dispatch table.  First, we want to start with a dispatch table generated
     // using the commands from the runtime, with the exception of commands that we need a terminator
     // for.  The loaderGenInitInstanceDispatchTable utility function handles that automatically for us.
@@ -231,13 +218,6 @@ XrResult LoaderInstance::CreateDispatchTable(XrInstance instance) {
     // Set the top-level instance dispatch table to the top-most commands now that we've figured them out.
     _dispatch_table = std::move(new_instance_dispatch_table);
     _dispatch_valid = true;
-    } catch (std::bad_alloc&) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateDispatchTable - failed to allocate memory");
-        res = XR_ERROR_OUT_OF_MEMORY;
-    } catch (...) {
-        LoaderLogger::LogErrorMessage("xrCreateInstance", "LoaderInstance::CreateDispatchTable - unknown error occurred");
-        res = XR_ERROR_INITIALIZATION_FAILED;
-    }
     return res;
 }
 

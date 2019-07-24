@@ -579,7 +579,6 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     generated_funcs += '#if %s\n' % cur_cmd.protect_string
 
                 generated_funcs += cur_cmd.cdecl.replace(";", " {\n")
-                generated_funcs += '    try {\n'
                 generated_funcs += tramp_variable_defines
 
                 # If this is not core, but an extension, check to make sure the extension is enabled.
@@ -619,30 +618,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
                 if has_return and not just_return_call:
                     generated_funcs += '    return result;\n'
-                if cur_cmd.is_create_connect:
-                    generated_funcs += '    } catch (std::bad_alloc &) {\n'
-                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s trampoline failed allocating memory");\n' % (
-                        cur_cmd.name, cur_cmd.name)
-                    generated_funcs += '        return XR_ERROR_OUT_OF_MEMORY;\n'
-                    generated_funcs += '    } catch (...) {\n'
-                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s trampoline encountered an unknown error");\n' % (
-                        cur_cmd.name, cur_cmd.name)
-                    generated_funcs += '        return XR_ERROR_INITIALIZATION_FAILED;\n'
-                elif cur_cmd.params[0].type == 'XrInstance':
-                    generated_funcs += '    } catch (...) {\n'
-                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s trampoline encountered an unknown error.  Likely XrInstance "\n' % (
-                        cur_cmd.name, cur_cmd.name)
-                    generated_funcs += '            + HandleToHexString(%s) + " is invalid");\n' % cur_cmd.params[0].name
-                    if has_return:
-                        generated_funcs += '        return XR_ERROR_HANDLE_INVALID;\n'
-                elif has_return:
-                    generated_funcs += '    } catch (...) {\n'
-                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s trampoline encountered an unknown error");\n' % (
-                        cur_cmd.name, cur_cmd.name)
-                    generated_funcs += '        // NOTE: Most calls only allow XR_SUCCESS as a return code\n'
-                    generated_funcs += '        return XR_SUCCESS;\n'
 
-                generated_funcs += '    }\n'
                 generated_funcs += '}\n\n'
 
                 # If this is a function that needs a terminator, provide the call to it, not the runtime.
@@ -652,7 +628,6 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     term_decl = cur_cmd.cdecl.replace(";", " {\n")
                     term_decl = term_decl.replace(" xr", " LoaderGenTermXr")
                     generated_funcs += term_decl
-                    generated_funcs += '    try {\n'
 
                     loader_override_func = False
                     if base_name == 'StructureTypeToString':
@@ -693,13 +668,6 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
 
                     if has_return and not just_return_call:
                         generated_funcs += '    return result;\n'
-                    generated_funcs += '    } catch (...) {\n'
-                    generated_funcs += '        LoaderLogger::LogErrorMessage("%s", "%s terminator encountered an unknown error");\n' % (
-                        cur_cmd.name, cur_cmd.name)
-                    if has_return:
-                        generated_funcs += '        // NOTE: Most calls only allow XR_SUCCESS as a return code\n'
-                        generated_funcs += '        return XR_SUCCESS;\n'
-                    generated_funcs += '    }\n'
                     generated_funcs += '}\n'
                 if cur_cmd.protect_value:
                     generated_funcs += '#endif // %s\n' % cur_cmd.protect_string
