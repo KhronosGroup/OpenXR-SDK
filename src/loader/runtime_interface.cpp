@@ -99,7 +99,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
                     LoaderLogger::LogErrorMessage(openxr_command, error_message);
                     res = XR_ERROR_FILE_CONTENTS_INVALID;
                 } else if (0 >= runtime_info.runtimeInterfaceVersion ||
-                            XR_CURRENT_LOADER_RUNTIME_VERSION < runtime_info.runtimeInterfaceVersion) {
+                           XR_CURRENT_LOADER_RUNTIME_VERSION < runtime_info.runtimeInterfaceVersion) {
                     std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
                     error_message += manifest_file->Filename();
                     error_message += ", negotiation succeeded but returned invalid interface version";
@@ -222,7 +222,7 @@ void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionPro
     std::vector<XrExtensionProperties> runtime_extension_properties;
     PFN_xrEnumerateInstanceExtensionProperties rt_xrEnumerateInstanceExtensionProperties;
     _get_instant_proc_addr(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
-                            reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrEnumerateInstanceExtensionProperties));
+                           reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrEnumerateInstanceExtensionProperties));
     uint32_t count = 0;
     uint32_t count_output = 0;
     // Get the count from the runtime

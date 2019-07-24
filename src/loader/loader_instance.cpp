@@ -82,8 +82,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             topmost_cali_fp = cur_cali_fp;
 
             // Fill in layer info and link previous (lower) layer fxn pointers
-            strncpy(next_info_list[ni_index].layerName, (*layer_interface)->LayerName().c_str(),
-                    XR_MAX_API_LAYER_NAME_SIZE - 1);
+            strncpy(next_info_list[ni_index].layerName, (*layer_interface)->LayerName().c_str(), XR_MAX_API_LAYER_NAME_SIZE - 1);
             next_info_list[ni_index].layerName[XR_MAX_API_LAYER_NAME_SIZE - 1] = '\0';
             next_info_list[ni_index].next = prev_nextinfo;
             next_info_list[ni_index].nextGetInstanceProcAddr = prev_gipa_fp;
@@ -132,7 +131,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             // Finally, check the enabled layers
             if (!found) {
                 for (auto layer_interface = layer_interfaces.begin(); layer_interface != layer_interfaces.end();
-                        ++layer_interface) {
+                     ++layer_interface) {
                     if ((*layer_interface)->SupportsExtension(info->enabledExtensionNames[ext])) {
                         found = true;
                         break;
@@ -158,7 +157,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         last_error = loader_instance->CreateDispatchTable(*instance);
         if (XR_FAILED(last_error)) {
             LoaderLogger::LogErrorMessage("xrCreateInstance",
-                                            "LoaderInstance::CreateInstance failed creating top-level dispatch table");
+                                          "LoaderInstance::CreateInstance failed creating top-level dispatch table");
         } else {
             last_error = g_instance_map.Insert(*instance, *loader_instance);
             if (XR_FAILED(last_error)) {

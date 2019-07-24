@@ -96,17 +96,11 @@
 #if (USE_FINAL_FS == 1) || (USE_EXPERIMENTAL_FS == 1)
 // We can use one of the C++ filesystem packages
 
-bool FileSysUtilsIsRegularFile(const std::string& path) {
-    return FS_PREFIX::is_regular_file(path);
-}
+bool FileSysUtilsIsRegularFile(const std::string& path) { return FS_PREFIX::is_regular_file(path); }
 
-bool FileSysUtilsIsDirectory(const std::string& path) {
-    return FS_PREFIX::is_directory(path);
-}
+bool FileSysUtilsIsDirectory(const std::string& path) { return FS_PREFIX::is_directory(path); }
 
-bool FileSysUtilsPathExists(const std::string& path) {
-    return FS_PREFIX::exists(path);
-}
+bool FileSysUtilsPathExists(const std::string& path) { return FS_PREFIX::exists(path); }
 
 bool FileSysUtilsIsAbsolutePath(const std::string& path) {
     FS_PREFIX::path file_path(path);
@@ -162,17 +156,11 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 // For pre C++17 compiler that doesn't support experimental filesystem
 #include <shlwapi.h>
 
-bool FileSysUtilsIsRegularFile(const std::string& path) {
-    return (1 != PathIsDirectoryW(utf8_to_wide(path).c_str()));
-}
+bool FileSysUtilsIsRegularFile(const std::string& path) { return (1 != PathIsDirectoryW(utf8_to_wide(path).c_str())); }
 
-bool FileSysUtilsIsDirectory(const std::string& path) {
-    return (1 == PathIsDirectoryW(utf8_to_wide(path).c_str()));
-}
+bool FileSysUtilsIsDirectory(const std::string& path) { return (1 == PathIsDirectoryW(utf8_to_wide(path).c_str())); }
 
-bool FileSysUtilsPathExists(const std::string& path) {
-    return (1 == PathFileExistsW(utf8_to_wide(path).c_str()));
-}
+bool FileSysUtilsPathExists(const std::string& path) { return (1 == PathFileExistsW(utf8_to_wide(path).c_str())); }
 
 bool FileSysUtilsIsAbsolutePath(const std::string& path) {
     if ((path[0] == '\\') || (path[1] == ':' && (path[2] == '\\' || path[2] == '/'))) {
@@ -271,13 +259,9 @@ bool FileSysUtilsIsDirectory(const std::string& path) {
     return S_ISDIR(path_stat.st_mode);
 }
 
-bool FileSysUtilsPathExists(const std::string& path) {
-    return (access(path.c_str(), F_OK) != -1);
-}
+bool FileSysUtilsPathExists(const std::string& path) { return (access(path.c_str(), F_OK) != -1); }
 
-bool FileSysUtilsIsAbsolutePath(const std::string& path) {
-    return (path[0] == DIRECTORY_SYMBOL);
-}
+bool FileSysUtilsIsAbsolutePath(const std::string& path) { return (path[0] == DIRECTORY_SYMBOL); }
 
 bool FileSysUtilsGetCurrentPath(std::string& path) {
     char tmp_path[PATH_MAX];

@@ -304,7 +304,7 @@ static bool FindXDGConfigFile(const std::string &relative_path, std::string &out
     }
 
     std::istringstream iss(GetXDGEnv("XDG_CONFIG_DIRS", nullptr, FALLBACK_CONFIG_DIRS));
-    std::string path;    
+    std::string path;
     while (std::getline(iss, path, PATH_SEPARATOR)) {
         if (path.empty()) continue;
         out = path;
@@ -360,8 +360,8 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
         warning_message += full_registry_location;
         LoaderLogger::LogWarningMessage("", warning_message);
     } else if (ERROR_SUCCESS != RegGetValueW(hkey, nullptr, default_runtime_value_name_w.c_str(),
-                                                RRF_RT_REG_SZ | REG_EXPAND_SZ | RRF_ZEROONFAILURE, NULL,
-                                                reinterpret_cast<LPBYTE>(&value_w), &value_size_w)) {
+                                             RRF_RT_REG_SZ | REG_EXPAND_SZ | RRF_ZEROONFAILURE, NULL,
+                                             reinterpret_cast<LPBYTE>(&value_w), &value_size_w)) {
         std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry value ";
         warning_message += default_runtime_value_name;
         LoaderLogger::LogWarningMessage("", warning_message);
@@ -404,7 +404,7 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
         }
         found[hive_index] = true;
         while (ERROR_SUCCESS ==
-                (rtn_value = RegEnumValueW(hkey, key_index++, name_w, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
+               (rtn_value = RegEnumValueW(hkey, key_index++, name_w, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
             if (value_size == sizeof(value) && value == 0) {
                 const std::string filename = wide_to_utf8(name_w);
                 AddFilesInPath(type, filename, false, manifest_files);
@@ -548,8 +548,7 @@ void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::u
     runtime_root_node = root_node["runtime"];
     // The Runtime manifest file needs the "runtime" root as well as sub-nodes for "api_version" and
     // "library_path".  If any of those aren't there, fail.
-    if (runtime_root_node.isNull() || runtime_root_node["library_path"].isNull() ||
-        !runtime_root_node["library_path"].isString()) {
+    if (runtime_root_node.isNull() || runtime_root_node["library_path"].isNull() || !runtime_root_node["library_path"].isString()) {
         std::string error_message = "RuntimeManifestFile::CreateIfValid ";
         error_message += filename;
         error_message += " is missing required fields.  Verify all proper fields exist.";
@@ -624,8 +623,7 @@ void RuntimeManifestFile::CreateIfValid(std::string filename, std::vector<std::u
             Json::Value inst_ext = (*inst_ext_it);
             Json::Value inst_ext_name = inst_ext["name"];
             Json::Value inst_ext_version = inst_ext["spec_version"];
-            if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() &&
-                inst_ext_version.isUInt()) {
+            if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() && inst_ext_version.isUInt()) {
                 ExtensionListing ext = {};
                 ext.name = inst_ext_name.asString();
                 ext.spec_version = inst_ext_version.asUInt();
@@ -683,20 +681,17 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
         }
         filename = filenames[0];
 #elif defined(XR_OS_LINUX)
-        const std::string relative_path = "openxr/"
-            + std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION))
-            + "/active_runtime.json";
+        const std::string relative_path =
+            "openxr/" + std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION)) + "/active_runtime.json";
         if (!FindXDGConfigFile(relative_path, filename)) {
             LoaderLogger::LogErrorMessage(
-                "",
-                "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
+                "", "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
             return XR_ERROR_FILE_ACCESS_ERROR;
         }
 #else
         if (!PlatformGetGlobalRuntimeFileName(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION), filename)) {
             LoaderLogger::LogErrorMessage(
-                "",
-                "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
+                "", "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
             return XR_ERROR_FILE_ACCESS_ERROR;
         }
 #endif
@@ -880,8 +875,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string file
             Json::Value inst_ext = (*inst_ext_it);
             Json::Value inst_ext_name = inst_ext["name"];
             Json::Value inst_ext_version = inst_ext["spec_version"];
-            if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() &&
-                inst_ext_version.isString()) {
+            if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() && inst_ext_version.isString()) {
                 ExtensionListing ext = {};
                 ext.name = inst_ext_name.asString();
                 ext.spec_version = atoi(inst_ext_version.asString().c_str());

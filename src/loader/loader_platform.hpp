@@ -82,7 +82,6 @@ static inline const char *LoaderPlatformLibraryGetProcAddrError(const std::strin
 
 #elif defined(XR_OS_WINDOWS)
 
-
 #define PATH_SEPARATOR ';'
 #define DIRECTORY_SYMBOL '\\'
 
