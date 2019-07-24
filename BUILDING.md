@@ -27,7 +27,7 @@ First, generate the 64-bit solution and project files using CMake:
 ```
 mkdir build\win64
 cd build\win64
-cmake -G "Visual Studio [Version Number] Win64" ..\..
+cmake -G "Visual Studio [Version Number] Win64" ../..
 ```
 
 Finally, open the build\win64\OPENXR.sln in the Visual Studio to build the samples.
@@ -39,7 +39,7 @@ First, generate the 32-bit solution and project files using CMake:
 ```
 mkdir build\win32
 cd build\win32
-cmake -G "Visual Studio [Version Number]" ..\..
+cmake -G "Visual Studio [Version Number]" ../..
 ```
 
 Open the build\win32\OPENXR.sln in the Visual Studio to build the samples.
@@ -85,7 +85,7 @@ The OpenXR loader is built as a static library by default. To instead build as a
 the cmake option `DYNAMIC_LOADER=ON`.  e.g. for Win64, replace the cmake line shown above with:
 
 ```
-cmake -DDYNAMIC_LOADER=ON -G "Visual Studio [Version Number] Win64" ..\..
+cmake -DDYNAMIC_LOADER=ON -G "Visual Studio [Version Number] Win64" ../..
 ```
 
 # Running the HELLO_XR sample
