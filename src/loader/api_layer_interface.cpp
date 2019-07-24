@@ -112,7 +112,8 @@ XrResult ApiLayerInterface::GetApiLayerProperties(const std::string& openxr_comm
             LoaderLogger::LogErrorMessage(openxr_command,
                                           "VUID-xrEnumerateApiLayerProperties-properties-parameter: invalid properties");
             return XR_ERROR_VALIDATION_FAILURE;
-        } else if (nullptr != outgoing_count) {
+        }
+        if (nullptr != outgoing_count) {
             *outgoing_count = prop;
         }
     }
