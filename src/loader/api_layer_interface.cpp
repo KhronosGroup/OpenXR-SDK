@@ -384,11 +384,11 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
     return last_error;
 }
 
-ApiLayerInterface::ApiLayerInterface(std::string layer_name, LoaderPlatformLibraryHandle layer_library,
+ApiLayerInterface::ApiLayerInterface(const std::string& layer_name, LoaderPlatformLibraryHandle layer_library,
                                      std::vector<std::string>& supported_extensions,
                                      PFN_xrGetInstanceProcAddr get_instant_proc_addr,
                                      PFN_xrCreateApiLayerInstance create_api_layer_instance)
-    : _layer_name(std::move(layer_name)),
+    : _layer_name(layer_name),
       _layer_library(layer_library),
       _get_instant_proc_addr(get_instant_proc_addr),
       _create_api_layer_instance(create_api_layer_instance),
