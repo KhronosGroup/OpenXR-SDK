@@ -21,7 +21,7 @@
 /*!
  * @file
  *
- * Implementations of the include-requiring hex convesion functions.
+ * Implementations of the include-requiring hex conversion functions.
  */
 
 #include "hex_and_handles.h"

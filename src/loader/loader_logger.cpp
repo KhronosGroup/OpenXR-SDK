@@ -17,7 +17,6 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-
 #include <algorithm>
 #include <iomanip>
 #include <iostream>

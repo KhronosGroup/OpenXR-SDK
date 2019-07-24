@@ -123,14 +123,21 @@ class LoaderLogRecorder {
     virtual ~LoaderLogRecorder() = default;
 
     XrLoaderLogType Type() { return _type; }
+
     uint64_t UniqueId() { return _unique_id; }
+
     XrLoaderLogMessageSeverityFlags MessageSeverities() { return _message_severities; }
+
     XrLoaderLogMessageTypeFlags MessageTypes() { return _message_types; }
 
     virtual void Start() { _active = true; }
+
     bool IsPaused() { return _active; }
+
     virtual void Pause() { _active = false; }
+
     virtual void Resume() { _active = true; }
+
     virtual void Stop() { _active = false; }
 
     virtual bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,

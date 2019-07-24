@@ -317,7 +317,7 @@ static std::string GetXDGEnv(const char *name, const char *fallback_env, const c
     return result;
 }
 
-// Return the first instance of relative_path occuring in an XDG config dir according to standard
+// Return the first instance of relative_path occurring in an XDG config dir according to standard
 // precedence order.
 static bool FindXDGConfigFile(const std::string &relative_path, std::string &out) {
     out = GetXDGEnv("XDG_CONFIG_HOME", "HOME", ".config");
@@ -754,9 +754,8 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
             }
             filename = filenames[0];
 #elif defined(XR_OS_LINUX)
-            const std::string relative_path = "openxr/"
-                + std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION))
-                + "/active_runtime.json";
+            const std::string relative_path =
+                "openxr/" + std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION)) + "/active_runtime.json";
             if (!FindXDGConfigFile(relative_path, filename)) {
                 LoaderLogger::LogErrorMessage(
                     "",
