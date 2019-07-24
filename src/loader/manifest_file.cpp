@@ -60,7 +60,7 @@
 
 // Utility functions for finding files in the appropriate paths
 
-static inline bool StringEndsWith(std::string const &value, std::string const &ending) {
+static inline bool StringEndsWith(const std::string &value, const std::string &ending) {
     if (ending.size() > value.size()) {
         return false;
     }
@@ -475,7 +475,7 @@ ManifestFile::ManifestFile(ManifestFileType type, const std::string &filename, c
 
 ManifestFile::~ManifestFile() = default;
 
-bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
+bool ManifestFile::IsValidJson(const Json::Value &root_node, JsonVersion &version) {
     try {
         if (root_node["file_format_version"].isNull() || !root_node["file_format_version"].isString()) {
             LoaderLogger::LogErrorMessage("", "ManifestFile::IsValidJson - JSON file missing \"file_format_version\"");
@@ -505,7 +505,7 @@ bool ManifestFile::IsValidJson(Json::Value &root_node, JsonVersion &version) {
     return true;
 }
 
-static void GetExtensionProperties(std::vector<ExtensionListing> const &extensions, std::vector<XrExtensionProperties> &props) {
+static void GetExtensionProperties(const std::vector<ExtensionListing> &extensions, std::vector<XrExtensionProperties> &props) {
     for (const auto &ext : extensions) {
         auto it =
             std::find_if(props.begin(), props.end(), [&](XrExtensionProperties &prop) { return prop.extensionName == ext.name; });
@@ -565,7 +565,7 @@ RuntimeManifestFile::RuntimeManifestFile(const std::string &filename, const std:
 
 RuntimeManifestFile::~RuntimeManifestFile() = default;
 
-void RuntimeManifestFile::CreateIfValid(std::string const &filename,
+void RuntimeManifestFile::CreateIfValid(const std::string &filename,
                                         std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
     try {
         std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
@@ -779,7 +779,7 @@ ApiLayerManifestFile::ApiLayerManifestFile(ManifestFileType type, const std::str
 
 ApiLayerManifestFile::~ApiLayerManifestFile() = default;
 
-void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, std::string const &filename,
+void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::string &filename,
                                          std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files) {
     try {
         std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
