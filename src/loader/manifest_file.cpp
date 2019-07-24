@@ -718,7 +718,7 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
     try {
     if (MANIFEST_TYPE_RUNTIME != type) {
         LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - unknown manifest file requested");
-        throw std::runtime_error("invalid manifest type");
+        return XR_ERROR_FILE_ACCESS_ERROR;
     }
     std::string filename;
     char *override_path = PlatformUtilsGetSecureEnv(OPENXR_RUNTIME_JSON_ENV_VAR);
@@ -1032,7 +1032,7 @@ XrResult ApiLayerManifestFile::FindManifestFiles(ManifestFileType type,
             break;
         default:
             LoaderLogger::LogErrorMessage("", "ApiLayerManifestFile::FindManifestFiles - unknown manifest file requested");
-            throw std::runtime_error("invalid manifest type");
+            return XR_ERROR_FILE_ACCESS_ERROR;
     }
 
     bool override_active = false;
