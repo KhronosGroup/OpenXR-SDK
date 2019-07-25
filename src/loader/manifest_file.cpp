@@ -27,6 +27,7 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "common_cmake_config.h"
 #include "filesystem_utils.hpp"
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"
@@ -48,6 +49,13 @@
 // OpenXR Loader environment variables of interest
 #define OPENXR_RUNTIME_JSON_ENV_VAR "XR_RUNTIME_JSON"
 #define OPENXR_API_LAYER_PATH_ENV_VAR "XR_API_LAYER_PATH"
+
+#ifndef XRLOADER_ENABLE_EXCEPTION_HANDLING
+#if JSON_USE_EXCEPTIONS
+#error \
+    "Loader is configured to not catch exceptions, but jsoncpp was built with exception-throwing enabled, which could violate the C ABI. One of those two things needs to change."
+#endif  // JSON_USE_EXCEPTIONS
+#endif  // !XRLOADER_ENABLE_EXCEPTION_HANDLING
 
 // Utility functions for finding files in the appropriate paths
 
