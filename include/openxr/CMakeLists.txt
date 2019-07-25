@@ -28,6 +28,8 @@ add_custom_target(generate_openxr_header
         ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
         ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h
 )
+set_target_properties(generate_openxr_header PROPERTIES FOLDER ${CODEGEN_FOLDER})
+
 
 # Copy the openxr_platform_defines.h file and place it in the binary (build) directory.
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h

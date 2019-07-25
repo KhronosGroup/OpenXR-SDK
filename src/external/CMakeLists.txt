@@ -24,6 +24,7 @@ add_custom_target(jsoncppAmalgamatedFiles
         ${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp/dist/json/json.h
         ${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp/dist/json/json-forwards.h
 )
+set_target_properties(jsoncppAmalgamatedFiles PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
 # Command to satisfy the amalgamated file dependencies
 add_custom_command(

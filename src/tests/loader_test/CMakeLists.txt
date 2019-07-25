@@ -22,6 +22,8 @@ add_executable(loader_test
     ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
     ${WAYLAND_PROTOCOL_SRC}
 )
+set_target_properties(loader_test PROPERTIES FOLDER ${TESTS_FOLDER})
+
 add_dependencies(loader_test
     generate_openxr_header
 )

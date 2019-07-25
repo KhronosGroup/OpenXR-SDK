@@ -26,9 +26,9 @@ add_executable(hello_xr
     ${LOCAL_SOURCE}
     ${LOCAL_HEADERS}
     ${VULKAN_SHADERS})
+set_target_properties(hello_xr PROPERTIES FOLDER ${SAMPLES_FOLDER})
 
 source_group("Headers" FILES ${LOCAL_HEADERS})
-set_target_properties (hello_xr PROPERTIES FOLDER Shaders)
 source_group("Shaders" FILES ${VULKAN_SHADERS})
 
 # Find glslc shader compiler.
@@ -69,6 +69,8 @@ function(compile_glsl)
         run_glsl_compiles ALL
         DEPENDS ${glsl_output_files}
     )
+	set_target_properties(run_glsl_compiles PROPERTIES FOLDER ${HELPER_FOLDER})
+
 endfunction()
 
 compile_glsl(${VULKAN_SHADERS})
@@ -121,7 +123,3 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
     target_sources(hello_xr PRIVATE ${WAYLAND_PROTOCOL_SRC})
 endif()
-
-set_target_properties(hello_xr
-    PROPERTIES FOLDER tests_hello_xr
-)

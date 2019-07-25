@@ -169,6 +169,8 @@ add_custom_target(xr_global_generated_files DEPENDS
     xr_generated_utilities.h
     xr_generated_utilities.c
 )
+set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
+
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.h)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.c)
 run_xr_xml_generate(utility_source_generator.py xr_generated_utilities.h)

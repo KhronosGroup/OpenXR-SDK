@@ -29,6 +29,8 @@ endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 add_library(test_runtime SHARED
     runtime_test.cpp
 )
+set_target_properties(test_runtime PROPERTIES FOLDER ${TESTS_FOLDER})
+
 add_dependencies(test_runtime
     xr_global_generated_files
     generate_openxr_header
@@ -72,6 +74,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} ${CMAKE_CURRENT_BINARY_DIR}/test_runtime.def
         VERBATIM
     )
+	set_target_properties(copy-test_runtime-def-file PROPERTIES FOLDER ${HELPER_FOLDER})
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(test_runtime PRIVATE -Wpointer-arith -Wno-unused-function -Wno-sign-compare)
     set_target_properties(test_runtime PROPERTIES LINK_FLAGS "-Wl,-Bsymbolic,--exclude-libs,ALL")
@@ -85,4 +88,5 @@ endif()
 add_custom_target(generated_rt_json_files DEPENDS
     ${CMAKE_BINARY_DIR}/src/tests/loader_test/resources/runtimes/test_runtime.json
 )
+set_target_properties(generated_rt_json_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
 

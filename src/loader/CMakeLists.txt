@@ -79,6 +79,8 @@ add_library(${LOADER_NAME} ${LIBRARY_TYPE}
     ${LOADER_EXTERNAL_GEN_FILES}
     ${openxr_loader_RESOURCE_FILE}
 )
+set_target_properties(${LOADER_NAME} PROPERTIES FOLDER ${LOADER_FOLDER})
+
 set_source_files_properties(
     ${LOADER_EXTERNAL_GEN_FILES}
     PROPERTIES GENERATED TRUE

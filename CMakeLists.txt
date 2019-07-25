@@ -24,8 +24,13 @@ project(OPENXR)
 
 # Enable IDE GUI folders.  "Helper targets" that don't have interesting source code should set their FOLDER property to this
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set(LOADER_HELPER_FOLDER "Helper Targets")
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "")
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake predefined targets")
+set(LOADER_FOLDER "Loader")
+set(HELPER_FOLDER "Helpers")
+set(CODEGEN_FOLDER "Generated")
+set(TESTS_FOLDER "Tests")
+set(API_LAYERS_FOLDER "Layers")
+set(SAMPLES_FOLDER "Samples")
 
 add_subdirectory(include)
 add_subdirectory(src)
@@ -37,7 +42,7 @@ if(NOT TARGET uninstall)
                    IMMEDIATE
                    @ONLY)
     add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-    set_target_properties(uninstall PROPERTIES FOLDER ${LOADER_HELPER_FOLDER})
+    set_target_properties(uninstall PROPERTIES FOLDER ${HELPER_FOLDER})
 endif()
 
 find_program(BASH_COMMAND NAMES bash)

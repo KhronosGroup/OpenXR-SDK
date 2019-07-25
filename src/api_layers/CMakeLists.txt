@@ -41,6 +41,8 @@ add_library(XrApiLayer_api_dump SHARED
     ${CMAKE_BINARY_DIR}/src/xr_generated_dispatch_table.c
     ${CMAKE_BINARY_DIR}/src/api_layers/xr_generated_api_dump.cpp
 )
+set_target_properties(XrApiLayer_api_dump PROPERTIES FOLDER ${API_LAYERS_FOLDER})
+
 add_dependencies(XrApiLayer_api_dump
     generate_openxr_header
     xr_global_generated_files
@@ -69,6 +71,8 @@ add_library(XrApiLayer_core_validation SHARED
     ${CMAKE_BINARY_DIR}/src/xr_generated_dispatch_table.c 
     ${CMAKE_BINARY_DIR}/src/api_layers/xr_generated_core_validation.cpp
 )
+set_target_properties(XrApiLayer_core_validation PROPERTIES FOLDER ${API_LAYERS_FOLDER})
+
 add_dependencies(XrApiLayer_core_validation
     generate_openxr_header
     xr_global_generated_files
@@ -109,6 +113,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_api_dump.def
         VERBATIM
     )
+	set_target_properties(copy-api_dump-def-file PROPERTIES FOLDER ${HELPER_FOLDER})
+
     gen_xr_layer_json(
         ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_api_dump.json
         api_dump
@@ -129,6 +135,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_core_validation.def
         VERBATIM
     )
+	set_target_properties(copy-core_validation-def-file PROPERTIES FOLDER ${HELPER_FOLDER})
     gen_xr_layer_json(
         ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_core_validation.json
         core_validation
@@ -208,24 +215,30 @@ add_custom_target(api_dump_gen_files DEPENDS
     xr_generated_api_dump.hpp
     xr_generated_api_dump.cpp
 )
+set_target_properties(api_dump_gen_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
+
 run_xr_xml_generate(api_dump_generator.py xr_generated_api_dump.hpp)
 run_xr_xml_generate(api_dump_generator.py xr_generated_api_dump.cpp)
 
 add_custom_target(api_dump_json_file DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_api_dump.json
 )
+set_target_properties(api_dump_json_file PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
 # Final bits for core_validation API Layer
 add_custom_target(core_validation_gen_files DEPENDS
     xr_generated_core_validation.hpp
     xr_generated_core_validation.cpp
 )
+set_target_properties(core_validation_gen_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
+
 run_xr_xml_generate(validation_layer_generator.py xr_generated_core_validation.hpp)
 run_xr_xml_generate(validation_layer_generator.py xr_generated_core_validation.cpp)
 
 add_custom_target(core_validation_json_file DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_core_validation.json
 )
+set_target_properties(core_validation_json_file PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
 # Install explicit layers on Linux
 set(TARGET_NAMES

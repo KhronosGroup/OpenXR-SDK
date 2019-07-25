@@ -29,6 +29,8 @@ endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 add_library(XrApiLayer_test SHARED
     layer_test.cpp
 )
+set_target_properties(XrApiLayer_test PROPERTIES FOLDER ${TESTS_FOLDER})
+
 add_dependencies(XrApiLayer_test
     xr_global_generated_files
     generate_openxr_header
@@ -63,6 +65,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} ${CMAKE_CURRENT_BINARY_DIR}/XrApiLayer_test.def
         VERBATIM
     )
+	set_target_properties(copy-test-def-file PROPERTIES FOLDER ${HELPER_FOLDER})
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(XrApiLayer_test PRIVATE -Wpointer-arith -Wno-unused-function -Wno-sign-compare)
     set_target_properties(XrApiLayer_test PROPERTIES LINK_FLAGS "-Wl,-Bsymbolic,--exclude-libs,ALL")
@@ -79,4 +82,5 @@ endif()
 add_custom_target(generated_layer_json_files DEPENDS
     ${CMAKE_BINARY_DIR}/src/tests/loader_test/resources/layers/XrApiLayer_test.json
 )
+set_target_properties(generated_layer_json_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
 

@@ -15,20 +15,20 @@
 # Author:
 #
 
-add_executable(list
+add_executable(runtime_list
     list.cpp
 )
-add_dependencies(list
+add_dependencies(runtime_list
     generate_openxr_header
 )
-target_include_directories(list
+target_include_directories(runtime_list
     PRIVATE ${CMAKE_SOURCE_DIR}/src
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_SOURCE_DIR}/external/include
 )
 if(VulkanHeaders_FOUND)
-    target_include_directories(list
+    target_include_directories(runtime_list
         PRIVATE ${VulkanHeaders_INCLUDE_DIRS}
     )
 endif()
@@ -40,16 +40,14 @@ else()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    target_compile_options(list PRIVATE /Zc:wchar_t /Zc:forScope /W4 /WX)
-    target_link_libraries(list ${OPENXR_LIB} opengl32)
+    target_compile_options(runtime_list PRIVATE /Zc:wchar_t /Zc:forScope /W4 /WX)
+    target_link_libraries(runtime_list ${OPENXR_LIB} opengl32)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(list PRIVATE -Wall)
-    target_link_libraries(list ${OPENXR_LIB} m pthread GL ${XLIB_LIBRARIES} ${XCB_LIBRARIES} ${WAYLAND_LIBRARIES})
+    target_compile_options(runtime_list PRIVATE -Wall)
+    target_link_libraries(runtime_list ${OPENXR_LIB} m pthread GL ${XLIB_LIBRARIES} ${XCB_LIBRARIES} ${WAYLAND_LIBRARIES})
 endif()
 
-set_target_properties(list
-    PROPERTIES FOLDER tests_loader
-)
+set_target_properties(runtime_list PROPERTIES FOLDER ${TESTS_FOLDER})
 
