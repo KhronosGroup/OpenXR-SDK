@@ -202,6 +202,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         elif self.genOpts.filename == 'xr_generated_loader.cpp':
             preamble += '#include "xr_generated_loader.hpp"\n\n'
             preamble += '#include "api_layer_interface.hpp"\n'
+            preamble += '#include "exception_handling.hpp"\n'
             preamble += '#include "hex_and_handles.h"\n'
             preamble += '#include "loader_instance.hpp"\n'
             preamble += '#include "loader_logger.hpp"\n'

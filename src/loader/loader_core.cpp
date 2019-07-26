@@ -22,6 +22,7 @@
 #endif
 
 #include "api_layer_interface.hpp"
+#include "exception_handling.hpp"
 #include "hex_and_handles.h"
 #include "loader_instance.hpp"
 #include "loader_logger_recorders.hpp"
