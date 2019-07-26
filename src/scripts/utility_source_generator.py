@@ -124,25 +124,26 @@ class UtilitySourceOutputGenerator(AutomaticSourceOutputGenerator):
         preamble = ''
         if self.genOpts.filename == 'xr_generated_dispatch_table.h':
             preamble += '#pragma once\n'
+            preamble += '#include "xr_dependencies.h"\n'
+            preamble += '#include <openxr/openxr.h>\n'
+            preamble += '#include <openxr/openxr_platform.h>\n\n'
         elif self.genOpts.filename == 'xr_generated_dispatch_table.c':
             preamble += '#include "xr_dependencies.h"\n'
             preamble += '#include <openxr/openxr.h>\n'
             preamble += '#include <openxr/openxr_platform.h>\n\n'
             preamble += '#include "xr_generated_dispatch_table.h"\n'
         elif self.genOpts.filename == 'xr_generated_utilities.h':
-            preamble += '#ifndef XR_GENERATED_UTILITIES_HEADER_FILE\n'
-            preamble += '#define XR_GENERATED_UTILITIES_HEADER_FILE\n\n'
+            preamble += '#pragma once\n\n'
+            preamble += '#include <openxr/openxr.h>\n\n'
         elif self.genOpts.filename == 'xr_generated_utilities.c':
             preamble += '#ifdef _WIN32\n'
             preamble += '// Disable Windows warning about using strncpy_s instead of strncpy\n'
             preamble += '#define  _CRT_SECURE_NO_WARNINGS 1\n'
             preamble += '#endif // _WIN32\n\n'
+            preamble += '#include "xr_generated_utilities.h"\n\n'
+            preamble += '#include <openxr/openxr.h>\n\n'
             preamble += '#include <stdio.h>\n'
             preamble += '#include <string.h>\n\n'
-            preamble += '#include "xr_dependencies.h"\n'
-            preamble += '#include <openxr/openxr.h>\n'
-            preamble += '#include <openxr/openxr_platform.h>\n\n'
-            preamble += '#include "xr_generated_utilities.h"\n\n'
         write(preamble, file=self.outFile)
 
     # Write out all the information for the appropriate file,
@@ -178,7 +179,6 @@ class UtilitySourceOutputGenerator(AutomaticSourceOutputGenerator):
             file_data += '} // extern "C"\n'
             file_data += '#endif\n'
             file_data += self.outputUtilityVersionDefine()
-            file_data += '#endif // XR_GENERATED_UTILITIES_HEADER_FILE\n'
 
         elif self.genOpts.filename == 'xr_generated_utilities.c':
             file_data += '#ifdef __cplusplus\n'

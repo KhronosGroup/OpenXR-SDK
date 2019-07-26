@@ -21,19 +21,24 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include "loader_instance.hpp"
+
+#include "api_layer_interface.hpp"
+#include "hex_and_handles.h"
+#include "loader_interfaces.h"
+#include "loader_logger.hpp"
+#include "runtime_interface.hpp"
+#include "xr_generated_dispatch_table.h"
+#include "xr_generated_loader.hpp"
+
+#include <openxr/openxr.h>
+
 #include <cstring>
 #include <memory>
 #include <sstream>
-#include <stack>
-
-#include "xr_dependencies.h"
-#include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
-
-#include "loader_instance.hpp"
-#include "xr_generated_dispatch_table.h"
-#include "xr_generated_loader.hpp"
-#include "loader_logger.hpp"
+#include <string>
+#include <utility>
+#include <vector>
 
 // Extensions that are supported by the loader, but may not be supported
 // the the runtime.
@@ -57,10 +62,10 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
 
     // Only start the xrCreateApiLayerInstance stack if we have layers.
     std::vector<std::unique_ptr<ApiLayerInterface>>& layer_interfaces = loader_instance->LayerInterfaces();
-    if (layer_interfaces.size() > 0) {
+    if (!layer_interfaces.empty()) {
         // Initialize an array of ApiLayerNextInfo structs
-        XrApiLayerNextInfo* next_info_list = new XrApiLayerNextInfo[layer_interfaces.size()];
-        uint32_t ni_index = static_cast<uint32_t>(layer_interfaces.size() - 1);
+        auto* next_info_list = new XrApiLayerNextInfo[layer_interfaces.size()];
+        auto ni_index = static_cast<uint32_t>(layer_interfaces.size() - 1);
         for (uint32_t i = 0; i <= ni_index; i++) {
             next_info_list[i].structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_NEXT_INFO;
             next_info_list[i].structVersion = XR_API_LAYER_NEXT_INFO_STRUCT_VERSION;
@@ -122,7 +127,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             // Next check the loader
             if (!found) {
                 for (auto loader_extension : LoaderInstance::_loader_supported_extensions) {
-                    if (!strcmp(loader_extension.extensionName, info->enabledExtensionNames[ext])) {
+                    if (strcmp(loader_extension.extensionName, info->enabledExtensionNames[ext]) == 0) {
                         found = true;
                         break;
                     }
@@ -130,9 +135,8 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             }
             // Finally, check the enabled layers
             if (!found) {
-                for (auto layer_interface = layer_interfaces.begin(); layer_interface != layer_interfaces.end();
-                     ++layer_interface) {
-                    if ((*layer_interface)->SupportsExtension(info->enabledExtensionNames[ext])) {
+                for (auto& layer_interface : layer_interfaces) {
+                    if (layer_interface->SupportsExtension(info->enabledExtensionNames[ext])) {
                         found = true;
                         break;
                     }
@@ -176,7 +180,8 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         oss << HandleToHexString(*instance);
         LoaderLogger::LogInfoMessage("xrCreateInstance", oss.str());
         // Make the unique_ptr no longer delete this.
-        loader_instance.release();
+        // Don't need to save the return value because we already set *instance
+        (void)loader_instance.release();
     }
 
     // Always clear the input lists.  Either we use them or we don't.
@@ -210,7 +215,7 @@ XrResult LoaderInstance::CreateDispatchTable(XrInstance instance) {
     // Go through all layers, and override the instance pointers with the layer version.  However,
     // go backwards through the layer list so we replace in reverse order so the layers can call their next function
     // appropriately.
-    if (_api_layer_interfaces.size() > 0) {
+    if (!_api_layer_interfaces.empty()) {
         (*_api_layer_interfaces.begin())->GenUpdateInstanceDispatchTable(instance, new_instance_dispatch_table);
     }
 

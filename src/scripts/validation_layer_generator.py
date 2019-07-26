@@ -119,21 +119,44 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
         preamble = ''
         if self.genOpts.filename == 'xr_generated_core_validation.hpp':
             preamble += '#pragma once\n'
+
+            preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '#include "validation_utils.h"\n'
+
+            preamble += '#include "api_layer_platform_defines.h"\n'
+            preamble += '#include "xr_dependencies.h"\n'
+            preamble += '#include <openxr/openxr.h>\n'
+            preamble += '#include <openxr/openxr_platform.h>\n\n'
+
             preamble += '#include <vector>\n'
             preamble += '#include <string>\n'
             preamble += '#include <unordered_map>\n'
             preamble += '#include <thread>\n'
             preamble += '#include <mutex>\n\n'
+        elif self.genOpts.filename == 'xr_generated_core_validation.cpp':
+            preamble += '#include "xr_generated_core_validation.hpp"\n'
+            preamble += '\n'
             preamble += '#include "api_layer_platform_defines.h"\n'
+            preamble += '#include "hex_and_handles.h"\n'
+            preamble += '#include "validation_utils.h"\n'
+            preamble += '#include "xr_dependencies.h"\n'
+            preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '\n'
+
+            preamble += '#include "api_layer_platform_defines.h"\n'
+            preamble += '#include "xr_dependencies.h"\n'
             preamble += '#include <openxr/openxr.h>\n'
             preamble += '#include <openxr/openxr_platform.h>\n\n'
-            preamble += '#include "xr_generated_dispatch_table.h"\n'
-            preamble += '#include "validation_utils.h"\n'
-        elif self.genOpts.filename == 'xr_generated_core_validation.cpp':
-            preamble += '#include <sstream>\n'
+
+            preamble += '#include <algorithm>\n'
             preamble += '#include <cstring>\n'
-            preamble += '#include <algorithm>\n\n'
-            preamble += '#include "xr_generated_core_validation.hpp"\n'
+            preamble += '#include <memory>\n'
+            preamble += '#include <sstream>\n'
+            preamble += '#include <string>\n'
+            preamble += '#include <unordered_map>\n'
+            preamble += '#include <utility>\n'
+            preamble += '#include <vector>\n'
+            preamble += '\n'
         write(preamble, file=self.outFile)
 
     # Write out all the information for the appropriate file,
@@ -1936,7 +1959,7 @@ class ValidationSourceOutputGenerator(AutomaticSourceOutputGenerator):
                     struct_check += '}\n'
                     if child_struct.protect_value:
                         struct_check += '#endif // %s\n' % child_struct.protect_string
-                
+
                 struct_check += self.writeIndent(indent)
                 struct_check += 'InvalidStructureType(instance_info, command_name, objects_info, "%s",\n' % xr_struct.name
                 struct_check += self.writeIndent(indent)

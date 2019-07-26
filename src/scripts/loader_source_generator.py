@@ -83,8 +83,6 @@ EXTENSIONS_LOADER_IMPLEMENTS = [
 ]
 
 # LoaderSourceGeneratorOptions - subclass of AutomaticSourceGeneratorOptions.
-
-
 class LoaderSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
     def __init__(self,
                  conventions=None,
@@ -140,9 +138,30 @@ class LoaderSourceGeneratorOptions(AutomaticSourceGeneratorOptions):
         self.alignFuncParam = alignFuncParam
         self.genEnumBeginEndRange = genEnumBeginEndRange
 
+
+def generateErrorMessage(indent_level, vuid, cur_cmd, message, object_info):
+    lines = []
+    lines.append('LoaderLogger::LogValidationErrorMessage(')
+    lines.append('    "VUID-{}",'.format('-'.join(vuid)))
+    lines.append('    "{}",'.format(cur_cmd.name))
+    lines.append('    {},'.format(message))
+
+    object_info_constructors = ['XrLoaderLogObjectInfo{%s, %s}' % p for p in object_info]
+    if len(object_info_constructors) <= 1:
+        lines.append('    {%s});' % (', '.join(object_info_constructors)))
+    else:
+        lines.append('    {')
+        lines.append(',\n'.join('    %s' % x for x in object_info_constructors))
+        lines.append('    });')
+    if isinstance(indent_level, str):
+        base_indent = indent_level
+    else:
+        base_indent = (4 * indent_level) * ' '
+    indented_lines_with_lf = (''.join((base_indent, line, '\n')) for line in lines)
+    return ''.join(indented_lines_with_lf)
+
+
 # LoaderSourceOutputGenerator - subclass of AutomaticSourceOutputGenerator.
-
-
 class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
     """Generate loader source using XML element attributes from registry"""
 
@@ -174,24 +193,32 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
             preamble += '#include <unordered_map>\n'
             preamble += '#include <thread>\n'
             preamble += '#include <mutex>\n\n'
+            preamble += '#include "xr_dependencies.h"\n'
+            preamble += '#include "openxr/openxr.h"\n'
+            preamble += '#include "openxr/openxr_platform.h"\n\n'
             preamble += '#include "loader_interfaces.h"\n\n'
             preamble += '#include "loader_instance.hpp"\n\n'
 
         elif self.genOpts.filename == 'xr_generated_loader.cpp':
-            preamble += '#include <ios>\n'
-            preamble += '#include <sstream>\n'
-            preamble += '#include <cstring>\n'
-            preamble += '#include <string>\n\n'
-            preamble += '#include <algorithm>\n\n'
+            preamble += '#include "xr_generated_loader.hpp"\n\n'
+            preamble += '#include "api_layer_interface.hpp"\n'
+            preamble += '#include "hex_and_handles.h"\n'
+            preamble += '#include "loader_instance.hpp"\n'
+            preamble += '#include "loader_logger.hpp"\n'
+            preamble += '#include "loader_platform.hpp"\n'
+            preamble += '#include "runtime_interface.hpp"\n'
+            preamble += '#include "xr_generated_dispatch_table.h"\n'
+            preamble += '#include "xr_generated_utilities.h"\n\n'
+
             preamble += '#include "xr_dependencies.h"\n'
             preamble += '#include <openxr/openxr.h>\n'
             preamble += '#include <openxr/openxr_platform.h>\n\n'
-            preamble += '#include "loader_logger.hpp"\n'
-            preamble += '#include "xr_generated_loader.hpp"\n'
-            preamble += '#include "xr_generated_dispatch_table.h"\n'
-            preamble += '#include "xr_generated_utilities.h"\n'
-            preamble += '#include "api_layer_interface.hpp"\n'
-            preamble += '#include "exception_handling.hpp"\n'
+
+            preamble += '#include <cstring>\n'
+            preamble += '#include <memory>\n'
+            preamble += '#include <new>\n'
+            preamble += '#include <string>\n'
+            preamble += '#include <unordered_map>\n'
 
         write(preamble, file=self.outFile)
 
@@ -347,7 +374,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         result_to_str += self.writeIndent(indent)
         result_to_str += '// If we did not find it in the generated code, ask the runtime.\n'
         result_to_str += self.writeIndent(indent)
-        result_to_str += 'const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);\n'
+        result_to_str += 'const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetDispatchTable(instance);\n'
         return result_to_str
 
     # A special-case handling of the "StructureTypeToString" command.  Since we can actually
@@ -371,7 +398,7 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         struct_to_str += self.writeIndent(indent)
         struct_to_str += '// If we did not find it in the generated code, ask the runtime.\n'
         struct_to_str += self.writeIndent(indent)
-        struct_to_str += 'const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetRuntime().GetDispatchTable(instance);\n'
+        struct_to_str += 'const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetDispatchTable(instance);\n'
         return struct_to_str
 
     # Instantiate the unordered_maps and mutexes for each of the object types.  Also, output a utility
@@ -471,11 +498,13 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                 if not param.is_optional:
                                     # Check we have at least 1 in the array.
                                     tramp_variable_defines += '    if (0 == %s) {\n' % param.pointer_count_var
-                                    tramp_variable_defines += '        LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
-                                        cur_cmd.name, param.pointer_count_var, cur_cmd.name)
-                                    tramp_variable_defines += '                                                "%s is 0, but %s is not optional", {XrLoaderLogObjectInfo{%s, %s} });\n' % (
-                                        param.pointer_count_var, param.name, first_handle_name,
-                                        self.genXrObjectType(param.type))
+                                    tramp_variable_defines += generateErrorMessage(
+                                        3,
+                                        [cur_cmd.name, param.pointer_count_var, 'parameter'],
+                                        cur_cmd,
+                                        '"%s is 0, but %s is not optional"' % (param.pointer_count_var, param.name),
+                                        [(first_handle_name, self.genXrObjectType(param.type))]
+                                    )
                                     tramp_variable_defines += '    }\n'
                             tramp_variable_defines += '    LoaderInstance *loader_instance = g_%s_map.Get(%s);\n' % (
                                 base_handle_name, first_handle_name)
@@ -496,30 +525,35 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
                                     base_handle_name, param.name)
                                 tramp_variable_defines += '        if (elt_loader_instance == nullptr || elt_loader_instance != loader_instance) {\n'
                                 tramp_variable_defines += '            auto elt_name = "%s[" + std::to_string(i) + "]";\n' % param.name
-                                loader_objects = '{XrLoaderLogObjectInfo{%s[i], %s} }' % (first_handle_name,
-                                                                                          self.genXrObjectType(param.type))
                                 tramp_variable_defines += '            if (elt_loader_instance == nullptr) {\n'
-                                tramp_variable_defines += '                LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
-                                    cur_cmd.name, param.name, cur_cmd.name)
-                                tramp_variable_defines += '                                                elt_name + " is not a valid %s", %s);\n' % (
-                                    param.name, param.type, loader_objects)
+                                tramp_variable_defines += generateErrorMessage(
+                                    '                    ',
+                                    [cur_cmd.name, param.name, 'parameter'],
+                                    cur_cmd,
+                                    'elt_name + " is not a valid %s"' % (param.name),
+                                    [(first_handle_name + '[i]', self.genXrObjectType(param.type))]
+                                )
                                 tramp_variable_defines += '            } else {\n'
-                                tramp_variable_defines += '                LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
-                                    cur_cmd.name, param.name, cur_cmd.name)
-                                tramp_variable_defines += '                                                        "%s[" + std::to_string(i) + "] belongs to a different instance than %s[0]", %s);\n' % (
-                                    param.name, param.name, loader_objects)
+                                tramp_variable_defines += generateErrorMessage(
+                                    '                    ',
+                                    [cur_cmd.name, param.name, 'parameter'],
+                                    cur_cmd,
+                                    '"%s[" + std::to_string(i) + "] belongs to a different instance than %s[0]"' % (param.name, param.name),
+                                    [(first_handle_name + '[i]', self.genXrObjectType(param.type))]
+                                )
                                 tramp_variable_defines += '            }\n'
                                 if has_return:
                                     tramp_variable_defines += '            return XR_ERROR_HANDLE_INVALID;\n'
                                 tramp_variable_defines += '        }\n'
                                 tramp_variable_defines += '    }\n'
-                            loader_objects = '{XrLoaderLogObjectInfo{%s, %s} }' % (first_handle_name,
-                                                                                   self.genXrObjectType(param.type))
                             tramp_variable_defines += '    if (nullptr == loader_instance) {\n'
-                            tramp_variable_defines += '        LoaderLogger::LogValidationErrorMessage("VUID-%s-%s-parameter", "%s",\n' % (
-                                cur_cmd.name, param.name, cur_cmd.name)
-                            tramp_variable_defines += '                                                "%s is not a valid %s", %s);\n' % (
-                                first_handle_name, param.type, loader_objects)
+                            tramp_variable_defines += generateErrorMessage(
+                                '            ',
+                                [cur_cmd.name, param.name, 'parameter'],
+                                cur_cmd,
+                                '"%s is not a valid %s"' % (first_handle_name, param.type),
+                                [(first_handle_name, self.genXrObjectType(param.type))]
+                            )
                             if has_return:
                                 tramp_variable_defines += '        return XR_ERROR_HANDLE_INVALID;\n'
                             tramp_variable_defines += '    }\n'
@@ -698,6 +732,16 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
         export_funcs += self.writeIndent(indent)
+        export_funcs += 'if (nullptr == name) {\n'
+        export_funcs += self.writeIndent(indent + 1)
+        export_funcs += 'LoaderLogger::LogValidationErrorMessage("VUID-xrGetInstanceProcAddr-function-parameter",\n'
+        export_funcs += self.writeIndent(indent + 1)
+        export_funcs += '                                        "xrGetInstanceProcAddr", "Invalid Name pointer");\n'
+        export_funcs += self.writeIndent(indent + 1)
+        export_funcs += '    return XR_ERROR_VALIDATION_FAILURE;\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '}\n'
+        export_funcs += self.writeIndent(indent)
         export_funcs += '// Initialize the function to nullptr in case it does not get caught in a known case\n'
         export_funcs += self.writeIndent(indent)
         export_funcs += '*function = nullptr;\n'
@@ -735,6 +779,24 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         indent = indent - 1
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
+        indent = indent - 1
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '}\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'else if (loader_instance == nullptr) {\n'
+        indent = indent + 1
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'std::string error_str = "Invalid handle for instance (query for ";\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'error_str += name;\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'error_str += " )";\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'LoaderLogger::LogValidationErrorMessage("VUID-xrGetInstanceProcAddr-instance-parameter",\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += '                                        "xrGetInstanceProcAddr", error_str);\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'return XR_ERROR_HANDLE_INVALID;\n'
         indent = indent - 1
         export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
@@ -813,11 +875,9 @@ class LoaderSourceOutputGenerator(AutomaticSourceOutputGenerator):
         export_funcs += self.writeIndent(indent + 1)
         export_funcs += 'return XR_ERROR_FUNCTION_UNSUPPORTED;\n'
         export_funcs += self.writeIndent(indent)
-        export_funcs += '} else {\n'
-        export_funcs += self.writeIndent(indent + 1)
-        export_funcs += 'return XR_SUCCESS;\n'
-        export_funcs += self.writeIndent(indent)
         export_funcs += '}\n'
+        export_funcs += self.writeIndent(indent)
+        export_funcs += 'return XR_SUCCESS;\n'
         export_funcs += '}\n'
         export_funcs += 'XRLOADER_ABI_CATCH_FALLBACK\n'
 

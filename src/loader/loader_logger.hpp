@@ -36,12 +36,14 @@
 #define XR_LOADER_LOG_MESSAGE_SEVERITY_INFO_BIT 0x00000010
 #define XR_LOADER_LOG_MESSAGE_SEVERITY_WARNING_BIT 0x00000100
 #define XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT 0x00001000
+#define XR_LOADER_LOG_MESSAGE_SEVERITY_DEFAULT_BITS 0x00000000
 typedef XrFlags64 XrLoaderLogMessageSeverityFlagBits;
 typedef XrFlags64 XrLoaderLogMessageSeverityFlags;
 
 #define XR_LOADER_LOG_MESSAGE_TYPE_GENERAL_BIT 0x00000001
 #define XR_LOADER_LOG_MESSAGE_TYPE_SPECIFICATION_BIT 0x00000002
 #define XR_LOADER_LOG_MESSAGE_TYPE_PERFORMANCE_BIT 0x00000004
+#define XR_LOADER_LOG_MESSAGE_TYPE_DEFAULT_BITS 0xffffffff
 typedef XrFlags64 XrLoaderLogMessageTypeFlagBits;
 typedef XrFlags64 XrLoaderLogMessageTypeFlags;
 
@@ -120,17 +122,24 @@ class LoaderLogRecorder {
         _message_severities = message_severities;
         _message_types = message_types;
     }
-    virtual ~LoaderLogRecorder() {}
+    virtual ~LoaderLogRecorder() = default;
 
     XrLoaderLogType Type() { return _type; }
+
     uint64_t UniqueId() { return _unique_id; }
+
     XrLoaderLogMessageSeverityFlags MessageSeverities() { return _message_severities; }
+
     XrLoaderLogMessageTypeFlags MessageTypes() { return _message_types; }
 
     virtual void Start() { _active = true; }
+
     bool IsPaused() { return _active; }
+
     virtual void Pause() { _active = false; }
+
     virtual void Resume() { _active = true; }
+
     virtual void Stop() { _active = false; }
 
     virtual bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
@@ -139,9 +148,7 @@ class LoaderLogRecorder {
     // Extension-specific logging functions - defaults to do nothing.
     virtual bool LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT message_severity,
                                       XrDebugUtilsMessageTypeFlagsEXT message_type,
-                                      const XrDebugUtilsMessengerCallbackDataEXT* callback_data) {
-        return false;
-    }
+                                      const XrDebugUtilsMessengerCallbackDataEXT* callback_data);
 
    protected:
     bool _active;

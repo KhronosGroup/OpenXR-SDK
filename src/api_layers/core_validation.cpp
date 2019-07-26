@@ -17,23 +17,30 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <string>
-#include <mutex>
-#include <unordered_map>
-#include <algorithm>
-#include <cctype>
-#include <vector>
-#include <memory>
-
-#include "xr_generated_core_validation.hpp"
+#include "api_layer_platform_defines.h"
+#include "extra_algorithms.h"
+#include "hex_and_handles.h"
 #include "loader_interfaces.h"
 #include "platform_utils.hpp"
+#include "validation_utils.h"
+#include "xr_generated_core_validation.hpp"
 #include "xr_generated_dispatch_table.h"
-#include "hex_and_handles.h"
+
+#include <openxr/openxr.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define LAYER_EXPORT __attribute__((visibility("default")))
@@ -61,7 +68,7 @@ static CoreValidationRecordInfo g_record_info = {};
 static std::mutex g_record_mutex = {};
 
 // HTML utilities
-bool CoreValidationWriteHtmlHeader(void) {
+bool CoreValidationWriteHtmlHeader() {
     try {
         std::unique_lock<std::mutex> mlock(g_record_mutex);
         std::ofstream html_file;
@@ -180,7 +187,7 @@ bool CoreValidationWriteHtmlHeader(void) {
     }
 }
 
-bool CoreValidationWriteHtmlFooter(void) {
+bool CoreValidationWriteHtmlFooter() {
     try {
         std::unique_lock<std::mutex> mlock(g_record_mutex);
         std::ofstream html_file;
@@ -238,15 +245,15 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
         // If we have instance information, see if we need to log this information out to a debug messenger
         // callback.
         if (nullptr != instance_info) {
-            if (objects_info.size() > 0) {
-                for (uint32_t obj = 0; obj < objects_info.size(); ++obj) {
+            if (!objects_info.empty()) {
+                for (auto &obj : objects_info) {
                     XrDebugUtilsObjectNameInfoEXT obj_name_info = {};
                     obj_name_info.next = nullptr;
-                    obj_name_info.objectType = objects_info[obj].type;
-                    obj_name_info.objectHandle = objects_info[obj].handle;
+                    obj_name_info.objectType = obj.type;
+                    obj_name_info.objectHandle = obj.handle;
                     // If there's a session in the list, see if it has labels
-                    if (XR_OBJECT_TYPE_SESSION == objects_info[obj].type) {
-                        XrSession session = TreatIntegerAsHandle<XrSession>(objects_info[obj].handle);
+                    if (XR_OBJECT_TYPE_SESSION == obj.type) {
+                        XrSession session = TreatIntegerAsHandle<XrSession>(obj.handle);
                         auto session_label_iterator = g_xr_session_labels.find(session);
                         if (session_label_iterator != g_xr_session_labels.end()) {
                             auto rev_iter = session_label_iterator->second->rbegin();
@@ -256,17 +263,16 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                         }
                     }
                     // Loop through all object names and see if any match
-                    for (uint32_t name_index = 0; name_index < instance_info->object_names.size(); ++name_index) {
-                        if (instance_info->object_names[name_index]->objectType == objects_info[obj].type &&
-                            instance_info->object_names[name_index]->objectHandle == objects_info[obj].handle) {
-                            obj_name_info.objectName = instance_info->object_names[name_index]->objectName;
+                    for (auto &object_name : instance_info->object_names) {
+                        if (object_name->objectType == obj.type && object_name->objectHandle == obj.handle) {
+                            obj_name_info.objectName = object_name->objectName;
                             break;
                         }
                     }
                     debug_utils_objects.push_back(obj_name_info);
                 }
             }
-            if (instance_info->debug_messengers.size() > 0) {
+            if (!instance_info->debug_messengers.empty()) {
                 // Setup our callback data once
                 XrDebugUtilsMessengerCallbackDataEXT callback_data = {};
                 callback_data.type = XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT;
@@ -287,8 +293,8 @@ void CoreValidLogMessage(GenValidUsageXrInstanceInfo *instance_info, const std::
                 }
 
                 // Loop through all active messengers and give each a chance to output information
-                for (uint32_t msg_index = 0; msg_index < instance_info->debug_messengers.size(); ++msg_index) {
-                    CoreValidationMessengerInfo *validation_messenger_info = instance_info->debug_messengers[msg_index].get();
+                for (auto &debug_messenger : instance_info->debug_messengers) {
+                    CoreValidationMessengerInfo *validation_messenger_info = debug_messenger.get();
                     XrDebugUtilsMessengerCreateInfoEXT *messenger_create_info = validation_messenger_info->create_info;
                     // If a callback exists, and the message is of a type this callback cares about, call it.
                     if (nullptr != messenger_create_info->userCallback &&
@@ -458,7 +464,7 @@ void InvalidStructureType(GenValidUsageXrInstanceInfo *instance_info, const std:
 //              "VUID-xrEnumerateInstanceExtensionProperties-propertyCountOutput-parameter"
 //              "VUID-xrEnumerateInstanceExtensionProperties-properties-parameter"
 
-XrResult CoreValidationXrCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) {
+XrResult CoreValidationXrCreateInstance(const XrInstanceCreateInfo * /*info*/, XrInstance * /*instance*/) {
     // Shouldn't be called, coreValidationXrCreateApiLayerInstance should called instead
     return XR_SUCCESS;
 }
@@ -504,7 +510,7 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
             std::cerr << "Core Validation output type: " << string_export_type << ", first time = " << std::to_string(first_time)
                       << std::endl;
             if (string_export_type == "text") {
-                if (g_record_info.file_name.size() > 0) {
+                if (!g_record_info.file_name.empty()) {
                     g_record_info.type = RECORD_TEXT_FILE;
                 } else {
                     g_record_info.type = RECORD_TEXT_COUT;
@@ -549,7 +555,7 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
         // See if a debug utils messenger is supposed to be created as part of the instance
         // NOTE: We have to wait until after the instance info is added to the map for this
         //       to work properly.
-        const XrBaseInStructure *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
+        const auto *next_header = reinterpret_cast<const XrBaseInStructure *>(info->next);
         const XrDebugUtilsMessengerCreateInfoEXT *dbg_utils_create_info = nullptr;
         while (next_header != nullptr) {
             if (next_header->type == XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
@@ -569,9 +575,9 @@ XrResult CoreValidationXrCreateApiLayerInstance(const XrInstanceCreateInfo *info
 
         if (XR_SUCCESS == validation_result) {
             return next_result;
-        } else {
-            return validation_result;
         }
+        return validation_result;
+
     } catch (std::bad_alloc &) {
         return XR_ERROR_OUT_OF_MEMORY;
     } catch (...) {
@@ -616,7 +622,7 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
 
         // Check the next chain for a graphics binding structure, we need at least one.
         uint32_t num_graphics_bindings_found = 0;
-        const XrBaseInStructure *cur_ptr = reinterpret_cast<const XrBaseInStructure *>(createInfo->next);
+        const auto *cur_ptr = reinterpret_cast<const XrBaseInStructure *>(createInfo->next);
         while (nullptr != cur_ptr) {
             switch (cur_ptr->type) {
                 default:
@@ -680,34 +686,35 @@ XrResult CoreValidationXrCreateSession(XrInstance instance, const XrSessionCreat
 // ---- XR_EXT_debug_utils extension commands
 XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const XrDebugUtilsObjectNameInfoEXT *nameInfo) {
     try {
-        if (!GenValidUsageInputsXrSetDebugUtilsObjectNameEXT(instance, nameInfo)) {
-            return XR_ERROR_VALIDATION_FAILURE;
+        XrResult result = GenValidUsageInputsXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
-        XrResult result = GenValidUsageNextXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
-        if (XR_SUCCESS == result) {
-            auto info_with_lock = g_instance_info.getWithLock(instance);
-            GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
-            if (nullptr != gen_instance_info) {
-                // Create a copy of the base object name info (no next items)
-                char *name_string = new char[strlen(nameInfo->objectName) + 1];
-                strcpy(name_string, nameInfo->objectName);
-                bool found = false;
-                for (uint32_t name_index = 0; name_index < gen_instance_info->object_names.size(); ++name_index) {
-                    if (gen_instance_info->object_names[name_index]->objectHandle == nameInfo->objectHandle &&
-                        gen_instance_info->object_names[name_index]->objectType == nameInfo->objectType) {
-                        delete[] gen_instance_info->object_names[name_index]->objectName;
-                        gen_instance_info->object_names[name_index]->objectName = name_string;
-                        found = true;
-                        break;
-                    }
+        result = GenValidUsageNextXrSetDebugUtilsObjectNameEXT(instance, nameInfo);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
+        }
+        auto info_with_lock = g_instance_info.getWithLock(instance);
+        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
+        if (nullptr != gen_instance_info) {
+            // Create a copy of the base object name info (no next items)
+            auto len = strlen(nameInfo->objectName);
+            char *name_string = new char[len + 1];
+            strncpy(name_string, nameInfo->objectName, len);
+            bool found = false;
+            for (auto &object_name : gen_instance_info->object_names) {
+                if (object_name->objectHandle == nameInfo->objectHandle && object_name->objectType == nameInfo->objectType) {
+                    delete[] object_name->objectName;
+                    object_name->objectName = name_string;
+                    found = true;
+                    break;
                 }
-                if (!found) {
-                    UniqueXrDebugUtilsObjectNameInfoEXT new_object_name(new XrDebugUtilsObjectNameInfoEXT);
-                    *new_object_name = *nameInfo;
-                    new_object_name->next = nullptr;
-                    new_object_name->objectName = name_string;
-                    gen_instance_info->object_names.push_back(std::move(new_object_name));
-                }
+            }
+            if (!found) {
+                UniqueXrDebugUtilsObjectNameInfoEXT new_object_name(new XrDebugUtilsObjectNameInfoEXT(*nameInfo));
+                new_object_name->next = nullptr;
+                new_object_name->objectName = name_string;
+                gen_instance_info->object_names.push_back(std::move(new_object_name));
             }
         }
         return result;
@@ -718,48 +725,50 @@ XrResult CoreValidationXrSetDebugUtilsObjectNameEXT(XrInstance instance, const X
 
 XrResult CoreValidationXrCreateDebugUtilsMessengerEXT(XrInstance instance, const XrDebugUtilsMessengerCreateInfoEXT *createInfo,
                                                       XrDebugUtilsMessengerEXT *messenger) {
-    XrResult result = XR_SUCCESS;
     try {
-        if (!GenValidUsageInputsXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger)) {
-            return XR_ERROR_VALIDATION_FAILURE;
+        XrResult result = GenValidUsageInputsXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
         result = GenValidUsageNextXrCreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
-        if (XR_SUCCESS == result) {
-            auto info_with_lock = g_instance_info.getWithLock(instance);
-            GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
-            if (nullptr != gen_instance_info) {
-                XrDebugUtilsMessengerCreateInfoEXT *new_create_info = new XrDebugUtilsMessengerCreateInfoEXT;
-                *new_create_info = *createInfo;
-                new_create_info->next = nullptr;
-                UniqueCoreValidationMessengerInfo new_messenger_info(new CoreValidationMessengerInfo);
-                new_messenger_info->messenger = *messenger;
-                new_messenger_info->create_info = new_create_info;
-                gen_instance_info->debug_messengers.push_back(std::move(new_messenger_info));
-            }
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
+        auto info_with_lock = g_instance_info.getWithLock(instance);
+        GenValidUsageXrInstanceInfo *gen_instance_info = info_with_lock.second;
+        if (nullptr != gen_instance_info) {
+            auto *new_create_info = new XrDebugUtilsMessengerCreateInfoEXT(*createInfo);
+            new_create_info->next = nullptr;
+            UniqueCoreValidationMessengerInfo new_messenger_info(new CoreValidationMessengerInfo);
+            new_messenger_info->messenger = *messenger;
+            new_messenger_info->create_info = new_create_info;
+            gen_instance_info->debug_messengers.push_back(std::move(new_messenger_info));
+        }
+        return result;
     } catch (...) {
         return XR_ERROR_VALIDATION_FAILURE;
     }
-    return result;
 }
 
 XrResult CoreValidationXrDestroyDebugUtilsMessengerEXT(XrDebugUtilsMessengerEXT messenger) {
     try {
-        if (!GenValidUsageInputsXrDestroyDebugUtilsMessengerEXT(messenger)) {
-            return XR_ERROR_VALIDATION_FAILURE;
+        XrResult result = GenValidUsageInputsXrDestroyDebugUtilsMessengerEXT(messenger);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
         }
-        XrResult result = GenValidUsageNextXrDestroyDebugUtilsMessengerEXT(messenger);
-        if (XR_NULL_HANDLE != messenger) {
-            auto info_with_lock = g_debugutilsmessengerext_info.getWithLock(messenger);
-            GenValidUsageXrHandleInfo *gen_handle_info = info_with_lock.second;
-            if (nullptr != gen_handle_info) {
-                auto &debug_messengers = gen_handle_info->instance_info->debug_messengers;
-                vector_remove_if_and_erase(
-                    debug_messengers, [=](UniqueCoreValidationMessengerInfo const &msg) { return msg->messenger == messenger; });
-
-            } else {
-                return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
-            }
+        result = GenValidUsageNextXrDestroyDebugUtilsMessengerEXT(messenger);
+        if (!XR_UNQUALIFIED_SUCCESS(result)) {
+            return result;
+        }
+        if (XR_NULL_HANDLE == messenger) {
+            return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
+        }
+        auto info_with_lock = g_debugutilsmessengerext_info.getWithLock(messenger);
+        GenValidUsageXrHandleInfo *gen_handle_info = info_with_lock.second;
+        if (nullptr != gen_handle_info) {
+            auto &debug_messengers = gen_handle_info->instance_info->debug_messengers;
+            vector_remove_if_and_erase(debug_messengers,
+                                       [=](UniqueCoreValidationMessengerInfo const &msg) { return msg->messenger == messenger; });
         }
         return result;
     } catch (...) {
@@ -793,7 +802,7 @@ void CoreValidationBeginLabelRegion(XrSession session, const XrDebugUtilsLabelEX
     CoreValidationRemoveIndividualLabel(vec_ptr);
 
     // Start the new label region
-    GenValidUsageXrInternalSessionLabel *new_session_label = new GenValidUsageXrInternalSessionLabel;
+    auto *new_session_label = new GenValidUsageXrInternalSessionLabel;
     new_session_label->label_name = label_info->labelName;
     new_session_label->debug_utils_label = *label_info;
     new_session_label->debug_utils_label.labelName = new_session_label->label_name.c_str();
@@ -834,7 +843,7 @@ void CoreValidationInsertLabel(XrSession session, const XrDebugUtilsLabelEXT *la
     CoreValidationRemoveIndividualLabel(vec_ptr);
 
     // Insert a new individual label
-    GenValidUsageXrInternalSessionLabel *new_session_label = new GenValidUsageXrInternalSessionLabel;
+    auto *new_session_label = new GenValidUsageXrInternalSessionLabel;
     new_session_label->label_name = label_info->labelName;
     new_session_label->debug_utils_label = *label_info;
     new_session_label->debug_utils_label.labelName = new_session_label->label_name.c_str();
@@ -893,7 +902,7 @@ extern "C" {
 
 // Function used to negotiate an interface betewen the loader and an API layer.  Each library exposing one or
 // more API layers needs to expose at least this function.
-LAYER_EXPORT XrResult xrNegotiateLoaderApiLayerInterface(const XrNegotiateLoaderInfo *loaderInfo, const char *apiLayerName,
+LAYER_EXPORT XrResult xrNegotiateLoaderApiLayerInterface(const XrNegotiateLoaderInfo *loaderInfo, const char * /*apiLayerName*/,
                                                          XrNegotiateApiLayerRequest *apiLayerRequest) {
     if (nullptr == loaderInfo || nullptr == apiLayerRequest || loaderInfo->structType != XR_LOADER_INTERFACE_STRUCT_LOADER_INFO ||
         loaderInfo->structVersion != XR_LOADER_INFO_STRUCT_VERSION || loaderInfo->structSize != sizeof(XrNegotiateLoaderInfo) ||

@@ -17,10 +17,17 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#include <sstream>
-#include <iostream>
-
 #include "loader_logger_recorders.hpp"
+
+#include "hex_and_handles.h"
+#include "loader_logger.hpp"
+
+#include <openxr/openxr.h>
+
+#include <memory>
+#include <string>
+#include <vector>
+#include <iostream>
 
 // Anonymous namespace to keep these types private
 namespace {
@@ -29,7 +36,6 @@ namespace {
 class OstreamLoaderLogRecorder : public LoaderLogRecorder {
    public:
     OstreamLoaderLogRecorder(std::ostream& os, void* user_data, XrLoaderLogMessageSeverityFlags flags);
-    ~OstreamLoaderLogRecorder() {}
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const XrLoaderLogMessengerCallbackData* callback_data) override;
@@ -42,7 +48,6 @@ class OstreamLoaderLogRecorder : public LoaderLogRecorder {
 class DebugUtilsLogRecorder : public LoaderLogRecorder {
    public:
     DebugUtilsLogRecorder(const XrDebugUtilsMessengerCreateInfoEXT* create_info, XrDebugUtilsMessengerEXT debug_messenger);
-    ~DebugUtilsLogRecorder() {}
 
     bool LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,
                     const XrLoaderLogMessengerCallbackData* callback_data) override;

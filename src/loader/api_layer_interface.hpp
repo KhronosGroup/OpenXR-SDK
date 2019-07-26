@@ -21,9 +21,14 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
+#include <openxr/openxr.h>
 
 #include "loader_platform.hpp"
 #include "loader_interfaces.h"
+
+struct XrGeneratedDispatchTable;
 
 class ApiLayerInterface {
    public:
@@ -37,7 +42,7 @@ class ApiLayerInterface {
     static XrResult GetInstanceExtensionProperties(const std::string& openxr_command, const char* layer_name,
                                                    std::vector<XrExtensionProperties>& extension_properties);
 
-    ApiLayerInterface(std::string layer_name, LoaderPlatformLibraryHandle layer_library,
+    ApiLayerInterface(const std::string& layer_name, LoaderPlatformLibraryHandle layer_library,
                       std::vector<std::string>& supported_extensions, PFN_xrGetInstanceProcAddr get_instant_proc_addr,
                       PFN_xrCreateApiLayerInstance create_api_layer_instance);
     virtual ~ApiLayerInterface();

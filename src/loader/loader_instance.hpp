@@ -19,17 +19,20 @@
 
 #pragma once
 
+#include "extra_algorithms.h"
+
+#include <openxr/openxr.h>
+
+#include <cmath>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-#include "loader_platform.hpp"
-#include "platform_utils.hpp"
-#include "extra_algorithms.h"
-#include "runtime_interface.hpp"
-#include "api_layer_interface.hpp"
-#include "xr_generated_dispatch_table.h"
-
 class LoaderInstance;
+class ApiLayerInterface;
+struct XrGeneratedDispatchTable;
 
 typedef std::unique_lock<std::mutex> UniqueLock;
 template <typename HandleType>

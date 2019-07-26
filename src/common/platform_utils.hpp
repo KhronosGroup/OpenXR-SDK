@@ -54,7 +54,7 @@ static inline char* PlatformUtilsGetSecureEnv(const char* name) {
 #endif
 }
 
-static inline void PlatformUtilsFreeEnv(char* val) {
+static inline void PlatformUtilsFreeEnv(const char* val) {
     // No freeing of memory necessary for Linux, but we should at least touch
     // the val and inst pointers to get rid of compiler warnings.
     (void)val;

@@ -19,16 +19,16 @@
 
 #pragma once
 
+#include <openxr/openxr.h>
+
 #include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-#include "xr_dependencies.h"
-#include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
-
-#include <json/json.h>
+namespace Json {
+class Value;
+}
 
 enum ManifestFileType {
     MANIFEST_TYPE_UNDEFINED = 0,
@@ -55,7 +55,7 @@ class ManifestFile {
    public:
     ManifestFile(ManifestFileType type, const std::string &filename, const std::string &library_path);
     virtual ~ManifestFile();
-    static bool IsValidJson(Json::Value &root, JsonVersion &version);
+    static bool IsValidJson(const Json::Value &root, JsonVersion &version);
 
     // We don't want any copy constructors
     ManifestFile &operator=(const ManifestFile &manifest_file) = delete;
@@ -84,11 +84,12 @@ class RuntimeManifestFile : public ManifestFile {
     static XrResult FindManifestFiles(ManifestFileType type, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
 
     RuntimeManifestFile(const std::string &filename, const std::string &library_path);
-    virtual ~RuntimeManifestFile();
-    static void CreateIfValid(std::string filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
+    ~RuntimeManifestFile() override;
+    static void CreateIfValid(const std::string &filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
 
-    // We don't want any copy constructors
-    RuntimeManifestFile &operator=(const RuntimeManifestFile &manifest_file) = delete;
+    // Non-copyable
+    RuntimeManifestFile(const RuntimeManifestFile &) = delete;
+    RuntimeManifestFile &operator=(const RuntimeManifestFile &) = delete;
 };
 
 // ApiLayerManifestFile class -
@@ -101,15 +102,16 @@ class ApiLayerManifestFile : public ManifestFile {
     ApiLayerManifestFile(ManifestFileType type, const std::string &filename, const std::string &layer_name,
                          const std::string &description, const JsonVersion &api_version, const uint32_t &implementation_version,
                          const std::string &library_path);
-    virtual ~ApiLayerManifestFile();
-    static void CreateIfValid(ManifestFileType type, std::string filename,
+    ~ApiLayerManifestFile() override;
+    static void CreateIfValid(ManifestFileType type, const std::string &filename,
                               std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files);
-
-    // We don't want any copy constructors
-    ApiLayerManifestFile &operator=(const ApiLayerManifestFile &manifest_file) = delete;
 
     std::string LayerName() { return _layer_name; }
     XrApiLayerProperties GetApiLayerProperties();
+
+    // Non-copyable
+    ApiLayerManifestFile(const ApiLayerManifestFile &) = delete;
+    ApiLayerManifestFile &operator=(const ApiLayerManifestFile &) = delete;
 
    private:
     JsonVersion _api_version;

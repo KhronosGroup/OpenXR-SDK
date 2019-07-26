@@ -16,16 +16,24 @@
 //
 // Author: Mark Young <marky@lunarg.com>
 //
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+
+#include "runtime_interface.hpp"
 
 #include "manifest_file.hpp"
-#include "runtime_interface.hpp"
-#include "xr_generated_loader.hpp"
 #include "loader_interfaces.h"
 #include "loader_logger.hpp"
+#include "loader_platform.hpp"
+#include "xr_generated_dispatch_table.h"
+
+#include <openxr/openxr.h>
+
+#include <cstring>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 std::unique_ptr<RuntimeInterface> RuntimeInterface::_single_runtime_interface;
 uint32_t RuntimeInterface::_single_runtime_count = 0;
@@ -66,7 +74,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 
             // Get and settle on an runtime interface version (using any provided name if required).
             std::string function_name = manifest_file->GetFunctionName("xrNegotiateLoaderRuntimeInterface");
-            PFN_xrNegotiateLoaderRuntimeInterface negotiate = reinterpret_cast<PFN_xrNegotiateLoaderRuntimeInterface>(
+            auto negotiate = reinterpret_cast<PFN_xrNegotiateLoaderRuntimeInterface>(
                 LoaderPlatformLibraryGetProcAddr(runtime_library, function_name));
 
             // Loader info for negotiation
@@ -85,7 +93,12 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             runtime_info.structVersion = XR_RUNTIME_INFO_STRUCT_VERSION;
             runtime_info.structSize = sizeof(XrNegotiateRuntimeRequest);
 
-            XrResult res = negotiate(&loader_info, &runtime_info);
+            // Skip calling the negotiate function and fail if the function pointer
+            // could not get loaded
+            XrResult res = XR_ERROR_RUNTIME_FAILURE;
+            if (nullptr != negotiate) {
+                res = negotiate(&loader_info, &runtime_info);
+            }
             // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
             // then something still went wrong, so return with an error.
             if (XR_SUCCESS == res) {
@@ -145,8 +158,9 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             std::vector<std::string> supported_extensions;
             std::vector<XrExtensionProperties> extension_properties;
             _single_runtime_interface->GetInstanceExtensionProperties(extension_properties);
+            supported_extensions.reserve(extension_properties.size());
             for (XrExtensionProperties ext_prop : extension_properties) {
-                supported_extensions.push_back(ext_prop.extensionName);
+                supported_extensions.emplace_back(ext_prop.extensionName);
             }
             _single_runtime_interface->SetSupportedExtensions(supported_extensions);
 
@@ -243,7 +257,7 @@ void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionPro
         for (size_t prop = 0; prop < props_count; ++prop) {
             // If we find it, then make sure the spec version matches that of the runtime instead of the
             // layer.
-            if (!strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName)) {
+            if (strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName) == 0) {
                 // Make sure the spec version used is the runtime's
                 extension_properties[prop].specVersion = runtime_extension_properties[ext].specVersion;
                 found = true;
@@ -318,7 +332,7 @@ void RuntimeInterface::SetSupportedExtensions(std::vector<std::string>& supporte
 
 bool RuntimeInterface::SupportsExtension(const std::string& extension_name) {
     bool found_prop = false;
-    for (std::string supported_extension : _supported_extensions) {
+    for (const std::string& supported_extension : _supported_extensions) {
         if (supported_extension == extension_name) {
             found_prop = true;
             break;
