@@ -45,7 +45,7 @@ struct JsonVersion {
 
 struct ExtensionListing {
     std::string name;
-    uint32_t spec_version;
+    uint32_t extension_version;
     std::vector<std::string> entrypoints;
 };
 

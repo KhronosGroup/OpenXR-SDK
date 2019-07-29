@@ -22,6 +22,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(OPENXR)
 
+find_package(PythonInterp 3)
+
 # Enable IDE GUI folders.  "Helper targets" that don't have interesting source code should set their FOLDER property to this
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake predefined targets")
@@ -31,6 +33,12 @@ set(CODEGEN_FOLDER "Generated")
 set(TESTS_FOLDER "Tests")
 set(API_LAYERS_FOLDER "Layers")
 set(SAMPLES_FOLDER "Samples")
+
+option(BUILD_FORCE_GENERATION "Force re-generation of files even in the presence of pre-generated copies, replacing those copies." OFF)
+
+if(BUILD_FORCE_GENERATION AND NOT PYTHON_EXECUTABLE)
+    message(FATAL_ERROR "BUILD_FORCE_GENERATION requires Python")
+endif()
 
 add_subdirectory(include)
 add_subdirectory(src)

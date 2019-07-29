@@ -478,14 +478,14 @@ static void GetExtensionProperties(const std::vector<ExtensionListing> &extensio
         auto it =
             std::find_if(props.begin(), props.end(), [&](XrExtensionProperties &prop) { return prop.extensionName == ext.name; });
         if (it != props.end()) {
-            it->specVersion = std::max(it->specVersion, ext.spec_version);
+            it->extensionVersion = std::max(it->extensionVersion, ext.extension_version);
         } else {
             XrExtensionProperties prop = {};
             prop.type = XR_TYPE_EXTENSION_PROPERTIES;
             prop.next = nullptr;
             strncpy(prop.extensionName, ext.name.c_str(), XR_MAX_EXTENSION_NAME_SIZE - 1);
             prop.extensionName[XR_MAX_EXTENSION_NAME_SIZE - 1] = '\0';
-            prop.specVersion = ext.spec_version;
+            prop.extensionVersion = ext.extension_version;
             props.push_back(prop);
         }
     }
@@ -535,7 +535,8 @@ void RuntimeManifestFile::CreateIfValid(const std::string &filename,
     if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
         std::string error_message = "RuntimeManifestFile::CreateIfValid failed to parse ";
         error_message += filename;
-        error_message += ".  Is it a valid runtime manifest file?";
+        error_message += ".  Is it a valid runtime manifest file? Error was:\n ";
+        error_message += reader.getFormattedErrorMessages();
         LoaderLogger::LogErrorMessage("", error_message);
         return;
     }
@@ -600,13 +601,13 @@ void RuntimeManifestFile::CreateIfValid(const std::string &filename,
         for (Json::ValueIterator dev_ext_it = dev_exts.begin(); dev_ext_it != dev_exts.end(); ++dev_ext_it) {
             Json::Value dev_ext = (*dev_ext_it);
             Json::Value dev_ext_name = dev_ext["name"];
-            Json::Value dev_ext_version = dev_ext["spec_version"];
+            Json::Value dev_ext_version = dev_ext["extension_version"];
             Json::Value dev_ext_entries = dev_ext["entrypoints"];
             if (!dev_ext_name.isNull() && dev_ext_name.isString() && !dev_ext_version.isNull() && dev_ext_version.isUInt() &&
                 !dev_ext_entries.isNull() && dev_ext_entries.isArray()) {
                 ExtensionListing ext = {};
                 ext.name = dev_ext_name.asString();
-                ext.spec_version = dev_ext_version.asUInt();
+                ext.extension_version = dev_ext_version.asUInt();
                 for (Json::ValueIterator entry_it = dev_ext_entries.begin(); entry_it != dev_ext_entries.end(); ++entry_it) {
                     Json::Value entry = (*entry_it);
                     if (!entry.isNull() && entry.isString()) {
@@ -623,11 +624,11 @@ void RuntimeManifestFile::CreateIfValid(const std::string &filename,
         for (Json::ValueIterator inst_ext_it = inst_exts.begin(); inst_ext_it != inst_exts.end(); ++inst_ext_it) {
             Json::Value inst_ext = (*inst_ext_it);
             Json::Value inst_ext_name = inst_ext["name"];
-            Json::Value inst_ext_version = inst_ext["spec_version"];
+            Json::Value inst_ext_version = inst_ext["extension_version"];
             if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() && inst_ext_version.isUInt()) {
                 ExtensionListing ext = {};
                 ext.name = inst_ext_name.asString();
-                ext.spec_version = inst_ext_version.asUInt();
+                ext.extension_version = inst_ext_version.asUInt();
                 manifest_files.back()->_instance_extensions.push_back(ext);
             }
         }
@@ -723,7 +724,8 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
     if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
         std::string error_message = "ApiLayerManifestFile::CreateIfValid failed to parse ";
         error_message += filename;
-        error_message += ".  Is it a valid layer manifest file?";
+        error_message += ".  Is it a valid layer manifest file? Error was:\n";
+        error_message += reader.getFormattedErrorMessages();
         LoaderLogger::LogErrorMessage("", error_message);
         return;
     }
@@ -850,13 +852,13 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
         for (Json::ValueIterator dev_ext_it = dev_exts.begin(); dev_ext_it != dev_exts.end(); ++dev_ext_it) {
             Json::Value dev_ext = (*dev_ext_it);
             Json::Value dev_ext_name = dev_ext["name"];
-            Json::Value dev_ext_version = dev_ext["spec_version"];
+            Json::Value dev_ext_version = dev_ext["extension_version"];
             Json::Value dev_ext_entries = dev_ext["entrypoints"];
             if (!dev_ext_name.isNull() && dev_ext_name.isString() && !dev_ext_version.isNull() && dev_ext_version.isString() &&
                 !dev_ext_entries.isNull() && dev_ext_entries.isArray()) {
                 ExtensionListing ext = {};
                 ext.name = dev_ext_name.asString();
-                ext.spec_version = atoi(dev_ext_version.asString().c_str());
+                ext.extension_version = atoi(dev_ext_version.asString().c_str());
                 for (Json::ValueIterator entry_it = dev_ext_entries.begin(); entry_it != dev_ext_entries.end(); ++entry_it) {
                     Json::Value entry = (*entry_it);
                     if (!entry.isNull() && entry.isString()) {
@@ -873,11 +875,11 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
         for (Json::ValueIterator inst_ext_it = inst_exts.begin(); inst_ext_it != inst_exts.end(); ++inst_ext_it) {
             Json::Value inst_ext = (*inst_ext_it);
             Json::Value inst_ext_name = inst_ext["name"];
-            Json::Value inst_ext_version = inst_ext["spec_version"];
+            Json::Value inst_ext_version = inst_ext["extension_version"];
             if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() && inst_ext_version.isString()) {
                 ExtensionListing ext = {};
                 ext.name = inst_ext_name.asString();
-                ext.spec_version = atoi(inst_ext_version.asString().c_str());
+                ext.extension_version = atoi(inst_ext_version.asString().c_str());
                 manifest_files.back()->_instance_extensions.push_back(ext);
             }
         }
@@ -904,7 +906,7 @@ XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() {
     XrApiLayerProperties props = {};
     props.type = XR_TYPE_API_LAYER_PROPERTIES;
     props.next = nullptr;
-    props.implementationVersion = _implementation_version;
+    props.layerVersion = _implementation_version;
     props.specVersion = XR_MAKE_VERSION(_api_version.major, _api_version.minor, _api_version.patch);
     strncpy(props.layerName, _layer_name.c_str(), XR_MAX_API_LAYER_NAME_SIZE - 1);
     if (_layer_name.size() >= XR_MAX_API_LAYER_NAME_SIZE - 1) {

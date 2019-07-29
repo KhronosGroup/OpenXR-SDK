@@ -82,6 +82,9 @@ XrResult ApiLayerInterface::GetApiLayerProperties(const std::string& openxr_comm
 
     manifest_count = static_cast<uint32_t>(manifest_files.size());
     if (0 == incoming_count) {
+        if (nullptr == outgoing_count) {
+            return XR_ERROR_VALIDATION_FAILURE;
+        }
         *outgoing_count = manifest_count;
     } else if (nullptr != api_layer_properties) {
         if (incoming_count < manifest_count && nullptr != api_layer_properties) {
@@ -274,6 +277,16 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
         auto negotiate = reinterpret_cast<PFN_xrNegotiateLoaderApiLayerInterface>(
             LoaderPlatformLibraryGetProcAddr(layer_library, function_name));
 
+        if (nullptr == negotiate) {
+            std::ostringstream oss;
+            oss << "ApiLayerInterface::LoadApiLayers skipping layer " << manifest_file->LayerName()
+                << " because negotiation function " << function_name << " was not found";
+            LoaderLogger::LogErrorMessage(openxr_command, oss.str());
+            LoaderPlatformLibraryClose(layer_library);
+            last_error = XR_ERROR_API_LAYER_NOT_PRESENT;
+            continue;
+        }
+
         // Loader info for negotiation
         XrNegotiateLoaderInfo loader_info = {};
         loader_info.structType = XR_LOADER_INTERFACE_STRUCT_LOADER_INFO;
@@ -281,8 +294,8 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
         loader_info.structSize = sizeof(XrNegotiateLoaderInfo);
         loader_info.minInterfaceVersion = 1;
         loader_info.maxInterfaceVersion = XR_CURRENT_LOADER_API_LAYER_VERSION;
-        loader_info.minXrVersion = XR_MAKE_VERSION(0, 1, 0);
-        loader_info.maxXrVersion = XR_MAKE_VERSION(1, 0, 0);
+        loader_info.minApiVersion = XR_MAKE_VERSION(1, 0, 0);
+        loader_info.maxApiVersion = XR_MAKE_VERSION(1, 0x3ff, 0xfff);  // Maximum allowed version for this major version.
 
         // Set up the layer return structure
         XrNegotiateApiLayerRequest api_layer_info = {};
@@ -316,7 +329,7 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
             std::ostringstream oss;
             oss << "ApiLayerInterface::LoadApiLayers succeeded loading layer " << manifest_file->LayerName()
                 << " using interface version " << api_layer_info.layerInterfaceVersion << " and OpenXR API version "
-                << XR_VERSION_MAJOR(api_layer_info.layerXrVersion) << "." << XR_VERSION_MINOR(api_layer_info.layerXrVersion);
+                << XR_VERSION_MAJOR(api_layer_info.layerApiVersion) << "." << XR_VERSION_MINOR(api_layer_info.layerApiVersion);
             LoaderLogger::LogInfoMessage(openxr_command, oss.str());
         }
 

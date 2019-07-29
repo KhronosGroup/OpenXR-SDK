@@ -73,7 +73,7 @@ class LoaderInstance {
     virtual ~LoaderInstance();
 
     bool IsValid() { return _unique_id == 0xDECAFBAD; }
-    uint32_t ApiVersion() { return _api_version; }
+    XrVersion ApiVersion() { return _api_version; }
     XrResult CreateDispatchTable(XrInstance instance);
     void SetRuntimeInstance(XrInstance instance) { _runtime_instance = instance; }
     const std::unique_ptr<XrGeneratedDispatchTable>& DispatchTable() { return _dispatch_table; }
@@ -86,7 +86,7 @@ class LoaderInstance {
 
    private:
     uint32_t _unique_id;  // 0xDECAFBAD - for debugging
-    uint32_t _api_version;
+    XrVersion _api_version;
     std::vector<std::unique_ptr<ApiLayerInterface>> _api_layer_interfaces;
     XrInstance _runtime_instance;
     bool _dispatch_valid;

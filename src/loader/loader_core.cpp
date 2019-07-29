@@ -65,7 +65,7 @@ inline bool IsMissingNullTerminator(const char (&str)[max_length]) {
 
 extern "C" {
 
-// ---- Core 0.1 manual loader trampoline functions
+// ---- Core 1.0 manual loader trampoline functions
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
                                                                            uint32_t *propertyCountOutput,
@@ -134,8 +134,8 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
                 if (0 == strcmp(existing_prop.extensionName, loader_prop.extensionName)) {
                     found_prop = true;
                     // Use the loader version if it is newer
-                    if (existing_prop.specVersion < loader_prop.specVersion) {
-                        existing_prop.specVersion = loader_prop.specVersion;
+                    if (existing_prop.extensionVersion < loader_prop.extensionVersion) {
+                        existing_prop.extensionVersion = loader_prop.extensionVersion;
                     }
                     break;
                 }
@@ -149,6 +149,9 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
 
     auto num_extension_properties = static_cast<uint32_t>(extension_properties.size());
     if (propertyCapacityInput == 0) {
+        if (nullptr == propertyCountOutput) {
+            return XR_ERROR_VALIDATION_FAILURE;
+        }
         *propertyCountOutput = num_extension_properties;
     } else if (nullptr != properties) {
         if (propertyCapacityInput < num_extension_properties) {
@@ -213,7 +216,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
         oss << "xrCreateInstance called with invalid API version " << app_major << "." << app_minor
             << ".  Max supported version is " << loader_major << "." << loader_minor;
         LoaderLogger::LogErrorMessage("xrCreateInstance", oss.str());
-        return XR_ERROR_DRIVER_INCOMPATIBLE;
+        return XR_ERROR_API_VERSION_UNSUPPORTED;
     }
 
     if (nullptr == instance) {
@@ -286,9 +289,9 @@ XRLOADER_ABI_CATCH_FALLBACK
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instance) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrDestroyInstance", "Entering loader trampoline");
-    // XR_NULL_HANDLE is ignored, but valid, in a delete operation.
+    // Runtimes may detect XR_NULL_HANDLE provided as a required handle parameter and return XR_ERROR_HANDLE_INVALID. - 2.9
     if (XR_NULL_HANDLE == instance) {
-        return XR_SUCCESS;
+        return XR_ERROR_HANDLE_INVALID;
     }
 
     LoaderInstance *const loader_instance = g_instance_map.Get(instance);
@@ -326,7 +329,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-// ---- Core 0.1 manual loader terminator functions
+// ---- Core 1.0 manual loader terminator functions
 
 // Validate that the applicationInfo structure in the XrInstanceCreateInfo is valid.
 static XrResult ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApplicationInfo &info) {
@@ -463,7 +466,7 @@ XRLOADER_ABI_CATCH_BAD_ALLOC_OOM XRLOADER_ABI_CATCH_FALLBACK
         LoaderLogger::LogValidationErrorMessage("VUID-xrDestroyDebugUtilsMessengerEXT-messenger-parameter",
                                                 "xrDestroyDebugUtilsMessengerEXT", "invalid messenger");
 
-        return XR_ERROR_DEBUG_UTILS_MESSENGER_INVALID_EXT;
+        return XR_ERROR_HANDLE_INVALID;
     }
 
     if (!loader_instance->ExtensionIsEnabled(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) {

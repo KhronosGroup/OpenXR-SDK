@@ -15,61 +15,79 @@
 # Author:
 #
 
+# Copy the openxr_platform_defines.h file and place it in the binary (build) directory.
+configure_file(openxr_platform_defines.h ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h COPYONLY)
+
 # Generate OpenXR header files.
 
-find_package(PythonInterp 3 REQUIRED)
+
+set(HEADERS
+    openxr.h
+    openxr_platform.h
+    openxr_reflection.h)
+set(HAVE_PREGENERATED TRUE)
+set(SOURCE_HEADERS)
+foreach(output ${HEADERS})
+    list(APPEND SOURCE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/${output})
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${output})
+        set(HAVE_PREGENERATED FALSE)
+    endif()
+endforeach()
+
 set(XR_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-# Define openxrHeader target to generate the OpenXR header files.
-# Other targets that need the OpenXR headers should use openxrHeader as a dependency.
-add_custom_target(generate_openxr_header
-    SOURCES ${XR_ROOT}/specification/registry/xr.xml
-    DEPENDS
+if(HAVE_PREGENERATED AND NOT BUILD_FORCE_GENERATION)
+    add_custom_target(generate_openxr_header
+        COMMENT "Using found pre-generated OpenXR headers.")
+
+    set(INSTALL_HEADERS ${SOURCE_HEADERS})
+else()
+
+    set(GENERATED_HEADERS)
+    set(OUTPUT_STAMPS)
+    # Copy the openxr_platform_defines.h file and place it in the binary (build) directory.
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/openxr_platform_defines.h
+        ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
+        COPYONLY)
+
+    # Generate the header files and place it in the binary (build) directory.
+    foreach(output ${HEADERS})
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${output}
+            COMMAND ${PYTHON_EXECUTABLE} ${XR_ROOT}/specification/scripts/genxr.py
+                -registry ${XR_ROOT}/specification/registry/xr.xml
+                -o ${CMAKE_CURRENT_BINARY_DIR} ${output}
+            DEPENDS
+                ${XR_ROOT}/specification/scripts/genxr.py
+                ${XR_ROOT}/specification/scripts/cgenerator.py
+                ${XR_ROOT}/specification/scripts/creflectiongenerator.py
+                ${XR_ROOT}/specification/scripts/generator.py
+                ${XR_ROOT}/specification/scripts/reg.py
+                ${XR_ROOT}/specification/registry/xr.xml
+            COMMENT "Generating ${CMAKE_CURRENT_BINARY_DIR}/${output}"
+        )
+        list(APPEND GENERATED_HEADERS "${CMAKE_CURRENT_BINARY_DIR}/${output}")
+    endforeach()
+
+    set_source_files_properties(
+        ${GENERATED_HEADERS}
+        PROPERTIES GENERATED TRUE
+    )
+
+    set(INSTALL_HEADERS
         ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
         ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
-        ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h
-)
+        ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h)
+
+
+    # Define generate_openxr_header target to generate the OpenXR header files.
+    # Other targets that need the OpenXR headers should use generate_openxr_header as a dependency.
+    add_custom_target(generate_openxr_header
+        SOURCES ${XR_ROOT}/specification/registry/xr.xml
+        DEPENDS
+        ${GENERATED_HEADERS}
+        ${OUTPUT_STAMPS}
+    )
+endif()
 set_target_properties(generate_openxr_header PROPERTIES FOLDER ${CODEGEN_FOLDER})
-
-
-# Copy the openxr_platform_defines.h file and place it in the binary (build) directory.
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/openxr_platform_defines.h ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/openxr_platform_defines.h
-    COMMENT "Copying ${CMAKE_CURRENT_SOURCE_DIR}/openxr_platform_defines.h to ${CMAKE_CURRENT_BINARY_DIR}"
-)
-
-# Generate the openxr_platform.h file and place it in the binary (build) directory.
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h
-    COMMAND ${PYTHON_EXECUTABLE} ${XR_ROOT}/specification/scripts/genxr.py
-        -registry ${XR_ROOT}/specification/registry/xr.xml
-        -o ${CMAKE_CURRENT_BINARY_DIR} openxr_platform.h
-    DEPENDS
-        ${XR_ROOT}/specification/scripts/genxr.py
-        ${XR_ROOT}/specification/registry/xr.xml
-    COMMENT "Generating ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h"
-)
-
-# Generate the openxr.h file and place it in the binary (build) directory.
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
-    COMMAND ${PYTHON_EXECUTABLE} ${XR_ROOT}/specification/scripts/genxr.py
-        -registry ${XR_ROOT}/specification/registry/xr.xml
-        -o ${CMAKE_CURRENT_BINARY_DIR} openxr.h
-    DEPENDS
-        ${XR_ROOT}/specification/scripts/genxr.py
-        ${XR_ROOT}/specification/registry/xr.xml
-    COMMENT "Generating ${CMAKE_CURRENT_BINARY_DIR}/openxr.h"
-)
-
-set_source_files_properties(
-    ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
-    ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h
-    PROPERTIES GENERATED TRUE
-)
-
-set(INSTALL_HEADERS
-    ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
-    ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
-    ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h)
 
 INSTALL(FILES ${INSTALL_HEADERS}
     DESTINATION include/openxr

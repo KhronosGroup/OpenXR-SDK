@@ -25,6 +25,7 @@
 #include "platform_utils.hpp"
 
 #include <openxr/openxr.h>
+
 #include <algorithm>
 #include <iterator>
 #include <memory>

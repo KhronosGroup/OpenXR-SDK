@@ -36,13 +36,6 @@
 
 #endif  // XR_USE_PLATFORM_WIN32
 
-#ifdef XR_USE_GRAPHICS_API_D3D10
-// d3d10_1 must be included to ensure proper SAL annotations, otherwise the compiler will emit:
-//    #error:  d3d10.h is included before d3d10_1.h, and it will confuse tools that honor SAL annotations.
-//    If possibly targeting d3d10.1, include d3d10_1.h instead of d3d10.h, or ensure d3d10_1.h is included before d3d10.h
-#include <d3d10_1.h>
-#endif  // XR_USE_GRAPHICS_API_D3D10
-
 #ifdef XR_USE_GRAPHICS_API_D3D11
 #include <d3d11.h>
 #endif  // XR_USE_GRAPHICS_API_D3D11

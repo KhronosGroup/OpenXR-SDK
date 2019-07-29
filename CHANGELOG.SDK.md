@@ -1,7 +1,9 @@
-# Changelog for OpenXR-SDK Repo
+# Changelog for OpenXR-SDK-Source and OpenXR-SDK Repo
 
-Update log for the OpenXR-SDK repo on GitHub.
+Update log for the OpenXR-SDK-Source and OpenXR-SDK repo on GitHub.
 Updates are in reverse chronological order starting with the latest public release.
+
+Note that only changes relating to the loader and some of the build changes will affect the OpenXR-SDK repository.
 
 This summarizes the periodic public updates, not individual commits. Updates
 on GitHub are generally done as single large patches at the release point,
@@ -9,6 +11,45 @@ collecting together the resolution of many Khronos internal issues,
 along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
+
+## OpenXR 1.0.0 release (29-July-2019)
+
+Incorporates spec changes from OpenXR 1.0,
+all public pull requests incorporated in the 0.90 series,
+and additional fixes and improvements not previously published.
+
+## Change log for OpenXR 0.90 provisional spec updates post-0.90.1
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- General, Build, Other
+  - #40 - Update BUILDING.md with some Linux pre-requisites
+  - #43 - Make manifest file more compatible
+  - #44 - Remove pkg-config dependency from xlib backend
+  - #46 - Support building with "embedded" Python
+  - #48 - Install layers and pkg-config file on Linux
+  - #66 - Install the layers libraries on Linux
+  - #71 - Validation layer: fix logic error
+- hello_xr
+  - #49 - Fix hello_xr to properly use two call idiom
+- Loader
+  - #38 - Remove dead file-locking code
+  - #51 - Idiomatic Linux active_runtime.json search logic
+  - #55, #58, #68 - Purge std::map bracket operations that might do inadvertent insertions
+  - #56 - Make `filesystem_util.cc` `#define UNICODE`-compatible
+  - #57 - Make it possible to bypass macro that checks which `filesystem` to use
+  - #60 - Fix build error with shlwapi function
+  - #62 - Don't limit contents of `XristanceCreateInfo` next chain
+  - #65 - Fix minor substr error
+  - #69 - Simplify loader
+  - #70, #76 - Make loader exception free
+  - #72 - filesystem: fix theoretical bug on Linux
+  - #73 - Loader proper UNICODE support
+  - #75 - Clang tidy
+  - #80 - Switchable exceptions
+  - #82 - Add folder properties to all CMake targets.
 
 ## Change log for OpenXR 0.90.1 provisional spec update (8-May-2019)
 

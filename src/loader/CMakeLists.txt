@@ -24,8 +24,6 @@ include(GNUInstallDirs)
 include(GenerateExportHeader)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS false)
 
-find_package(PythonInterp 3 REQUIRED)
-
 set(LOADER_NAME openxr_loader)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -42,9 +40,7 @@ endif()
 # List of all files externally generated outside of the loader that the loader
 # needs to build with.
 SET(LOADER_EXTERNAL_GEN_FILES
-    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/dist/jsoncpp.cpp
-    ${CMAKE_BINARY_DIR}/src/xr_generated_dispatch_table.c
-    ${CMAKE_BINARY_DIR}/src/xr_generated_utilities.c
+    ${COMMON_GENERATED_OUTPUT}
 )
 run_xr_xml_generate(loader_source_generator.py xr_generated_loader.hpp)
 run_xr_xml_generate(loader_source_generator.py xr_generated_loader.cpp)
@@ -70,12 +66,14 @@ add_library(${LOADER_NAME} ${LIBRARY_TYPE}
     manifest_file.hpp
     runtime_interface.cpp
     runtime_interface.hpp
-    ${CMAKE_CURRENT_BINARY_DIR}/xr_generated_loader.hpp
-    ${CMAKE_CURRENT_BINARY_DIR}/xr_generated_loader.cpp
+    ${GENERATED_OUTPUT}
     ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
     ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.hpp
     ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.cpp
     ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.h
+    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp
+    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp
+    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp
     ${LOADER_EXTERNAL_GEN_FILES}
     ${openxr_loader_RESOURCE_FILE}
 )
@@ -88,7 +86,6 @@ set_source_files_properties(
 add_dependencies(${LOADER_NAME}
     generate_openxr_header
     xr_global_generated_files
-    jsoncppAmalgamatedFiles
 )
 target_include_directories(${LOADER_NAME}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -96,7 +93,7 @@ target_include_directories(${LOADER_NAME}
     PRIVATE ${CMAKE_BINARY_DIR}/include
     PRIVATE ${CMAKE_BINARY_DIR}/src
     PRIVATE ${CMAKE_SOURCE_DIR}/src/common
-    PRIVATE ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/dist
+    PRIVATE ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/include
 )
 if(VulkanHeaders_FOUND)
     target_include_directories(${LOADER_NAME}

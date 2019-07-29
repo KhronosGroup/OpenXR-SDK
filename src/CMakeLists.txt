@@ -28,8 +28,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
     option(DYNAMIC_LOADER "Build the loader as a .dll library" ON)
 endif()
-option(BUILD_API_LAYERS "Build API layers" ON)
-option(BUILD_TESTS "Build tests" ON)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/api_layers")
+    option(BUILD_API_LAYERS "Build API layers" ON)
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    option(BUILD_TESTS "Build tests" ON)
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance")
+    option(BUILD_CONFORMANCE_TESTS "Build conformance tests" ON)
+endif()
 
 # Several files use these compile-time OS switches
 if(WIN32)
@@ -51,8 +58,14 @@ elseif( PRESENTATION_BACKEND MATCHES "xlib" )
     add_definitions( -DXR_USE_PLATFORM_XLIB )
 elseif( PRESENTATION_BACKEND MATCHES "xcb" )
     add_definitions( -DXR_USE_PLATFORM_XCB )
+
+    # TODO remove once conformance supports XCB
+    set(BUILD_CONFORMANCE_TESTS OFF)
 elseif( PRESENTATION_BACKEND MATCHES "wayland" )
     add_definitions( -DXR_USE_PLATFORM_WAYLAND )
+
+    # TODO remove once conformance supports Wayland
+    set(BUILD_CONFORMANCE_TESTS OFF)
 endif()
 
 # Enable graphics API available to the build.
@@ -75,7 +88,6 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions(-DXR_USE_GRAPHICS_API_D3D)
-    add_definitions(-DXR_USE_GRAPHICS_API_D3D10)
     add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
     add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
 endif()
@@ -89,39 +101,14 @@ CHECK_FUNCTION_EXISTS(secure_getenv HAVE_SECURE_GETENV)
 CHECK_FUNCTION_EXISTS(__secure_getenv HAVE___SECURE_GETENV)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/common_cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/common_cmake_config.h)
 
+# Be able to find pre-generated files, if used.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include
+    ${CMAKE_CURRENT_SOURCE_DIR})
+
 add_definitions(-DXR_USE_TIMESPEC)
 
 # Set up the OpenXR version variables, used by several targets in this project.
-set(MAJOR "0")
-set(MINOR "0")
-set(PATCH "0")
-
-# Fetch the Major/Minor version from registry
-file(STRINGS ${CMAKE_SOURCE_DIR}/specification/registry/xr.xml lines REGEX "#define <name>XR_CURRENT_API_VERSION")
-list(LENGTH lines len)
-if(${len} EQUAL 1)
-    list(GET lines 0 cur_line)
-    # Erase everything up to the open parentheses
-    string(REGEX REPLACE "^[^\(]+" "" VERSION_BEFORE_ERASED ${cur_line})
-    # Erase everything after the close parentheses
-    string(REGEX REPLACE "[^\)]+$" "" VERSION_AFTER_ERASED ${VERSION_BEFORE_ERASED})
-    # Erase the parentheses
-    string(REPLACE "(" "" VERSION_AFTER_ERASED2 ${VERSION_AFTER_ERASED})
-    string(REPLACE ")" "" VERSION_AFTER_ERASED3 ${VERSION_AFTER_ERASED2})
-    string(REPLACE " " "" VERSION_AFTER_ERASED4 ${VERSION_AFTER_ERASED3})
-    string(REGEX REPLACE "^([0-9]+)\\,[0-9]+\\,[0-9]+" "\\1" MAJOR "${VERSION_AFTER_ERASED4}")
-    string(REGEX REPLACE "^[0-9]+\\,([0-9]+)\\,[0-9]+" "\\1" MINOR "${VERSION_AFTER_ERASED4}")
-    string(REGEX REPLACE "^[0-9]+\\,[0-9]+\\,([0-9]+)" "\\1" PATCH "${VERSION_AFTER_ERASED4}")
-else()
-    message(FATAL_ERROR "Unable to fetch major/minor version from registry")
-endif()
-
-# TODO Not sure BASE_DIR is used?
-if(WIN32)
-    string(REGEX REPLACE "/" "\\\\" BASE_DIR "${CMAKE_SOURCE_DIR}")
-else()
-    set(BASE_DIR "${CMAKE_SOURCE_DIR}")
-endif()
+include(${CMAKE_CURRENT_SOURCE_DIR}/version.cmake)
 
 # Path separators ( : or ; ) are not handled well in CMake.
 # This seems like a reasonable approach.
@@ -133,21 +120,33 @@ endif()
 
 # General code generation macro used by several targets.
 macro(run_xr_xml_generate dependency output)
-    add_custom_command(OUTPUT ${output}
-        COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CODEGEN_PYTHON_PATH}"
-            ${PYTHON_EXECUTABLE}
-                ${CMAKE_SOURCE_DIR}/src/scripts/src_genxr.py
-                -registry ${CMAKE_SOURCE_DIR}/specification/registry/xr.xml
-                ${output}
-        DEPENDS 
-            ${CMAKE_SOURCE_DIR}/specification/registry/xr.xml
-            ${CMAKE_SOURCE_DIR}/specification/scripts/generator.py
-            ${CMAKE_SOURCE_DIR}/specification/scripts/reg.py
-            ${CMAKE_SOURCE_DIR}/src/scripts/${dependency}
-            ${CMAKE_SOURCE_DIR}/src/scripts/src_genxr.py
-        COMMENT "Generating ${output} using ${PYTHON_EXECUTABLE} on ${dependency}"
-    )
-    set_source_files_properties(${output} PROPERTIES GENERATED TRUE)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${output}" AND NOT BUILD_FORCE_GENERATION)
+        # pre-generated found
+        message(STATUS "Found and will use pre-generated ${output} in source tree")
+        list(APPEND GENERATED_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${output}")
+    else()
+        if(NOT PYTHON_EXECUTABLE)
+            message(FATAL_ERROR "Python 3 not found, but pre-generated ${CMAKE_CURRENT_SOURCE_DIR}/${output} not found")
+        endif()
+        add_custom_command(OUTPUT ${output}
+            COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CODEGEN_PYTHON_PATH}"
+                ${PYTHON_EXECUTABLE}
+                    ${CMAKE_SOURCE_DIR}/src/scripts/src_genxr.py
+                    -registry ${CMAKE_SOURCE_DIR}/specification/registry/xr.xml
+                    ${output}
+            DEPENDS
+                    "${CMAKE_SOURCE_DIR}/specification/registry/xr.xml"
+                    "${CMAKE_SOURCE_DIR}/specification/scripts/generator.py"
+                    "${CMAKE_SOURCE_DIR}/specification/scripts/reg.py"
+                    "${CMAKE_SOURCE_DIR}/src/scripts/${dependency}"
+                    "${CMAKE_SOURCE_DIR}/src/scripts/src_genxr.py"
+                ${ARGN}
+            COMMENT "Generating ${output} using ${PYTHON_EXECUTABLE} on ${dependency}"
+        )
+        set_source_files_properties(${output} PROPERTIES GENERATED TRUE)
+        list(APPEND GENERATED_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${output}")
+        list(APPEND GENERATED_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${output}")
+    endif()
 endmacro()
 
 # Layer JSON generation macro used by several targets.
@@ -163,20 +162,17 @@ macro(gen_xr_layer_json filename layername libfile version desc genbad)
 endmacro()
 
 # Custom target for generated dispatch table sources, used by several targets.
-add_custom_target(xr_global_generated_files DEPENDS
-    xr_generated_dispatch_table.h
-    xr_generated_dispatch_table.c
-    xr_generated_utilities.h
-    xr_generated_utilities.c
-)
-set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
-
+set(GENERATED_OUTPUT)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.h)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.c)
 run_xr_xml_generate(utility_source_generator.py xr_generated_utilities.h)
 run_xr_xml_generate(utility_source_generator.py xr_generated_utilities.c)
+add_custom_target(xr_global_generated_files DEPENDS
+    ${GENERATED_DEPENDS}
+)
+set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
-add_subdirectory(external)
+set(COMMON_GENERATED_OUTPUT ${GENERATED_OUTPUT})
 
 if(BUILD_LOADER)
     add_subdirectory(loader)
@@ -189,3 +185,10 @@ endif()
 if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
+
+if(BUILD_CONFORMANCE_TESTS)
+    add_subdirectory(conformance)
+endif()
+
+
+

@@ -19,6 +19,7 @@
 *.sh      eol=lf
 
 *.png     binary
+*.pdf     binary
 
 # Shell scripts that don't end in .sh
 specification/makeAllExts           eol=lf

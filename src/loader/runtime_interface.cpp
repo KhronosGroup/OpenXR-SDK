@@ -84,8 +84,8 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             loader_info.structSize = sizeof(XrNegotiateLoaderInfo);
             loader_info.minInterfaceVersion = 1;
             loader_info.maxInterfaceVersion = XR_CURRENT_LOADER_RUNTIME_VERSION;
-            loader_info.minXrVersion = XR_MAKE_VERSION(0, 1, 0);
-            loader_info.maxXrVersion = XR_MAKE_VERSION(1, 0, 0);
+            loader_info.minApiVersion = XR_MAKE_VERSION(1, 0, 0);
+            loader_info.maxApiVersion = XR_MAKE_VERSION(1, 0x3ff, 0xfff);  // Maximum allowed version for this major version.
 
             // Set up the runtime return structure
             XrNegotiateRuntimeRequest runtime_info = {};
@@ -102,8 +102,8 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
             // then something still went wrong, so return with an error.
             if (XR_SUCCESS == res) {
-                uint32_t runtime_major = XR_VERSION_MAJOR(runtime_info.runtimeXrVersion);
-                uint32_t runtime_minor = XR_VERSION_MINOR(runtime_info.runtimeXrVersion);
+                uint32_t runtime_major = XR_VERSION_MAJOR(runtime_info.runtimeApiVersion);
+                uint32_t runtime_minor = XR_VERSION_MINOR(runtime_info.runtimeApiVersion);
                 uint32_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
                 if (nullptr == runtime_info.getInstanceProcAddr) {
                     std::string error_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
@@ -144,9 +144,9 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             info_message += " using interface version ";
             info_message += std::to_string(runtime_info.runtimeInterfaceVersion);
             info_message += " and OpenXR API version ";
-            info_message += std::to_string(XR_VERSION_MAJOR(runtime_info.runtimeXrVersion));
+            info_message += std::to_string(XR_VERSION_MAJOR(runtime_info.runtimeApiVersion));
             info_message += ".";
-            info_message += std::to_string(XR_VERSION_MINOR(runtime_info.runtimeXrVersion));
+            info_message += std::to_string(XR_VERSION_MINOR(runtime_info.runtimeApiVersion));
             LoaderLogger::LogInfoMessage(openxr_command, info_message);
 
             // Use this runtime
@@ -259,7 +259,7 @@ void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionPro
             // layer.
             if (strcmp(extension_properties[prop].extensionName, runtime_extension_properties[ext].extensionName) == 0) {
                 // Make sure the spec version used is the runtime's
-                extension_properties[prop].specVersion = runtime_extension_properties[ext].specVersion;
+                extension_properties[prop].extensionVersion = runtime_extension_properties[ext].extensionVersion;
                 found = true;
                 break;
             }

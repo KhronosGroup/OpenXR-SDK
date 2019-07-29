@@ -1,10 +1,14 @@
-/build
-/build*
+/build/
+/build*/
 CMakeLists.txt.user
 *.orig
 .*
 *~
+*.tar
 *.tar.gz
+*.log
+pregen/
+doc/
 
 # Cached python scripts in bytecode form
 *.pyc
@@ -18,6 +22,9 @@ specification/examples.mk
 
 # Files related to pytest
 specification/scripts/.cache
+
+# VS 2019 CMake artifacts
+out/build/
 
 # VS misc
 *.sln
