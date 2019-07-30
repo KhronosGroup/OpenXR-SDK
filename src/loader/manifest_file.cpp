@@ -23,7 +23,9 @@
 
 #include "manifest_file.hpp"
 
+#if !defined(OPENXR_NON_CMAKE_BUILD)
 #include "common_cmake_config.h"
+#endif  // !defined(OPENXR_NON_CMAKE_BUILD)
 #include "filesystem_utils.hpp"
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"

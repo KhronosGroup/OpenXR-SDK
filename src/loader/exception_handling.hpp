@@ -18,7 +18,9 @@
 
 #pragma once
 
+#if !defined(OPENXR_NON_CMAKE_BUILD)
 #include "common_cmake_config.h"
+#endif  // !defined(OPENXR_NON_CMAKE_BUILD)
 
 #ifdef XRLOADER_ENABLE_EXCEPTION_HANDLING
 #include <stdexcept>
