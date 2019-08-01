@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <openxr/openxr.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
