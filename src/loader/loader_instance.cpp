@@ -17,9 +17,9 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#ifdef XR_OS_WINDOWS
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
-#endif
+#endif  // defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 
 #include "loader_instance.hpp"
 
@@ -42,9 +42,11 @@
 
 // Extensions that are supported by the loader, but may not be supported
 // the the runtime.
-static const XrExtensionProperties g_debug_utils_props = {XR_TYPE_EXTENSION_PROPERTIES, nullptr, XR_EXT_DEBUG_UTILS_EXTENSION_NAME,
-                                                          XR_EXT_debug_utils_SPEC_VERSION};
-const std::vector<XrExtensionProperties> LoaderInstance::_loader_supported_extensions = {g_debug_utils_props};
+const std::array<XrExtensionProperties, 1>& LoaderInstance::LoaderSpecificExtensions() {
+    static const std::array<XrExtensionProperties, 1> extensions = {XrExtensionProperties{
+        XR_TYPE_EXTENSION_PROPERTIES, nullptr, XR_EXT_DEBUG_UTILS_EXTENSION_NAME, XR_EXT_debug_utils_SPEC_VERSION}};
+    return extensions;
+}
 
 // Factory method
 XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces,
@@ -126,7 +128,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
             }
             // Next check the loader
             if (!found) {
-                for (auto loader_extension : LoaderInstance::_loader_supported_extensions) {
+                for (auto& loader_extension : LoaderInstance::LoaderSpecificExtensions()) {
                     if (strcmp(loader_extension.extensionName, info->enabledExtensionNames[ext]) == 0) {
                         found = true;
                         break;

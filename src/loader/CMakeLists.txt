@@ -120,10 +120,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_custom_target(lib${LOADER_NAME}.so.${MAJOR}.${MINOR} ALL
         COMMAND ${CMAKE_COMMAND} -E create_symlink lib${LOADER_NAME}.so.${MAJOR}.${MINOR}.${PATCH} lib${LOADER_NAME}.so.${MAJOR}.${MINOR})
 
-    install(TARGETS ${LOADER_NAME}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
     set(XR_API_VERSION "${MAJOR}.${MINOR}")
     configure_file("openxr.pc.in" "openxr.pc" @ONLY)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openxr.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
@@ -176,6 +172,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     endif()
 endif()
 
-install(TARGETS ${LOADER_NAME} DESTINATION lib)
-
-# Custom commands to build dependencies for above targets
+install(TARGETS ${LOADER_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

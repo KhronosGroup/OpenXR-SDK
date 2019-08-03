@@ -87,19 +87,21 @@ if (OPENGL_FOUND)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    add_definitions(-DXR_USE_GRAPHICS_API_D3D)
     add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
     add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
 endif()
 
 if(BUILD_LOADER_WITH_EXCEPTION_HANDLING)
+    # This variable is configured into common_config.h
     set(XRLOADER_ENABLE_EXCEPTION_HANDLING TRUE)
 endif()
 # Check for the existence of the secure_getenv or __secure_getenv commands
 include(CheckFunctionExists)
-CHECK_FUNCTION_EXISTS(secure_getenv HAVE_SECURE_GETENV)
-CHECK_FUNCTION_EXISTS(__secure_getenv HAVE___SECURE_GETENV)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/common_cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/common_cmake_config.h)
+
+check_function_exists(secure_getenv HAVE_SECURE_GETENV)
+check_function_exists(__secure_getenv HAVE___SECURE_GETENV)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/common_config.h)
+add_definitions(-DOPENXR_HAVE_COMMON_CONFIG)
 
 # Be able to find pre-generated files, if used.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include
@@ -165,8 +167,6 @@ endmacro()
 set(GENERATED_OUTPUT)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.h)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.c)
-run_xr_xml_generate(utility_source_generator.py xr_generated_utilities.h)
-run_xr_xml_generate(utility_source_generator.py xr_generated_utilities.c)
 add_custom_target(xr_global_generated_files DEPENDS
     ${GENERATED_DEPENDS}
 )

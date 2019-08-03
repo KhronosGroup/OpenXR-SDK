@@ -12,6 +12,44 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR 1.0.1 release (2-August-2019)
+
+Patch release for the 1.0 series.
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- General, Build, Other
+  - #87 - Fix makefiles
+  - #88 - Remove unneeded generation (corresponds to issue #74, internal issue 1139, internal MR 1491)
+  - #101 - Fix install of header and loader.
+- Loader
+  - #91 - Fix a loader bug which prevented Layers from not implementing all XR functions
+  - #95 - Guard config includes/defines (relates to #81, #92)
+  - #97 - Remove a constant static std::vector, use a std::array instead.
+- Layers
+  - #84 - Fix Linux warning for apidump
+- From OpenXR-Docs:
+  - #26 - Proposal for unbounded space and spatial anchor extensions (vendor extensions)
+
+### Internal issues
+
+- General, Build, Other
+  - Makefile cleanups (internal MR 1469, 1489)
+  - Add release scripts (internal MR 1496)
+- Registry
+  - Reserve Oculus extension numbers (internal MR 1493)
+  - Add Monado headless (vendor extension) (internal MR 1482)
+- Loader
+  - Remove unnecessary `#ifdef _WIN32` in loader. (internal MR 1487)
+
+### New extensions
+
+- `XR_MND_headless`
+- `XR_MSFT_spatial_anchor`
+- `XR_MSFT_unbounded_reference_space`
+
 ## OpenXR 1.0.0 release (29-July-2019)
 
 Incorporates spec changes from OpenXR 1.0,

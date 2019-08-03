@@ -1,4 +1,4 @@
-// Copyright (c) 2017 The Khronos Group Inc.
+// Copyright (c) 2017-2019 The Khronos Group Inc.
 // Copyright (c) 2017 Valve Corporation
 // Copyright (c) 2017 LunarG, Inc.
 //
@@ -29,11 +29,15 @@
 #endif
 
 // This is a CMake generated file with #defines for any functions/includes
-// that it found present.  This is currently necessary to properly determine
-// if secure_getenv or __secure_getenv are present
-#if !defined(OPENXR_NON_CMAKE_BUILD)
-#include "common_cmake_config.h"
-#endif  // !defined(OPENXR_NON_CMAKE_BUILD)
+// that it found present and build-time configuration.
+// If you don't have this file, on non-Windows you'll need to define
+// one of HAVE_SECURE_GETENV or HAVE___SECURE_GETENV depending on which
+// of secure_getenv or __secure_getenv are present, as well as defining
+// XRLOADER_ENABLE_EXCEPTION_HANDLING if your standard library can throw exceptions
+// (which most can)
+#ifdef OPENXR_HAVE_COMMON_CONFIG
+#include "common_config.h"
+#endif  // OPENXR_HAVE_COMMON_CONFIG
 
 // Environment variables
 #if defined(XR_OS_LINUX)

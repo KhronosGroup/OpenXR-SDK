@@ -49,6 +49,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
         <tag name="KHR"        author="Khronos"                 contact="Nick Whiting @whitingn"/>
         <tag name="LUNARG"     author="LunarG"                  contact="Mark Young @marky_lunarg, Karl Schultz @karlschultz"/>
+        <tag name="MND"        author="Monado Project"          contact="Ryan Pavlik @rpavlik"/>
         <tag name="MSFT"       author="Microsoft"               contact="Alex Turner @alexturn, Yin Li @yl_msft, Bryce Hutchings @brycehutchings, Lachlan Ford @laford_msft, Minmin Gong @gongminmin "/>
         <tag name="NV"         author="NVIDIA Corporation"      contact="Satish Salian @ssalian, Robert Menzel"/>
         <tag name="OCULUS"     author="Oculus"                  contact="Cass Everitt @casseveritt, Paul Pedriana @ppedriana"/>
@@ -111,7 +112,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 0)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 1)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -232,6 +233,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSwapchain</name>)</type>
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSpace</name>)</type>
         <type category="handle" parent="XrInstance"><type>XR_DEFINE_HANDLE</type>(<name>XrDebugUtilsMessengerEXT</name>)</type>
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSpatialAnchorMSFT</name>)</type>
 
         <!-- enums and flag bits generated from corresponding <enums> tags below -->
         <type name="XrStructureType" category="enum"/>
@@ -966,6 +968,22 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             const <type>XrDebugUtilsMessengerCallbackDataEXT</type>*      callbackData,
             <type>void</type>*                                            userData);
         </type>
+
+        <!-- types for XR_MSFT_spatial_anchor -->
+        <type category="struct" name="XrSpatialAnchorCreateInfoMSFT">
+            <member values="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"><type>XrStructureType</type><name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>space</name></member>
+            <member><type>XrPosef</type>     <name>pose</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+        </type>
+        <type category="struct" name="XrSpatialAnchorSpaceCreateInfoMSFT">
+            <member values="XR_TYPE_ACTION_SPACE_CREATE_INFO"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                     <name>next</name></member>
+            <member><type>XrSpatialAnchorMSFT</type>             <name>anchor</name></member>
+            <member><type>XrPosef</type>                         <name>poseInAnchorSpace</name></member>
+        </type>
+
     </types>
 
     <!-- SECTION: OpenXR enumerant (token) definitions. -->
@@ -1764,6 +1782,25 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrVisibilityMaskTypeKHR</type> <name>visibilityMaskType</name></param>
             <param><type>XrVisibilityMaskKHR</type>* <name>visibilityMask</name></param>
         </command>
+
+        <!-- commands for XR_MSFT_spatial_anchor -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_POSE_INVALID,XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT,XR_ERROR_TIME_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+            <proto><type>XrResult</type> <name>xrCreateSpatialAnchorMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpatialAnchorCreateInfoMSFT</type>* <name>createInfo</name></param>
+            <param><type>XrSpatialAnchorMSFT</type>* <name>anchor</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_POSE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+            <proto><type>XrResult</type> <name>xrCreateSpatialAnchorSpaceMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpatialAnchorSpaceCreateInfoMSFT</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>space</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrDestroySpatialAnchorMSFT</name></proto>
+            <param><type>XrSpatialAnchorMSFT</type> <name>anchor</name></param>
+        </command>
+
     </commands>
 
     <!-- SECTION: OpenXR API interface definitions -->
@@ -2263,19 +2300,49 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_unbounded_reference_space" number="39" type="instance" supported="disabled">
+    <extension name="XR_MSFT_unbounded_reference_space" number="39" type="instance" supported="openxr">
         <require>
             <enum value="1" name="XR_MSFT_unbounded_reference_space_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_unbounded_reference_space&quot;" name="XR_MSFT_UNBOUNDED_REFERENCE_SPACE_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrReferenceSpaceType" name="XR_REFERENCE_SPACE_TYPE_UNBOUNDED_MSFT"/>
         </require>
     </extension>
 
-    <extension name="XR_MSFT_spatial_anchor" number="40" type="instance" supported="disabled">
+    <extension name="XR_MSFT_spatial_anchor" number="40" type="instance" supported="openxr">
         <require>
             <enum value="1" name="XR_MSFT_spatial_anchor_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_spatial_anchor&quot;" name="XR_MSFT_SPATIAL_ANCHOR_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT"/>
+            <command name="xrCreateSpatialAnchorMSFT" />
+            <command name="xrCreateSpatialAnchorSpaceMSFT" />
+            <command name="xrDestroySpatialAnchorMSFT" />
+            <enum offset="0" extends="XrObjectType" name="XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT" comment="XrSpatialAnchorMSFT" />
+            <enum offset="1" dir="-" extends="XrResult" name="XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT" comment="Spatial anchor could not be created at that location." />
         </require>
     </extension>
 
+    <extension name="XR_OCULUS_extension_41" number="41" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_OCULUS_extension_41_SPEC_VERSION"/>
+            <enum value="&quot;XR_OCULUS_extension_41&quot;" name="XR_OCULUS_EXTENSION_41_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_OCULUS_extension_42" number="42" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_OCULUS_extension_42_SPEC_VERSION"/>
+            <enum value="&quot;XR_OCULUS_extension_42&quot;" name="XR_OCULUS_EXTENSION_42_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MND_headless" number="43" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_MND_headless_SPEC_VERSION"/>
+            <enum value="&quot;XR_MND_headless&quot;" name="XR_MND_HEADLESS_EXTENSION_NAME"/>
+        </require>
+    </extension>
     </extensions>
 </registry>

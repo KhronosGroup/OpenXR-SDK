@@ -275,14 +275,6 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateApiLayerInstance(const XrInstan
 
 
 // Generated loader terminator prototypes
-XRAPI_ATTR XrResult XRAPI_CALL LoaderGenTermXrResultToString(
-    XrInstance                                  instance,
-    XrResult                                    value,
-    char                                        buffer[XR_MAX_RESULT_STRING_SIZE]);
-XRAPI_ATTR XrResult XRAPI_CALL LoaderGenTermXrStructureTypeToString(
-    XrInstance                                  instance,
-    XrStructureType                             value,
-    char                                        buffer[XR_MAX_STRUCTURE_NAME_SIZE]);
 // Instance Init Dispatch Table (put all terminators in first)
 void LoaderGenInitInstanceDispatchTable(XrInstance runtime_instance,
                                         std::unique_ptr<XrGeneratedDispatchTable>& table);
@@ -299,6 +291,7 @@ extern HandleLoaderMap<XrAction> g_action_map;
 extern HandleLoaderMap<XrSwapchain> g_swapchain_map;
 extern HandleLoaderMap<XrActionSet> g_actionset_map;
 extern HandleLoaderMap<XrDebugUtilsMessengerEXT> g_debugutilsmessengerext_map;
+extern HandleLoaderMap<XrSpatialAnchorMSFT> g_spatialanchormsft_map;
 
 // Function used to clean up any residual map values that point to an instance prior to that
 // instance being deleted.

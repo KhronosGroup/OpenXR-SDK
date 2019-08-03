@@ -31,7 +31,6 @@
 #include "loader_platform.hpp"
 #include "runtime_interface.hpp"
 #include "xr_generated_dispatch_table.h"
-#include "xr_generated_utilities.h"
 
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>
@@ -51,6 +50,7 @@ HandleLoaderMap<XrAction> g_action_map;
 HandleLoaderMap<XrSwapchain> g_swapchain_map;
 HandleLoaderMap<XrActionSet> g_actionset_map;
 HandleLoaderMap<XrDebugUtilsMessengerEXT> g_debugutilsmessengerext_map;
+HandleLoaderMap<XrSpatialAnchorMSFT> g_spatialanchormsft_map;
 
 // Function used to clean up any residual map values that point to an instance prior to that
 // instance being deleted.
@@ -62,6 +62,7 @@ void LoaderCleanUpMapsForInstance(LoaderInstance *instance) {
     g_swapchain_map.RemoveHandlesForLoader(*instance);
     g_actionset_map.RemoveHandlesForLoader(*instance);
     g_debugutilsmessengerext_map.RemoveHandlesForLoader(*instance);
+    g_spatialanchormsft_map.RemoveHandlesForLoader(*instance);
 }
 
 #ifdef __cplusplus
@@ -125,21 +126,6 @@ XRAPI_ATTR XrResult XRAPI_CALL xrResultToString(
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-XRAPI_ATTR XrResult XRAPI_CALL LoaderGenTermXrResultToString(
-    XrInstance                                  instance,
-    XrResult                                    value,
-    char                                        buffer[XR_MAX_RESULT_STRING_SIZE]) {
-    XrResult result = GeneratedXrUtilitiesResultToString(value, buffer);
-    if (XR_SUCCEEDED(result)) {
-        return result;
-    }
-    // If we did not find it in the generated code, ask the runtime.
-    const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetDispatchTable(instance);
-    if (nullptr != dispatch_table->ResultToString) {
-    result = dispatch_table->ResultToString(instance, value, buffer);
-    }
-    return result;
-}
 
 XRAPI_ATTR XrResult XRAPI_CALL xrStructureTypeToString(
     XrInstance                                  instance,
@@ -159,21 +145,6 @@ XRAPI_ATTR XrResult XRAPI_CALL xrStructureTypeToString(
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-XRAPI_ATTR XrResult XRAPI_CALL LoaderGenTermXrStructureTypeToString(
-    XrInstance                                  instance,
-    XrStructureType                             value,
-    char                                        buffer[XR_MAX_STRUCTURE_NAME_SIZE]) {
-    XrResult result = GeneratedXrUtilitiesStructureTypeToString(value, buffer);
-    if (XR_SUCCEEDED(result)) {
-        return result;
-    }
-    // If we did not find it in the generated code, ask the runtime.
-    const XrGeneratedDispatchTable* dispatch_table = RuntimeInterface::GetDispatchTable(instance);
-    if (nullptr != dispatch_table->StructureTypeToString) {
-    result = dispatch_table->StructureTypeToString(instance, value, buffer);
-    }
-    return result;
-}
 
 XRAPI_ATTR XrResult XRAPI_CALL xrGetSystem(
     XrInstance                                  instance,
@@ -1699,6 +1670,110 @@ XRLOADER_ABI_CATCH_FALLBACK
 
 
 
+// ---- XR_MSFT_spatial_anchor extension commands
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorMSFT(
+    XrSession                                   session,
+    const XrSpatialAnchorCreateInfoMSFT*        createInfo,
+    XrSpatialAnchorMSFT*                        anchor) XRLOADER_ABI_TRY {
+    LoaderInstance *loader_instance = g_session_map.Get(session);
+    if (nullptr == loader_instance) {
+            LoaderLogger::LogValidationErrorMessage(
+                "VUID-xrCreateSpatialAnchorMSFT-session-parameter",
+                "xrCreateSpatialAnchorMSFT",
+                "session is not a valid XrSession",
+                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+        return XR_ERROR_HANDLE_INVALID;
+    }
+    const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
+        XrResult result = XR_SUCCESS;
+    if (!loader_instance->ExtensionIsEnabled("XR_MSFT_spatial_anchor")) {
+        LoaderLogger::LogValidationErrorMessage("VUID-xrCreateSpatialAnchorMSFT-extension-notenabled",
+                                                "xrCreateSpatialAnchorMSFT",
+                                                "The XR_MSFT_spatial_anchor extension has not been enabled prior to calling xrCreateSpatialAnchorMSFT");
+        return XR_ERROR_FUNCTION_UNSUPPORTED;
+    }
+
+    result = dispatch_table->CreateSpatialAnchorMSFT(session, createInfo, anchor);
+        if (XR_SUCCESS == result && nullptr != anchor) {
+            XrResult insert_result = g_spatialanchormsft_map.Insert(*anchor, *loader_instance);
+            if (XR_FAILED(insert_result)) {
+                LoaderLogger::LogErrorMessage(
+                    "xrCreateSpatialAnchorMSFT",
+                    "Failed inserting new spatialanchormsft into map: may be null or not unique");
+            }
+        }
+    return result;
+}
+XRLOADER_ABI_CATCH_FALLBACK
+
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorSpaceMSFT(
+    XrSession                                   session,
+    const XrSpatialAnchorSpaceCreateInfoMSFT*   createInfo,
+    XrSpace*                                    space) XRLOADER_ABI_TRY {
+    LoaderInstance *loader_instance = g_session_map.Get(session);
+    if (nullptr == loader_instance) {
+            LoaderLogger::LogValidationErrorMessage(
+                "VUID-xrCreateSpatialAnchorSpaceMSFT-session-parameter",
+                "xrCreateSpatialAnchorSpaceMSFT",
+                "session is not a valid XrSession",
+                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+        return XR_ERROR_HANDLE_INVALID;
+    }
+    const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
+        XrResult result = XR_SUCCESS;
+    if (!loader_instance->ExtensionIsEnabled("XR_MSFT_spatial_anchor")) {
+        LoaderLogger::LogValidationErrorMessage("VUID-xrCreateSpatialAnchorSpaceMSFT-extension-notenabled",
+                                                "xrCreateSpatialAnchorSpaceMSFT",
+                                                "The XR_MSFT_spatial_anchor extension has not been enabled prior to calling xrCreateSpatialAnchorSpaceMSFT");
+        return XR_ERROR_FUNCTION_UNSUPPORTED;
+    }
+
+    result = dispatch_table->CreateSpatialAnchorSpaceMSFT(session, createInfo, space);
+        if (XR_SUCCESS == result && nullptr != space) {
+            XrResult insert_result = g_space_map.Insert(*space, *loader_instance);
+            if (XR_FAILED(insert_result)) {
+                LoaderLogger::LogErrorMessage(
+                    "xrCreateSpatialAnchorSpaceMSFT",
+                    "Failed inserting new space into map: may be null or not unique");
+            }
+        }
+    return result;
+}
+XRLOADER_ABI_CATCH_FALLBACK
+
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
+    XrSpatialAnchorMSFT                         anchor) XRLOADER_ABI_TRY {
+    LoaderInstance *loader_instance = g_spatialanchormsft_map.Get(anchor);
+    // Destroy the mapping entry for this item if it was valid.
+    if (nullptr != loader_instance) {
+            g_spatialanchormsft_map.Erase(anchor);
+    }
+    if (nullptr == loader_instance) {
+            LoaderLogger::LogValidationErrorMessage(
+                "VUID-xrDestroySpatialAnchorMSFT-anchor-parameter",
+                "xrDestroySpatialAnchorMSFT",
+                "anchor is not a valid XrSpatialAnchorMSFT",
+                {XrLoaderLogObjectInfo{anchor, XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT}});
+        return XR_ERROR_HANDLE_INVALID;
+    }
+    const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
+        XrResult result = XR_SUCCESS;
+    if (!loader_instance->ExtensionIsEnabled("XR_MSFT_spatial_anchor")) {
+        LoaderLogger::LogValidationErrorMessage("VUID-xrDestroySpatialAnchorMSFT-extension-notenabled",
+                                                "xrDestroySpatialAnchorMSFT",
+                                                "The XR_MSFT_spatial_anchor extension has not been enabled prior to calling xrDestroySpatialAnchorMSFT");
+        return XR_ERROR_FUNCTION_UNSUPPORTED;
+    }
+
+    result = dispatch_table->DestroySpatialAnchorMSFT(anchor);
+    return result;
+}
+XRLOADER_ABI_CATCH_FALLBACK
+
+
+
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance instance, const char* name,
                                                                    PFN_xrVoidFunction* function) XRLOADER_ABI_TRY {
     if (nullptr == function) {
@@ -2013,6 +2088,21 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance in
             if (loader_instance->ExtensionIsEnabled("XR_EXT_debug_utils")) {
                 *function = reinterpret_cast<PFN_xrVoidFunction>(xrSessionInsertDebugUtilsLabelEXT);
             }
+
+        // ---- XR_MSFT_spatial_anchor extension commands
+
+        } else if (func_name == "CreateSpatialAnchorMSFT") {
+            if (loader_instance->ExtensionIsEnabled("XR_MSFT_spatial_anchor")) {
+                *function = reinterpret_cast<PFN_xrVoidFunction>(loader_instance->DispatchTable()->CreateSpatialAnchorMSFT);
+            }
+        } else if (func_name == "CreateSpatialAnchorSpaceMSFT") {
+            if (loader_instance->ExtensionIsEnabled("XR_MSFT_spatial_anchor")) {
+                *function = reinterpret_cast<PFN_xrVoidFunction>(loader_instance->DispatchTable()->CreateSpatialAnchorSpaceMSFT);
+            }
+        } else if (func_name == "DestroySpatialAnchorMSFT") {
+            if (loader_instance->ExtensionIsEnabled("XR_MSFT_spatial_anchor")) {
+                *function = reinterpret_cast<PFN_xrVoidFunction>(loader_instance->DispatchTable()->DestroySpatialAnchorMSFT);
+            }
         }
     }
     if (*function == nullptr) {
@@ -2028,16 +2118,15 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermGetInstanceProcAddr(XrInstance instan
 
     // A few instance commands need to go through a loader terminator.
     // Otherwise, go directly to the runtime version of the command if it exists.
+    // But first set the function pointer to NULL so that the fall-through below actually works.
+    *function = nullptr;
+
     if (0 == strcmp(name, "xrGetInstanceProcAddr")) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrTermGetInstanceProcAddr);
     } else if (0 == strcmp(name, "xrCreateInstance")) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrTermCreateInstance);
     } else if (0 == strcmp(name, "xrDestroyInstance")) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrTermDestroyInstance);
-    } else if (0 == strcmp(name, "xrResultToString")) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderGenTermXrResultToString);
-    } else if (0 == strcmp(name, "xrStructureTypeToString")) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderGenTermXrStructureTypeToString);
     } else if (0 == strcmp(name, "xrSetDebugUtilsObjectNameEXT")) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrTermSetDebugUtilsObjectNameEXT);
     } else if (0 == strcmp(name, "xrCreateDebugUtilsMessengerEXT")) {
@@ -2195,6 +2284,11 @@ void LoaderGenInitInstanceDispatchTable(XrInstance instance, std::unique_ptr<XrG
     LoaderXrTermGetInstanceProcAddr(instance, "xrSessionBeginDebugUtilsLabelRegionEXT", reinterpret_cast<PFN_xrVoidFunction*>(&table->SessionBeginDebugUtilsLabelRegionEXT));
     LoaderXrTermGetInstanceProcAddr(instance, "xrSessionEndDebugUtilsLabelRegionEXT", reinterpret_cast<PFN_xrVoidFunction*>(&table->SessionEndDebugUtilsLabelRegionEXT));
     LoaderXrTermGetInstanceProcAddr(instance, "xrSessionInsertDebugUtilsLabelEXT", reinterpret_cast<PFN_xrVoidFunction*>(&table->SessionInsertDebugUtilsLabelEXT));
+
+    // ---- XR_MSFT_spatial_anchor extension commands
+    LoaderXrTermGetInstanceProcAddr(instance, "xrCreateSpatialAnchorMSFT", reinterpret_cast<PFN_xrVoidFunction*>(&table->CreateSpatialAnchorMSFT));
+    LoaderXrTermGetInstanceProcAddr(instance, "xrCreateSpatialAnchorSpaceMSFT", reinterpret_cast<PFN_xrVoidFunction*>(&table->CreateSpatialAnchorSpaceMSFT));
+    LoaderXrTermGetInstanceProcAddr(instance, "xrDestroySpatialAnchorMSFT", reinterpret_cast<PFN_xrVoidFunction*>(&table->DestroySpatialAnchorMSFT));
 }
 
 // Instance Update Dispatch Table with an API Layer Interface
@@ -2560,6 +2654,20 @@ void ApiLayerInterface::GenUpdateInstanceDispatchTable(XrInstance instance, std:
     _get_instant_proc_addr(instance, "xrSessionInsertDebugUtilsLabelEXT", &cur_func_ptr);
     if (nullptr != cur_func_ptr) {
         table->SessionInsertDebugUtilsLabelEXT = reinterpret_cast<PFN_xrSessionInsertDebugUtilsLabelEXT>(cur_func_ptr);
+    }
+
+    // ---- XR_MSFT_spatial_anchor extension commands
+    _get_instant_proc_addr(instance, "xrCreateSpatialAnchorMSFT", &cur_func_ptr);
+    if (nullptr != cur_func_ptr) {
+        table->CreateSpatialAnchorMSFT = reinterpret_cast<PFN_xrCreateSpatialAnchorMSFT>(cur_func_ptr);
+    }
+    _get_instant_proc_addr(instance, "xrCreateSpatialAnchorSpaceMSFT", &cur_func_ptr);
+    if (nullptr != cur_func_ptr) {
+        table->CreateSpatialAnchorSpaceMSFT = reinterpret_cast<PFN_xrCreateSpatialAnchorSpaceMSFT>(cur_func_ptr);
+    }
+    _get_instant_proc_addr(instance, "xrDestroySpatialAnchorMSFT", &cur_func_ptr);
+    if (nullptr != cur_func_ptr) {
+        table->DestroySpatialAnchorMSFT = reinterpret_cast<PFN_xrDestroySpatialAnchorMSFT>(cur_func_ptr);
     }
 }
 #ifdef __cplusplus

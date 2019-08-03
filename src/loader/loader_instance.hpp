@@ -23,6 +23,7 @@
 
 #include <openxr/openxr.h>
 
+#include <array>
 #include <cmath>
 #include <memory>
 #include <mutex>
@@ -80,7 +81,7 @@ class LoaderInstance {
     std::vector<std::unique_ptr<ApiLayerInterface>>& LayerInterfaces() { return _api_layer_interfaces; }
     void AddEnabledExtension(const std::string& extension) { return _enabled_extensions.push_back(extension); }
     bool ExtensionIsEnabled(const std::string& extension);
-    static const std::vector<XrExtensionProperties>& LoaderSpecificExtensions() { return _loader_supported_extensions; }
+    static const std::array<XrExtensionProperties, 1>& LoaderSpecificExtensions();
     XrDebugUtilsMessengerEXT DefaultDebugUtilsMessenger() { return _messenger; }
     void SetDefaultDebugUtilsMessenger(XrDebugUtilsMessengerEXT messenger) { _messenger = messenger; }
 
@@ -91,7 +92,6 @@ class LoaderInstance {
     XrInstance _runtime_instance;
     bool _dispatch_valid;
     std::unique_ptr<XrGeneratedDispatchTable> _dispatch_table;
-    static const std::vector<XrExtensionProperties> _loader_supported_extensions;
     std::vector<std::string> _enabled_extensions;
     // Internal debug messenger created during xrCreateInstance
     XrDebugUtilsMessengerEXT _messenger;

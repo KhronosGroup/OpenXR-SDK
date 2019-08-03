@@ -17,9 +17,9 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#ifdef XR_OS_WINDOWS
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
-#endif
+#endif  // defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 
 #include "api_layer_interface.hpp"
 #include "exception_handling.hpp"
@@ -127,8 +127,7 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
     // If this is not in reference to a specific layer, then add the loader-specific extension properties as well.
     // These are extensions that the loader directly supports.
     if (!just_layer_properties) {
-        auto loader_extension_props = LoaderInstance::LoaderSpecificExtensions();
-        for (XrExtensionProperties &loader_prop : loader_extension_props) {
+        for (const XrExtensionProperties &loader_prop : LoaderInstance::LoaderSpecificExtensions()) {
             bool found_prop = false;
             for (XrExtensionProperties &existing_prop : extension_properties) {
                 if (0 == strcmp(existing_prop.extensionName, loader_prop.extensionName)) {

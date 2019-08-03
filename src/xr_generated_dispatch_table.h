@@ -167,6 +167,11 @@ struct XrGeneratedDispatchTable {
     PFN_xrSessionBeginDebugUtilsLabelRegionEXT SessionBeginDebugUtilsLabelRegionEXT;
     PFN_xrSessionEndDebugUtilsLabelRegionEXT SessionEndDebugUtilsLabelRegionEXT;
     PFN_xrSessionInsertDebugUtilsLabelEXT SessionInsertDebugUtilsLabelEXT;
+
+    // ---- XR_MSFT_spatial_anchor extension commands
+    PFN_xrCreateSpatialAnchorMSFT CreateSpatialAnchorMSFT;
+    PFN_xrCreateSpatialAnchorSpaceMSFT CreateSpatialAnchorSpaceMSFT;
+    PFN_xrDestroySpatialAnchorMSFT DestroySpatialAnchorMSFT;
 };
 
 

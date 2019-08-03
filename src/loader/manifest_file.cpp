@@ -17,13 +17,16 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
-#ifdef XR_OS_WINDOWS
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
-#endif
+#endif  // defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 
 #include "manifest_file.hpp"
 
-#include "common_cmake_config.h"
+#ifdef OPENXR_HAVE_COMMON_CONFIG
+#include "common_config.h"
+#endif  // OPENXR_HAVE_COMMON_CONFIG
+
 #include "filesystem_utils.hpp"
 #include "loader_platform.hpp"
 #include "platform_utils.hpp"

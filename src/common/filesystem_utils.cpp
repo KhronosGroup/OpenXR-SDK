@@ -22,10 +22,6 @@
 
 #include "platform_utils.hpp"
 
-#ifdef _WIN32
-#include "xr_dependencies.h"
-#endif
-
 #include <cstring>
 
 #if defined DISABLE_STD_FILESYSTEM

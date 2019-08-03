@@ -39,7 +39,9 @@ if(HAVE_PREGENERATED AND NOT BUILD_FORCE_GENERATION)
     add_custom_target(generate_openxr_header
         COMMENT "Using found pre-generated OpenXR headers.")
 
-    set(INSTALL_HEADERS ${SOURCE_HEADERS})
+    set(INSTALL_HEADERS 
+        ${CMAKE_CURRENT_SOURCE_DIR}/openxr_platform_defines.h
+        ${SOURCE_HEADERS})
 else()
 
     set(GENERATED_HEADERS)
@@ -74,8 +76,7 @@ else()
 
     set(INSTALL_HEADERS
         ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform_defines.h
-        ${CMAKE_CURRENT_BINARY_DIR}/openxr.h
-        ${CMAKE_CURRENT_BINARY_DIR}/openxr_platform.h)
+        ${GENERATED_HEADERS})
 
 
     # Define generate_openxr_header target to generate the OpenXR header files.

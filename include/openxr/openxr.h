@@ -35,7 +35,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 0)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 1)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -192,6 +192,7 @@ typedef enum XrResult {
     XR_ERROR_LOCALIZED_NAME_INVALID = -49,
     XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR = -1000003000,
     XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR = -1000003001,
+    XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT = -1000039001,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
 } XrResult;
 
@@ -277,6 +278,8 @@ typedef enum XrStructureType {
     XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR = 1000028002,
     XR_TYPE_VISIBILITY_MASK_KHR = 1000031000,
     XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR = 1000031001,
+    XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT = 1000039000,
+    XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT = 1000039001,
     XR_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrStructureType;
 
@@ -304,6 +307,7 @@ typedef enum XrReferenceSpaceType {
     XR_REFERENCE_SPACE_TYPE_VIEW = 1,
     XR_REFERENCE_SPACE_TYPE_LOCAL = 2,
     XR_REFERENCE_SPACE_TYPE_STAGE = 3,
+    XR_REFERENCE_SPACE_TYPE_UNBOUNDED_MSFT = 1000038000,
     XR_REFERENCE_SPACE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrReferenceSpaceType;
 
@@ -345,6 +349,7 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_ACTION_SET = 5,
     XR_OBJECT_TYPE_ACTION = 6,
     XR_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT = 1000019000,
+    XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT = 1000039000,
     XR_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrObjectType;
 typedef XrFlags64 XrInstanceCreateFlags;
@@ -1530,6 +1535,55 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(
 #define XR_VARJO_quad_views 1
 #define XR_VARJO_quad_views_SPEC_VERSION  1
 #define XR_VARJO_QUAD_VIEWS_EXTENSION_NAME "XR_VARJO_quad_views"
+
+
+#define XR_MSFT_unbounded_reference_space 1
+#define XR_MSFT_unbounded_reference_space_SPEC_VERSION 1
+#define XR_MSFT_UNBOUNDED_REFERENCE_SPACE_EXTENSION_NAME "XR_MSFT_unbounded_reference_space"
+
+
+#define XR_MSFT_spatial_anchor 1
+XR_DEFINE_HANDLE(XrSpatialAnchorMSFT)
+#define XR_MSFT_spatial_anchor_SPEC_VERSION 1
+#define XR_MSFT_SPATIAL_ANCHOR_EXTENSION_NAME "XR_MSFT_spatial_anchor"
+typedef struct XrSpatialAnchorCreateInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpace                     space;
+    XrPosef                     pose;
+    XrTime                      time;
+} XrSpatialAnchorCreateInfoMSFT;
+
+typedef struct XrSpatialAnchorSpaceCreateInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpatialAnchorMSFT         anchor;
+    XrPosef                     poseInAnchorSpace;
+} XrSpatialAnchorSpaceCreateInfoMSFT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorMSFT)(XrSession session, const XrSpatialAnchorCreateInfoMSFT* createInfo, XrSpatialAnchorMSFT* anchor);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorSpaceMSFT)(XrSession session, const XrSpatialAnchorSpaceCreateInfoMSFT* createInfo, XrSpace* space);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroySpatialAnchorMSFT)(XrSpatialAnchorMSFT anchor);
+
+#ifndef XR_NO_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorMSFT(
+    XrSession                                   session,
+    const XrSpatialAnchorCreateInfoMSFT*        createInfo,
+    XrSpatialAnchorMSFT*                        anchor);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorSpaceMSFT(
+    XrSession                                   session,
+    const XrSpatialAnchorSpaceCreateInfoMSFT*   createInfo,
+    XrSpace*                                    space);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
+    XrSpatialAnchorMSFT                         anchor);
+#endif
+
+
+#define XR_MND_headless 1
+#define XR_MND_headless_SPEC_VERSION      1
+#define XR_MND_HEADLESS_EXTENSION_NAME    "XR_MND_headless"
 
 #ifdef __cplusplus
 }

@@ -21,11 +21,11 @@
 // Author: Mark Young <marky@lunarg.com>
 //
 
+#include "xr_generated_dispatch_table.h"
 #include "xr_dependencies.h"
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
 
-#include "xr_generated_dispatch_table.h"
 
 #ifdef __cplusplus
 extern "C" { 
@@ -167,7 +167,13 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrSessionBeginDebugUtilsLabelRegionEXT", (PFN_xrVoidFunction*)&table->SessionBeginDebugUtilsLabelRegionEXT));
     (get_inst_proc_addr(instance, "xrSessionEndDebugUtilsLabelRegionEXT", (PFN_xrVoidFunction*)&table->SessionEndDebugUtilsLabelRegionEXT));
     (get_inst_proc_addr(instance, "xrSessionInsertDebugUtilsLabelEXT", (PFN_xrVoidFunction*)&table->SessionInsertDebugUtilsLabelEXT));
+
+    // ---- XR_MSFT_spatial_anchor extension commands
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorMSFT", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorMSFT));
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorSpaceMSFT", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorSpaceMSFT));
+    (get_inst_proc_addr(instance, "xrDestroySpatialAnchorMSFT", (PFN_xrVoidFunction*)&table->DestroySpatialAnchorMSFT));
 }
+
 
 #ifdef __cplusplus
 } // extern "C"
