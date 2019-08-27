@@ -65,9 +65,6 @@ void LoaderCleanUpMapsForInstance(LoaderInstance *instance) {
     g_spatialanchormsft_map.RemoveHandlesForLoader(*instance);
 }
 
-#ifdef __cplusplus
-extern "C" { 
-#endif
 
 // Automatically generated instance trampolines and terminators
 
@@ -81,7 +78,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProperties(
                 "VUID-xrGetInstanceProperties-instance-parameter",
                 "xrGetInstanceProperties",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -99,7 +96,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrPollEvent(
                 "VUID-xrPollEvent-instance-parameter",
                 "xrPollEvent",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -118,7 +115,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrResultToString(
                 "VUID-xrResultToString-instance-parameter",
                 "xrResultToString",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -137,7 +134,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrStructureTypeToString(
                 "VUID-xrStructureTypeToString-instance-parameter",
                 "xrStructureTypeToString",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -156,7 +153,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetSystem(
                 "VUID-xrGetSystem-instance-parameter",
                 "xrGetSystem",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -175,7 +172,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetSystemProperties(
                 "VUID-xrGetSystemProperties-instance-parameter",
                 "xrGetSystemProperties",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -197,7 +194,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateEnvironmentBlendModes(
                 "VUID-xrEnumerateEnvironmentBlendModes-instance-parameter",
                 "xrEnumerateEnvironmentBlendModes",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -216,7 +213,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSession(
                 "VUID-xrCreateSession-instance-parameter",
                 "xrCreateSession",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -247,7 +244,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySession(
                 "VUID-xrDestroySession-session-parameter",
                 "xrDestroySession",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -269,7 +266,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateReferenceSpaces(
                 "VUID-xrEnumerateReferenceSpaces-session-parameter",
                 "xrEnumerateReferenceSpaces",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -288,7 +285,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateReferenceSpace(
                 "VUID-xrCreateReferenceSpace-session-parameter",
                 "xrCreateReferenceSpace",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -317,7 +314,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetReferenceSpaceBoundsRect(
                 "VUID-xrGetReferenceSpaceBoundsRect-session-parameter",
                 "xrGetReferenceSpaceBoundsRect",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -336,7 +333,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateActionSpace(
                 "VUID-xrCreateActionSpace-session-parameter",
                 "xrCreateActionSpace",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -366,7 +363,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrLocateSpace(
                 "VUID-xrLocateSpace-space-parameter",
                 "xrLocateSpace",
                 "space is not a valid XrSpace",
-                {XrLoaderLogObjectInfo{space, XR_OBJECT_TYPE_SPACE}});
+                {XrSdkLogObjectInfo{space, XR_OBJECT_TYPE_SPACE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -387,7 +384,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpace(
                 "VUID-xrDestroySpace-space-parameter",
                 "xrDestroySpace",
                 "space is not a valid XrSpace",
-                {XrLoaderLogObjectInfo{space, XR_OBJECT_TYPE_SPACE}});
+                {XrSdkLogObjectInfo{space, XR_OBJECT_TYPE_SPACE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -410,7 +407,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateViewConfigurations(
                 "VUID-xrEnumerateViewConfigurations-instance-parameter",
                 "xrEnumerateViewConfigurations",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -430,7 +427,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetViewConfigurationProperties(
                 "VUID-xrGetViewConfigurationProperties-instance-parameter",
                 "xrGetViewConfigurationProperties",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -452,7 +449,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateViewConfigurationViews(
                 "VUID-xrEnumerateViewConfigurationViews-instance-parameter",
                 "xrEnumerateViewConfigurationViews",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -472,7 +469,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateSwapchainFormats(
                 "VUID-xrEnumerateSwapchainFormats-session-parameter",
                 "xrEnumerateSwapchainFormats",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -491,7 +488,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSwapchain(
                 "VUID-xrCreateSwapchain-session-parameter",
                 "xrCreateSwapchain",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -522,7 +519,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySwapchain(
                 "VUID-xrDestroySwapchain-swapchain-parameter",
                 "xrDestroySwapchain",
                 "swapchain is not a valid XrSwapchain",
-                {XrLoaderLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
+                {XrSdkLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -544,7 +541,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateSwapchainImages(
                 "VUID-xrEnumerateSwapchainImages-swapchain-parameter",
                 "xrEnumerateSwapchainImages",
                 "swapchain is not a valid XrSwapchain",
-                {XrLoaderLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
+                {XrSdkLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -563,7 +560,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrAcquireSwapchainImage(
                 "VUID-xrAcquireSwapchainImage-swapchain-parameter",
                 "xrAcquireSwapchainImage",
                 "swapchain is not a valid XrSwapchain",
-                {XrLoaderLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
+                {XrSdkLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -581,7 +578,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrWaitSwapchainImage(
                 "VUID-xrWaitSwapchainImage-swapchain-parameter",
                 "xrWaitSwapchainImage",
                 "swapchain is not a valid XrSwapchain",
-                {XrLoaderLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
+                {XrSdkLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -599,7 +596,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrReleaseSwapchainImage(
                 "VUID-xrReleaseSwapchainImage-swapchain-parameter",
                 "xrReleaseSwapchainImage",
                 "swapchain is not a valid XrSwapchain",
-                {XrLoaderLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
+                {XrSdkLogObjectInfo{swapchain, XR_OBJECT_TYPE_SWAPCHAIN}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -617,7 +614,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrBeginSession(
                 "VUID-xrBeginSession-session-parameter",
                 "xrBeginSession",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -634,7 +631,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEndSession(
                 "VUID-xrEndSession-session-parameter",
                 "xrEndSession",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -651,7 +648,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrRequestExitSession(
                 "VUID-xrRequestExitSession-session-parameter",
                 "xrRequestExitSession",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -670,7 +667,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrWaitFrame(
                 "VUID-xrWaitFrame-session-parameter",
                 "xrWaitFrame",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -688,7 +685,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrBeginFrame(
                 "VUID-xrBeginFrame-session-parameter",
                 "xrBeginFrame",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -706,7 +703,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEndFrame(
                 "VUID-xrEndFrame-session-parameter",
                 "xrEndFrame",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -728,7 +725,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrLocateViews(
                 "VUID-xrLocateViews-session-parameter",
                 "xrLocateViews",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -747,7 +744,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrStringToPath(
                 "VUID-xrStringToPath-instance-parameter",
                 "xrStringToPath",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -768,7 +765,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrPathToString(
                 "VUID-xrPathToString-instance-parameter",
                 "xrPathToString",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -787,7 +784,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateActionSet(
                 "VUID-xrCreateActionSet-instance-parameter",
                 "xrCreateActionSet",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -818,7 +815,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyActionSet(
                 "VUID-xrDestroyActionSet-actionSet-parameter",
                 "xrDestroyActionSet",
                 "actionSet is not a valid XrActionSet",
-                {XrLoaderLogObjectInfo{actionSet, XR_OBJECT_TYPE_ACTION_SET}});
+                {XrSdkLogObjectInfo{actionSet, XR_OBJECT_TYPE_ACTION_SET}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -839,7 +836,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateAction(
                 "VUID-xrCreateAction-actionSet-parameter",
                 "xrCreateAction",
                 "actionSet is not a valid XrActionSet",
-                {XrLoaderLogObjectInfo{actionSet, XR_OBJECT_TYPE_ACTION_SET}});
+                {XrSdkLogObjectInfo{actionSet, XR_OBJECT_TYPE_ACTION_SET}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -870,7 +867,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroyAction(
                 "VUID-xrDestroyAction-action-parameter",
                 "xrDestroyAction",
                 "action is not a valid XrAction",
-                {XrLoaderLogObjectInfo{action, XR_OBJECT_TYPE_ACTION}});
+                {XrSdkLogObjectInfo{action, XR_OBJECT_TYPE_ACTION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -890,7 +887,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSuggestInteractionProfileBindings(
                 "VUID-xrSuggestInteractionProfileBindings-instance-parameter",
                 "xrSuggestInteractionProfileBindings",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -908,7 +905,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrAttachSessionActionSets(
                 "VUID-xrAttachSessionActionSets-session-parameter",
                 "xrAttachSessionActionSets",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -927,7 +924,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetCurrentInteractionProfile(
                 "VUID-xrGetCurrentInteractionProfile-session-parameter",
                 "xrGetCurrentInteractionProfile",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -946,7 +943,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStateBoolean(
                 "VUID-xrGetActionStateBoolean-session-parameter",
                 "xrGetActionStateBoolean",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -965,7 +962,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStateFloat(
                 "VUID-xrGetActionStateFloat-session-parameter",
                 "xrGetActionStateFloat",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -984,7 +981,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStateVector2f(
                 "VUID-xrGetActionStateVector2f-session-parameter",
                 "xrGetActionStateVector2f",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1003,7 +1000,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStatePose(
                 "VUID-xrGetActionStatePose-session-parameter",
                 "xrGetActionStatePose",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1021,7 +1018,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSyncActions(
                 "VUID-xrSyncActions-session-parameter",
                 "xrSyncActions",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1042,7 +1039,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateBoundSourcesForAction(
                 "VUID-xrEnumerateBoundSourcesForAction-session-parameter",
                 "xrEnumerateBoundSourcesForAction",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1063,7 +1060,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetInputSourceLocalizedName(
                 "VUID-xrGetInputSourceLocalizedName-session-parameter",
                 "xrGetInputSourceLocalizedName",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1082,7 +1079,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrApplyHapticFeedback(
                 "VUID-xrApplyHapticFeedback-session-parameter",
                 "xrApplyHapticFeedback",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1100,7 +1097,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrStopHapticFeedback(
                 "VUID-xrStopHapticFeedback-session-parameter",
                 "xrStopHapticFeedback",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1122,7 +1119,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetAndroidApplicationThreadKHR(
                 "VUID-xrSetAndroidApplicationThreadKHR-session-parameter",
                 "xrSetAndroidApplicationThreadKHR",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1153,7 +1150,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSwapchainAndroidSurfaceKHR(
                 "VUID-xrCreateSwapchainAndroidSurfaceKHR-session-parameter",
                 "xrCreateSwapchainAndroidSurfaceKHR",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1185,7 +1182,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetOpenGLGraphicsRequirementsKHR(
                 "VUID-xrGetOpenGLGraphicsRequirementsKHR-instance-parameter",
                 "xrGetOpenGLGraphicsRequirementsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1215,7 +1212,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetOpenGLESGraphicsRequirementsKHR(
                 "VUID-xrGetOpenGLESGraphicsRequirementsKHR-instance-parameter",
                 "xrGetOpenGLESGraphicsRequirementsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1247,7 +1244,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanInstanceExtensionsKHR(
                 "VUID-xrGetVulkanInstanceExtensionsKHR-instance-parameter",
                 "xrGetVulkanInstanceExtensionsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1277,7 +1274,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanDeviceExtensionsKHR(
                 "VUID-xrGetVulkanDeviceExtensionsKHR-instance-parameter",
                 "xrGetVulkanDeviceExtensionsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1306,7 +1303,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsDeviceKHR(
                 "VUID-xrGetVulkanGraphicsDeviceKHR-instance-parameter",
                 "xrGetVulkanGraphicsDeviceKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1334,7 +1331,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsRequirementsKHR(
                 "VUID-xrGetVulkanGraphicsRequirementsKHR-instance-parameter",
                 "xrGetVulkanGraphicsRequirementsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1364,7 +1361,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetD3D11GraphicsRequirementsKHR(
                 "VUID-xrGetD3D11GraphicsRequirementsKHR-instance-parameter",
                 "xrGetD3D11GraphicsRequirementsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1394,7 +1391,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetD3D12GraphicsRequirementsKHR(
                 "VUID-xrGetD3D12GraphicsRequirementsKHR-instance-parameter",
                 "xrGetD3D12GraphicsRequirementsKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1425,7 +1422,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetVisibilityMaskKHR(
                 "VUID-xrGetVisibilityMaskKHR-session-parameter",
                 "xrGetVisibilityMaskKHR",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1454,7 +1451,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrConvertWin32PerformanceCounterToTimeKHR(
                 "VUID-xrConvertWin32PerformanceCounterToTimeKHR-instance-parameter",
                 "xrConvertWin32PerformanceCounterToTimeKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1482,7 +1479,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimeToWin32PerformanceCounterKHR(
                 "VUID-xrConvertTimeToWin32PerformanceCounterKHR-instance-parameter",
                 "xrConvertTimeToWin32PerformanceCounterKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1512,7 +1509,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimespecTimeToTimeKHR(
                 "VUID-xrConvertTimespecTimeToTimeKHR-instance-parameter",
                 "xrConvertTimespecTimeToTimeKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1540,7 +1537,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimeToTimespecTimeKHR(
                 "VUID-xrConvertTimeToTimespecTimeKHR-instance-parameter",
                 "xrConvertTimeToTimespecTimeKHR",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1569,7 +1566,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrPerfSettingsSetPerformanceLevelEXT(
                 "VUID-xrPerfSettingsSetPerformanceLevelEXT-session-parameter",
                 "xrPerfSettingsSetPerformanceLevelEXT",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1599,7 +1596,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrThermalGetTemperatureTrendEXT(
                 "VUID-xrThermalGetTemperatureTrendEXT-session-parameter",
                 "xrThermalGetTemperatureTrendEXT",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1626,7 +1623,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetDebugUtilsObjectNameEXT(
                 "VUID-xrSetDebugUtilsObjectNameEXT-instance-parameter",
                 "xrSetDebugUtilsObjectNameEXT",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1653,7 +1650,7 @@ XRAPI_ATTR XrResult                                    XRAPI_CALL xrSubmitDebugU
                 "VUID-xrSubmitDebugUtilsMessageEXT-instance-parameter",
                 "xrSubmitDebugUtilsMessageEXT",
                 "instance is not a valid XrInstance",
-                {XrLoaderLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
+                {XrSdkLogObjectInfo{instance, XR_OBJECT_TYPE_INSTANCE}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1681,7 +1678,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorMSFT(
                 "VUID-xrCreateSpatialAnchorMSFT-session-parameter",
                 "xrCreateSpatialAnchorMSFT",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1717,7 +1714,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorSpaceMSFT(
                 "VUID-xrCreateSpatialAnchorSpaceMSFT-session-parameter",
                 "xrCreateSpatialAnchorSpaceMSFT",
                 "session is not a valid XrSession",
-                {XrLoaderLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
+                {XrSdkLogObjectInfo{session, XR_OBJECT_TYPE_SESSION}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -1755,7 +1752,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
                 "VUID-xrDestroySpatialAnchorMSFT-anchor-parameter",
                 "xrDestroySpatialAnchorMSFT",
                 "anchor is not a valid XrSpatialAnchorMSFT",
-                {XrLoaderLogObjectInfo{anchor, XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT}});
+                {XrSdkLogObjectInfo{anchor, XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT}});
         return XR_ERROR_HANDLE_INVALID;
     }
     const std::unique_ptr<XrGeneratedDispatchTable>& dispatch_table = loader_instance->DispatchTable();
@@ -2670,7 +2667,4 @@ void ApiLayerInterface::GenUpdateInstanceDispatchTable(XrInstance instance, std:
         table->DestroySpatialAnchorMSFT = reinterpret_cast<PFN_xrDestroySpatialAnchorMSFT>(cur_func_ptr);
     }
 }
-#ifdef __cplusplus
-} // extern "C"
-#endif
 

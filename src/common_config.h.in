@@ -24,9 +24,6 @@
 // If you can't provide the .h version of this file (because you're not using the
 // provided CMake build system and not providing it yourself), you need to do the following:
 //
-// - Define XRLOADER_ENABLE_EXCEPTION_HANDLING if your
-//   standard library can throw exceptions
-//   (most can - it's non-standard for them to not do so.)
 // - On non-Windows, for security purposes, define one of
 //   `HAVE_SECURE_GETENV` or `HAVE___SECURE_GETENV` depending on which
 //   of secure_getenv or __secure_getenv are present, respectively
@@ -37,7 +34,3 @@
 
 // If defined, __secure_getenv is available
 #cmakedefine HAVE___SECURE_GETENV
-
-// If defined, the OpenXR loader will catch any standard-library exceptions.
-// Must be defined unless you're using a non-standard standard library build with exceptions disabled.
-#cmakedefine XRLOADER_ENABLE_EXCEPTION_HANDLING

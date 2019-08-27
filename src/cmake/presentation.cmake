@@ -64,7 +64,7 @@ elseif( PRESENTATION_BACKEND MATCHES "wayland" )
             ${WAYLAND_EGL_LIBRARIES} )
 
     # generate wayland protocols
-    set(WAYLAND_PROTOCOLS_DIR ${CMAKE_SOURCE_DIR}/wayland-protocols/)
+    set(WAYLAND_PROTOCOLS_DIR ${PROJECT_SOURCE_DIR}/wayland-protocols/)
     file(MAKE_DIRECTORY ${WAYLAND_PROTOCOLS_DIR})
 
     pkg_get_variable(WAYLAND_PROTOCOLS_DATADIR wayland-protocols pkgdatadir)

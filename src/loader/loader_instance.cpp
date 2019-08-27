@@ -66,7 +66,7 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
     std::vector<std::unique_ptr<ApiLayerInterface>>& layer_interfaces = loader_instance->LayerInterfaces();
     if (!layer_interfaces.empty()) {
         // Initialize an array of ApiLayerNextInfo structs
-        auto* next_info_list = new XrApiLayerNextInfo[layer_interfaces.size()];
+        std::unique_ptr<XrApiLayerNextInfo[]> next_info_list(new XrApiLayerNextInfo[layer_interfaces.size()]);
         auto ni_index = static_cast<uint32_t>(layer_interfaces.size() - 1);
         for (uint32_t i = 0; i <= ni_index; i++) {
             next_info_list[i].structType = XR_LOADER_INTERFACE_STRUCT_API_LAYER_NEXT_INFO;
@@ -109,10 +109,9 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         api_layer_ci.structSize = sizeof(XrApiLayerCreateInfo);
         api_layer_ci.loaderInstance = reinterpret_cast<void*>(loader_instance.get());
         api_layer_ci.settings_file_location[0] = '\0';
-        api_layer_ci.nextInfo = next_info_list;
+        api_layer_ci.nextInfo = next_info_list.get();
         last_error = topmost_cali_fp(info, &api_layer_ci, instance);
 
-        delete[] next_info_list;
     } else {
         last_error = topmost_ci_fp(info, instance);
     }

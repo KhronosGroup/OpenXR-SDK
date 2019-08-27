@@ -24,7 +24,6 @@ include(GNUInstallDirs)
 include(GenerateExportHeader)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS false)
 
-set(LOADER_NAME openxr_loader)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(FALLBACK_CONFIG_DIRS "/etc/xdg" CACHE STRING
@@ -32,9 +31,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(FALLBACK_DATA_DIRS "/usr/local/share:/usr/share" CACHE STRING
         "Search path to use when XDG_DATA_DIRS is unset or empty or the current process is SUID/SGID. Default is freedesktop compliant.")
 endif()
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+if(WIN32)
     set(openxr_loader_RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/loader.rc)
-    set(LOADER_NAME ${LOADER_NAME}-${MAJOR}_${MINOR})
 endif()
 
 # List of all files externally generated outside of the loader that the loader
@@ -52,7 +50,7 @@ else() # build static lib
     set(LIBRARY_TYPE STATIC)
 endif()
 
-add_library(${LOADER_NAME} ${LIBRARY_TYPE}
+add_library(openxr_loader ${LIBRARY_TYPE}
     api_layer_interface.cpp
     api_layer_interface.hpp
     loader_core.cpp
@@ -67,45 +65,63 @@ add_library(${LOADER_NAME} ${LIBRARY_TYPE}
     runtime_interface.cpp
     runtime_interface.hpp
     ${GENERATED_OUTPUT}
-    ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/common/filesystem_utils.hpp
-    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.cpp
-    ${CMAKE_SOURCE_DIR}/src/common/hex_and_handles.h
-    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp
-    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp
-    ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp
+    ${PROJECT_SOURCE_DIR}/src/common/filesystem_utils.cpp
+    ${PROJECT_SOURCE_DIR}/src/common/filesystem_utils.hpp
+    ${PROJECT_SOURCE_DIR}/src/common/hex_and_handles.cpp
+    ${PROJECT_SOURCE_DIR}/src/common/hex_and_handles.h
+    ${PROJECT_SOURCE_DIR}/src/common/object_info.cpp
+    ${PROJECT_SOURCE_DIR}/src/common/object_info.h
+    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp
+    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp
+    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp
     ${LOADER_EXTERNAL_GEN_FILES}
     ${openxr_loader_RESOURCE_FILE}
 )
-set_target_properties(${LOADER_NAME} PROPERTIES FOLDER ${LOADER_FOLDER})
+set_target_properties(openxr_loader PROPERTIES FOLDER ${LOADER_FOLDER})
 
 set_source_files_properties(
     ${LOADER_EXTERNAL_GEN_FILES}
     PROPERTIES GENERATED TRUE
 )
-add_dependencies(${LOADER_NAME}
+add_dependencies(openxr_loader
     generate_openxr_header
     xr_global_generated_files
 )
-target_include_directories(${LOADER_NAME}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-    PRIVATE ${CMAKE_BINARY_DIR}/include
-    PRIVATE ${CMAKE_BINARY_DIR}/src
-    PRIVATE ${CMAKE_SOURCE_DIR}/src/common
-    PRIVATE ${CMAKE_SOURCE_DIR}/src/external/jsoncpp/include
+target_include_directories(openxr_loader
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/common
+
+    # for OpenXR headers
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/include
+
+    # for generated dispatch table, common_config.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_BINARY_DIR}/..
+
+    # for target-specific generated files
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+
+    # For jsoncpp
+    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/include
 )
 if(VulkanHeaders_FOUND)
-    target_include_directories(${LOADER_NAME}
+    target_include_directories(openxr_loader
         PRIVATE ${Vulkan_INCLUDE_DIRS}
     )
 endif()
+if(NOT BUILD_LOADER_WITH_EXCEPTION_HANDLING)
+    target_compile_definitions(openxr_loader
+        PRIVATE XRLOADER_DISABLE_EXCEPTION_HANDLING
+    )
+endif()
 
-target_compile_definitions(${LOADER_NAME}
+target_compile_definitions(openxr_loader
     PRIVATE API_NAME="OpenXR"
 )
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_definitions(${LOADER_NAME}
+    target_compile_definitions(openxr_loader
         PRIVATE FALLBACK_CONFIG_DIRS="${FALLBACK_CONFIG_DIRS}"
         PRIVATE FALLBACK_DATA_DIRS="${FALLBACK_DATA_DIRS}"
         PRIVATE SYSCONFDIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}"
@@ -114,48 +130,56 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_compile_definitions(openxr_loader PRIVATE EXTRASYSCONFDIR="/etc")
     endif()
 
-    set_target_properties(${LOADER_NAME} PROPERTIES SOVERSION "${MAJOR}" VERSION "${MAJOR}.${MINOR}.${PATCH}")
-    target_link_libraries(${LOADER_NAME} -lstdc++fs -ldl -lpthread -lm)
+    set_target_properties(openxr_loader PROPERTIES SOVERSION "${MAJOR}" VERSION "${MAJOR}.${MINOR}.${PATCH}")
+    target_link_libraries(openxr_loader -lstdc++fs -ldl -lpthread -lm)
 
-    add_custom_target(lib${LOADER_NAME}.so.${MAJOR}.${MINOR} ALL
-        COMMAND ${CMAKE_COMMAND} -E create_symlink lib${LOADER_NAME}.so.${MAJOR}.${MINOR}.${PATCH} lib${LOADER_NAME}.so.${MAJOR}.${MINOR})
+    add_custom_target(libopenxr_loader.so.${MAJOR}.${MINOR} ALL
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libopenxr_loader.so.${MAJOR}.${MINOR}.${PATCH} libopenxr_loader.so.${MAJOR}.${MINOR})
 
     set(XR_API_VERSION "${MAJOR}.${MINOR}")
     configure_file("openxr.pc.in" "openxr.pc" @ONLY)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openxr.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    foreach(configuration in CMAKE_C_FLAGS_DEBUG
-                             CMAKE_C_FLAGS_RELEASE
-                             CMAKE_C_FLAGS_RELWITHDEBINFO
-                             CMAKE_CXX_FLAGS_DEBUG
-                             CMAKE_CXX_FLAGS_RELEASE
-                             CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-        # If building DLLs, force static CRT linkage
-        if(DYNAMIC_LOADER)
-            if (${configuration} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${configuration} "${${configuration}}")
+elseif(WIN32)
+    # WindowsStore (UWP) apps must be compiled with dynamic CRT linkage (default)
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+        foreach(configuration in CMAKE_C_FLAGS_DEBUG
+                                CMAKE_C_FLAGS_RELEASE
+                                CMAKE_C_FLAGS_RELWITHDEBINFO
+                                CMAKE_CXX_FLAGS_DEBUG
+                                CMAKE_CXX_FLAGS_RELEASE
+                                CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+            # If building DLLs, force static CRT linkage
+            if(DYNAMIC_LOADER)
+                if (${configuration} MATCHES "/MD")
+                    string(REGEX REPLACE "/MD" "/MT" ${configuration} "${${configuration}}")
+                endif()
+            else()  # Otherwise for static libs, link the CRT dynamically
+                if (${configuration} MATCHES "/MT")
+                    string(REGEX REPLACE "/MT" "/MD" ${configuration} "${${configuration}}")
+                endif()
             endif()
-        else()  # Otherwise for static libs, link the CRT dynamically
-            if (${configuration} MATCHES "/MT")
-                string(REGEX REPLACE "/MT" "/MD" ${configuration} "${${configuration}}")
-            endif()
-        endif()
-    endforeach()
+        endforeach()
+    endif()
 
-    target_link_libraries(${LOADER_NAME} shlwapi)
-    target_compile_options(${LOADER_NAME} PRIVATE)
-    generate_export_header(${LOADER_NAME})
+    target_link_libraries(openxr_loader shlwapi)
+    target_compile_options(openxr_loader PRIVATE)
+    generate_export_header(openxr_loader)
     # set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS false)
 
     # Need to copy DLL to client directories so clients can easily load it.
     if( (DYNAMIC_LOADER) AND (CMAKE_GENERATOR MATCHES "^Visual Studio.*") )
-        file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>/${LOADER_NAME}.dll COPY_SRC_PATH )
-        # file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/../tests/triangle/$<CONFIGURATION>/ COPY_DST_TEST_PATH )
-        file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/../tests/hello_xr/$<CONFIGURATION>/ COPY_DST_TEST_PATH )
+        file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>/openxr_loader.dll COPY_DLL_SRC_PATH )
+        file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>/openxr_loader.pdb COPY_PDB_SRC_PATH )
+        file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/../tests/hello_xr/$<CONFIGURATION>/ COPY_DST_HELLO_XR_PATH )
         file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/../tests/loader_test/$<CONFIGURATION>/ COPY_DST_LOADER_TEST_PATH )
-        add_custom_command( TARGET ${LOADER_NAME} POST_BUILD
-            COMMAND xcopy /Y /I ${COPY_SRC_PATH} ${COPY_DST_TEST_PATH}
-            COMMAND xcopy /Y /I ${COPY_SRC_PATH} ${COPY_DST_LOADER_TEST_PATH}
+        file( TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/../conformance/conformance_test/$<CONFIGURATION>/ COPY_DST_CONFORMANCE_TEST_PATH )
+        add_custom_command( TARGET openxr_loader POST_BUILD
+            COMMAND xcopy /Y /I ${COPY_DLL_SRC_PATH} ${COPY_DST_HELLO_XR_PATH}
+            COMMAND xcopy /Y /I ${COPY_PDB_SRC_PATH} ${COPY_DST_HELLO_XR_PATH}
+            COMMAND xcopy /Y /I ${COPY_DLL_SRC_PATH} ${COPY_DST_LOADER_TEST_PATH}
+            COMMAND xcopy /Y /I ${COPY_PDB_SRC_PATH} ${COPY_DST_LOADER_TEST_PATH}
+            COMMAND xcopy /Y /I ${COPY_DLL_SRC_PATH} ${COPY_DST_CONFORMANCE_TEST_PATH}
+            COMMAND xcopy /Y /I ${COPY_PDB_SRC_PATH} ${COPY_DST_CONFORMANCE_TEST_PATH}
         )
     endif()
 endif()
@@ -172,7 +196,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     endif()
 endif()
 
-install(TARGETS ${LOADER_NAME}
+install(TARGETS openxr_loader
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -38,28 +38,24 @@
 
 // Add any layers defined in the loader layer environment variable.
 static void AddEnvironmentApiLayers(const std::string& openxr_command, std::vector<std::string>& enabled_layers) {
-    char* layer_environment_variable = PlatformUtilsGetEnv(OPENXR_ENABLE_LAYERS_ENV_VAR);
-    if (nullptr != layer_environment_variable) {
-        std::string layers = layer_environment_variable;
-        PlatformUtilsFreeEnv(layer_environment_variable);
+    std::string layers = PlatformUtilsGetEnv(OPENXR_ENABLE_LAYERS_ENV_VAR);
 
-        std::size_t last_found = 0;
-        std::size_t found = layers.find_first_of(PATH_SEPARATOR);
-        std::string cur_search;
+    std::size_t last_found = 0;
+    std::size_t found = layers.find_first_of(PATH_SEPARATOR);
+    std::string cur_search;
 
-        // Handle any path listings in the string (separated by the appropriate path separator)
-        while (found != std::string::npos) {
-            cur_search = layers.substr(last_found, found);
-            enabled_layers.push_back(cur_search);
-            last_found = found + 1;
-            found = layers.find_first_of(PATH_SEPARATOR, last_found);
-        }
+    // Handle any path listings in the string (separated by the appropriate path separator)
+    while (found != std::string::npos) {
+        cur_search = layers.substr(last_found, found);
+        enabled_layers.push_back(cur_search);
+        last_found = found + 1;
+        found = layers.find_first_of(PATH_SEPARATOR, last_found);
+    }
 
-        // If there's something remaining in the string, copy it over
-        if (last_found < layers.size()) {
-            cur_search = layers.substr(last_found);
-            enabled_layers.push_back(cur_search);
-        }
+    // If there's something remaining in the string, copy it over
+    if (last_found < layers.size()) {
+        cur_search = layers.substr(last_found);
+        enabled_layers.push_back(cur_search);
     }
 }
 

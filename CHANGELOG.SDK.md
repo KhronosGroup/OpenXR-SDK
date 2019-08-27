@@ -12,6 +12,58 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR 1.0.2 release (27-August-2019)
+
+Patch release for the 1.0 series.
+
+Note that the loader on Windows has a **security fix**: All developers incorporating
+the OpenXR loader should update immediately.
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- General, Build, Other
+  - #112 - Update active runtime search documentation
+  - #106 - List app changes
+  - #114 - Support for building WindowsStore loader and layers, and simplified filename
+  - #96 - Misc cleanup: build simplification, install hello_xr,
+    allow building as subproject, fix null deref in validation layer.
+- Loader
+  - #102 - Default to catching exceptions, since not being able to catch
+    (and having a non-throwing standard library) is less common
+  - #109 - Factor out some debug-utils related code from the loader,
+    and migrate validation layer to that shared code.
+  - #108 - Update json_stream initialization to improve compatibility
+  - #118 - Fix logic error in Linux active runtime search
+  - #115, #117 - Simplification and refactoring.
+- Layers
+  - #111 - Some fixes to Validation Layer (as found applying to the UE4 OpenXR plugin)
+  - #110 - Fix cleaning up session labels in validation layer
+- From OpenXR-Docs:
+  - #26 - Proposal for unbounded space and spatial anchor extensions (vendor extensions)
+
+### Internal issues
+
+- General, Build, Other
+  - Allow project to be included in a parent project. (Internal MR 1512)
+- hello_xr
+  - Fix OpenGL version number to be XrVersion. (Internal MR 1515)
+  - Make D3D11 debug device handling more friendly. (Internal MR 1504)
+- Registry
+  - Fix error in extension-added function. (Internal MR 1510)
+  - Add Oculus Android extension. (Internal MR 1518)
+  - Reserve additional extension number for Oculus. (Internal MR 1517)
+- Loader
+  - **Security fix**: Do not use HKEY_CURRENT_USER or environment variables when
+    running as a medium-integrity process or higher on Windows.
+    (Internal issue 1205, internal MR 1511)
+  - Small updates to the loader documentation.
+
+### New extension
+
+- `XR_OCULUS_android_session_state_enable`
+
 ## OpenXR 1.0.1 release (2-August-2019)
 
 Patch release for the 1.0 series.

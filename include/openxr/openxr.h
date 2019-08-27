@@ -35,7 +35,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 1)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 2)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -1584,6 +1584,11 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
 #define XR_MND_headless 1
 #define XR_MND_headless_SPEC_VERSION      1
 #define XR_MND_HEADLESS_EXTENSION_NAME    "XR_MND_headless"
+
+
+#define XR_OCULUS_android_session_state_enable 1
+#define XR_OCULUS_android_session_state_enable_SPEC_VERSION 1
+#define XR_OCULUS_ANDROID_SESSION_STATE_ENABLE_EXTENSION_NAME "XR_OCULUS_android_session_state_enable"
 
 #ifdef __cplusplus
 }

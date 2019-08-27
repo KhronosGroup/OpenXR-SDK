@@ -62,12 +62,12 @@
 #define OPENXR_RUNTIME_JSON_ENV_VAR "XR_RUNTIME_JSON"
 #define OPENXR_API_LAYER_PATH_ENV_VAR "XR_API_LAYER_PATH"
 
-#ifndef XRLOADER_ENABLE_EXCEPTION_HANDLING
+#ifdef XRLOADER_DISABLE_EXCEPTION_HANDLING
 #if JSON_USE_EXCEPTIONS
 #error \
     "Loader is configured to not catch exceptions, but jsoncpp was built with exception-throwing enabled, which could violate the C ABI. One of those two things needs to change."
 #endif  // JSON_USE_EXCEPTIONS
-#endif  // !XRLOADER_ENABLE_EXCEPTION_HANDLING
+#endif  // !XRLOADER_DISABLE_EXCEPTION_HANDLING
 
 // Utility functions for finding files in the appropriate paths
 
@@ -185,55 +185,44 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
                                        bool &override_active, std::vector<std::string> &manifest_files) {
     bool is_directory_list = true;
     bool is_runtime = (type == MANIFEST_TYPE_RUNTIME);
-    char *override_env = nullptr;
     std::string override_path;
     std::string search_path;
 
     if (!override_env_var.empty()) {
+        bool permit_override = true;
 #ifndef XR_OS_WINDOWS
         if (geteuid() != getuid() || getegid() != getgid()) {
-            // Don't allow setuid apps to use the env var:
-            override_env = nullptr;
-        } else
+            // Don't allow setuid apps to use the env var
+            permit_override = false;
+        }
 #endif
-        {
-            override_env = PlatformUtilsGetSecureEnv(override_env_var.c_str());
-            if (nullptr != override_env) {
+        if (permit_override) {
+            override_path = PlatformUtilsGetSecureEnv(override_env_var.c_str());
+            if (!override_path.empty()) {
                 // The runtime override is actually a specific list of filenames, not directories
                 if (is_runtime) {
                     is_directory_list = false;
                 }
-                override_path = override_env;
             }
         }
     }
 
-    if (nullptr != override_env && !override_path.empty()) {
+    if (!override_path.empty()) {
         CopyIncludedPaths(is_directory_list, override_path, "", search_path);
-        PlatformUtilsFreeEnv(override_env);
         override_active = true;
     } else {
         override_active = false;
 #ifndef XR_OS_WINDOWS
-        bool xdg_conf_dirs_alloc = true;
-        bool xdg_data_dirs_alloc = true;
         const char home_additional[] = ".local/share/";
 
         // Determine how much space is needed to generate the full search path
         // for the current manifest files.
-        char *xdg_conf_dirs = PlatformUtilsGetSecureEnv("XDG_CONFIG_DIRS");
-        char *xdg_data_dirs = PlatformUtilsGetSecureEnv("XDG_DATA_DIRS");
-        char *xdg_data_home = PlatformUtilsGetSecureEnv("XDG_DATA_HOME");
-        char *home = PlatformUtilsGetSecureEnv("HOME");
+        std::string xdg_conf_dirs = PlatformUtilsGetSecureEnv("XDG_CONFIG_DIRS");
+        std::string xdg_data_dirs = PlatformUtilsGetSecureEnv("XDG_DATA_DIRS");
+        std::string xdg_data_home = PlatformUtilsGetSecureEnv("XDG_DATA_HOME");
+        std::string home = PlatformUtilsGetSecureEnv("HOME");
 
-        if (nullptr == xdg_conf_dirs) {
-            xdg_conf_dirs_alloc = false;
-        }
-        if (nullptr == xdg_data_dirs) {
-            xdg_data_dirs_alloc = false;
-        }
-
-        if (nullptr == xdg_conf_dirs || xdg_conf_dirs[0] == '\0') {
+        if (xdg_conf_dirs.empty()) {
             CopyIncludedPaths(true, FALLBACK_CONFIG_DIRS, relative_path, search_path);
         } else {
             CopyIncludedPaths(true, xdg_conf_dirs, relative_path, search_path);
@@ -244,32 +233,20 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
         CopyIncludedPaths(true, EXTRASYSCONFDIR, relative_path, search_path);
 #endif
 
-        if (xdg_data_dirs == nullptr || xdg_data_dirs[0] == '\0') {
+        if (xdg_data_dirs.empty()) {
             CopyIncludedPaths(true, FALLBACK_DATA_DIRS, relative_path, search_path);
         } else {
             CopyIncludedPaths(true, xdg_data_dirs, relative_path, search_path);
         }
 
-        if (nullptr != xdg_data_home) {
+        if (!xdg_data_home.empty()) {
             CopyIncludedPaths(true, xdg_data_home, relative_path, search_path);
-        } else if (nullptr != home) {
+        } else if (!home.empty()) {
             std::string relative_home_path = home_additional;
             relative_home_path += relative_path;
             CopyIncludedPaths(true, home, relative_home_path, search_path);
         }
 
-        if (xdg_conf_dirs_alloc) {
-            PlatformUtilsFreeEnv(xdg_conf_dirs);
-        }
-        if (xdg_data_dirs_alloc) {
-            PlatformUtilsFreeEnv(xdg_data_dirs);
-        }
-        if (nullptr != xdg_data_home) {
-            PlatformUtilsFreeEnv(xdg_data_home);
-        }
-        if (nullptr != home) {
-            PlatformUtilsFreeEnv(home);
-        }
 #endif
     }
 
@@ -279,43 +256,34 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
 
 #ifdef XR_OS_LINUX
 
-// If ${name} has a nonempty value, return it; if both other arguments are supplied return
-// ${fallback_env}/fallback_path; otherwise, return whichever of ${fallback_env} and fallback_path
-// is supplied. If ${fallback_env} or ${fallback_env}/... would be returned but that environment
-// variable is unset or empty, return the empty string.
-static std::string GetXDGEnv(const char *name, const char *fallback_env, const char *fallback_path) {
-    char *path = PlatformUtilsGetSecureEnv(name);
-    std::string result;
-    if (path != nullptr) {
-        result = path;
-        PlatformUtilsFreeEnv(path);
-        if (!result.empty()) {
-            return result;
-        }
+// Get an XDG environment variable with a $HOME-relative default
+static std::string GetXDGEnvHome(const char *name, const char *fallback_path) {
+    std::string result = PlatformUtilsGetSecureEnv(name);
+    if (!result.empty()) {
+        return result;
     }
-    if (fallback_env != nullptr) {
-        char *path = PlatformUtilsGetSecureEnv(fallback_env);
-        if (path != nullptr) {
-            result = path;
-            PlatformUtilsFreeEnv(path);
-        }
-        if (result.empty()) {
-            return "";
-        }
-        if (fallback_path != nullptr) {
-            result += "/";
-        }
+    result = PlatformUtilsGetSecureEnv("HOME");
+    if (result.empty()) {
+        return result;
     }
-    if (fallback_path != nullptr) {
-        result += fallback_path;
-    }
+    result += "/";
+    result += fallback_path;
     return result;
+}
+
+// Get an XDG environment variable with absolute defaults
+static std::string GetXDGEnvAbsolute(const char *name, const char *fallback_paths) {
+    std::string result = PlatformUtilsGetSecureEnv(name);
+    if (!result.empty()) {
+        return result;
+    }
+    return fallback_paths;
 }
 
 // Return the first instance of relative_path occurring in an XDG config dir according to standard
 // precedence order.
 static bool FindXDGConfigFile(const std::string &relative_path, std::string &out) {
-    out = GetXDGEnv("XDG_CONFIG_HOME", "HOME", ".config");
+    out = GetXDGEnvHome("XDG_CONFIG_HOME", ".config");
     if (!out.empty()) {
         out += "/";
         out += relative_path;
@@ -324,7 +292,7 @@ static bool FindXDGConfigFile(const std::string &relative_path, std::string &out
         }
     }
 
-    std::istringstream iss(GetXDGEnv("XDG_CONFIG_DIRS", nullptr, FALLBACK_CONFIG_DIRS));
+    std::istringstream iss(GetXDGEnvAbsolute("XDG_CONFIG_DIRS", FALLBACK_CONFIG_DIRS));
     std::string path;
     while (std::getline(iss, path, PATH_SEPARATOR)) {
         if (path.empty()) {
@@ -385,15 +353,12 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
     LONG open_value = RegOpenKeyExW(HKEY_LOCAL_MACHINE, full_registry_location_w.c_str(), 0, access_flags, &hkey);
 
     if (ERROR_SUCCESS != open_value) {
-        std::string warning_message = "ReadLayerDataFilesInRegistry - failed to open registry key ";
-        warning_message += full_registry_location;
-        LoaderLogger::LogWarningMessage("", warning_message);
+        LoaderLogger::LogWarningMessage("", "ReadLayerDataFilesInRegistry - failed to open registry key " + full_registry_location);
     } else if (ERROR_SUCCESS != RegGetValueW(hkey, nullptr, default_runtime_value_name_w.c_str(),
                                              RRF_RT_REG_SZ | REG_EXPAND_SZ | RRF_ZEROONFAILURE, NULL,
                                              reinterpret_cast<LPBYTE>(&value_w), &value_size_w)) {
-        std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry value ";
-        warning_message += default_runtime_value_name;
-        LoaderLogger::LogWarningMessage("", warning_message);
+        LoaderLogger::LogWarningMessage(
+            "", "ReadLayerDataFilesInRegistry - failed to read registry value " + default_runtime_value_name);
     } else {
         AddFilesInPath(wide_to_utf8(value_w), false, manifest_files);
     }
@@ -403,35 +368,22 @@ static void ReadRuntimeDataFilesInRegistry(ManifestFileType type, const std::str
 // if we should use that instead.
 static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::string &registry_location,
                                          std::vector<std::string> &manifest_files) {
-    HKEY hive[2] = {HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER};
-    bool found[2] = {false, false};
-    HKEY hkey;
-    DWORD access_flags;
-    LONG rtn_value;
-    wchar_t name_w[1024]{};
-    DWORD value;
-    DWORD name_size = 1023;
-    DWORD value_size = sizeof(value);
+    const std::wstring full_registry_location_w =
+        utf8_to_wide(OPENXR_REGISTRY_LOCATION + std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION)) + registry_location);
 
-    for (uint8_t hive_index = 0; hive_index < 2; ++hive_index) {
-        DWORD key_index = 0;
-        std::string full_registry_location = OPENXR_REGISTRY_LOCATION;
-        full_registry_location += std::to_string(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION));
-        full_registry_location += registry_location;
-
-        access_flags = KEY_QUERY_VALUE;
-        std::wstring full_registry_location_w = utf8_to_wide(full_registry_location);
-        LONG open_value = RegOpenKeyExW(hive[hive_index], full_registry_location_w.c_str(), 0, access_flags, &hkey);
+    auto ReadLayerDataFilesInHive = [&](HKEY hive) {
+        HKEY hkey;
+        LONG open_value = RegOpenKeyExW(hive, full_registry_location_w.c_str(), 0, KEY_QUERY_VALUE, &hkey);
         if (ERROR_SUCCESS != open_value) {
-            if (hive_index == 1 && !found[0]) {
-                std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
-                warning_message += registry_location;
-                warning_message += " in either HKEY_LOCAL_MACHINE or KHEY_CURRENT_USER";
-                LoaderLogger::LogWarningMessage("", warning_message);
-            }
-            continue;
+            return false;
         }
-        found[hive_index] = true;
+
+        wchar_t name_w[1024]{};
+        LONG rtn_value;
+        DWORD name_size = 1023;
+        DWORD value;
+        DWORD value_size = sizeof(value);
+        DWORD key_index = 0;
         while (ERROR_SUCCESS ==
                (rtn_value = RegEnumValueW(hkey, key_index++, name_w, &name_size, NULL, NULL, (LPBYTE)&value, &value_size))) {
             if (value_size == sizeof(value) && value == 0) {
@@ -441,6 +393,25 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
             // Reset some items for the next loop
             name_size = 1023;
         }
+
+        RegCloseKey(hkey);
+
+        return true;
+    };
+
+    // Do not allow high integrity processes to act on data that can be controlled by medium integrity processes.
+    const bool readFromCurrentUser = !IsHighIntegrityLevel();
+
+    bool found = ReadLayerDataFilesInHive(HKEY_LOCAL_MACHINE);
+    if (readFromCurrentUser) {
+        found |= ReadLayerDataFilesInHive(HKEY_CURRENT_USER);
+    }
+
+    if (!found) {
+        std::string warning_message = "ReadLayerDataFilesInRegistry - failed to read registry location ";
+        warning_message += registry_location;
+        warning_message += (readFromCurrentUser ? " in either HKEY_LOCAL_MACHINE or HKEY_CURRENT_USER" : " in HKEY_LOCAL_MACHINE");
+        LoaderLogger::LogWarningMessage("", warning_message);
     }
 }
 
@@ -448,8 +419,6 @@ static void ReadLayerDataFilesInRegistry(ManifestFileType type, const std::strin
 
 ManifestFile::ManifestFile(ManifestFileType type, const std::string &filename, const std::string &library_path)
     : _filename(filename), _type(type), _library_path(library_path) {}
-
-ManifestFile::~ManifestFile() = default;
 
 bool ManifestFile::IsValidJson(const Json::Value &root_node, JsonVersion &version) {
     if (root_node["file_format_version"].isNull() || !root_node["file_format_version"].isString()) {
@@ -462,14 +431,10 @@ bool ManifestFile::IsValidJson(const Json::Value &root_node, JsonVersion &versio
     // Only version 1.0.0 is defined currently.  Eventually we may have more version, but
     // some of the versions may only be valid for layers or runtimes specifically.
     if (version.major != 1 || version.minor != 0 || version.patch != 0) {
-        std::string error_message = "ManifestFile::IsValidJson - JSON \"file_format_version\" ";
-        error_message += std::to_string(version.major);
-        error_message += ".";
-        error_message += std::to_string(version.minor);
-        error_message += ".";
-        error_message += std::to_string(version.patch);
-        error_message += " is not supported";
-        LoaderLogger::LogErrorMessage("", error_message);
+        std::ostringstream error_ss;
+        error_ss << "ManifestFile::IsValidJson - JSON \"file_format_version\" " << version.major << "." << version.minor << "."
+                 << version.patch << " is not supported";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return false;
     }
 
@@ -506,7 +471,7 @@ void ManifestFile::GetDeviceExtensionProperties(std::vector<XrExtensionPropertie
     GetExtensionProperties(_device_extensions, props);
 }
 
-const std::string &ManifestFile::GetFunctionName(const std::string &func_name) {
+const std::string &ManifestFile::GetFunctionName(const std::string &func_name) const {
     if (!_functions_renamed.empty()) {
         auto found = _functions_renamed.find(func_name);
         if (found != _functions_renamed.end()) {
@@ -519,45 +484,82 @@ const std::string &ManifestFile::GetFunctionName(const std::string &func_name) {
 RuntimeManifestFile::RuntimeManifestFile(const std::string &filename, const std::string &library_path)
     : ManifestFile(MANIFEST_TYPE_RUNTIME, filename, library_path) {}
 
-RuntimeManifestFile::~RuntimeManifestFile() = default;
+static void ParseExtension(Json::Value const &ext, std::vector<ExtensionListing> &extensions) {
+    Json::Value ext_name = ext["name"];
+    Json::Value ext_version = ext["extension_version"];
+    Json::Value ext_entries = ext["entrypoints"];
+    if (ext_name.isString() && ext_version.isUInt() && ext_entries.isArray()) {
+        ExtensionListing ext = {};
+        ext.name = ext_name.asString();
+        ext.extension_version = ext_version.asUInt();
+        for (const auto &entrypoint : ext_entries) {
+            if (entrypoint.isString()) {
+                ext.entrypoints.push_back(entrypoint.asString());
+            }
+        }
+        extensions.push_back(ext);
+    }
+}
 
-void RuntimeManifestFile::CreateIfValid(const std::string &filename,
+void ManifestFile::ParseCommon(Json::Value const &root_node) {
+    const Json::Value &dev_exts = root_node["device_extensions"];
+    if (!dev_exts.isNull() && dev_exts.isArray()) {
+        for (const auto &ext : dev_exts) {
+            ParseExtension(ext, _device_extensions);
+        }
+    }
+
+    const Json::Value &inst_exts = root_node["instance_extensions"];
+    if (!inst_exts.isNull() && inst_exts.isArray()) {
+        for (const auto &ext : inst_exts) {
+            ParseExtension(ext, _instance_extensions);
+        }
+    }
+    const Json::Value &funcs_renamed = root_node["functions"];
+    if (!funcs_renamed.isNull() && !funcs_renamed.empty()) {
+        for (Json::ValueConstIterator func_it = funcs_renamed.begin(); func_it != funcs_renamed.end(); ++func_it) {
+            if (!(*func_it).isString()) {
+                LoaderLogger::LogWarningMessage(
+                    "", "ManifestFile::ParseCommon " + _filename + " \"functions\" section contains non-string values.");
+                continue;
+            }
+            std::string original_name = func_it.key().asString();
+            std::string new_name = (*func_it).asString();
+            _functions_renamed.emplace(original_name, new_name);
+        }
+    }
+}
+
+void RuntimeManifestFile::CreateIfValid(std::string const &filename,
                                         std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
-    std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
+    std::ifstream json_stream(filename, std::ifstream::in);
+
+    std::ostringstream error_ss("RuntimeManifestFile::CreateIfValid ");
     if (!json_stream.is_open()) {
-        std::string error_message = "RuntimeManifestFile::createIfValid failed to open ";
-        error_message += filename;
-        error_message += ".  Does it exist?";
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << "failed to open " << filename << ".  Does it exist?";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
     Json::Reader reader;
     Json::Value root_node = Json::nullValue;
-    Json::Value runtime_root_node = Json::nullValue;
-    JsonVersion file_version = {};
     if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
-        std::string error_message = "RuntimeManifestFile::CreateIfValid failed to parse ";
-        error_message += filename;
-        error_message += ".  Is it a valid runtime manifest file? Error was:\n ";
-        error_message += reader.getFormattedErrorMessages();
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << "failed to parse " << filename << ".  Is it a valid runtime manifest file?";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
+
+    JsonVersion file_version = {};
     if (!ManifestFile::IsValidJson(root_node, file_version)) {
-        std::string error_message = "RuntimeManifestFile::CreateIfValid isValidJson indicates ";
-        error_message += filename;
-        error_message += " is not a valid manifest file.";
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << "isValidJson indicates " << filename << " is not a valid manifest file.";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
-    runtime_root_node = root_node["runtime"];
+    const Json::Value &runtime_root_node = root_node["runtime"];
     // The Runtime manifest file needs the "runtime" root as well as sub-nodes for "api_version" and
     // "library_path".  If any of those aren't there, fail.
     if (runtime_root_node.isNull() || runtime_root_node["library_path"].isNull() || !runtime_root_node["library_path"].isString()) {
-        std::string error_message = "RuntimeManifestFile::CreateIfValid ";
-        error_message += filename;
-        error_message += " is missing required fields.  Verify all proper fields exist.";
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << filename << " is missing required fields.  Verify all proper fields exist.";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
 
@@ -569,12 +571,8 @@ void RuntimeManifestFile::CreateIfValid(const std::string &filename,
         // If the library_path is an absolute path, just use that if it exists
         if (FileSysUtilsIsAbsolutePath(lib_path)) {
             if (!FileSysUtilsPathExists(lib_path)) {
-                std::string error_message = "RuntimeManifestFile::CreateIfValid ";
-                error_message += filename;
-                error_message += " library ";
-                error_message += lib_path;
-                error_message += " does not appear to exist";
-                LoaderLogger::LogErrorMessage("", error_message);
+                error_ss << filename << " library " << lib_path << " does not appear to exist";
+                LoaderLogger::LogErrorMessage("", error_ss.str());
                 return;
             }
         } else {
@@ -583,12 +581,8 @@ void RuntimeManifestFile::CreateIfValid(const std::string &filename,
             std::string file_parent;
             if (!FileSysUtilsGetParentPath(filename, file_parent) ||
                 !FileSysUtilsCombinePaths(file_parent, lib_path, combined_path) || !FileSysUtilsPathExists(combined_path)) {
-                std::string error_message = "RuntimeManifestFile::CreateIfValid ";
-                error_message += filename;
-                error_message += " library ";
-                error_message += combined_path;
-                error_message += " does not appear to exist";
-                LoaderLogger::LogErrorMessage("", error_message);
+                error_ss << filename << " library " << combined_path << " does not appear to exist";
+                LoaderLogger::LogErrorMessage("", error_ss.str());
                 return;
             }
             lib_path = combined_path;
@@ -599,59 +593,8 @@ void RuntimeManifestFile::CreateIfValid(const std::string &filename,
     manifest_files.emplace_back(new RuntimeManifestFile(filename, lib_path));
 
     // Add any extensions to it after the fact.
-    Json::Value dev_exts = runtime_root_node["device_extensions"];
-    if (!dev_exts.isNull() && dev_exts.isArray()) {
-        for (Json::ValueIterator dev_ext_it = dev_exts.begin(); dev_ext_it != dev_exts.end(); ++dev_ext_it) {
-            Json::Value dev_ext = (*dev_ext_it);
-            Json::Value dev_ext_name = dev_ext["name"];
-            Json::Value dev_ext_version = dev_ext["extension_version"];
-            Json::Value dev_ext_entries = dev_ext["entrypoints"];
-            if (!dev_ext_name.isNull() && dev_ext_name.isString() && !dev_ext_version.isNull() && dev_ext_version.isUInt() &&
-                !dev_ext_entries.isNull() && dev_ext_entries.isArray()) {
-                ExtensionListing ext = {};
-                ext.name = dev_ext_name.asString();
-                ext.extension_version = dev_ext_version.asUInt();
-                for (Json::ValueIterator entry_it = dev_ext_entries.begin(); entry_it != dev_ext_entries.end(); ++entry_it) {
-                    Json::Value entry = (*entry_it);
-                    if (!entry.isNull() && entry.isString()) {
-                        ext.entrypoints.push_back(entry.asString());
-                    }
-                }
-                manifest_files.back()->_device_extensions.push_back(ext);
-            }
-        }
-    }
-
-    Json::Value inst_exts = runtime_root_node["instance_extensions"];
-    if (!inst_exts.isNull() && inst_exts.isArray()) {
-        for (Json::ValueIterator inst_ext_it = inst_exts.begin(); inst_ext_it != inst_exts.end(); ++inst_ext_it) {
-            Json::Value inst_ext = (*inst_ext_it);
-            Json::Value inst_ext_name = inst_ext["name"];
-            Json::Value inst_ext_version = inst_ext["extension_version"];
-            if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() && inst_ext_version.isUInt()) {
-                ExtensionListing ext = {};
-                ext.name = inst_ext_name.asString();
-                ext.extension_version = inst_ext_version.asUInt();
-                manifest_files.back()->_instance_extensions.push_back(ext);
-            }
-        }
-    }
-
-    Json::Value funcs_renamed = runtime_root_node["functions"];
-    if (!funcs_renamed.isNull() && !funcs_renamed.empty()) {
-        for (Json::ValueIterator func_it = funcs_renamed.begin(); func_it != funcs_renamed.end(); ++func_it) {
-            if (!(*func_it).isString()) {
-                std::string warning_message = "RuntimeManifestFile::CreateIfValid ";
-                warning_message += filename;
-                warning_message += " \"functions\" section contains non-string values.";
-                LoaderLogger::LogWarningMessage("", warning_message);
-                continue;
-            }
-            std::string original_name = func_it.key().asString();
-            std::string new_name = (*func_it).asString();
-            manifest_files.back()->_functions_renamed.insert(std::make_pair(original_name, new_name));
-        }
-    }
+    // Handle any renamed functions
+    manifest_files.back()->ParseCommon(runtime_root_node);
 }
 
 // Find all manifest files in the appropriate search paths/registries for the given type.
@@ -662,16 +605,11 @@ XrResult RuntimeManifestFile::FindManifestFiles(ManifestFileType type,
         LoaderLogger::LogErrorMessage("", "RuntimeManifestFile::FindManifestFiles - unknown manifest file requested");
         return XR_ERROR_FILE_ACCESS_ERROR;
     }
-    std::string filename;
-    char *override_path = PlatformUtilsGetSecureEnv(OPENXR_RUNTIME_JSON_ENV_VAR);
-    if (override_path != nullptr && *override_path != '\0') {
-        filename = override_path;
-        PlatformUtilsFreeEnv(override_path);
-        std::string info_message = "RuntimeManifestFile::FindManifestFiles - using environment variable override runtime file ";
-        info_message += filename;
-        LoaderLogger::LogInfoMessage("", info_message);
+    std::string filename = PlatformUtilsGetSecureEnv(OPENXR_RUNTIME_JSON_ENV_VAR);
+    if (!filename.empty()) {
+        LoaderLogger::LogInfoMessage(
+            "", "RuntimeManifestFile::FindManifestFiles - using environment variable override runtime file " + filename);
     } else {
-        PlatformUtilsFreeEnv(override_path);
 #ifdef XR_OS_WINDOWS
         std::vector<std::string> filenames;
         ReadRuntimeDataFilesInRegistry(type, "", "ActiveRuntime", filenames);
@@ -717,27 +655,28 @@ ApiLayerManifestFile::ApiLayerManifestFile(ManifestFileType type, const std::str
       _description(description),
       _implementation_version(implementation_version) {}
 
-ApiLayerManifestFile::~ApiLayerManifestFile() = default;
-
 void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::string &filename,
                                          std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files) {
-    std::ifstream json_stream = std::ifstream(filename, std::ifstream::in);
+    std::ifstream json_stream(filename, std::ifstream::in);
+
+    std::ostringstream error_ss("ApiLayerManifestFile::CreateIfValid ");
+    if (!json_stream.is_open()) {
+        error_ss << "failed to open " << filename << ".  Does it exist?";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
+        return;
+    }
+
     Json::Reader reader;
     Json::Value root_node = Json::nullValue;
     if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
-        std::string error_message = "ApiLayerManifestFile::CreateIfValid failed to parse ";
-        error_message += filename;
-        error_message += ".  Is it a valid layer manifest file? Error was:\n";
-        error_message += reader.getFormattedErrorMessages();
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << "failed to parse " << filename << ".  Is it a valid layer manifest file?";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
     JsonVersion file_version = {};
     if (!ManifestFile::IsValidJson(root_node, file_version)) {
-        std::string error_message = "ApiLayerManifestFile::CreateIfValid isValidJson indicates ";
-        error_message += filename;
-        error_message += " is not a valid manifest file.";
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << "isValidJson indicates " << filename << " is not a valid manifest file.";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
 
@@ -749,45 +688,37 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
         layer_root_node["api_version"].isNull() || !layer_root_node["api_version"].isString() ||
         layer_root_node["library_path"].isNull() || !layer_root_node["library_path"].isString() ||
         layer_root_node["implementation_version"].isNull() || !layer_root_node["implementation_version"].isString()) {
-        std::string error_message = "ApiLayerManifestFile::CreateIfValid ";
-        error_message += filename;
-        error_message += " is missing required fields.  Verify all proper fields exist.";
-        LoaderLogger::LogErrorMessage("", error_message);
+        error_ss << filename << " is missing required fields.  Verify all proper fields exist.";
+        LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
     if (MANIFEST_TYPE_IMPLICIT_API_LAYER == type) {
         bool enabled = true;
         // Implicit layers require the disable environment variable.
         if (layer_root_node["disable_environment"].isNull() || !layer_root_node["disable_environment"].isString()) {
-            std::string error_message = "ApiLayerManifestFile::CreateIfValid Implicit layer ";
-            error_message += filename;
-            error_message += " is missing \"disable_environment\"";
-            LoaderLogger::LogErrorMessage("", error_message);
+            error_ss << "Implicit layer " << filename << " is missing \"disable_environment\"";
+            LoaderLogger::LogErrorMessage("", error_ss.str());
             return;
         }
         // Check if there's an enable environment variable provided
         if (!layer_root_node["enable_environment"].isNull() && layer_root_node["enable_environment"].isString()) {
-            char *enable_val = PlatformUtilsGetEnv(layer_root_node["enable_environment"].asString().c_str());
+            std::string env_var = layer_root_node["enable_environment"].asString();
             // If it's not set in the environment, disable the layer
-            if (nullptr == enable_val) {
+            if (!PlatformUtilsGetEnvSet(env_var.c_str())) {
                 enabled = false;
             }
-            PlatformUtilsFreeEnv(enable_val);
         }
         // Check for the disable environment variable, which must be provided in the JSON
-        char *disable_val = PlatformUtilsGetEnv(layer_root_node["disable_environment"].asString().c_str());
-        // If the envar is set, disable the layer. Disable envar overrides enable above
-        if (nullptr != disable_val) {
+        std::string env_var = layer_root_node["disable_environment"].asString();
+        // If the env var is set, disable the layer. Disable env var overrides enable above
+        if (PlatformUtilsGetEnvSet(env_var.c_str())) {
             enabled = false;
         }
-        PlatformUtilsFreeEnv(disable_val);
 
         // Not enabled, so pretend like it isn't even there.
         if (!enabled) {
-            std::string info_message = "ApiLayerManifestFile::CreateIfValid Implicit layer ";
-            info_message += filename;
-            info_message += " is disabled";
-            LoaderLogger::LogInfoMessage("", info_message);
+            error_ss << "Implicit layer " << filename << " is disabled";
+            LoaderLogger::LogInfoMessage("", error_ss.str());
             return;
         }
     }
@@ -798,10 +729,8 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
     api_version.patch = 0;
 
     if ((api_version.major == 0 && api_version.minor == 0) || api_version.major > XR_VERSION_MAJOR(XR_CURRENT_API_VERSION)) {
-        std::string warning_message = "ApiLayerManifestFile::CreateIfValid layer ";
-        warning_message += filename;
-        warning_message += " has invalid API Version.  Skipping layer.";
-        LoaderLogger::LogWarningMessage("", warning_message);
+        error_ss << "layer " << filename << " has invalid API Version.  Skipping layer.";
+        LoaderLogger::LogWarningMessage("", error_ss.str());
         return;
     }
 
@@ -814,12 +743,8 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
         // If the library_path is an absolute path, just use that if it exists
         if (FileSysUtilsIsAbsolutePath(library_path)) {
             if (!FileSysUtilsPathExists(library_path)) {
-                std::string error_message = "ApiLayerManifestFile::CreateIfValid ";
-                error_message += filename;
-                error_message += " library ";
-                error_message += library_path;
-                error_message += " does not appear to exist";
-                LoaderLogger::LogErrorMessage("", error_message);
+                error_ss << filename << " library " << library_path << " does not appear to exist";
+                LoaderLogger::LogErrorMessage("", error_ss.str());
                 return;
             }
         } else {
@@ -828,12 +753,8 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
             std::string file_parent;
             if (!FileSysUtilsGetParentPath(filename, file_parent) ||
                 !FileSysUtilsCombinePaths(file_parent, library_path, combined_path) || !FileSysUtilsPathExists(combined_path)) {
-                std::string error_message = "ApiLayerManifestFile::CreateIfValid ";
-                error_message += filename;
-                error_message += " library ";
-                error_message += combined_path;
-                error_message += " does not appear to exist";
-                LoaderLogger::LogErrorMessage("", error_message);
+                error_ss << filename << " library " << combined_path << " does not appear to exist";
+                LoaderLogger::LogErrorMessage("", error_ss.str());
                 return;
             }
             library_path = combined_path;
@@ -850,62 +771,10 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
         new ApiLayerManifestFile(type, filename, layer_name, description, api_version, implementation_version, library_path));
 
     // Add any extensions to it after the fact.
-    Json::Value dev_exts = layer_root_node["device_extensions"];
-    if (!dev_exts.isNull() && dev_exts.isArray()) {
-        for (Json::ValueIterator dev_ext_it = dev_exts.begin(); dev_ext_it != dev_exts.end(); ++dev_ext_it) {
-            Json::Value dev_ext = (*dev_ext_it);
-            Json::Value dev_ext_name = dev_ext["name"];
-            Json::Value dev_ext_version = dev_ext["extension_version"];
-            Json::Value dev_ext_entries = dev_ext["entrypoints"];
-            if (!dev_ext_name.isNull() && dev_ext_name.isString() && !dev_ext_version.isNull() && dev_ext_version.isString() &&
-                !dev_ext_entries.isNull() && dev_ext_entries.isArray()) {
-                ExtensionListing ext = {};
-                ext.name = dev_ext_name.asString();
-                ext.extension_version = atoi(dev_ext_version.asString().c_str());
-                for (Json::ValueIterator entry_it = dev_ext_entries.begin(); entry_it != dev_ext_entries.end(); ++entry_it) {
-                    Json::Value entry = (*entry_it);
-                    if (!entry.isNull() && entry.isString()) {
-                        ext.entrypoints.push_back(entry.asString());
-                    }
-                }
-                manifest_files.back()->_device_extensions.push_back(ext);
-            }
-        }
-    }
-
-    Json::Value inst_exts = layer_root_node["instance_extensions"];
-    if (!inst_exts.isNull() && inst_exts.isArray()) {
-        for (Json::ValueIterator inst_ext_it = inst_exts.begin(); inst_ext_it != inst_exts.end(); ++inst_ext_it) {
-            Json::Value inst_ext = (*inst_ext_it);
-            Json::Value inst_ext_name = inst_ext["name"];
-            Json::Value inst_ext_version = inst_ext["extension_version"];
-            if (!inst_ext_name.isNull() && inst_ext_name.isString() && !inst_ext_version.isNull() && inst_ext_version.isString()) {
-                ExtensionListing ext = {};
-                ext.name = inst_ext_name.asString();
-                ext.extension_version = atoi(inst_ext_version.asString().c_str());
-                manifest_files.back()->_instance_extensions.push_back(ext);
-            }
-        }
-    }
-
-    Json::Value funcs_renamed = layer_root_node["functions"];
-    if (!funcs_renamed.isNull() && !funcs_renamed.empty()) {
-        for (Json::ValueIterator func_it = funcs_renamed.begin(); func_it != funcs_renamed.end(); ++func_it) {
-            if (!(*func_it).isString()) {
-                std::string warning_message = "ApiLayerManifestFile::CreateIfValid ";
-                warning_message += filename;
-                warning_message += " \"functions\" section contains non-string values.";
-                LoaderLogger::LogWarningMessage("", warning_message);
-                continue;
-            }
-            std::string original_name = func_it.key().asString();
-            std::string new_name = (*func_it).asString();
-            manifest_files.back()->_functions_renamed.insert(std::make_pair(original_name, new_name));
-        }
-    }
+    manifest_files.back()->ParseCommon(layer_root_node);
 }
 
-XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() {
+XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() const {
     XrApiLayerProperties props = {};
     props.type = XR_TYPE_API_LAYER_PROPERTIES;
     props.next = nullptr;

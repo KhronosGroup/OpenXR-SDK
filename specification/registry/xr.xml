@@ -112,7 +112,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 1)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 2)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -978,7 +978,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member><type>XrTime</type>      <name>time</name></member>
         </type>
         <type category="struct" name="XrSpatialAnchorSpaceCreateInfoMSFT">
-            <member values="XR_TYPE_ACTION_SPACE_CREATE_INFO"><type>XrStructureType</type> <name>type</name></member>
+            <member values="XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                     <name>next</name></member>
             <member><type>XrSpatialAnchorMSFT</type>             <name>anchor</name></member>
             <member><type>XrPosef</type>                         <name>poseInAnchorSpace</name></member>
@@ -2344,5 +2344,20 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <enum value="&quot;XR_MND_headless&quot;" name="XR_MND_HEADLESS_EXTENSION_NAME"/>
         </require>
     </extension>
+
+    <extension name="XR_OCULUS_extension_44" number="44" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_OCULUS_extension_44_SPEC_VERSION"/>
+            <enum value="&quot;XR_OCULUS_extension_44&quot;" name="XR_OCULUS_EXTENSION_44_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_OCULUS_android_session_state_enable" number="45" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_OCULUS_android_session_state_enable_SPEC_VERSION"/>
+            <enum value="&quot;XR_OCULUS_android_session_state_enable&quot;" name="XR_OCULUS_ANDROID_SESSION_STATE_ENABLE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
     </extensions>
 </registry>

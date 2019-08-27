@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Author: Ryan Pavlik <ryan.pavlik@collabora.com
+// Author: Ryan Pavlik <ryan.pavlik@collabora.com>
 //
 // Provides protection for C ABI functions if standard library functions may throw.
 
@@ -22,7 +22,14 @@
 #include "common_config.h"
 #endif  // OPENXR_HAVE_COMMON_CONFIG
 
-#ifdef XRLOADER_ENABLE_EXCEPTION_HANDLING
+#ifdef XRLOADER_DISABLE_EXCEPTION_HANDLING
+
+#define XRLOADER_ABI_TRY
+#define XRLOADER_ABI_CATCH_BAD_ALLOC_OOM
+#define XRLOADER_ABI_CATCH_FALLBACK
+
+#else
+
 #include <stdexcept>
 #define XRLOADER_ABI_TRY try
 #define XRLOADER_ABI_CATCH_BAD_ALLOC_OOM                               \
@@ -40,15 +47,4 @@
         return XR_ERROR_RUNTIME_FAILURE;                                                \
     }
 
-#else
-
-// Make it hard to accidentally build this wrong.
-#ifndef XRLOADER_SILENCE_EXCEPTION_HANDLING_WARNING
-#warning \
-    "Warning: Exception handling disabled in OpenXR loader - exceptions may escape C ABI if standard library can throw exceptions!"
-#endif
-
-#define XRLOADER_ABI_TRY
-#define XRLOADER_ABI_CATCH_BAD_ALLOC_OOM
-#define XRLOADER_ABI_CATCH_FALLBACK
 #endif
