@@ -98,7 +98,7 @@ class ApiLayerManifestFile : public ManifestFile {
     static XrResult FindManifestFiles(ManifestFileType type, std::vector<std::unique_ptr<ApiLayerManifestFile>> &manifest_files);
 
     const std::string &LayerName() const { return _layer_name; }
-    XrApiLayerProperties GetApiLayerProperties() const;
+    void PopulateApiLayerProperties(XrApiLayerProperties &props) const;
 
    private:
     ApiLayerManifestFile(ManifestFileType type, const std::string &filename, const std::string &layer_name,

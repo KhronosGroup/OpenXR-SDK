@@ -52,7 +52,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 
     // Find the available runtimes which we may need to report information for.
     last_error = RuntimeManifestFile::FindManifestFiles(MANIFEST_TYPE_RUNTIME, runtime_manifest_files);
-    if (XR_SUCCESS != last_error) {
+    if (XR_FAILED(last_error)) {
         LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - unknown error");
         last_error = XR_ERROR_FILE_ACCESS_ERROR;
     } else {
@@ -101,7 +101,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             }
             // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
             // then something still went wrong, so return with an error.
-            if (XR_SUCCESS == res) {
+            if (XR_SUCCEEDED(res)) {
                 uint32_t runtime_major = XR_VERSION_MAJOR(runtime_info.runtimeApiVersion);
                 uint32_t runtime_minor = XR_VERSION_MINOR(runtime_info.runtimeApiVersion);
                 uint32_t loader_major = XR_VERSION_MAJOR(XR_CURRENT_API_VERSION);
@@ -126,7 +126,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
                     res = XR_ERROR_FILE_CONTENTS_INVALID;
                 }
             }
-            if (XR_SUCCESS != res) {
+            if (XR_FAILED(res)) {
                 if (!any_loaded) {
                     last_error = res;
                 }
@@ -194,7 +194,7 @@ void RuntimeInterface::UnloadRuntime(const std::string& openxr_command) {
 }
 
 XrResult RuntimeInterface::GetInstanceProcAddr(XrInstance instance, const char* name, PFN_xrVoidFunction* function) {
-    return _single_runtime_interface->_get_instant_proc_addr(instance, name, function);
+    return _single_runtime_interface->_get_instance_proc_addr(instance, name, function);
 }
 
 const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance instance) {
@@ -220,7 +220,7 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatch
 }
 
 RuntimeInterface::RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr)
-    : _runtime_library(runtime_library), _get_instant_proc_addr(get_instant_proc_addr) {}
+    : _runtime_library(runtime_library), _get_instance_proc_addr(get_instant_proc_addr) {}
 
 RuntimeInterface::~RuntimeInterface() {
     std::string info_message = "RuntimeInterface being destroyed.";
@@ -235,8 +235,8 @@ RuntimeInterface::~RuntimeInterface() {
 void RuntimeInterface::GetInstanceExtensionProperties(std::vector<XrExtensionProperties>& extension_properties) {
     std::vector<XrExtensionProperties> runtime_extension_properties;
     PFN_xrEnumerateInstanceExtensionProperties rt_xrEnumerateInstanceExtensionProperties;
-    _get_instant_proc_addr(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
-                           reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrEnumerateInstanceExtensionProperties));
+    _get_instance_proc_addr(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
+                            reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrEnumerateInstanceExtensionProperties));
     uint32_t count = 0;
     uint32_t count_output = 0;
     // Get the count from the runtime
@@ -274,20 +274,20 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
     XrResult res = XR_SUCCESS;
     bool create_succeeded = false;
     PFN_xrCreateInstance rt_xrCreateInstance;
-    _get_instant_proc_addr(XR_NULL_HANDLE, "xrCreateInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrCreateInstance));
+    _get_instance_proc_addr(XR_NULL_HANDLE, "xrCreateInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrCreateInstance));
     res = rt_xrCreateInstance(info, instance);
-    if (XR_SUCCESS == res) {
+    if (XR_SUCCEEDED(res)) {
         create_succeeded = true;
         std::unique_ptr<XrGeneratedDispatchTable> dispatch_table(new XrGeneratedDispatchTable());
-        GeneratedXrPopulateDispatchTable(dispatch_table.get(), *instance, _get_instant_proc_addr);
+        GeneratedXrPopulateDispatchTable(dispatch_table.get(), *instance, _get_instance_proc_addr);
         std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
         _dispatch_table_map[*instance] = std::move(dispatch_table);
     }
 
     // If the failure occurred during the populate, clean up the instance we had picked up from the runtime
-    if (XR_SUCCESS != res && create_succeeded) {
+    if (XR_FAILED(res) && create_succeeded) {
         PFN_xrDestroyInstance rt_xrDestroyInstance;
-        _get_instant_proc_addr(*instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
+        _get_instance_proc_addr(*instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
         rt_xrDestroyInstance(*instance);
         *instance = XR_NULL_HANDLE;
     }
@@ -307,7 +307,7 @@ XrResult RuntimeInterface::DestroyInstance(XrInstance instance) {
         }
         // Now delete the instance
         PFN_xrDestroyInstance rt_xrDestroyInstance;
-        _get_instant_proc_addr(instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
+        _get_instance_proc_addr(instance, "xrDestroyInstance", reinterpret_cast<PFN_xrVoidFunction*>(&rt_xrDestroyInstance));
         rt_xrDestroyInstance(instance);
     }
     return XR_SUCCESS;

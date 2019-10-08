@@ -16,6 +16,7 @@
 // limitations under the License.
 //
 // Author: Mark Young <marky@lunarg.com>, Ryan Pavlik <ryan.pavlik@collabora.com>
+// Author: Dave Houlton <daveh@lunarg.com>
 //
 
 #include "object_info.h"
@@ -31,6 +32,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "memory.h"
 
 std::string XrSdkLogObjectInfo::ToString() const {
     std::ostringstream oss;
@@ -238,44 +241,45 @@ NamesAndLabels DebugUtilsData::PopulateNamesAndLabels(std::vector<XrSdkLogObject
     return {objects, labels};
 }
 
-AugmentedCallbackData DebugUtilsData::AugmentCallbackData(
-    const XrDebugUtilsMessengerCallbackDataEXT& provided_callback_data) const {
-    AugmentedCallbackData ret{provided_callback_data};
-    if (object_info_.Empty() || provided_callback_data.objectCount == 0) {
-        return ret;
+void DebugUtilsData::WrapCallbackData(AugmentedCallbackData* aug_data,
+                                      const XrDebugUtilsMessengerCallbackDataEXT* callback_data) const {
+    // If there's nothing to add, just return the original data as the augmented copy
+    aug_data->exported_data = callback_data;
+    if (object_info_.Empty() || callback_data->objectCount == 0) {
+        return;
     }
-    bool obj_name_found = false;
-    for (uint32_t obj = 0; obj < provided_callback_data.objectCount; ++obj) {
-        auto& current_obj = provided_callback_data.objects[obj];
-        if (!obj_name_found) {
-            auto lookup = object_info_.LookUpStoredObjectInfo(current_obj.objectHandle, current_obj.objectType);
-            if (lookup != nullptr) {
-                obj_name_found = true;
-            }
-        }
 
-        // If this is a session, see if there are any labels associated with it for us to add
-        // to the callback content.
+    // Inspect each of the callback objects
+    bool name_found = false;
+    for (uint32_t obj = 0; obj < callback_data->objectCount; ++obj) {
+        auto& current_obj = callback_data->objects[obj];
+        name_found |= (nullptr != object_info_.LookUpStoredObjectInfo(current_obj.objectHandle, current_obj.objectType));
+
+        // If this is a session, record any labels associated with it
         if (XR_OBJECT_TYPE_SESSION == current_obj.objectType) {
             XrSession session = TreatIntegerAsHandle<XrSession>(current_obj.objectHandle);
-            LookUpSessionLabels(session, ret.labels);
+            LookUpSessionLabels(session, aug_data->labels);
         }
     }
 
-    if (!obj_name_found && ret.labels.empty()) {
-        // nothing to add to the data
-        return ret;
+    // If we found nothing to add, return the original data
+    if (!name_found && aug_data->labels.empty()) {
+        return;
     }
 
-    // If a name or a label has been found, we should update it in a new version of the callback data
-    ret.new_objects.assign(provided_callback_data.objects, provided_callback_data.objects + provided_callback_data.objectCount);
+    // Found additional data - modify an internal copy and return that as the exported data
+    memcpy(&aug_data->modified_data, callback_data, sizeof(XrDebugUtilsMessengerCallbackDataEXT));
+    aug_data->new_objects.assign(callback_data->objects, callback_data->objects + callback_data->objectCount);
 
-    for (auto& obj : ret.new_objects) {
+    // Record (overwrite) the names of all incoming objects provided in our internal list
+    for (auto& obj : aug_data->new_objects) {
         object_info_.LookUpObjectName(obj);
     }
-    ret.temporary_callback_data.objects = ret.new_objects.data();
-    ret.temporary_callback_data.sessionLabelCount = static_cast<uint32_t>(ret.labels.size());
-    ret.temporary_callback_data.sessionLabels = ret.labels.empty() ? nullptr : ret.labels.data();
-    ret.callback_data_to_use = &ret.temporary_callback_data;
-    return ret;
+
+    // Update local copy & point export to it
+    aug_data->modified_data.objects = aug_data->new_objects.data();
+    aug_data->modified_data.sessionLabelCount = static_cast<uint32_t>(aug_data->labels.size());
+    aug_data->modified_data.sessionLabels = aug_data->labels.empty() ? nullptr : aug_data->labels.data();
+    aug_data->exported_data = &aug_data->modified_data;
+    return;
 }

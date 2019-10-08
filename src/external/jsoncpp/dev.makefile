@@ -1,6 +1,6 @@
 # This is only for jsoncpp developers/contributors.
 # We use this to sign releases, generate documentation, etc.
-VER?=$(shell cat version)
+VER?=$(shell cat version.txt)
 
 default:
 	@echo "VER=${VER}"
@@ -12,7 +12,7 @@ jsoncpp-%.tar.gz:
 	curl https://github.com/open-source-parsers/jsoncpp/archive/$*.tar.gz -o $@
 dox:
 	python doxybuild.py --doxygen=$$(which doxygen) --in doc/web_doxyfile.in
-	rsync -va --delete dist/doxygen/jsoncpp-api-html-${VER}/ ../jsoncpp-docs/doxygen/
+	rsync -va -c --delete dist/doxygen/jsoncpp-api-html-${VER}/ ../jsoncpp-docs/doxygen/
 	# Then 'git add -A' and 'git push' in jsoncpp-docs.
 build:
 	mkdir -p build/debug

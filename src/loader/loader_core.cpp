@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 // Author: Mark Young <marky@lunarg.com>
+// Author: Dave Houlton <daveh@lunarg.com>
 //
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
@@ -42,9 +43,6 @@
 #include <utility>
 #include <vector>
 
-// Flag to cause the one time to init to only occur one time.
-std::once_flag g_one_time_init_flag;
-
 // Global lock to prevent reading JSON manifest files at the same time.
 static std::mutex g_loader_json_mutex;
 
@@ -63,8 +61,6 @@ inline bool IsMissingNullTerminator(const char (&str)[max_length]) {
     return true;
 }
 
-extern "C" {
-
 // ---- Core 1.0 manual loader trampoline functions
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
@@ -77,7 +73,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint3
 
     XrResult result = ApiLayerInterface::GetApiLayerProperties("xrEnumerateApiLayerProperties", propertyCapacityInput,
                                                                propertyCountOutput, properties);
-    if (XR_SUCCESS != result) {
+    if (XR_FAILED(result)) {
         LoaderLogger::LogErrorMessage("xrEnumerateApiLayerProperties", "Failed ApiLayerInterface::GetApiLayerProperties");
     }
 
@@ -90,6 +86,12 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
                                        XrExtensionProperties *properties) XRLOADER_ABI_TRY {
     bool just_layer_properties = false;
     LoaderLogger::LogVerboseMessage("xrEnumerateInstanceExtensionProperties", "Entering loader trampoline");
+
+    // "Independent of elementCapacityInput or elements parameters, elementCountOutput must be a valid pointer,
+    // and the function sets elementCountOutput." - 2.11
+    if (nullptr == propertyCountOutput) {
+        return XR_ERROR_VALIDATION_FAILURE;
+    }
 
     if (nullptr != layerName && 0 != strlen(layerName)) {
         // Application is only interested in layer's properties, not all of them.
@@ -106,10 +108,10 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
         // Get the layer extension properties
         result = ApiLayerInterface::GetInstanceExtensionProperties("xrEnumerateInstanceExtensionProperties", layerName,
                                                                    extension_properties);
-        if (XR_SUCCESS == result && !just_layer_properties) {
+        if (XR_SUCCEEDED(result) && !just_layer_properties) {
             // If not specific to a layer, get the runtime extension properties
             result = RuntimeInterface::LoadRuntime("xrEnumerateInstanceExtensionProperties");
-            if (XR_SUCCESS == result) {
+            if (XR_SUCCEEDED(result)) {
                 RuntimeInterface::GetRuntime().GetInstanceExtensionProperties(extension_properties);
                 RuntimeInterface::UnloadRuntime("xrEnumerateInstanceExtensionProperties");
             } else {
@@ -119,7 +121,7 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
         }
     }
 
-    if (XR_SUCCESS != result) {
+    if (XR_FAILED(result)) {
         LoaderLogger::LogErrorMessage("xrEnumerateInstanceExtensionProperties", "Failed querying extension properties");
         return result;
     }
@@ -148,9 +150,6 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
 
     auto num_extension_properties = static_cast<uint32_t>(extension_properties.size());
     if (propertyCapacityInput == 0) {
-        if (nullptr == propertyCountOutput) {
-            return XR_ERROR_VALIDATION_FAILURE;
-        }
         *propertyCountOutput = num_extension_properties;
     } else if (nullptr != properties) {
         if (propertyCapacityInput < num_extension_properties) {
@@ -172,11 +171,6 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
                 LoaderLogger::LogValidationErrorMessage("VUID-XrExtensionProperties-type-type",
                                                         "xrEnumerateInstanceExtensionProperties", "unknown type in properties");
             }
-            if (nullptr != properties[prop].next) {
-                LoaderLogger::LogValidationErrorMessage("VUID-XrExtensionProperties-next-next",
-                                                        "xrEnumerateInstanceExtensionProperties", "expected NULL");
-                properties_valid = false;
-            }
             if (properties_valid) {
                 properties[prop] = extension_properties[prop];
             }
@@ -189,6 +183,9 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
         if (nullptr != propertyCountOutput) {
             *propertyCountOutput = num_to_copy;
         }
+    } else {
+        // incoming_count is not 0 BUT the properties is NULL
+        return XR_ERROR_VALIDATION_FAILURE;
     }
     LoaderLogger::LogVerboseMessage("xrEnumerateInstanceExtensionProperties", "Completed loader trampoline");
     return XR_SUCCESS;
@@ -231,14 +228,14 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
         std::unique_lock<std::mutex> json_lock(g_loader_json_mutex);
         // Load the available runtime
         result = RuntimeInterface::LoadRuntime("xrCreateInstance");
-        if (XR_SUCCESS != result) {
+        if (XR_FAILED(result)) {
             LoaderLogger::LogErrorMessage("xrCreateInstance", "Failed loading runtime information");
         } else {
             runtime_loaded = true;
             // Load the appropriate layers
             result = ApiLayerInterface::LoadApiLayers("xrCreateInstance", info->enabledApiLayerCount, info->enabledApiLayerNames,
                                                       api_layer_interfaces);
-            if (XR_SUCCESS != result) {
+            if (XR_FAILED(result)) {
                 LoaderLogger::LogErrorMessage("xrCreateInstance", "Failed loading layer information");
             }
         }
@@ -271,7 +268,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
                 dbg_utils_create_info = reinterpret_cast<const XrDebugUtilsMessengerCreateInfoEXT *>(next_header);
                 XrDebugUtilsMessengerEXT messenger;
                 result = xrCreateDebugUtilsMessengerEXT(*instance, dbg_utils_create_info, &messenger);
-                if (XR_SUCCESS != result) {
+                if (XR_FAILED(result)) {
                     return XR_ERROR_VALIDATION_FAILURE;
                 }
                 loader_instance->SetDefaultDebugUtilsMessenger(messenger);
@@ -309,7 +306,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
     }
 
     // Now destroy the instance
-    if (XR_SUCCESS != dispatch_table->DestroyInstance(instance)) {
+    if (XR_FAILED(dispatch_table->DestroyInstance(instance))) {
         LoaderLogger::LogErrorMessage("xrDestroyInstance", "Unknown error occurred calling down chain");
     }
 
@@ -331,7 +328,7 @@ XRLOADER_ABI_CATCH_FALLBACK
 // ---- Core 1.0 manual loader terminator functions
 
 // Validate that the applicationInfo structure in the XrInstanceCreateInfo is valid.
-static XrResult ValidateApplicationInfo(LoaderInstance *loader_instance, const XrApplicationInfo &info) {
+static XrResult ValidateApplicationInfo(const XrApplicationInfo &info) {
     if (IsMissingNullTerminator<XR_MAX_APPLICATION_NAME_SIZE>(info.applicationName)) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrApplicationInfo-applicationName-parameter", "xrCreateInstance",
                                                 "application name missing NULL terminator.");
@@ -351,7 +348,7 @@ static XrResult ValidateApplicationInfo(LoaderInstance *loader_instance, const X
 }
 
 // Validate that the XrInstanceCreateInfo is valid
-static XrResult ValidateInstanceCreateInfo(LoaderInstance *loader_instance, const XrInstanceCreateInfo *info) {
+static XrResult ValidateInstanceCreateInfo(const XrInstanceCreateInfo *info) {
     // Should have a valid 'type'
     if (XR_TYPE_INSTANCE_CREATE_INFO != info->type) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-type-type", "xrCreateInstance",
@@ -365,8 +362,8 @@ static XrResult ValidateInstanceCreateInfo(LoaderInstance *loader_instance, cons
         return XR_ERROR_VALIDATION_FAILURE;
     }
     // ApplicationInfo struct must be valid
-    XrResult result = ValidateApplicationInfo(loader_instance, info->applicationInfo);
-    if (XR_SUCCESS != result) {
+    XrResult result = ValidateApplicationInfo(info->applicationInfo);
+    if (XR_FAILED(result)) {
         LoaderLogger::LogValidationErrorMessage("VUID-XrInstanceCreateInfo-applicationInfo-parameter", "xrCreateInstance",
                                                 "info->applicationInfo is not valid.");
         return result;
@@ -380,16 +377,17 @@ static XrResult ValidateInstanceCreateInfo(LoaderInstance *loader_instance, cons
     return XR_SUCCESS;
 }
 
-XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(const XrInstanceCreateInfo *createInfo,
+                                                          XrInstance *instance) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader terminator");
     LoaderInstance *loader_instance = reinterpret_cast<LoaderInstance *>(*instance);
-    XrResult result = ValidateInstanceCreateInfo(loader_instance, info);
-    if (XR_SUCCESS != result) {
+    XrResult result = ValidateInstanceCreateInfo(createInfo);
+    if (XR_FAILED(result)) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance",
                                                 "something wrong with XrInstanceCreateInfo contents");
         return result;
     }
-    result = RuntimeInterface::GetRuntime().CreateInstance(info, instance);
+    result = RuntimeInterface::GetRuntime().CreateInstance(createInfo, instance);
     loader_instance->SetRuntimeInstance(*instance);
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Completed loader terminator");
     return result;
@@ -437,7 +435,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(XrInstance instanc
     const std::unique_ptr<XrGeneratedDispatchTable> &dispatch_table = loader_instance->DispatchTable();
     XrResult result = XR_SUCCESS;
     result = dispatch_table->CreateDebugUtilsMessengerEXT(instance, createInfo, messenger);
-    if (XR_SUCCESS == result && nullptr != messenger) {
+    if (XR_SUCCEEDED(result) && nullptr != messenger) {
         result = g_debugutilsmessengerext_map.Insert(*messenger, *loader_instance);
         if (XR_FAILED(result)) {
             LoaderLogger::LogErrorMessage("xrCreateDebugUtilsMessengerEXT",
@@ -505,7 +503,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstan
         char *temp_mess_ptr = new char;
         *messenger = reinterpret_cast<XrDebugUtilsMessengerEXT>(temp_mess_ptr);
     }
-    if (XR_SUCCESS == result) {
+    if (XR_SUCCEEDED(result)) {
         LoaderLogger::GetInstance().AddLogRecorder(MakeDebugUtilsLoaderLogRecorder(createInfo, *messenger));
         RuntimeInterface::GetRuntime().TrackDebugMessenger(instance, *messenger);
     }
@@ -645,5 +643,3 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(XrSession sessi
     return XR_SUCCESS;
 }
 XRLOADER_ABI_CATCH_FALLBACK
-
-}  // extern "C"

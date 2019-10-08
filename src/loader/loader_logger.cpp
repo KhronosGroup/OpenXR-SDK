@@ -112,12 +112,22 @@ XrDebugUtilsMessageTypeFlagsEXT LoaderLogMessageTypesToDebugUtilsMessageTypes(Xr
 }
 
 LoaderLogger::LoaderLogger() {
+    std::string debug_string = PlatformUtilsGetEnv("XR_LOADER_DEBUG");
+
     // Add an error logger by default so that we at least get errors out to std::cerr.
-    AddLogRecorder(MakeStdErrLoaderLogRecorder(nullptr));
+    // Normally we enable stderr output. But if the XR_LOADER_DEBUG environment variable is
+    // present as "none" then we don't.
+    if (debug_string != "none") {
+        AddLogRecorder(MakeStdErrLoaderLogRecorder(nullptr));
+    }
+
+#if _WIN32
+    // Add an debugger logger by default so that we at least get errors out to the debugger.
+    AddLogRecorder(MakeDebuggerLoaderLogRecorder(nullptr));
+#endif
 
     // If the environment variable to enable loader debugging is set, then enable the
     // appropriate logging out to std::cout.
-    std::string debug_string = PlatformUtilsGetEnv("XR_LOADER_DEBUG");
     if (!debug_string.empty()) {
         XrLoaderLogMessageSeverityFlags debug_flags = {};
         if (debug_string == "error") {
@@ -175,7 +185,8 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
     XrLoaderLogMessageSeverityFlags log_message_severity = DebugUtilsSeveritiesToLoaderLogMessageSeverities(message_severity);
     XrLoaderLogMessageTypeFlags log_message_type = DebugUtilsMessageTypesToLoaderLogMessageTypes(message_type);
 
-    auto augmented = data_.AugmentCallbackData(*callback_data);
+    AugmentedCallbackData augmented_data;
+    data_.WrapCallbackData(&augmented_data, callback_data);
 
     // Loop through the recorders
     for (std::unique_ptr<LoaderLogRecorder>& recorder : _recorders) {
@@ -186,7 +197,7 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
             continue;
         }
 
-        exit_app |= recorder->LogDebugUtilsMessage(message_severity, message_type, augmented.callback_data_to_use);
+        exit_app |= recorder->LogDebugUtilsMessage(message_severity, message_type, augmented_data.exported_data);
     }
     return exit_app;
 }

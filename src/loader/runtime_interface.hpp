@@ -64,7 +64,7 @@ class RuntimeInterface {
     static std::unique_ptr<RuntimeInterface> _single_runtime_interface;
     static uint32_t _single_runtime_count;
     LoaderPlatformLibraryHandle _runtime_library;
-    PFN_xrGetInstanceProcAddr _get_instant_proc_addr;
+    PFN_xrGetInstanceProcAddr _get_instance_proc_addr;
     std::unordered_map<XrInstance, std::unique_ptr<XrGeneratedDispatchTable>> _dispatch_table_map;
     std::mutex _dispatch_table_mutex;
     std::unordered_map<XrDebugUtilsMessengerEXT, XrInstance> _messenger_to_instance_map;

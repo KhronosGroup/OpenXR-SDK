@@ -25,15 +25,20 @@
 
 #include <memory>
 
-//! Standard Error logger, always on for now
+//! Standard Error logger, on by default. Disabled with environment variable XR_LOADER_DEBUG = "none".
 std::unique_ptr<LoaderLogRecorder> MakeStdErrLoaderLogRecorder(void* user_data);
 
-//! Standard Output logger used with XR_LOADER_DEBUG
+//! Standard Output logger used with XR_LOADER_DEBUG environment variable.
 std::unique_ptr<LoaderLogRecorder> MakeStdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags);
 
 // Debug Utils logger used with XR_EXT_debug_utils
 std::unique_ptr<LoaderLogRecorder> MakeDebugUtilsLoaderLogRecorder(const XrDebugUtilsMessengerCreateInfoEXT* create_info,
                                                                    XrDebugUtilsMessengerEXT debug_messenger);
+
+#if _WIN32
+//! Win32 debugger output
+std::unique_ptr<LoaderLogRecorder> MakeDebuggerLoaderLogRecorder(void* user_data);
+#endif
 
 // TODO: Add other Derived classes:
 //  - FileLoaderLogRecorder     - During/after xrCreateInstance

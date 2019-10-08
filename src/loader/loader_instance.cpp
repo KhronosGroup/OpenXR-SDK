@@ -48,6 +48,68 @@ const std::array<XrExtensionProperties, 1>& LoaderInstance::LoaderSpecificExtens
     return extensions;
 }
 
+namespace {
+class InstanceCreateInfoManager {
+   public:
+    explicit InstanceCreateInfoManager(const XrInstanceCreateInfo* info) : original_create_info(info), modified_create_info(*info) {
+        Reset();
+    }
+
+    // Reset the "modified" state to match the original state.
+    void Reset() {
+        enabled_extensions_cstr.clear();
+        enabled_extensions_cstr.reserve(original_create_info->enabledExtensionCount);
+
+        for (uint32_t i = 0; i < original_create_info->enabledExtensionCount; ++i) {
+            enabled_extensions_cstr.push_back(original_create_info->enabledExtensionNames[i]);
+        }
+        Update();
+    }
+
+    // Remove extensions named in the parameter and return a pointer to the current state.
+    const XrInstanceCreateInfo* FilterOutExtensions(const std::vector<const char*>& extensions_to_skip) {
+        if (enabled_extensions_cstr.empty()) {
+            return Get();
+        }
+        if (extensions_to_skip.empty()) {
+            return Get();
+        }
+        for (auto& ext : extensions_to_skip) {
+            FilterOutExtension(ext);
+        }
+        return Update();
+    }
+    // Remove the extension named in the parameter and return a pointer to the current state.
+    const XrInstanceCreateInfo* FilterOutExtension(const char* extension_to_skip) {
+        if (enabled_extensions_cstr.empty()) {
+            return &modified_create_info;
+        }
+        auto b = enabled_extensions_cstr.begin();
+        auto e = enabled_extensions_cstr.end();
+        auto it = std::find_if(b, e, [&](const char* extension) { return strcmp(extension_to_skip, extension) == 0; });
+        if (it != e) {
+            // Just that one element goes away
+            enabled_extensions_cstr.erase(it);
+        }
+        return Update();
+    }
+
+    // Get the current modified XrInstanceCreateInfo
+    const XrInstanceCreateInfo* Get() const { return &modified_create_info; }
+
+   private:
+    const XrInstanceCreateInfo* Update() {
+        modified_create_info.enabledExtensionCount = static_cast<uint32_t>(enabled_extensions_cstr.size());
+        modified_create_info.enabledExtensionNames = enabled_extensions_cstr.empty() ? nullptr : enabled_extensions_cstr.data();
+        return &modified_create_info;
+    }
+    const XrInstanceCreateInfo* original_create_info;
+
+    XrInstanceCreateInfo modified_create_info;
+    std::vector<const char*> enabled_extensions_cstr;
+};
+}  // namespace
+
 // Factory method
 XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces,
                                         const XrInstanceCreateInfo* info, XrInstance* instance) {
@@ -61,6 +123,20 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
     // Create the loader instance
     std::unique_ptr<LoaderInstance> loader_instance(new LoaderInstance(std::move(api_layer_interfaces)));
     *instance = reinterpret_cast<XrInstance>(loader_instance.get());
+
+    // Remove the loader-supported-extensions (debug utils), if it's in the list of enabled extensions but not supported by
+    // the runtime.
+    InstanceCreateInfoManager create_info_manager{info};
+    const XrInstanceCreateInfo* modified_create_info = info;
+    if (info->enabledExtensionCount > 0) {
+        std::vector<const char*> extensions_to_skip;
+        for (const auto& ext : LoaderInstance::LoaderSpecificExtensions()) {
+            if (!RuntimeInterface::GetRuntime().SupportsExtension(ext.extensionName)) {
+                extensions_to_skip.emplace_back(ext.extensionName);
+            }
+        }
+        modified_create_info = create_info_manager.FilterOutExtensions(extensions_to_skip);
+    }
 
     // Only start the xrCreateApiLayerInstance stack if we have layers.
     std::vector<std::unique_ptr<ApiLayerInterface>>& layer_interfaces = loader_instance->LayerInterfaces();
@@ -110,10 +186,12 @@ XrResult LoaderInstance::CreateInstance(std::vector<std::unique_ptr<ApiLayerInte
         api_layer_ci.loaderInstance = reinterpret_cast<void*>(loader_instance.get());
         api_layer_ci.settings_file_location[0] = '\0';
         api_layer_ci.nextInfo = next_info_list.get();
-        last_error = topmost_cali_fp(info, &api_layer_ci, instance);
+        //! @todo do we filter our create info extension list here?
+        //! Think that actually each layer might need to filter...
+        last_error = topmost_cali_fp(modified_create_info, &api_layer_ci, instance);
 
     } else {
-        last_error = topmost_ci_fp(info, instance);
+        last_error = topmost_ci_fp(modified_create_info, instance);
     }
 
     if (XR_SUCCEEDED(last_error)) {

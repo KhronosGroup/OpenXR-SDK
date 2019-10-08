@@ -68,7 +68,7 @@ class LoaderInstance {
    public:
     // Factory method
     static XrResult CreateInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& layer_interfaces,
-                                   const XrInstanceCreateInfo* info, XrInstance* instance);
+                                   const XrInstanceCreateInfo* createInfo, XrInstance* instance);
 
     LoaderInstance(std::vector<std::unique_ptr<ApiLayerInterface>>&& api_layer_interfaces);
     virtual ~LoaderInstance();

@@ -35,7 +35,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 2)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 3)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -280,6 +280,7 @@ typedef enum XrStructureType {
     XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR = 1000031001,
     XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT = 1000039000,
     XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT = 1000039001,
+    XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT = 1000046000,
     XR_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrStructureType;
 
@@ -1589,6 +1590,20 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
 #define XR_OCULUS_android_session_state_enable 1
 #define XR_OCULUS_android_session_state_enable_SPEC_VERSION 1
 #define XR_OCULUS_ANDROID_SESSION_STATE_ENABLE_EXTENSION_NAME "XR_OCULUS_android_session_state_enable"
+
+
+#define XR_EXT_view_configuration_depth_range 1
+#define XR_EXT_view_configuration_depth_range_SPEC_VERSION 1
+#define XR_EXT_VIEW_CONFIGURATION_DEPTH_RANGE_EXTENSION_NAME "XR_EXT_view_configuration_depth_range"
+typedef struct XrViewConfigurationDepthRangeEXT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    float                 recommendedNearZ;
+    float                 minNearZ;
+    float                 recommendedFarZ;
+    float                 maxFarZ;
+} XrViewConfigurationDepthRangeEXT;
+
 
 #ifdef __cplusplus
 }

@@ -712,7 +712,8 @@ inline static bool XrMatrix4x4f_CullBounds(const XrMatrix4x4f* mvp, const XrVect
 
     XrVector4f c[8];
     for (int i = 0; i < 8; i++) {
-        const XrVector4f corner = {(i & 1) ? maxs->x : mins->x, (i & 2) ? maxs->y : mins->y, (i & 4) ? maxs->z : mins->z, 1.0f};
+        const XrVector4f corner = {(i & 1) != 0 ? maxs->x : mins->x, (i & 2) != 0 ? maxs->y : mins->y,
+                                   (i & 4) != 0 ? maxs->z : mins->z, 1.0f};
         XrMatrix4x4f_TransformVector4f(&c[i], mvp, &corner);
     }
 
@@ -763,11 +764,7 @@ inline static bool XrMatrix4x4f_CullBounds(const XrMatrix4x4f* mvp, const XrVect
             break;
         }
     }
-    if (i == 8) {
-        return true;
-    }
-
-    return false;
+    return i == 8;
 }
 
 #endif  // XR_LINEAR_H_

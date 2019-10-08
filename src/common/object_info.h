@@ -181,14 +181,12 @@ struct NamesAndLabels {
 };
 
 struct AugmentedCallbackData {
-    explicit AugmentedCallbackData(const XrDebugUtilsMessengerCallbackDataEXT& data_to_use)
-        : temporary_callback_data(data_to_use), callback_data_to_use(&data_to_use) {}
     std::vector<XrDebugUtilsLabelEXT> labels;
-    XrDebugUtilsMessengerCallbackDataEXT temporary_callback_data;
     std::vector<XrDebugUtilsObjectNameInfoEXT> new_objects;
-
-    const XrDebugUtilsMessengerCallbackDataEXT* callback_data_to_use;
+    XrDebugUtilsMessengerCallbackDataEXT modified_data;
+    const XrDebugUtilsMessengerCallbackDataEXT* exported_data;
 };
+
 /// Tracks all the data (handle names and session labels) required to fully augment XR_EXT_debug_utils-related calls.
 class DebugUtilsData {
    public:
@@ -225,7 +223,8 @@ class DebugUtilsData {
     /// Given the collection of objects, populate their names and list of labels
     NamesAndLabels PopulateNamesAndLabels(std::vector<XrSdkLogObjectInfo> objects) const;
 
-    AugmentedCallbackData AugmentCallbackData(const XrDebugUtilsMessengerCallbackDataEXT& provided_callback_data) const;
+    void WrapCallbackData(AugmentedCallbackData* aug_data,
+                          const XrDebugUtilsMessengerCallbackDataEXT* provided_callback_data) const;
 
    private:
     void RemoveIndividualLabel(XrSdkSessionLabelList& label_vec);

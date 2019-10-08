@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 // Author: Mark Young <marky@lunarg.com>
+// Author: Dave Houlton <daveh@lunarg.com>
 //
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
@@ -48,19 +49,17 @@
 #include <utility>
 #include <vector>
 
-// OpenXR paths and registry key locations
-#define OPENXR_RELATIVE_PATH "openxr/"
-#define OPENXR_IMPLICIT_API_LAYER_RELATIVE_PATH "/api_layers/implicit.d"
-#define OPENXR_EXPLICIT_API_LAYER_RELATIVE_PATH "/api_layers/explicit.d"
-#ifdef XR_OS_WINDOWS
-#define OPENXR_REGISTRY_LOCATION "SOFTWARE\\Khronos\\OpenXR\\"
-#define OPENXR_IMPLICIT_API_LAYER_REGISTRY_LOCATION "\\ApiLayers\\Implicit"
-#define OPENXR_EXPLICIT_API_LAYER_REGISTRY_LOCATION "\\ApiLayers\\Explicit"
-#endif
+#ifndef FALLBACK_CONFIG_DIRS
+#define FALLBACK_CONFIG_DIRS "/etc/xdg"
+#endif  // !FALLBACK_CONFIG_DIRS
 
-// OpenXR Loader environment variables of interest
-#define OPENXR_RUNTIME_JSON_ENV_VAR "XR_RUNTIME_JSON"
-#define OPENXR_API_LAYER_PATH_ENV_VAR "XR_API_LAYER_PATH"
+#ifndef FALLBACK_DATA_DIRS
+#define FALLBACK_DATA_DIRS "/usr/local/share:/usr/share"
+#endif  // !FALLBACK_DATA_DIRS
+
+#ifndef SYSCONFDIR
+#define SYSCONFDIR "/etc"
+#endif  // !SYSCONFDIR
 
 #ifdef XRLOADER_DISABLE_EXCEPTION_HANDLING
 #if JSON_USE_EXCEPTIONS
@@ -426,11 +425,11 @@ bool ManifestFile::IsValidJson(const Json::Value &root_node, JsonVersion &versio
         return false;
     }
     std::string file_format = root_node["file_format_version"].asString();
-    sscanf(file_format.c_str(), "%d.%d.%d", &version.major, &version.minor, &version.patch);
+    const int num_fields = sscanf(file_format.c_str(), "%u.%u.%u", &version.major, &version.minor, &version.patch);
 
     // Only version 1.0.0 is defined currently.  Eventually we may have more version, but
     // some of the versions may only be valid for layers or runtimes specifically.
-    if (version.major != 1 || version.minor != 0 || version.patch != 0) {
+    if (num_fields != 3 || version.major != 1 || version.minor != 0 || version.patch != 0) {
         std::ostringstream error_ss;
         error_ss << "ManifestFile::IsValidJson - JSON \"file_format_version\" " << version.major << "." << version.minor << "."
                  << version.patch << " is not supported";
@@ -489,15 +488,15 @@ static void ParseExtension(Json::Value const &ext, std::vector<ExtensionListing>
     Json::Value ext_version = ext["extension_version"];
     Json::Value ext_entries = ext["entrypoints"];
     if (ext_name.isString() && ext_version.isUInt() && ext_entries.isArray()) {
-        ExtensionListing ext = {};
-        ext.name = ext_name.asString();
-        ext.extension_version = ext_version.asUInt();
+        ExtensionListing ext_listing = {};
+        ext_listing.name = ext_name.asString();
+        ext_listing.extension_version = ext_version.asUInt();
         for (const auto &entrypoint : ext_entries) {
             if (entrypoint.isString()) {
-                ext.entrypoints.push_back(entrypoint.asString());
+                ext_listing.entrypoints.push_back(entrypoint.asString());
             }
         }
-        extensions.push_back(ext);
+        extensions.push_back(ext_listing);
     }
 }
 
@@ -725,10 +724,11 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
     std::string layer_name = layer_root_node["name"].asString();
     std::string api_version_string = layer_root_node["api_version"].asString();
     JsonVersion api_version = {};
-    sscanf(api_version_string.c_str(), "%d.%d", &api_version.major, &api_version.minor);
+    const int num_fields = sscanf(api_version_string.c_str(), "%u.%u", &api_version.major, &api_version.minor);
     api_version.patch = 0;
 
-    if ((api_version.major == 0 && api_version.minor == 0) || api_version.major > XR_VERSION_MAJOR(XR_CURRENT_API_VERSION)) {
+    if ((num_fields != 2) || (api_version.major == 0 && api_version.minor == 0) ||
+        api_version.major > XR_VERSION_MAJOR(XR_CURRENT_API_VERSION)) {
         error_ss << "layer " << filename << " has invalid API Version.  Skipping layer.";
         LoaderLogger::LogWarningMessage("", error_ss.str());
         return;
@@ -774,10 +774,7 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
     manifest_files.back()->ParseCommon(layer_root_node);
 }
 
-XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() const {
-    XrApiLayerProperties props = {};
-    props.type = XR_TYPE_API_LAYER_PROPERTIES;
-    props.next = nullptr;
+void ApiLayerManifestFile::PopulateApiLayerProperties(XrApiLayerProperties &props) const {
     props.layerVersion = _implementation_version;
     props.specVersion = XR_MAKE_VERSION(_api_version.major, _api_version.minor, _api_version.patch);
     strncpy(props.layerName, _layer_name.c_str(), XR_MAX_API_LAYER_NAME_SIZE - 1);
@@ -788,7 +785,6 @@ XrApiLayerProperties ApiLayerManifestFile::GetApiLayerProperties() const {
     if (_description.size() >= XR_MAX_API_LAYER_DESCRIPTION_SIZE - 1) {
         props.description[XR_MAX_API_LAYER_DESCRIPTION_SIZE - 1] = '\0';
     }
-    return props;
 }
 
 // Find all layer manifest files in the appropriate search paths/registries for the given type.

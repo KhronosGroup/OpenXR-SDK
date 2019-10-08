@@ -153,13 +153,20 @@ bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::strin
 #elif defined(XR_OS_WINDOWS)
 
 // For pre C++17 compiler that doesn't support experimental filesystem
-#include <shlwapi.h>
 
-bool FileSysUtilsIsRegularFile(const std::string& path) { return (1 != PathIsDirectoryW(utf8_to_wide(path).c_str())); }
+bool FileSysUtilsIsRegularFile(const std::string& path) {
+    const DWORD attr = GetFileAttributesW(utf8_to_wide(path).c_str());
+    return attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY);
+}
 
-bool FileSysUtilsIsDirectory(const std::string& path) { return (1 == PathIsDirectoryW(utf8_to_wide(path).c_str())); }
+bool FileSysUtilsIsDirectory(const std::string& path) {
+    const DWORD attr = GetFileAttributesW(utf8_to_wide(path).c_str());
+    return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY);
+}
 
-bool FileSysUtilsPathExists(const std::string& path) { return (1 == PathFileExistsW(utf8_to_wide(path).c_str())); }
+bool FileSysUtilsPathExists(const std::string& path) {
+    return (GetFileAttributesW(utf8_to_wide(path).c_str()) != INVALID_FILE_ATTRIBUTES);
+}
 
 bool FileSysUtilsIsAbsolutePath(const std::string& path) {
     if ((path[0] == '\\') || (path[1] == ':' && (path[2] == '\\' || path[2] == '/'))) {
@@ -223,8 +230,11 @@ bool FileSysUtilsParsePathList(std::string& path_list, std::vector<std::string>&
 }
 
 bool FileSysUtilsFindFilesInPath(const std::string& path, std::vector<std::string>& files) {
+    std::string searchPath;
+    FileSysUtilsCombinePaths(path, "*", searchPath);
+
     WIN32_FIND_DATAW file_data;
-    HANDLE file_handle = FindFirstFileW(utf8_to_wide(path).c_str(), &file_data);
+    HANDLE file_handle = FindFirstFileW(utf8_to_wide(searchPath).c_str(), &file_data);
     if (file_handle != INVALID_HANDLE_VALUE) {
         do {
             if (!(file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {

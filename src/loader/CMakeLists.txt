@@ -35,6 +35,11 @@ if(WIN32)
     set(openxr_loader_RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/loader.rc)
 endif()
 
+if(NOT MSVC)
+    set(CMAKE_C_VISIBILITY_PRESET hidden)
+    set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+endif()
+
 # List of all files externally generated outside of the loader that the loader
 # needs to build with.
 SET(LOADER_EXTERNAL_GEN_FILES
@@ -46,6 +51,9 @@ run_xr_xml_generate(loader_source_generator.py xr_generated_loader.cpp)
 if(DYNAMIC_LOADER)
     add_definitions(-DXRAPI_DLL_EXPORT)
     set(LIBRARY_TYPE SHARED)
+    if(WIN32)
+        list(APPEND openxr_loader_RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.def)
+    endif()
 else() # build static lib
     set(LIBRARY_TYPE STATIC)
 endif()
@@ -71,6 +79,7 @@ add_library(openxr_loader ${LIBRARY_TYPE}
     ${PROJECT_SOURCE_DIR}/src/common/hex_and_handles.h
     ${PROJECT_SOURCE_DIR}/src/common/object_info.cpp
     ${PROJECT_SOURCE_DIR}/src/common/object_info.h
+    ${PROJECT_SOURCE_DIR}/src/common/platform_utils.hpp
     ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp
     ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp
     ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp
@@ -161,8 +170,10 @@ elseif(WIN32)
         endforeach()
     endif()
 
-    target_link_libraries(openxr_loader shlwapi)
     target_compile_options(openxr_loader PRIVATE)
+    if(MSVC)
+        target_compile_options(openxr_loader PRIVATE /wd6386)
+    endif()
     generate_export_header(openxr_loader)
     # set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS false)
 
@@ -188,6 +199,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(openxr_loader
         PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wpointer-arith
         PRIVATE -fno-strict-aliasing -fno-builtin-memcmp "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>"
+        -ffunction-sections -fdata-sections
     )
     # For GCC version 7.1 or greater, we need to disable the implicit fallthrough warning since
     # there's no consistent way to satisfy all compilers until they all accept the C++17 standard

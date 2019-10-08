@@ -12,6 +12,50 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR 1.0.3 release (7-October-2019)
+
+Patch release for the 1.0 series.
+
+Note that this release includes changes to adjust the symbol exports from
+dynamic library versions of the loader to align with the specification. Only
+**core** symbols are currently exported. All extension symbols must be retrieved
+using `xrGetInstanceProcAddr`.
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- General, Build, Other
+  - #139 - Write output atomically at the end of generator scripts
+  - #119 - Loader test updates.
+  - #116 - Static analysis cleanups.
+- Loader
+  - #140 - Permit broader valid usage re: layers
+  - #133 - Remove shwapi dependency
+  - #132 - Fix directory searching for layers
+  - #130 - Fix exporting of symbols on Windows.
+  - #129 - Remove debug ext only when added by loader - fixes usage of debug ext
+    on runtimes that do not provide it themselves.
+  - #125 - Include a `OutputDebugString` logger for Win32
+- Layers
+  - #138 - Don't validate output enum buffer values
+  - #137 - Fix incorrect filenames in the generated API layer JSON
+
+### Internal issues
+
+- General, Build, Other
+  - Fix warnings in MSVC static code analysis mode (internal MR 1574)
+  - Validation layer improvements and fixes (internal MR 1568)
+  - Update vendored jsoncpp to 1.9.1 (internal MR 1523)
+- Loader
+  - Add ability to quiet the loader's default output (internal MR 1576)
+  - Fix conformance of loader in `xrEnumerateApiLayerProperties`/`xrEnumerateInstanceExtensionProperties`
+- hello_xr
+  - Simplify action usage in hello_xr (internal MR 1553)
+- Registry
+  - Add `XR_EXT_view_configuration_depth_range` extension (internal MR 1502, internal issue 1201)
+  - Reserve a Monado extension (internal MR 1541)
+
 ## OpenXR 1.0.2 release (27-August-2019)
 
 Patch release for the 1.0 series.
@@ -56,7 +100,7 @@ These had been integrated into the public repo incrementally.
   - Reserve additional extension number for Oculus. (Internal MR 1517)
 - Loader
   - **Security fix**: Do not use HKEY_CURRENT_USER or environment variables when
-    running as a medium-integrity process or higher on Windows.
+    the process is running higher than medium-integrity on Windows.
     (Internal issue 1205, internal MR 1511)
   - Small updates to the loader documentation.
 

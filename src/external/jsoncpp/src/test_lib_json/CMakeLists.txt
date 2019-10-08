@@ -1,38 +1,42 @@
 # vim: et ts=4 sts=4 sw=4 tw=0
 
-ADD_EXECUTABLE( jsoncpp_test 
+add_executable( jsoncpp_test
                 jsontest.cpp
                 jsontest.h
+                fuzz.cpp
+                fuzz.h
                 main.cpp
                 )
 
 
-IF(BUILD_SHARED_LIBS)
-    ADD_DEFINITIONS( -DJSON_DLL )
-    TARGET_LINK_LIBRARIES(jsoncpp_test jsoncpp_lib)
-ELSE(BUILD_SHARED_LIBS)
-    TARGET_LINK_LIBRARIES(jsoncpp_test jsoncpp_lib_static)
-ENDIF()
+if(BUILD_SHARED_LIBS)
+    add_compile_definitions( JSON_DLL )
+endif()
+target_link_libraries(jsoncpp_test jsoncpp_lib)
 
 # another way to solve issue #90
 #set_target_properties(jsoncpp_test PROPERTIES COMPILE_FLAGS -ffloat-store)
 
 # Run unit tests in post-build
 # (default cmake workflow hides away the test result into a file, resulting in poor dev workflow?!?)
-IF(JSONCPP_WITH_POST_BUILD_UNITTEST)
-    IF(BUILD_SHARED_LIBS)
+if(JSONCPP_WITH_POST_BUILD_UNITTEST)
+    if(BUILD_SHARED_LIBS)
         # First, copy the shared lib, for Microsoft.
         # Then, run the test executable.
-        ADD_CUSTOM_COMMAND( TARGET jsoncpp_test
+        add_custom_command( TARGET jsoncpp_test
                             POST_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:jsoncpp_lib> $<TARGET_FILE_DIR:jsoncpp_test>
-                            COMMAND $<TARGET_FILE:jsoncpp_test>)
-    ELSE(BUILD_SHARED_LIBS)
+                            COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} $<TARGET_FILE:jsoncpp_test>)
+    else(BUILD_SHARED_LIBS)
         # Just run the test executable.
-        ADD_CUSTOM_COMMAND( TARGET jsoncpp_test
+        add_custom_command( TARGET jsoncpp_test
                             POST_BUILD
-                            COMMAND $<TARGET_FILE:jsoncpp_test>)
-    ENDIF()
-ENDIF()
+                            COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} $<TARGET_FILE:jsoncpp_test>)
+    endif()
+    ## Create tests for dashboard submission, allows easy review of CI results https://my.cdash.org/index.php?project=jsoncpp
+    add_test(NAME jsoncpp_test
+       COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}  $<TARGET_FILE:jsoncpp_test>
+    )
+endif()
 
-SET_TARGET_PROPERTIES(jsoncpp_test PROPERTIES OUTPUT_NAME jsoncpp_test) 
+set_target_properties(jsoncpp_test PROPERTIES OUTPUT_NAME jsoncpp_test)

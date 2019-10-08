@@ -32,13 +32,13 @@
 std::string Uint64ToHexString(uint64_t val) {
     std::ostringstream oss;
     oss << "0x";
-    oss << std::hex << std::setw(16) << std::setfill('0') << val;
+    oss << std::hex << std::setw(sizeof(val) * 2) << std::setfill('0') << val;
     return oss.str();
 }
 
 std::string Uint32ToHexString(uint32_t val) {
     std::ostringstream oss;
     oss << "0x";
-    oss << std::hex << std::setw(8) << std::setfill('0') << val;
+    oss << std::hex << std::setw(sizeof(val) * 2) << std::setfill('0') << val;
     return oss.str();
 }

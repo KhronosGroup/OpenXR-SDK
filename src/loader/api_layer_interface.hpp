@@ -47,19 +47,19 @@ class ApiLayerInterface {
                       PFN_xrCreateApiLayerInstance create_api_layer_instance);
     virtual ~ApiLayerInterface();
 
-    PFN_xrGetInstanceProcAddr GetInstanceProcAddrFuncPointer() { return _get_instant_proc_addr; }
+    PFN_xrGetInstanceProcAddr GetInstanceProcAddrFuncPointer() { return _get_instance_proc_addr; }
     PFN_xrCreateApiLayerInstance GetCreateApiLayerInstanceFuncPointer() { return _create_api_layer_instance; }
 
     std::string LayerName() { return _layer_name; }
 
     // Generated methods
     void GenUpdateInstanceDispatchTable(XrInstance instance, std::unique_ptr<XrGeneratedDispatchTable>& table);
-    bool SupportsExtension(const std::string& extension_name);
+    bool SupportsExtension(const std::string& extension_name) const;
 
    private:
     std::string _layer_name;
     LoaderPlatformLibraryHandle _layer_library;
-    PFN_xrGetInstanceProcAddr _get_instant_proc_addr;
+    PFN_xrGetInstanceProcAddr _get_instance_proc_addr;
     PFN_xrCreateApiLayerInstance _create_api_layer_instance;
     std::vector<std::string> _supported_extensions;
 };

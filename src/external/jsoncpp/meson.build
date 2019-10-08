@@ -1,12 +1,13 @@
 project(
   'jsoncpp',
   'cpp',
-  version : '1.8.1',
+  version : '1.9.0',
   default_options : [
     'buildtype=release',
+    'cpp_std=c++11',
     'warning_level=1'],
   license : 'Public Domain',
-  meson_version : '>= 0.41.1')
+  meson_version : '>= 0.50.0')
 
 jsoncpp_ver_arr = meson.project_version().split('.')
 jsoncpp_major_version = jsoncpp_ver_arr[0]
@@ -18,6 +19,7 @@ jsoncpp_cdata.set('JSONCPP_VERSION', meson.project_version())
 jsoncpp_cdata.set('JSONCPP_VERSION_MAJOR', jsoncpp_major_version)
 jsoncpp_cdata.set('JSONCPP_VERSION_MINOR', jsoncpp_minor_version)
 jsoncpp_cdata.set('JSONCPP_VERSION_PATCH', jsoncpp_patch_version)
+jsoncpp_cdata.set('JSONCPP_USE_SECURE_MEMORY',0)
 
 jsoncpp_gen_sources = configure_file(
   input : 'src/lib_json/version.h.in',
@@ -44,6 +46,14 @@ install_headers(
   jsoncpp_headers,
   subdir : 'json')
 
+if get_option('default_library') == 'shared' and meson.get_compiler('cpp').get_id() == 'msvc'
+  dll_export_flag = '-DJSON_DLL_BUILD'
+  dll_import_flag = '-DJSON_DLL'
+else
+  dll_export_flag = []
+  dll_import_flag = []
+endif
+
 jsoncpp_lib = library(
   'jsoncpp',
   [ jsoncpp_gen_sources,
@@ -52,9 +62,10 @@ jsoncpp_lib = library(
     'src/lib_json/json_reader.cpp',
     'src/lib_json/json_value.cpp',
     'src/lib_json/json_writer.cpp'],
-  soversion : 18,
+  soversion : 21,
   install : true,
-  include_directories : jsoncpp_include_directories)
+  include_directories : jsoncpp_include_directories,
+  cpp_args: dll_export_flag)
 
 import('pkgconfig').generate(
   libraries : jsoncpp_lib,
@@ -64,7 +75,7 @@ import('pkgconfig').generate(
   description : 'A C++ library for interacting with JSON')
 
 # for libraries bundling jsoncpp
-declare_dependency(
+jsoncpp_dep = declare_dependency(
   include_directories : jsoncpp_include_directories,
   link_with : jsoncpp_lib,
   version : meson.project_version(),
@@ -77,10 +88,12 @@ jsoncpp_test = executable(
   'jsoncpp_test',
   [ 'src/test_lib_json/jsontest.cpp',
     'src/test_lib_json/jsontest.h',
-    'src/test_lib_json/main.cpp'],
+    'src/test_lib_json/main.cpp',
+    'src/test_lib_json/fuzz.cpp'],
   include_directories : jsoncpp_include_directories,
   link_with : jsoncpp_lib,
-  install : false)
+  install : false,
+  cpp_args: dll_import_flag)
 test(
   'unittest_jsoncpp_test',
   jsoncpp_test)
@@ -90,7 +103,8 @@ jsontestrunner = executable(
   'src/jsontestrunner/main.cpp',
   include_directories : jsoncpp_include_directories,
   link_with : jsoncpp_lib,
-  install : false)
+  install : false,
+  cpp_args: dll_import_flag)
 test(
   'unittest_jsontestrunner',
   python,

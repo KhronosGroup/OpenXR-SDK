@@ -49,6 +49,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
         <tag name="KHR"        author="Khronos"                 contact="Nick Whiting @whitingn"/>
         <tag name="LUNARG"     author="LunarG"                  contact="Mark Young @marky_lunarg, Karl Schultz @karlschultz"/>
+        <tag name="MAGICLEAP"  author="Magic Leap"              contact="Blake Taylor @theblindprogramm3r"/>
         <tag name="MND"        author="Monado Project"          contact="Ryan Pavlik @rpavlik"/>
         <tag name="MSFT"       author="Microsoft"               contact="Alex Turner @alexturn, Yin Li @yl_msft, Bryce Hutchings @brycehutchings, Lachlan Ford @laford_msft, Minmin Gong @gongminmin "/>
         <tag name="NV"         author="NVIDIA Corporation"      contact="Satish Salian @ssalian, Robert Menzel"/>
@@ -112,7 +113,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 2)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 3)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -958,6 +959,16 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member><type>D3D_FEATURE_LEVEL</type>  <name>minFeatureLevel</name></member>
         </type>
 
+        <!-- struct types for XR_EXT_view_configuration_depth_range -->
+        <type category="struct" name="XrViewConfigurationDepthRangeEXT" structextends="XrViewConfigurationView">
+            <member values="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>float</type> <name>recommendedNearZ</name></member>
+            <member><type>float</type> <name>minNearZ</name></member>
+            <member><type>float</type> <name>recommendedFarZ</name></member>
+            <member><type>float</type> <name>maxFarZ</name></member>
+        </type>
+
         <!-- The PFN_xrVoidFunction type are used by XrGetInstanceProcAddr below -->
         <type category="funcpointer">typedef void (XRAPI_PTR *<name>PFN_xrVoidFunction</name>)(void);</type>
 
@@ -1025,7 +1036,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum value="4"     name="XR_TYPE_SYSTEM_GET_INFO"/>
         <enum value="5"     name="XR_TYPE_SYSTEM_PROPERTIES"/>
         <enum value="6"     name="XR_TYPE_VIEW_LOCATE_INFO"/>
-        <enum value="7"     name="XR_TYPE_VIEW"/>        
+        <enum value="7"     name="XR_TYPE_VIEW"/>
         <enum value="8"     name="XR_TYPE_SESSION_CREATE_INFO"/>
         <enum value="9"     name="XR_TYPE_SWAPCHAIN_CREATE_INFO"/>
         <enum value="10"    name="XR_TYPE_SESSION_BEGIN_INFO"/>
@@ -1063,7 +1074,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum value="56"    name="XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO"/>
         <enum value="57"    name="XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO"/>
         <enum value="58"    name="XR_TYPE_ACTION_STATE_GET_INFO"/>
-        <enum value="59"    name="XR_TYPE_HAPTIC_ACTION_INFO"/>        
+        <enum value="59"    name="XR_TYPE_HAPTIC_ACTION_INFO"/>
         <enum value="60"    name="XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO"/>
         <enum value="61"    name="XR_TYPE_ACTIONS_SYNC_INFO"/>
         <enum value="62"    name="XR_TYPE_BOUND_SOURCES_FOR_ACTION_ENUMERATE_INFO"/>
@@ -2031,6 +2042,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
+
     <!-- Vulkan image format list extension -->
     <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" requires="XR_KHR_vulkan_enable" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN">
         <require>
@@ -2356,6 +2368,22 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_OCULUS_android_session_state_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_OCULUS_android_session_state_enable&quot;" name="XR_OCULUS_ANDROID_SESSION_STATE_ENABLE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MND_extension_46" number="46" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MND_extension_46_SPEC_VERSION"/>
+            <enum value="&quot;XR_MND_extension_46&quot;" name="XR_MND_EXTENSION_46_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_view_configuration_depth_range" number="47" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_EXT_view_configuration_depth_range_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_view_configuration_depth_range&quot;" name="XR_EXT_VIEW_CONFIGURATION_DEPTH_RANGE_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"/>
+            <type name="XrViewConfigurationDepthRangeEXT"/>
         </require>
     </extension>
 
