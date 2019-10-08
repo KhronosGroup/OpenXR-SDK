@@ -41,6 +41,7 @@ if(HAVE_PREGENERATED AND NOT BUILD_FORCE_GENERATION)
 
     set(INSTALL_HEADERS 
         ${CMAKE_CURRENT_SOURCE_DIR}/openxr_platform_defines.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/openxr.hpp
         ${SOURCE_HEADERS})
 else()
 
