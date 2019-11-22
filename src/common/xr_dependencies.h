@@ -19,6 +19,9 @@
 
 #ifdef XR_USE_PLATFORM_ANDROID
 #include <android/native_window.h>
+#include <android/window.h>
+#include <android/native_window_jni.h>
+#include <android_native_app_glue.h>
 #endif  // XR_USE_PLATFORM_ANDROID
 
 #ifdef XR_USE_PLATFORM_WIN32
@@ -53,6 +56,18 @@
 #ifdef XR_USE_PLATFORM_XLIB
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+
+#ifdef Success
+#undef Success
+#endif  // Success
+
+#ifdef Always
+#undef Always
+#endif  // Always
+
+#ifdef None
+#undef None
+#endif  // None
 #endif  // XR_USE_PLATFORM_XLIB
 
 #ifdef XR_USE_PLATFORM_XCB

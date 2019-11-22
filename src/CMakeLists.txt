@@ -15,8 +15,8 @@
 # Author:
 #
 
-# Entire project uses C++11
-set(CMAKE_CXX_STANDARD 11)
+# Entire project uses C++14
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -38,6 +38,11 @@ endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance" AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
     option(BUILD_CONFORMANCE_TESTS "Build conformance tests" ON)
 endif()
+include(CMakeDependentOption)
+
+find_package(JsonCpp)
+cmake_dependent_option(BUILD_WITH_SYSTEM_JSONCPP "Use system jsoncpp instead of vendored source" ON
+                       "JSONCPP_FOUND" OFF)
 
 
 # Several files use these compile-time OS switches

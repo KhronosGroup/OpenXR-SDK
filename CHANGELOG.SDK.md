@@ -1,9 +1,10 @@
 # Changelog for OpenXR-SDK-Source and OpenXR-SDK Repo
 
-Update log for the OpenXR-SDK-Source and OpenXR-SDK repo on GitHub.
-Updates are in reverse chronological order starting with the latest public release.
+Update log for the OpenXR-SDK-Source and OpenXR-SDK repo on GitHub. Updates are
+in reverse chronological order starting with the latest public release.
 
-Note that only changes relating to the loader and some of the build changes will affect the OpenXR-SDK repository.
+Note that only changes relating to the loader and some of the build changes will
+affect the OpenXR-SDK repository.
 
 This summarizes the periodic public updates, not individual commits. Updates
 on GitHub are generally done as single large patches at the release point,
@@ -11,6 +12,45 @@ collecting together the resolution of many Khronos internal issues,
 along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
+
+## OpenXR 1.0.4 release (21-November-2019)
+
+Patch release for the 1.0 series.
+
+This release includes some fixes, extensions, and a small build system change:
+the build system is now configured to use C++14. No code changes in the loader
+or layers have yet taken place that require C++14. **Please file an issue** in
+OpenXR-SDK-Source if there is some deployment platform where you would be unable
+to use a loader making use of C++14 features.
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- General, Build, Other
+  - #141 - Support system libs better (permit system jsoncpp, etc. for easier
+    packaging)
+- hello_xr
+  - #144 - Fix hello_xr when running under Linux OpenGL X11
+- Registry
+  - Reserve a Monado EGL extension
+    <https://github.com/KhronosGroup/OpenXR-Docs/pull/39>
+
+### Internal issues
+
+- General, Build, Other
+  - Switch C++ standard version to C++14 (internal MR 1602)
+  - Remove unused/unneeded files (internal MR 1609)
+- Loader
+  - Fix typo in parameter/member names (internal MR 1607, internal issue 1233)
+  - Fix deprecated usage of JsonCpp (internal MR 1604, internal issue 1212)
+- hello_xr
+  - Resolve misleading use of `xrLocateViews` before `xrWaitFrame` in helloXR
+    and spec (internal MR 1584, internal issue 1227, public issue
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/134>)
+- Registry
+  - Add `XR_EXT_conformance_automation` extension, for use **only** by
+    conformance testing (internal MR 1577, 1608)
 
 ## OpenXR 1.0.3 release (7-October-2019)
 

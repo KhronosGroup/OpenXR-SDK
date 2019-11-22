@@ -43,7 +43,7 @@ class ApiLayerInterface {
                                                    std::vector<XrExtensionProperties>& extension_properties);
 
     ApiLayerInterface(const std::string& layer_name, LoaderPlatformLibraryHandle layer_library,
-                      std::vector<std::string>& supported_extensions, PFN_xrGetInstanceProcAddr get_instant_proc_addr,
+                      std::vector<std::string>& supported_extensions, PFN_xrGetInstanceProcAddr get_instance_proc_addr,
                       PFN_xrCreateApiLayerInstance create_api_layer_instance);
     virtual ~ApiLayerInterface();
 

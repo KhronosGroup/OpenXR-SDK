@@ -80,12 +80,21 @@ add_library(openxr_loader ${LIBRARY_TYPE}
     ${PROJECT_SOURCE_DIR}/src/common/object_info.cpp
     ${PROJECT_SOURCE_DIR}/src/common/object_info.h
     ${PROJECT_SOURCE_DIR}/src/common/platform_utils.hpp
-    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp
-    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp
-    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp
     ${LOADER_EXTERNAL_GEN_FILES}
     ${openxr_loader_RESOURCE_FILE}
 )
+if(BUILD_WITH_SYSTEM_JSONCPP)
+    target_link_libraries(openxr_loader PRIVATE JsonCpp::JsonCpp)
+else()
+    target_sources(openxr_loader PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp
+        ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp
+        ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp)
+    target_include_directories(openxr_loader
+        PRIVATE
+        # For jsoncpp
+        ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/include)
+endif()
 set_target_properties(openxr_loader PROPERTIES FOLDER ${LOADER_FOLDER})
 
 set_source_files_properties(
@@ -111,9 +120,6 @@ target_include_directories(openxr_loader
     # for target-specific generated files
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-
-    # For jsoncpp
-    ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/include
 )
 if(VulkanHeaders_FOUND)
     target_include_directories(openxr_loader
@@ -140,7 +146,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     set_target_properties(openxr_loader PROPERTIES SOVERSION "${MAJOR}" VERSION "${MAJOR}.${MINOR}.${PATCH}")
-    target_link_libraries(openxr_loader -lstdc++fs -ldl -lpthread -lm)
+    target_link_libraries(openxr_loader PRIVATE stdc++fs PUBLIC dl pthread m)
 
     add_custom_target(libopenxr_loader.so.${MAJOR}.${MINOR} ALL
         COMMAND ${CMAKE_COMMAND} -E create_symlink libopenxr_loader.so.${MAJOR}.${MINOR}.${PATCH} libopenxr_loader.so.${MAJOR}.${MINOR})

@@ -35,7 +35,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 3)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 4)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -1583,7 +1583,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
 
 
 #define XR_MND_headless 1
-#define XR_MND_headless_SPEC_VERSION      1
+#define XR_MND_headless_SPEC_VERSION      2
 #define XR_MND_HEADLESS_EXTENSION_NAME    "XR_MND_headless"
 
 
@@ -1604,6 +1604,49 @@ typedef struct XrViewConfigurationDepthRangeEXT {
     float                 maxFarZ;
 } XrViewConfigurationDepthRangeEXT;
 
+
+
+#define XR_EXT_conformance_automation 1
+#define XR_EXT_conformance_automation_SPEC_VERSION 1
+#define XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME "XR_EXT_conformance_automation"
+typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceActiveEXT)(XrSession session, XrPath interactionProfile, XrPath topLevelPath, XrBool32 isActive);
+typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceStateBoolEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, XrBool32 state);
+typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceStateFloatEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, float state);
+typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceStateVector2fEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, XrVector2f state);
+typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceLocationEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, XrSpace space, XrPosef pose);
+
+#ifndef XR_NO_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceActiveEXT(
+    XrSession                                   session,
+    XrPath                                      interactionProfile,
+    XrPath                                      topLevelPath,
+    XrBool32                                    isActive);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceStateBoolEXT(
+    XrSession                                   session,
+    XrPath                                      topLevelPath,
+    XrPath                                      inputSourcePath,
+    XrBool32                                    state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceStateFloatEXT(
+    XrSession                                   session,
+    XrPath                                      topLevelPath,
+    XrPath                                      inputSourcePath,
+    float                                       state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceStateVector2fEXT(
+    XrSession                                   session,
+    XrPath                                      topLevelPath,
+    XrPath                                      inputSourcePath,
+    XrVector2f                                  state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceLocationEXT(
+    XrSession                                   session,
+    XrPath                                      topLevelPath,
+    XrPath                                      inputSourcePath,
+    XrSpace                                     space,
+    XrPosef                                     pose);
+#endif
 
 #ifdef __cplusplus
 }

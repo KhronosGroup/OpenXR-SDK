@@ -113,7 +113,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 3)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 4)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1812,6 +1812,49 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrSpatialAnchorMSFT</type> <name>anchor</name></param>
         </command>
 
+        <!-- commands for XR_EXT_conformance_automation -->
+        <command successcodes="XR_SUCCESS"
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrSetInputDeviceActiveEXT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>interactionProfile</name></param>
+            <param><type>XrPath</type> <name>topLevelPath</name></param>
+            <param><type>XrBool32</type> <name>isActive</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS"
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrSetInputDeviceStateBoolEXT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>topLevelPath</name></param>
+            <param><type>XrPath</type> <name>inputSourcePath</name></param>
+            <param><type>XrBool32</type> <name>state</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS"
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrSetInputDeviceStateFloatEXT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>topLevelPath</name></param>
+            <param><type>XrPath</type> <name>inputSourcePath</name></param>
+            <param><type>float</type> <name>state</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS"
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrSetInputDeviceStateVector2fEXT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>topLevelPath</name></param>
+            <param><type>XrPath</type> <name>inputSourcePath</name></param>
+            <param><type>XrVector2f</type> <name>state</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS"
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_POSE_INVALID">
+            <proto><type>XrResult</type> <name>xrSetInputDeviceLocationEXT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>topLevelPath</name></param>
+            <param><type>XrPath</type> <name>inputSourcePath</name></param>
+            <param><type>XrSpace</type> <name>space</name></param>
+            <param><type>XrPosef</type> <name>pose</name></param>
+        </command>
+
     </commands>
 
     <!-- SECTION: OpenXR API interface definitions -->
@@ -2352,7 +2395,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MND_headless" number="43" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MND_headless_SPEC_VERSION"/>
+            <enum value="2" name="XR_MND_headless_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_headless&quot;" name="XR_MND_HEADLESS_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -2384,6 +2427,24 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <enum value="&quot;XR_EXT_view_configuration_depth_range&quot;" name="XR_EXT_VIEW_CONFIGURATION_DEPTH_RANGE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"/>
             <type name="XrViewConfigurationDepthRangeEXT"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_conformance_automation" number="48" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_EXT_conformance_automation_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_conformance_automation&quot;" name="XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME"/>
+            <command name="xrSetInputDeviceActiveEXT"/>
+            <command name="xrSetInputDeviceStateBoolEXT"/>
+            <command name="xrSetInputDeviceStateFloatEXT"/>
+            <command name="xrSetInputDeviceStateVector2fEXT"/>
+            <command name="xrSetInputDeviceLocationEXT"/>
+        </require>
+    </extension>
+    <extension name="XR_MND_egl_enable" number="49" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MND_egl_enable_SPEC_VERSION"/>
+            <enum value="&quot;XR_MND_egl_enable&quot;" name="XR_MND_EGL_ENABLE_EXTENSION_NAME"/>
         </require>
     </extension>
 

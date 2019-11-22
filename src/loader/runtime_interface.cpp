@@ -219,8 +219,8 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatch
     return GetDispatchTable(runtime_instance);
 }
 
-RuntimeInterface::RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr)
-    : _runtime_library(runtime_library), _get_instance_proc_addr(get_instant_proc_addr) {}
+RuntimeInterface::RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instance_proc_addr)
+    : _runtime_library(runtime_library), _get_instance_proc_addr(get_instance_proc_addr) {}
 
 RuntimeInterface::~RuntimeInterface() {
     std::string info_message = "RuntimeInterface being destroyed.";

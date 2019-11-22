@@ -58,7 +58,7 @@ class RuntimeInterface {
     RuntimeInterface& operator=(const RuntimeInterface&) = delete;
 
    private:
-    RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instant_proc_addr);
+    RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instance_proc_addr);
     void SetSupportedExtensions(std::vector<std::string>& supported_extensions);
 
     static std::unique_ptr<RuntimeInterface> _single_runtime_interface;

@@ -539,10 +539,15 @@ void RuntimeManifestFile::CreateIfValid(std::string const &filename,
         LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
-    Json::Reader reader;
+    Json::CharReaderBuilder builder;
+    std::string errors;
     Json::Value root_node = Json::nullValue;
-    if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
-        error_ss << "failed to parse " << filename << ".  Is it a valid runtime manifest file?";
+    if (!Json::parseFromStream(builder, json_stream, &root_node, &errors) || root_node.isNull()) {
+        error_ss << "failed to parse " << filename << ".";
+        if (!errors.empty()) {
+            error_ss << " (Error message: " << errors << ")";
+        }
+        error_ss << " Is it a valid runtime manifest file?";
         LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
@@ -665,10 +670,15 @@ void ApiLayerManifestFile::CreateIfValid(ManifestFileType type, const std::strin
         return;
     }
 
-    Json::Reader reader;
+    Json::CharReaderBuilder builder;
+    std::string errors;
     Json::Value root_node = Json::nullValue;
-    if (!reader.parse(json_stream, root_node, false) || root_node.isNull()) {
-        error_ss << "failed to parse " << filename << ".  Is it a valid layer manifest file?";
+    if (!Json::parseFromStream(builder, json_stream, &root_node, &errors) || root_node.isNull()) {
+        error_ss << "failed to parse " << filename << ".";
+        if (!errors.empty()) {
+            error_ss << " (Error message: " << errors << ")";
+        }
+        error_ss << " Is it a valid layer manifest file?";
         LoaderLogger::LogErrorMessage("", error_ss.str());
         return;
     }
