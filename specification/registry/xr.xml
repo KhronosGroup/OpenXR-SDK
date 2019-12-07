@@ -113,7 +113,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 4)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 5)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -2445,6 +2445,55 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_MND_egl_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_egl_enable&quot;" name="XR_MND_EGL_ENABLE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_50" number="50" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_50_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_50&quot;" name="XR_MSFT_extension_50_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_51" number="51" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_51_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_51&quot;" name="XR_MSFT_extension_51_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_52" number="52" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_52_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_52&quot;" name="XR_MSFT_extension_52_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_53" number="53" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_53_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_53&quot;" name="XR_MSFT_extension_53_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_54" number="54" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_54_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_54&quot;" name="XR_MSFT_extension_54_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_55" number="55" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_55_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_55&quot;" name="XR_MSFT_extension_55_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_56" number="56" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_56_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_56&quot;" name="XR_MSFT_extension_56_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MSFT_extension_57" number="57" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_57_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_57&quot;" name="XR_MSFT_extension_57_EXTENSION_NAME"/>
         </require>
     </extension>
 

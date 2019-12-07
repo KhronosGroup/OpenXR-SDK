@@ -13,6 +13,25 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR 1.0.5 release (6-December-2019)
+
+Patch release for the 1.0 series.
+
+This release primarily contains extension reservations and small specification
+clarifications/fixes.
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- Loader tests
+  - #147 - Small bugfix and output extension
+
+### Internal issues
+
+- Registry
+  - Reserve Microsoft extension numbers (Internal MR 1613)
+
 ## OpenXR 1.0.4 release (21-November-2019)
 
 Patch release for the 1.0 series.
