@@ -1,0 +1,33 @@
+parameters:
+  buildType: 'Debug'
+  cmakeArgs: ''
+  sourceDir: '$(System.DefaultWorkingDirectory)'
+  useVulkan: 'true'
+
+steps:
+  # - script: choco install -y ninja
+  #   displayName: 'Install Ninja'
+
+  - script: mkdir  $(System.DefaultWorkingDirectory)\\vulkan_sdk
+    displayName: 'Make Vulkan SDK dir'
+
+  - powershell:  ./.azure-pipelines/install_vulkan.ps1
+    displayName: Install Vulkan SDK
+    workingDirectory: '${{ parameters.sourceDir }}'
+    condition: eq('${{ parameters.useVulkan}}', 'true')
+
+  - script: mkdir build
+    displayName: 'Create build directory'
+    workingDirectory: '${{ parameters.sourceDir }}'
+
+  - script: |
+      set VULKAN_SDK=$(System.DefaultWorkingDirectory)\\vulkan_sdk\\$(VULKAN_SDK_VERSION)
+      cmake .. -G "MinGW Makefiles" ${{ parameters.cmakeArgs }} -DCMAKE_BUILD_TYPE=${{ parameters.buildType }} -DCMAKE_INSTALL_PREFIX=${{ parameters.sourceDir }}/install
+    displayName: 'Generate build system'
+    workingDirectory: '${{ parameters.sourceDir }}/build'
+
+  - script: mingw32-make -C build -j
+    displayName: Build all targets
+
+  - script: mingw32-make -C build install
+    displayName: Install build

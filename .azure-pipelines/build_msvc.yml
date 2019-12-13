@@ -1,0 +1,37 @@
+parameters:
+  buildType: 'Debug'
+  generator: 'Visual Studio 16 2019'
+  cmakeArgs: ''
+  sourceDir: '$(System.DefaultWorkingDirectory)'
+  useVulkan: 'true'
+
+steps:
+
+  - powershell: ./.azure-pipelines/install_vulkan.ps1
+    displayName: Install Vulkan SDK
+    workingDirectory: '${{ parameters.sourceDir }}'
+    condition: eq('${{ parameters.useVulkan}}', 'true')
+
+  - script: mkdir build
+    displayName: 'Create build directory'
+    workingDirectory: '${{ parameters.sourceDir }}'
+
+  - script: |
+      set VULKAN_SDK=$(System.DefaultWorkingDirectory)\\vulkan_sdk\\$(VULKAN_SDK_VERSION)
+      cmake .. -G "${{ parameters.generator }}" ${{ parameters.cmakeArgs }}  -DCMAKE_INSTALL_PREFIX=${{ parameters.sourceDir }}/install
+    displayName: 'Generate build system'
+    workingDirectory: '${{ parameters.sourceDir }}/build'
+
+  - task: MSBuild@1
+    displayName: Build all targets
+    inputs:
+      solution: '${{ parameters.sourceDir }}/build/ALL_BUILD.vcxproj'
+      maximumCpuCount: true
+      configuration: ${{ parameters.buildType }}
+
+  - task: MSBuild@1
+    displayName: Install build
+    inputs:
+      solution: '${{ parameters.sourceDir }}/build/INSTALL.vcxproj'
+      maximumCpuCount: true
+      configuration: ${{ parameters.buildType }}

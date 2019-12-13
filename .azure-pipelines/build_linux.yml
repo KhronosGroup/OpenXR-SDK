@@ -1,0 +1,19 @@
+parameters:
+  buildType: RelWithDebInfo
+  cmakeArgs: ''
+  buildDir: build
+  sourceDir: '$(System.DefaultWorkingDirectory)'
+
+steps:
+  - script: |
+      rm -rf ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+      mkdir -p ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+    displayName: 'Clean up and create new build directory'
+
+  - script: cmake -G Ninja .. -DCMAKE_BUILD_TYPE=${{ parameters.buildType }} ${{ parameters.cmakeArgs }}
+    workingDirectory: ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+    displayName: 'Generate build system'
+
+  - script: ninja
+    workingDirectory: ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+    displayName: 'Compile'

@@ -1,0 +1,10 @@
+
+jobs:
+- job: check_codespell
+  displayName: 'codespell'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  container: khronosgroup/docker-images:openxr-sdk
+  steps:
+    - script: ./checkCodespell
+      displayName: Run Codespell script

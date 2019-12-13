@@ -1,0 +1,11 @@
+# Main azure-pipelines configuration for the OpenXR-SDK repo.
+
+trigger:
+  branches:
+    include:
+      - '*'
+
+stages:
+- stage: Build
+  jobs:
+  - template: build_jobs.yml

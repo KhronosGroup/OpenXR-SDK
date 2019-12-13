@@ -29,3 +29,6 @@ out/build/
 # VS misc
 *.sln
 *.pyproj
+
+# Don't ignore pipeline stuff
+!.azure-pipelines/

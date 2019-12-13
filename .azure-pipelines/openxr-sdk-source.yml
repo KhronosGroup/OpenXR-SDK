@@ -1,0 +1,102 @@
+# Main azure-pipelines configuration for the OpenXR-SDK-Sources repo.
+trigger:
+  branches:
+    include:
+      - '*'
+variables:
+  VULKAN_SDK_VERSION: "1.1.114.0"
+
+stages:
+- stage: Check
+  jobs:
+  - template: check_clang_format.yml
+
+- stage: Build
+  jobs:
+  - template: build_jobs.yml
+  # Build the loader documentation
+  - job: loader_docs
+    pool:
+      vmImage: 'ubuntu-16.04'
+    container: khronosgroup/docker-images:openxr-base
+    steps:
+      - script: make loader
+        workingDirectory: specification
+        displayName: Build loader document
+      - publish: $(System.DefaultWorkingDirectory)/specification/out/1.0/loader.html
+        artifact: LoaderDoc
+
+- stage: Generate
+  jobs:
+  - job: archive
+    pool:
+      vmImage: 'ubuntu-16.04'
+    container: khronosgroup/docker-images:openxr-base
+    steps:
+      - script: make loader
+        workingDirectory: specification
+        displayName: Build loader document
+      - script: maintainer-scripts/archive-sdk.sh
+        displayName: Generate archived source
+      - publish: $(System.DefaultWorkingDirectory)/OpenXR-SDK.tar.gz
+        artifact: sdk-tarball
+
+- stage: GeneratedTest
+  jobs:
+  # Build the loader on Linux
+  - job: linux_build_archive
+    displayName: 'Linux'
+    strategy:
+      matrix:
+        xlib:
+          buildType: RelWithDebInfo
+          presentationBackend: xlib
+        xcb:
+          buildType: RelWithDebInfo
+          presentationBackend: xcb
+        wayland:
+          buildType: RelWithDebInfo
+          presentationBackend: wayland
+    pool:
+      vmImage: 'ubuntu-16.04'
+    container: khronosgroup/docker-images:openxr-sdk
+    steps:
+      - download: current
+        artifact: sdk-tarball
+        displayName: Download archived OpenXR-SDK
+      - script: ls -la
+      - script: ls -la sdk-tarball || true
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: '$(Pipeline.Workspace)/*.tar.gz' 
+          destinationFolder: $(Pipeline.Workspace)/pregen
+          cleanDestinationFolder: true 
+      - script: ls -la $(Pipeline.Workspace)/pregen
+      - template: build_linux.yml
+        parameters:
+          sourceDir: $(Pipeline.Workspace)/pregen
+          buildType: RelWithDebInfo
+          cmakeArgs: '-DPRESENTATION_BACKEND=$(PresentationBackend)'
+
+  - job: windows_build_archive
+    displayName: 'Windows MSVC'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - download: current
+      artifact: sdk-tarball
+      displayName: Download archived OpenXR-SDK
+
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '$(Pipeline.Workspace)/*.tar.gz' 
+        destinationFolder: $(Pipeline.Workspace)/pregen
+        cleanDestinationFolder: true 
+
+    - template: build_msvc.yml
+      parameters:
+        sourceDir: $(Pipeline.Workspace)/pregen
+        buildType: RelWithDebInfo
+        generator: "Visual Studio 16 2019"
+        useVulkan: 'false'
+
