@@ -8,6 +8,9 @@ steps:
   # - script: choco install -y ninja
   #   displayName: 'Install Ninja'
 
+  - script: cmake --version
+    displayName: Show CMake version
+
   - script: mkdir  $(System.DefaultWorkingDirectory)\\vulkan_sdk
     displayName: 'Make Vulkan SDK dir'
 

@@ -5,6 +5,9 @@ parameters:
   sourceDir: '$(System.DefaultWorkingDirectory)'
 
 steps:
+  - script: cmake --version
+    displayName: Show CMake version
+
   - script: |
       rm -rf ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
       mkdir -p ${{ parameters.sourceDir }}/${{ parameters.buildDir }}

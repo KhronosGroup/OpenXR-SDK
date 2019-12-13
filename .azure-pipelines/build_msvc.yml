@@ -6,6 +6,8 @@ parameters:
   useVulkan: 'true'
 
 steps:
+  - script: cmake --version
+    displayName: Show CMake version
 
   - powershell: ./.azure-pipelines/install_vulkan.ps1
     displayName: Install Vulkan SDK
