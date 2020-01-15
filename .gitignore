@@ -8,7 +8,6 @@ CMakeLists.txt.user
 *.tar.gz
 *.log
 pregen/
-doc/
 
 # Cached python scripts in bytecode form
 *.pyc
