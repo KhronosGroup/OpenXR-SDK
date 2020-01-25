@@ -6,6 +6,6 @@ includedir=${prefix}/include
 Name: @CMAKE_PROJECT_NAME@
 Description: OpenXR Loader
 Version: @XR_API_VERSION@
-Libs: -L${libdir} -lopenxr_loader @PRIVATE_LIBS@
+Libs: -L${libdir} -lopenxr_loader @EXTRA_LIBS@
 Cflags: -I${includedir}
 

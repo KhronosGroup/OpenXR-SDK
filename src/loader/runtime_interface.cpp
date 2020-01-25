@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 The Khronos Group Inc.
+// Copyright (c) 2017-2020 The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
@@ -39,9 +39,6 @@ std::unique_ptr<RuntimeInterface> RuntimeInterface::_single_runtime_interface;
 uint32_t RuntimeInterface::_single_runtime_count = 0;
 
 XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
-    XrResult last_error = XR_SUCCESS;
-    bool any_loaded = false;
-
     // If something's already loaded, we're done here.
     if (_single_runtime_interface != nullptr) {
         _single_runtime_count++;
@@ -49,9 +46,10 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
     }
 
     std::vector<std::unique_ptr<RuntimeManifestFile>> runtime_manifest_files = {};
+    bool any_loaded = false;
 
     // Find the available runtimes which we may need to report information for.
-    last_error = RuntimeManifestFile::FindManifestFiles(MANIFEST_TYPE_RUNTIME, runtime_manifest_files);
+    XrResult last_error = RuntimeManifestFile::FindManifestFiles(MANIFEST_TYPE_RUNTIME, runtime_manifest_files);
     if (XR_FAILED(last_error)) {
         LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - unknown error");
         last_error = XR_ERROR_FILE_ACCESS_ERROR;

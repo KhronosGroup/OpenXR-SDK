@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 The Khronos Group Inc.
+// Copyright (c) 2017-2020 The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
@@ -242,7 +242,8 @@ static inline std::string PlatformUtilsGetEnv(const char* name) {
     const std::wstring wname = utf8_to_wide(name);
     const DWORD valSize = ::GetEnvironmentVariableW(wname.c_str(), nullptr, 0);
     // GetEnvironmentVariable returns 0 when environment variable does not exist or there is an error.
-    if (valSize == 0) {
+    // The size includes the null-terminator, so a size of 1 is means the variable was explicitly set to empty.
+    if (valSize == 0 || valSize == 1) {
         return {};
     }
 

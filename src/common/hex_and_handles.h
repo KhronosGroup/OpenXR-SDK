@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 The Khronos Group Inc.
+// Copyright (c) 2017-2020 The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 // Copyright (c) 2019 Collabora, Ltd.
@@ -22,10 +22,6 @@
  * @file
  *
  * Some utilities, primarily for working with OpenXR handles in a generic way.
- *
- * Most are trivial and inlined by default, but a few involve some non-trivial standard headers:
- * the various `...ToHexString`functions.
- * If you want those, make sure your build includes the corresponding hex_and_handles.cpp file.
  */
 
 #pragma once
@@ -34,6 +30,25 @@
 
 #include <string>
 #include <stdint.h>
+
+inline std::string to_hex(const uint8_t* const data, size_t bytes) {
+    std::string out(2 + bytes * 2, '?');
+    out[0] = '0';
+    out[1] = 'x';
+    static const char* hex = "0123456789abcdef";
+    auto ch = out.end();
+    for (size_t i = 0; i < bytes; ++i) {
+        auto b = data[i];
+        *--ch = hex[(b >> 0) & 0xf];
+        *--ch = hex[(b >> 4) & 0xf];
+    }
+    return out;
+}
+
+template <typename T>
+inline std::string to_hex(const T& data) {
+    return to_hex(reinterpret_cast<const uint8_t* const>(&data), sizeof(data));
+}
 
 #if XR_PTR_SIZE == 8
 /// Convert a handle into a same-sized integer.
@@ -82,27 +97,22 @@ static inline bool IsIntegerNullHandle(uint64_t handle) { return XR_NULL_HANDLE 
 /// Turns a uint64_t into a string formatted as hex.
 ///
 /// The core of the HandleToHexString implementation is in here.
-std::string Uint64ToHexString(uint64_t val);
+inline std::string Uint64ToHexString(uint64_t val) { return to_hex(val); }
 
 /// Turns a uint32_t into a string formatted as hex.
-std::string Uint32ToHexString(uint32_t val);
+inline std::string Uint32ToHexString(uint32_t val) { return to_hex(val); }
 
 /// Turns an OpenXR handle into a string formatted as hex.
 template <typename T>
-static inline std::string HandleToHexString(T handle) {
-    return Uint64ToHexString(MakeHandleGeneric(handle));
+inline std::string HandleToHexString(T handle) {
+    return to_hex(handle);
 }
 
-#if XR_PTR_SIZE == 8
 /// Turns a pointer-sized integer into a string formatted as hex.
-static inline std::string UintptrToHexString(uintptr_t val) { return Uint64ToHexString(val); }
-#else
-/// Turns a pointer-sized integer into a string formatted as hex.
-static inline std::string UintptrToHexString(uintptr_t val) { return Uint32ToHexString(val); }
-#endif
+inline std::string UintptrToHexString(uintptr_t val) { return to_hex(val); }
 
 /// Convert a pointer to a string formatted as hex.
 template <typename T>
-static inline std::string PointerToHexString(T const* ptr) {
-    return UintptrToHexString(reinterpret_cast<uintptr_t>(ptr));
+inline std::string PointerToHexString(T const* ptr) {
+    return to_hex(ptr);
 }

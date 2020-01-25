@@ -13,6 +13,59 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR 1.0.6 release (24-January-2020)
+
+Patch release for the 1.0 series.
+
+This release contains, among other things, a substantial simplification and
+cleanup of the loader, which should fix a number of issues and also make it
+forward compatible with extensions newer than the loader itself. As a part of
+this change, the loader itself now only supports a single `XrInstance` active at
+a time per process. If you attempt to create a new instance while an existing
+one remains (such as in the case of application code leaking an `XrInstance`
+handle), the loader will now return `XR_ERROR_LIMIT_REACHED`.
+
+### GitHub Pull Requests
+
+These had been integrated into the public repo incrementally.
+
+- hello_xr
+  - Initialize hand_scale to 1.0
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/157>
+  - Fix Vulkan CHECK_CBSTATE build under newer MSVC
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/154>
+  - Initialize hand_scale to 1.0 to still show controller cubes even if
+    grabAction not available on startup.
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/157>
+- Loader
+  - Single instance loader refactor with forward compatibility
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/146> (and internal
+    MRs 1599, 1621)
+  - Fix bug in loading API layers that could result in not loading an available
+    and enabled layer
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/155>
+- Build
+  - Clean up linking, build loader and layers with all available
+    platform/presentation support, fix pkg-config file, rename `runtime_list`
+    test executable to `openxr_runtime_list`
+    <https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/149>
+
+### Internal issues
+
+- Registry
+  - Fix typo in visibility mesh enum comment.
+  - Add `XR_EXT_win32_appcontainer_compatible` extension.
+- Scripts
+  - Fix comment typos.
+  - Sync scripts with Vulkan. (internal MR 1625)
+- Loader
+  - Allow use of `/` in paths in FileSysUtils on Windows.
+- Build
+  - Improve messages
+- hello_xr
+  - Add D3D12 graphics plugin (internal MR 1616)
+  - Fix comment typo.
+
 ## OpenXR 1.0.5 release (6-December-2019)
 
 Patch release for the 1.0 series.
@@ -108,11 +161,13 @@ These had been integrated into the public repo incrementally.
   - Update vendored jsoncpp to 1.9.1 (internal MR 1523)
 - Loader
   - Add ability to quiet the loader's default output (internal MR 1576)
-  - Fix conformance of loader in `xrEnumerateApiLayerProperties`/`xrEnumerateInstanceExtensionProperties`
+  - Fix conformance of loader in
+    `xrEnumerateApiLayerProperties`/`xrEnumerateInstanceExtensionProperties`
 - hello_xr
   - Simplify action usage in hello_xr (internal MR 1553)
 - Registry
-  - Add `XR_EXT_view_configuration_depth_range` extension (internal MR 1502, internal issue 1201)
+  - Add `XR_EXT_view_configuration_depth_range` extension (internal MR 1502,
+    internal issue 1201)
   - Reserve a Monado extension (internal MR 1541)
 
 ## OpenXR 1.0.2 release (27-August-2019)
@@ -129,7 +184,8 @@ These had been integrated into the public repo incrementally.
 - General, Build, Other
   - #112 - Update active runtime search documentation
   - #106 - List app changes
-  - #114 - Support for building WindowsStore loader and layers, and simplified filename
+  - #114 - Support for building WindowsStore loader and layers, and simplified
+    filename
   - #96 - Misc cleanup: build simplification, install hello_xr,
     allow building as subproject, fix null deref in validation layer.
 - Loader
@@ -141,10 +197,12 @@ These had been integrated into the public repo incrementally.
   - #118 - Fix logic error in Linux active runtime search
   - #115, #117 - Simplification and refactoring.
 - Layers
-  - #111 - Some fixes to Validation Layer (as found applying to the UE4 OpenXR plugin)
+  - #111 - Some fixes to Validation Layer (as found applying to the UE4 OpenXR
+    plugin)
   - #110 - Fix cleaning up session labels in validation layer
 - From OpenXR-Docs:
-  - #26 - Proposal for unbounded space and spatial anchor extensions (vendor extensions)
+  - #26 - Proposal for unbounded space and spatial anchor extensions (vendor
+    extensions)
 
 ### Internal issues
 
@@ -177,16 +235,19 @@ These had been integrated into the public repo incrementally.
 
 - General, Build, Other
   - #87 - Fix makefiles
-  - #88 - Remove unneeded generation (corresponds to issue #74, internal issue 1139, internal MR 1491)
+  - #88 - Remove unneeded generation (corresponds to issue #74, internal issue
+    1139, internal MR 1491)
   - #101 - Fix install of header and loader.
 - Loader
-  - #91 - Fix a loader bug which prevented Layers from not implementing all XR functions
+  - #91 - Fix a loader bug which prevented Layers from not implementing all XR
+    functions
   - #95 - Guard config includes/defines (relates to #81, #92)
   - #97 - Remove a constant static std::vector, use a std::array instead.
 - Layers
   - #84 - Fix Linux warning for apidump
 - From OpenXR-Docs:
-  - #26 - Proposal for unbounded space and spatial anchor extensions (vendor extensions)
+  - #26 - Proposal for unbounded space and spatial anchor extensions (vendor
+    extensions)
 
 ### Internal issues
 
@@ -230,7 +291,8 @@ These had been integrated into the public repo incrementally.
 - Loader
   - #38 - Remove dead file-locking code
   - #51 - Idiomatic Linux active_runtime.json search logic
-  - #55, #58, #68 - Purge std::map bracket operations that might do inadvertent insertions
+  - #55, #58, #68 - Purge std::map bracket operations that might do inadvertent
+    insertions
   - #56 - Make `filesystem_util.cc` `#define UNICODE`-compatible
   - #57 - Make it possible to bypass macro that checks which `filesystem` to use
   - #60 - Fix build error with shlwapi function
@@ -247,8 +309,9 @@ These had been integrated into the public repo incrementally.
 ## Change log for OpenXR 0.90.1 provisional spec update (8-May-2019)
 
 No API changes, and only minimal consistency changes to the spec/registry.
-Mostly an update for tooling, layers, loader, and sample code.
-Header version has been bumped to 43, but no symbols that should have actually been in use have changed.
+Mostly an update for tooling, layers, loader, and sample code. Header version
+has been bumped to 43, but no symbols that should have actually been in use have
+changed.
 
 ### GitHub Pull Requests
 
@@ -269,31 +332,40 @@ These had been integrated into the public repo incrementally.
   - #26 - Fix a warning
 - Loader
   - #3 - Don't cross 32/64 registry silos
-  - #14 - Initialize XrExtensionProperties array parameter for rt_xrEnumerateInstanceExtensionProperties
+  - #14 - Initialize XrExtensionProperties array parameter for
+    rt_xrEnumerateInstanceExtensionProperties
   - #20 - Fix Linux manifest file search
   - #30 - Add default implementations of API functions to dispatch chains
   - #32 - Avoid crash when evaluating layer disable environment vars
   - #35 - Add 'unknown' strings to loader's *ToString fallback functions
-  - #36 - Allow null instance in xrGetInstanceProcAddr() for certain entry points
+  - #36 - Allow null instance in xrGetInstanceProcAddr() for certain entry
+    points
   - #39 - Default to static loader only on Windows
 
 ### Internal Issues
 
 - General, Build, Other
-  - Unify (for the most part) the OpenXR and Vulkan generator scripts. (internal MR 1166)
+  - Unify (for the most part) the OpenXR and Vulkan generator scripts. (internal
+    MR 1166)
   - List instance extensions in the "list" test. (internal MR 1169)
-  - Avoid dllexport for all apps compiled with `openxr_platform_defines.h` (internal MR 1187)
-  - Don't offer `BUILD_SPECIFICATION` unless the spec makefile is there. (internal MR 1179)
+  - Avoid dllexport for all apps compiled with `openxr_platform_defines.h`
+    (internal MR 1187)
+  - Don't offer `BUILD_SPECIFICATION` unless the spec makefile is there.
+    (internal MR 1179)
   - Add simple input example to hello_xr. (internal MR 1178)
   - Add a clang-format script for ease of development.
 - API Registry and Headers
   - Remove impossible and undocumented error codes. (internal MR 1185 and 1189)
-  - Mark layers in `XrFrameEndInfo` as optional. (internal MR 1151, internal issue 899)
+  - Mark layers in `XrFrameEndInfo` as optional. (internal MR 1151, internal
+    issue 899)
   - Remove unused windows types from `openxr_platform.h` (internal MR 1197)
-  - Make `openxr_platform.h` include `openxr.h` on which it depends. (internal MR 1140, internal issue 918)
+  - Make `openxr_platform.h` include `openxr.h` on which it depends. (internal
+    MR 1140, internal issue 918)
   - Remove unused, undocumented defines. (internal MR 1238, internal issue 1012)
 - Loader
-  - Fix loader regkey search logic so 64bit application loads 64bit regkey value. (internal MR 1180)
-  - Modify loader to be friendly to UWP (Universal Windows Platform) build target. (internal MR 1198)
+  - Fix loader regkey search logic so 64bit application loads 64bit regkey
+    value. (internal MR 1180)
+  - Modify loader to be friendly to UWP (Universal Windows Platform) build
+    target. (internal MR 1198)
 
 ## OpenXR 0.90.0 - Initial public provisional release at GDC

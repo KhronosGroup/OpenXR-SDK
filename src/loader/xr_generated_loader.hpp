@@ -2,7 +2,7 @@
 //     See loader_source_generator.py for modifications
 // ************************************************************
 
-// Copyright (c) 2017-2019 The Khronos Group Inc.
+// Copyright (c) 2017-2020 The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
@@ -43,35 +43,6 @@ extern "C" {
 
 // Loader manually generated function prototypes
 
-
-// ---- Core 1.0 loader manual functions
-extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(
-    XrInstance                                  instance,
-    const char*                                 name,
-    PFN_xrVoidFunction*                         function);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermGetInstanceProcAddr(
-    XrInstance                                  instance,
-    const char*                                 name,
-    PFN_xrVoidFunction*                         function);
-extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(
-    uint32_t                                    propertyCapacityInput,
-    uint32_t*                                   propertyCountOutput,
-    XrApiLayerProperties*                       properties);
-extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionProperties(
-    const char*                                 layerName,
-    uint32_t                                    propertyCapacityInput,
-    uint32_t*                                   propertyCountOutput,
-    XrExtensionProperties*                      properties);
-extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(
-    const XrInstanceCreateInfo*                 createInfo,
-    XrInstance*                                 instance);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateInstance(
-    const XrInstanceCreateInfo*                 createInfo,
-    XrInstance*                                 instance);
-extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(
-    XrInstance                                  instance);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyInstance(
-    XrInstance                                  instance);
 extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProperties(
     XrInstance                                  instance,
     XrInstanceProperties*                       instanceProperties);
@@ -105,6 +76,32 @@ extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateSession(
     XrInstance                                  instance,
     const XrSessionCreateInfo*                  createInfo,
     XrSession*                                  session);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroySession(
+    XrSession                                   session);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateReferenceSpaces(
+    XrSession                                   session,
+    uint32_t                                    spaceCapacityInput,
+    uint32_t*                                   spaceCountOutput,
+    XrReferenceSpaceType*                       spaces);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateReferenceSpace(
+    XrSession                                   session,
+    const XrReferenceSpaceCreateInfo*           createInfo,
+    XrSpace*                                    space);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetReferenceSpaceBoundsRect(
+    XrSession                                   session,
+    XrReferenceSpaceType                        referenceSpaceType,
+    XrExtent2Df*                                bounds);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateActionSpace(
+    XrSession                                   session,
+    const XrActionSpaceCreateInfo*              createInfo,
+    XrSpace*                                    space);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrLocateSpace(
+    XrSpace                                     space,
+    XrSpace                                     baseSpace,
+    XrTime                                      time,
+    XrSpaceLocation*                            location);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpace(
+    XrSpace                                     space);
 extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateViewConfigurations(
     XrInstance                                  instance,
     XrSystemId                                  systemId,
@@ -123,6 +120,56 @@ extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateViewConfigura
     uint32_t                                    viewCapacityInput,
     uint32_t*                                   viewCountOutput,
     XrViewConfigurationView*                    views);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateSwapchainFormats(
+    XrSession                                   session,
+    uint32_t                                    formatCapacityInput,
+    uint32_t*                                   formatCountOutput,
+    int64_t*                                    formats);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateSwapchain(
+    XrSession                                   session,
+    const XrSwapchainCreateInfo*                createInfo,
+    XrSwapchain*                                swapchain);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroySwapchain(
+    XrSwapchain                                 swapchain);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateSwapchainImages(
+    XrSwapchain                                 swapchain,
+    uint32_t                                    imageCapacityInput,
+    uint32_t*                                   imageCountOutput,
+    XrSwapchainImageBaseHeader*                 images);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrAcquireSwapchainImage(
+    XrSwapchain                                 swapchain,
+    const XrSwapchainImageAcquireInfo*          acquireInfo,
+    uint32_t*                                   index);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrWaitSwapchainImage(
+    XrSwapchain                                 swapchain,
+    const XrSwapchainImageWaitInfo*             waitInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrReleaseSwapchainImage(
+    XrSwapchain                                 swapchain,
+    const XrSwapchainImageReleaseInfo*          releaseInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrBeginSession(
+    XrSession                                   session,
+    const XrSessionBeginInfo*                   beginInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEndSession(
+    XrSession                                   session);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrRequestExitSession(
+    XrSession                                   session);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrWaitFrame(
+    XrSession                                   session,
+    const XrFrameWaitInfo*                      frameWaitInfo,
+    XrFrameState*                               frameState);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrBeginFrame(
+    XrSession                                   session,
+    const XrFrameBeginInfo*                     frameBeginInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEndFrame(
+    XrSession                                   session,
+    const XrFrameEndInfo*                       frameEndInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrLocateViews(
+    XrSession                                   session,
+    const XrViewLocateInfo*                     viewLocateInfo,
+    XrViewState*                                viewState,
+    uint32_t                                    viewCapacityInput,
+    uint32_t*                                   viewCountOutput,
+    XrView*                                     views);
 extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrStringToPath(
     XrInstance                                  instance,
     const char*                                 pathString,
@@ -137,166 +184,63 @@ extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateActionSet(
     XrInstance                                  instance,
     const XrActionSetCreateInfo*                createInfo,
     XrActionSet*                                actionSet);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyActionSet(
+    XrActionSet                                 actionSet);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateAction(
+    XrActionSet                                 actionSet,
+    const XrActionCreateInfo*                   createInfo,
+    XrAction*                                   action);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyAction(
+    XrAction                                    action);
 extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrSuggestInteractionProfileBindings(
     XrInstance                                  instance,
     const XrInteractionProfileSuggestedBinding* suggestedBindings);
-
-// ---- XR_KHR_opengl_enable loader manual functions
-#if defined(XR_USE_GRAPHICS_API_OPENGL)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetOpenGLGraphicsRequirementsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    XrGraphicsRequirementsOpenGLKHR*            graphicsRequirements);
-#endif // defined(XR_USE_GRAPHICS_API_OPENGL)
-
-// ---- XR_KHR_opengl_es_enable loader manual functions
-#if defined(XR_USE_GRAPHICS_API_OPENGL_ES)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetOpenGLESGraphicsRequirementsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    XrGraphicsRequirementsOpenGLESKHR*          graphicsRequirements);
-#endif // defined(XR_USE_GRAPHICS_API_OPENGL_ES)
-
-// ---- XR_KHR_vulkan_enable loader manual functions
-#if defined(XR_USE_GRAPHICS_API_VULKAN)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanInstanceExtensionsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrAttachSessionActionSets(
+    XrSession                                   session,
+    const XrSessionActionSetsAttachInfo*        attachInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetCurrentInteractionProfile(
+    XrSession                                   session,
+    XrPath                                      topLevelUserPath,
+    XrInteractionProfileState*                  interactionProfile);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStateBoolean(
+    XrSession                                   session,
+    const XrActionStateGetInfo*                 getInfo,
+    XrActionStateBoolean*                       state);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStateFloat(
+    XrSession                                   session,
+    const XrActionStateGetInfo*                 getInfo,
+    XrActionStateFloat*                         state);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStateVector2f(
+    XrSession                                   session,
+    const XrActionStateGetInfo*                 getInfo,
+    XrActionStateVector2f*                      state);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetActionStatePose(
+    XrSession                                   session,
+    const XrActionStateGetInfo*                 getInfo,
+    XrActionStatePose*                          state);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrSyncActions(
+    XrSession                                   session,
+    const XrActionsSyncInfo*                    syncInfo);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateBoundSourcesForAction(
+    XrSession                                   session,
+    const XrBoundSourcesForActionEnumerateInfo* enumerateInfo,
+    uint32_t                                    sourceCapacityInput,
+    uint32_t*                                   sourceCountOutput,
+    XrPath*                                     sources);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInputSourceLocalizedName(
+    XrSession                                   session,
+    const XrInputSourceLocalizedNameGetInfo*    getInfo,
     uint32_t                                    bufferCapacityInput,
     uint32_t*                                   bufferCountOutput,
     char*                                       buffer);
-#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
-#if defined(XR_USE_GRAPHICS_API_VULKAN)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanDeviceExtensionsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    uint32_t                                    bufferCapacityInput,
-    uint32_t*                                   bufferCountOutput,
-    char*                                       buffer);
-#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
-#if defined(XR_USE_GRAPHICS_API_VULKAN)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsDeviceKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    VkInstance                                  vkInstance,
-    VkPhysicalDevice*                           vkPhysicalDevice);
-#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
-#if defined(XR_USE_GRAPHICS_API_VULKAN)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsRequirementsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    XrGraphicsRequirementsVulkanKHR*            graphicsRequirements);
-#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
-
-// ---- XR_KHR_D3D11_enable loader manual functions
-#if defined(XR_USE_GRAPHICS_API_D3D11)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetD3D11GraphicsRequirementsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    XrGraphicsRequirementsD3D11KHR*             graphicsRequirements);
-#endif // defined(XR_USE_GRAPHICS_API_D3D11)
-
-// ---- XR_KHR_D3D12_enable loader manual functions
-#if defined(XR_USE_GRAPHICS_API_D3D12)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrGetD3D12GraphicsRequirementsKHR(
-    XrInstance                                  instance,
-    XrSystemId                                  systemId,
-    XrGraphicsRequirementsD3D12KHR*             graphicsRequirements);
-#endif // defined(XR_USE_GRAPHICS_API_D3D12)
-
-// ---- XR_KHR_win32_convert_performance_counter_time loader manual functions
-#if defined(XR_USE_PLATFORM_WIN32)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrConvertWin32PerformanceCounterToTimeKHR(
-    XrInstance                                  instance,
-    const LARGE_INTEGER*                        performanceCounter,
-    XrTime*                                     time);
-#endif // defined(XR_USE_PLATFORM_WIN32)
-#if defined(XR_USE_PLATFORM_WIN32)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimeToWin32PerformanceCounterKHR(
-    XrInstance                                  instance,
-    XrTime                                      time,
-    LARGE_INTEGER*                              performanceCounter);
-#endif // defined(XR_USE_PLATFORM_WIN32)
-
-// ---- XR_KHR_convert_timespec_time loader manual functions
-#if defined(XR_USE_TIMESPEC)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimespecTimeToTimeKHR(
-    XrInstance                                  instance,
-    const struct timespec*                      timespecTime,
-    XrTime*                                     time);
-#endif // defined(XR_USE_TIMESPEC)
-#if defined(XR_USE_TIMESPEC)
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimeToTimespecTimeKHR(
-    XrInstance                                  instance,
-    XrTime                                      time,
-    struct timespec*                            timespecTime);
-#endif // defined(XR_USE_TIMESPEC)
-
-// ---- XR_EXT_debug_utils loader manual functions
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrSetDebugUtilsObjectNameEXT(
-    XrInstance                                  instance,
-    const XrDebugUtilsObjectNameInfoEXT*        nameInfo);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermSetDebugUtilsObjectNameEXT(
-    XrInstance                                  instance,
-    const XrDebugUtilsObjectNameInfoEXT*        nameInfo);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrCreateDebugUtilsMessengerEXT(
-    XrInstance                                  instance,
-    const XrDebugUtilsMessengerCreateInfoEXT*   createInfo,
-    XrDebugUtilsMessengerEXT*                   messenger);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(
-    XrInstance                                  instance,
-    const XrDebugUtilsMessengerCreateInfoEXT*   createInfo,
-    XrDebugUtilsMessengerEXT*                   messenger);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrDestroyDebugUtilsMessengerEXT(
-    XrDebugUtilsMessengerEXT                    messenger);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyDebugUtilsMessengerEXT(
-    XrDebugUtilsMessengerEXT                    messenger);
-extern "C" XRAPI_ATTR XrResult                                    XRAPI_CALL xrSubmitDebugUtilsMessageEXT(
-    XrInstance                                  instance,
-    XrDebugUtilsMessageSeverityFlagsEXT         messageSeverity,
-    XrDebugUtilsMessageTypeFlagsEXT             messageTypes,
-    const XrDebugUtilsMessengerCallbackDataEXT* callbackData);
-extern "C" XRAPI_ATTR XrResult                                    XRAPI_CALL LoaderXrTermSubmitDebugUtilsMessageEXT(
-    XrInstance                                  instance,
-    XrDebugUtilsMessageSeverityFlagsEXT         messageSeverity,
-    XrDebugUtilsMessageTypeFlagsEXT             messageTypes,
-    const XrDebugUtilsMessengerCallbackDataEXT* callbackData);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrSessionBeginDebugUtilsLabelRegionEXT(
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrApplyHapticFeedback(
     XrSession                                   session,
-    const XrDebugUtilsLabelEXT*                 labelInfo);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(
-    XrSession                                   session);
-extern "C" XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(
+    const XrHapticActionInfo*                   hapticActionInfo,
+    const XrHapticBaseHeader*                   hapticFeedback);
+extern "C" LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrStopHapticFeedback(
     XrSession                                   session,
-    const XrDebugUtilsLabelEXT*                 labelInfo);
-
-// Special use function to handle creating API Layer information during xrCreateInstance
-XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateApiLayerInstance(const XrInstanceCreateInfo* info,
-                                                                  const struct XrApiLayerCreateInfo* apiLayerInfo,
-                                                                  XrInstance* instance);
-
-
-// Generated loader terminator prototypes
-// Instance Init Dispatch Table (put all terminators in first)
-void LoaderGenInitInstanceDispatchTable(XrInstance runtime_instance,
-                                        std::unique_ptr<XrGeneratedDispatchTable>& table);
-
+    const XrHapticActionInfo*                   hapticActionInfo);
 #ifdef __cplusplus
 } // extern "C"
 #endif
-
-// Unordered maps and mutexes to lookup the instance for a given object type
-extern HandleLoaderMap<XrInstance> g_instance_map;
-extern HandleLoaderMap<XrSession> g_session_map;
-extern HandleLoaderMap<XrSpace> g_space_map;
-extern HandleLoaderMap<XrAction> g_action_map;
-extern HandleLoaderMap<XrSwapchain> g_swapchain_map;
-extern HandleLoaderMap<XrActionSet> g_actionset_map;
-extern HandleLoaderMap<XrDebugUtilsMessengerEXT> g_debugutilsmessengerext_map;
-extern HandleLoaderMap<XrSpatialAnchorMSFT> g_spatialanchormsft_map;
-
-// Function used to clean up any residual map values that point to an instance prior to that
-// instance being deleted.
-void LoaderCleanUpMapsForInstance(LoaderInstance *instance);
-
 

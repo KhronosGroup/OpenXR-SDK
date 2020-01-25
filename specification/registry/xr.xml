@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <registry>
     <comment>
-Copyright (c) 2017-2019 The Khronos Group Inc.
+Copyright (c) 2017-2020 The Khronos Group Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and/or associated documentation files (the
@@ -113,7 +113,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 5)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 6)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1239,7 +1239,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     <!--enums for XR_KHR_visibility_mask -->
     <enums name="XrVisibilityMaskTypeKHR" type="enum" comment="">
         <enum value="1"    name="XR_VISIBILITY_MASK_TYPE_HIDDEN_TRIANGLE_MESH_KHR"  comment="exclusive mesh; indicates that which the viewer cannot see."/>
-        <enum value="2"    name="XR_VISIBILITY_MASK_TYPE_VISIBLE_TRIANGLE_MESH_KHR" comment="incluse mesh; indicates strictly that which the viewer can see."/>
+        <enum value="2"    name="XR_VISIBILITY_MASK_TYPE_VISIBLE_TRIANGLE_MESH_KHR" comment="inclusive mesh; indicates strictly that which the viewer can see."/>
         <enum value="3"    name="XR_VISIBILITY_MASK_TYPE_LINE_LOOP_KHR"             comment="line loop; traces the outline of the area the viewer can see."/>
     </enums>
 
@@ -2186,7 +2186,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     <!-- OpenGL graphics binding extension -->
     <extension name="XR_KHR_opengl_enable" number="24" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL" supported="openxr">
         <require>
-            <enum value="7" name="XR_KHR_opengl_enable_SPEC_VERSION"/>
+            <enum value="8" name="XR_KHR_opengl_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_enable&quot;" name="XR_KHR_OPENGL_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR"/>
             <enum offset="1" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR"/>
@@ -2494,6 +2494,12 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_MSFT_extension_57_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_57&quot;" name="XR_MSFT_extension_57_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_EXT_win32_appcontainer_compatible" number="58" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_EXT_win32_appcontainer_compatible_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_win32_appcontainer_compatible&quot;" name="XR_EXT_WIN32_APPCONTAINER_COMPATIBLE_EXTENSION_NAME"/>
         </require>
     </extension>
 
