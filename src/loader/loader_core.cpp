@@ -42,11 +42,18 @@
 #include <string>
 #include <utility>
 #include <vector>
-// Global lock to prevent reading JSON manifest files at the same time.
-static std::mutex g_loader_json_mutex;
 
+// Global lock to prevent reading JSON manifest files at the same time.
+std::mutex& GetLoaderJsonMutex() {
+    static std::mutex loader_json_mutex;
+    return loader_json_mutex;
+}
+ 
 // Global lock to prevent simultaneous instance creation/destruction
-static std::mutex g_instance_create_destroy_mutex;
+std::mutex& GetInstanceCreateDestroyMutex() {
+    static std::mutex instance_create_destroy_mutex;
+    return instance_create_destroy_mutex;
+}
 
 // Terminal functions needed by xrCreateInstance.
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermGetInstanceProcAddr(XrInstance, const char *, PFN_xrVoidFunction *);
@@ -82,7 +89,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint3
     LoaderLogger::LogVerboseMessage("xrEnumerateApiLayerProperties", "Entering loader trampoline");
 
     // Make sure only one thread is attempting to read the JSON files at a time.
-    std::unique_lock<std::mutex> json_lock(g_loader_json_mutex);
+    std::unique_lock<std::mutex> json_lock(GetLoaderJsonMutex());
 
     XrResult result = ApiLayerInterface::GetApiLayerProperties("xrEnumerateApiLayerProperties", propertyCapacityInput,
                                                                propertyCountOutput, properties);
@@ -116,7 +123,7 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
 
     {
         // Make sure only one thread is attempting to read the JSON files at a time.
-        std::unique_lock<std::mutex> json_lock(g_loader_json_mutex);
+        std::unique_lock<std::mutex> json_lock(GetLoaderJsonMutex());
 
         // Get the layer extension properties
         result = ApiLayerInterface::GetInstanceExtensionProperties("xrEnumerateInstanceExtensionProperties", layerName,
@@ -233,7 +240,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
         return XR_ERROR_VALIDATION_FAILURE;
     }
 
-    std::unique_lock<std::mutex> instance_lock(g_instance_create_destroy_mutex);
+    std::unique_lock<std::mutex> instance_lock(GetInstanceCreateDestroyMutex());
 
     // Check if there is already an XrInstance that is alive. If so, another instance cannot be created.
     // The loader does not support multiple simultaneous instances because the loader is intended to be
@@ -250,7 +257,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
 
     // Make sure only one thread is attempting to read the JSON files and use the instance.
     {
-        std::unique_lock<std::mutex> json_lock(g_loader_json_mutex);
+        std::unique_lock<std::mutex> json_lock(GetLoaderJsonMutex());
         // Load the available runtime
         result = RuntimeInterface::LoadRuntime("xrCreateInstance");
         if (XR_FAILED(result)) {
@@ -327,7 +334,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
         return XR_ERROR_HANDLE_INVALID;
     }
 
-    std::unique_lock<std::mutex> loader_instance_lock(g_instance_create_destroy_mutex);
+    std::unique_lock<std::mutex> loader_instance_lock(GetInstanceCreateDestroyMutex());
 
     LoaderInstance *loader_instance;
     XrResult result = ActiveLoaderInstance::Get(&loader_instance, "xrDestroyInstance");

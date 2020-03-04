@@ -35,12 +35,11 @@
 #include <utility>
 #include <vector>
 
-std::unique_ptr<RuntimeInterface> RuntimeInterface::_single_runtime_interface;
 uint32_t RuntimeInterface::_single_runtime_count = 0;
 
 XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
     // If something's already loaded, we're done here.
-    if (_single_runtime_interface != nullptr) {
+    if (GetInstance() != nullptr) {
         _single_runtime_count++;
         return XR_SUCCESS;
     }
@@ -148,19 +147,19 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
             LoaderLogger::LogInfoMessage(openxr_command, info_message);
 
             // Use this runtime
-            _single_runtime_interface.reset(new RuntimeInterface(runtime_library, runtime_info.getInstanceProcAddr));
+            GetInstance().reset(new RuntimeInterface(runtime_library, runtime_info.getInstanceProcAddr));
             _single_runtime_count++;
 
             // Grab the list of extensions this runtime supports for easy filtering after the
             // xrCreateInstance call
             std::vector<std::string> supported_extensions;
             std::vector<XrExtensionProperties> extension_properties;
-            _single_runtime_interface->GetInstanceExtensionProperties(extension_properties);
+            GetInstance()->GetInstanceExtensionProperties(extension_properties);
             supported_extensions.reserve(extension_properties.size());
             for (XrExtensionProperties ext_prop : extension_properties) {
                 supported_extensions.emplace_back(ext_prop.extensionName);
             }
-            _single_runtime_interface->SetSupportedExtensions(supported_extensions);
+            GetInstance()->SetSupportedExtensions(supported_extensions);
 
             // If we load one, clear all errors.
             any_loaded = true;
@@ -184,7 +183,7 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 void RuntimeInterface::UnloadRuntime(const std::string& openxr_command) {
     if (_single_runtime_count == 1) {
         _single_runtime_count = 0;
-        _single_runtime_interface.reset();
+        GetInstance().reset();
     } else if (_single_runtime_count > 0) {
         --_single_runtime_count;
     }
@@ -192,14 +191,14 @@ void RuntimeInterface::UnloadRuntime(const std::string& openxr_command) {
 }
 
 XrResult RuntimeInterface::GetInstanceProcAddr(XrInstance instance, const char* name, PFN_xrVoidFunction* function) {
-    return _single_runtime_interface->_get_instance_proc_addr(instance, name, function);
+    return GetInstance()->_get_instance_proc_addr(instance, name, function);
 }
 
 const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance instance) {
     XrGeneratedDispatchTable* table = nullptr;
-    std::lock_guard<std::mutex> mlock(_single_runtime_interface->_dispatch_table_mutex);
-    auto it = _single_runtime_interface->_dispatch_table_map.find(instance);
-    if (it != _single_runtime_interface->_dispatch_table_map.end()) {
+    std::lock_guard<std::mutex> mlock(GetInstance()->_dispatch_table_mutex);
+    auto it = GetInstance()->_dispatch_table_map.find(instance);
+    if (it != GetInstance()->_dispatch_table_map.end()) {
         table = it->second.get();
     }
     return table;
@@ -208,9 +207,9 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance in
 const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger) {
     XrInstance runtime_instance = XR_NULL_HANDLE;
     {
-        std::lock_guard<std::mutex> mlock(_single_runtime_interface->_messenger_to_instance_mutex);
-        auto it = _single_runtime_interface->_messenger_to_instance_map.find(messenger);
-        if (it != _single_runtime_interface->_messenger_to_instance_map.end()) {
+        std::lock_guard<std::mutex> mlock(GetInstance()->_messenger_to_instance_mutex);
+        auto it = GetInstance()->_messenger_to_instance_map.find(messenger);
+        if (it != GetInstance()->_messenger_to_instance_map.end()) {
             runtime_instance = it->second;
         }
     }
