@@ -13,6 +13,56 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.7 (2020-03-20)
+
+Patch release for the 1.0 series.
+
+Note: Changelogs are now being assembled with the help of the
+[Proclamation](https://pypi.org/project/proclamation/) tool, so the format has
+changed somewhat.
+
+- Registry
+  - Introduce `XR_MSFT_hand_interaction` extension for hand interaction profile.
+    ([internal MR 1601](https://gitlab.khronos.org/openxr/openxr/merge_requests/1601))
+  - Introduce `XR_EPIC_view_configuration_fov` extension for system field-of-view
+    queries.
+    ([internal MR 1170](https://gitlab.khronos.org/openxr/openxr/merge_requests/1170))
+  - Indicate that `xrBeginFrame` returns `XR_ERROR_CALL_ORDER_INVALID` when not
+    paired with a corresponding `xrWaitFrame` call.
+    ([internal MR 1673](https://gitlab.khronos.org/openxr/openxr/merge_requests/1673))
+  - Update the version number of `XR_KHR_D3D12_enable` extension.
+    ([internal MR 1681](https://gitlab.khronos.org/openxr/openxr/merge_requests/1681))
+  - Introduce `XR_EXTX_overlay` extension for Overlay sessions (which can
+    provide overlay composition layers).
+    ([internal MR 1665](https://gitlab.khronos.org/openxr/openxr/merge_requests/1665))
+- SDK
+  - loader: Add linker export map/version script to avoid exporting implementation
+    symbols from C++ on non-MSVC platforms. ([internal MR
+    1641](https://gitlab.khronos.org/openxr/openxr/merge_requests/1641), [OpenXR-
+    SDK-Source/#159](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/159))
+  - Add tracking and destruction of debug messengers in the loader.
+    ([internal MR 1668](https://gitlab.khronos.org/openxr/openxr/merge_requests/1668),
+    [OpenXR-SDK-Source/#29](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/29),
+    [internal issue 1284](https://gitlab.khronos.org/openxr/openxr/issues/1284))
+  - Fix issue in `hello_xr` breaking the build in certain limited conditions.
+    ([OpenXR-SDK-Source/#170](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/170))
+  - Add initial (partial) Android support for `hello_xr`.
+    ([internal MR 1680](https://gitlab.khronos.org/openxr/openxr/merge_requests/1680))
+  - Fix a mismatched type signature, breaking compiles of hello_xr in at least some
+    Linux environments.
+    ([OpenXR-SDK-Source/#164](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/164),
+    [internal MR 166](https://gitlab.khronos.org/openxr/openxr/merge_requests/166))
+  - Explicitly link in `advapi32` for many of the APIs the loader uses on Windows,
+    needed when building for ARM/ARM64 (non-UWP only).
+    ([internal MR 1664](https://gitlab.khronos.org/openxr/openxr/merge_requests/1664))
+  - Remove "Dev Build" string from loader resources and fix version. ([internal MR
+    1664](https://gitlab.khronos.org/openxr/openxr/merge_requests/1664))
+  - Add manual pages for `openxr_runtime_list` and `hello_xr` (based on their
+    `--help`), and install in the standard location on non-Windows platforms.
+    ([OpenXR-SDK-Source/#169](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/169))
+  - Silence some noisy warnings in hello_xr and the layers.
+    ([OpenXR-SDK-Source/#165](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/165))
+
 ## OpenXR 1.0.6 release (24-January-2020)
 
 Patch release for the 1.0 series.

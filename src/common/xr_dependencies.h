@@ -21,7 +21,6 @@
 #include <android/native_window.h>
 #include <android/window.h>
 #include <android/native_window_jni.h>
-#include <android_native_app_glue.h>
 #endif  // XR_USE_PLATFORM_ANDROID
 
 #ifdef XR_USE_PLATFORM_WIN32

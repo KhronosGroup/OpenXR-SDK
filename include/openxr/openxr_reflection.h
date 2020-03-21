@@ -181,9 +181,12 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR, 1000028002) \
     _(XR_TYPE_VISIBILITY_MASK_KHR, 1000031000) \
     _(XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR, 1000031001) \
+    _(XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX, 1000033000) \
+    _(XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX, 1000033003) \
     _(XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT, 1000039000) \
     _(XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT, 1000039001) \
     _(XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT, 1000046000) \
+    _(XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC, 1000059000) \
     _(XR_STRUCTURE_TYPE_MAX_ENUM, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrFormFactor(_) \
@@ -339,6 +342,12 @@ XR_ENUM_STR(XrResult);
     _(XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT, 0x00000002) \
     _(XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT, 0x00000004) \
     _(XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT, 0x00000008)
+
+#define XR_LIST_BITS_XrOverlaySessionCreateFlagsEXTX(_) \
+    _(XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_EXTX, 0x00000001)
+
+#define XR_LIST_BITS_XrOverlayMainSessionFlagsEXTX(_) \
+    _(XR_MAIN_SESSION_BIT_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_EXTX, 0x00000001)
 
 #define XR_LIST_STRUCT_XrApiLayerProperties(_) \
     _(type) \
@@ -1003,6 +1012,18 @@ XR_ENUM_STR(XrResult);
     _(userCallback) \
     _(userData)
 
+#define XR_LIST_STRUCT_XrSessionCreateInfoOverlayEXTX(_) \
+    _(type) \
+    _(next) \
+    _(createFlags) \
+    _(sessionLayersPlacement)
+
+#define XR_LIST_STRUCT_XrEventDataMainSessionVisibilityChangedEXTX(_) \
+    _(type) \
+    _(next) \
+    _(visible) \
+    _(flags)
+
 #define XR_LIST_STRUCT_XrSpatialAnchorCreateInfoMSFT(_) \
     _(type) \
     _(next) \
@@ -1023,6 +1044,12 @@ XR_ENUM_STR(XrResult);
     _(minNearZ) \
     _(recommendedFarZ) \
     _(maxFarZ)
+
+#define XR_LIST_STRUCT_XrViewConfigurationViewFovEPIC(_) \
+    _(type) \
+    _(next) \
+    _(recommendedMutableFov) \
+    _(maxMutableFov)
 
 
 

@@ -23,7 +23,10 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
+#include <set>
+#include <map>
 
 #include <openxr/openxr.h>
 
@@ -124,6 +127,9 @@ class LoaderLogger {
     void AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder);
     void RemoveLogRecorder(uint64_t unique_id);
 
+    void AddLogRecorderForXrInstance(XrInstance instance, std::unique_ptr<LoaderLogRecorder>&& recorder);
+    void RemoveLogRecordersForXrInstance(XrInstance instance);
+
     //! Called from LoaderXrTermSetDebugUtilsObjectNameEXT - an empty name means remove
     void AddObjectName(uint64_t object_handle, XrObjectType object_type, const std::string& object_name);
     void BeginLabelRegion(XrSession session, const XrDebugUtilsLabelEXT* label_info);
@@ -179,8 +185,11 @@ class LoaderLogger {
     static std::unique_ptr<LoaderLogger> _instance;
     static std::once_flag _once_flag;
 
-    // List of available recorder objects
+    // List of *all* available recorder objects (including created specifically for an Instance)
     std::vector<std::unique_ptr<LoaderLogRecorder>> _recorders;
+
+    // List of recorder objects only created specifically for an XrInstance
+    std::unordered_map<XrInstance, std::unordered_set<uint64_t>> _recordersByInstance;
 
     DebugUtilsData data_;
 };

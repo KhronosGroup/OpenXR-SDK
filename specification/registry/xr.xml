@@ -45,6 +45,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="COLLABORA"  author="Collabora"               contact="Ryan Pavlik @rpavlik"/>
         <tag name="EPIC"       author="Epic"                    contact="Nick Whiting @whitingn"/>
         <tag name="EXT"        author="Multivendor"             contact="Kaye Mason @chaleur"/>
+        <tag name="EXTX"       author="Multivendor experimental"             contact="Brad Grantham @bradgrantham-lunarg"/>
         <tag name="GOOGLE"     author="Google"                  contact="Kaye Mason @chaleur"/>
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
         <tag name="KHR"        author="Khronos"                 contact="Nick Whiting @whitingn"/>
@@ -113,7 +114,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 6)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 7)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -225,6 +226,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type bitvalues="XrDebugUtilsMessageSeverityFlagBitsEXT"    category="bitmask">typedef <type>XrFlags64</type> <name>XrDebugUtilsMessageSeverityFlagsEXT</name>;</type>
         <type bitvalues="XrDebugUtilsMessageTypeFlagBitsEXT"        category="bitmask">typedef <type>XrFlags64</type> <name>XrDebugUtilsMessageTypeFlagsEXT</name>;</type>
 
+        <!-- Bitmask types for XR_EXTX_overlay -->
+        <type bitvalues="XrOverlayMainSessionFlagBitsEXTX"           category="bitmask">typedef <type>XrFlags64</type> <name>XrOverlayMainSessionFlagsEXTX</name>;</type>
+        <type bitvalues="XrOverlaySessionCreateFlagBitsEXTX"           category="bitmask">typedef <type>XrFlags64</type> <name>XrOverlaySessionCreateFlagsEXTX</name>;</type>
+
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
         <type category="handle"><type>XR_DEFINE_HANDLE</type>(<name>XrInstance</name>)</type>
@@ -265,6 +270,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <!-- enums and flag bits for XR_EXT_debug_utils -->
         <type name="XrDebugUtilsMessageSeverityFlagBitsEXT" category="enum"/>
         <type name="XrDebugUtilsMessageTypeFlagBitsEXT" category="enum"/>
+
+        <!-- enums and flag bits for XR_EXTX_overlay -->
+        <type name="XrOverlayMainSessionFlagBitsEXTX" category="enum"/>
+        <type name="XrOverlaySessionCreateFlagBitsEXTX" category="enum"/>
 
         <!-- enums for XR_KHR_visibility_mask -->
         <type name="XrVisibilityMaskTypeKHR" category="enum"/>
@@ -959,6 +968,20 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member><type>D3D_FEATURE_LEVEL</type>  <name>minFeatureLevel</name></member>
         </type>
 
+        <!-- XR_EXTX_overlay structs -->
+        <type category="struct" name="XrSessionCreateInfoOverlayEXTX" structextends="XrSessionCreateInfo">
+            <member values="XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                      <name>next</name></member>
+            <member><type>XrOverlaySessionCreateFlagsEXTX</type>                                                         <name>createFlags</name></member>
+            <member><type>uint32_t</type>                                                         <name>sessionLayersPlacement</name></member>
+        </type>
+        <type category="struct" name="XrEventDataMainSessionVisibilityChangedEXTX" parentstruct="XrEventDataBaseHeader">
+            <member values="XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                                     <name>next</name></member>
+            <member><type>XrBool32</type>                                                                        <name>visible</name></member>
+            <member><type>XrOverlayMainSessionFlagsEXTX</type>                                                    <name>flags</name></member>
+        </type>
+
         <!-- struct types for XR_EXT_view_configuration_depth_range -->
         <type category="struct" name="XrViewConfigurationDepthRangeEXT" structextends="XrViewConfigurationView">
             <member values="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"><type>XrStructureType</type> <name>type</name></member>
@@ -967,6 +990,14 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member><type>float</type> <name>minNearZ</name></member>
             <member><type>float</type> <name>recommendedFarZ</name></member>
             <member><type>float</type> <name>maxFarZ</name></member>
+        </type>
+
+        <!-- struct types for XR_EPIC_view_configuration_fov -->
+        <type category="struct" name="XrViewConfigurationViewFovEPIC" structextends="XrViewConfigurationView">
+            <member values="XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*           <name>next</name></member>
+            <member><type>XrFovf</type>                <name>recommendedMutableFov</name></member>
+            <member><type>XrFovf</type>                <name>maxMutableFov</name></member>
         </type>
 
         <!-- The PFN_xrVoidFunction type are used by XrGetInstanceProcAddr below -->
@@ -1305,6 +1336,13 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum bitpos="2"     name="XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT"  comment="Indicates the message is related to a potential performance situation"/>
         <enum bitpos="3"     name="XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT"  comment="Indicates the message is related to a non-conformant runtime result"/>
     </enums>
+    <enums name="XrOverlayMainSessionFlagBitsEXTX" type="bitmask">
+        <enum bitpos="0"     name="XR_MAIN_SESSION_BIT_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_EXTX"  comment="Indicates the main session enabled XR_KHR_extra_layer_info_depth"/>
+    </enums>
+    <enums name="XrOverlaySessionCreateFlagBitsEXTX" type="bitmask">
+        <enum bitpos="0"     name="XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_EXTX"  comment="Indicates the runtime does not need to attempt to lock the overlay session displayTime to the main session displayTime"/>
+    </enums>
+
 
     <!-- SECTION: OpenXR command definitions -->
     <commands>
@@ -1491,7 +1529,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>uint32_t</type>* <name>viewCountOutput</name></param>
             <param optional="true" len="viewCapacityInput"><type>XrViewConfigurationView</type>* <name>views</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_FRAME_DISCARDED" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_VALIDATION_FAILURE">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_FRAME_DISCARDED" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_CALL_ORDER_INVALID,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_VALIDATION_FAILURE">
             <proto><type>XrResult</type> <name>xrBeginFrame</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param optional="true">const <type>XrFrameBeginInfo</type>* <name>frameBeginInfo</name></param>
@@ -1505,7 +1543,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>uint32_t</type>* <name>viewCountOutput</name></param>
             <param optional="true" len="viewCapacityInput"><type>XrView</type>* <name>views</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_CALL_ORDER_INVALID,XR_ERROR_LAYER_INVALID,XR_ERROR_SWAPCHAIN_RECT_INVALID,XR_ERROR_ENVIRONMENT_BLEND_MODE_UNSUPPORTED,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_LAYER_LIMIT_EXCEEDED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_TIME_INVALID">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_CALL_ORDER_INVALID,XR_ERROR_LAYER_INVALID,XR_ERROR_SWAPCHAIN_RECT_INVALID,XR_ERROR_ENVIRONMENT_BLEND_MODE_UNSUPPORTED,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_LAYER_LIMIT_EXCEEDED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_TIME_INVALID,XR_ERROR_POSE_INVALID">
             <proto><type>XrResult</type> <name>xrEndFrame</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrFrameEndInfo</type>* <name>frameEndInfo</name></param>
@@ -2263,7 +2301,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     <!-- D3D12 graphics binding extension -->
     <extension name="XR_KHR_D3D12_enable" number="29" type="instance" protect="XR_USE_GRAPHICS_API_D3D12" supported="openxr">
         <require>
-            <enum value="5" name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
+            <enum value="6" name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D12_enable&quot;" name="XR_KHR_D3D12_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"    name="XR_TYPE_GRAPHICS_BINDING_D3D12_KHR"/>
             <enum offset="1" extends="XrStructureType"    name="XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR"/>
@@ -2313,13 +2351,18 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <!--Reserved space for EXT overlay support -->
-    <extension name="XR_EXT_overlay" number="34" type="instance" supported="disabled">
+    <!-- Overlay preview extension -->
+    <extension name="XR_EXTX_overlay" number="34" type="instance" provisional="true" supported="openxr">
         <require>
-            <enum value="1" name="XR_EXT_overlay_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_overlay&quot;"         name="XR_EXT_OVERLAY_EXTENSION_NAME"/>
+            <enum value="3" name="XR_EXTX_overlay_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXTX_overlay&quot;"         name="XR_EXTX_OVERLAY_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType"       name="XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX"/>
+            <enum offset="3" extends="XrStructureType"       name="XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX"/>
+            <type name="XrSessionCreateInfoOverlayEXTX"/>
+            <type name="XrEventDataMainSessionVisibilityChangedEXTX"/>
         </require>
     </extension>
+
 
     <!-- Reserved space for additional per-layer color modulation info -->
     <extension name="XR_KHR_composition_layer_color_modulation" number="35" type="instance" supported="disabled">
@@ -2454,12 +2497,14 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <enum value="&quot;XR_MSFT_extension_50&quot;" name="XR_MSFT_extension_50_EXTENSION_NAME"/>
         </require>
     </extension>
-    <extension name="XR_MSFT_extension_51" number="51" type="instance" supported="disabled">
+
+    <extension name="XR_MSFT_hand_interaction" number="51" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_51_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_51&quot;" name="XR_MSFT_extension_51_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MSFT_hand_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_hand_interaction&quot;" name="XR_MSFT_HAND_INTERACTION_EXTENSION_NAME"/>
         </require>
     </extension>
+
     <extension name="XR_MSFT_extension_52" number="52" type="instance" supported="disabled">
         <require>
             <enum value="1" name="XR_MSFT_extension_52_SPEC_VERSION"/>
@@ -2500,6 +2545,20 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_EXT_win32_appcontainer_compatible_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_win32_appcontainer_compatible&quot;" name="XR_EXT_WIN32_APPCONTAINER_COMPATIBLE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_MAGICLEAP_extension_59" number="59" type="instance" supported="disabled">
+        <require>
+          <enum value="1" name="XR_MAGICLEAP_extension_59_SPEC_VERSION"/>
+          <enum value="&quot;XR_MAGICLEAP_extension_59&quot;" name="XR_MAGICLEAP_extension_59_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_EPIC_view_configuration_fov" number="60" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_EPIC_view_configuration_fov_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_view_configuration_fov&quot;" name="XR_EPIC_VIEW_CONFIGURATION_FOV_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC"/>
+            <type name="XrViewConfigurationViewFovEPIC"/>
         </require>
     </extension>
 

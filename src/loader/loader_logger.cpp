@@ -147,9 +147,30 @@ LoaderLogger::LoaderLogger() {
 
 void LoaderLogger::AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder) { _recorders.push_back(std::move(recorder)); }
 
+void LoaderLogger::AddLogRecorderForXrInstance(XrInstance instance, std::unique_ptr<LoaderLogRecorder>&& recorder) {
+    _recordersByInstance[instance].insert(recorder->UniqueId());
+    _recorders.emplace_back(std::move(recorder));
+}
+
 void LoaderLogger::RemoveLogRecorder(uint64_t unique_id) {
     vector_remove_if_and_erase(
         _recorders, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) { return recorder->UniqueId() == unique_id; });
+    for (auto& recorders : _recordersByInstance) {
+        auto& messengersForInstance = recorders.second;
+        if (messengersForInstance.count(unique_id) > 0) {
+            messengersForInstance.erase(unique_id);
+        }
+    }
+}
+
+void LoaderLogger::RemoveLogRecordersForXrInstance(XrInstance instance) {
+    if (_recordersByInstance.find(instance) != _recordersByInstance.end()) {
+        auto recorders = _recordersByInstance[instance];
+        vector_remove_if_and_erase(_recorders, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) {
+            return recorders.find(recorder->UniqueId()) != recorders.end();
+        });
+        _recordersByInstance.erase(instance);
+    }
 }
 
 bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severity, XrLoaderLogMessageTypeFlags message_type,

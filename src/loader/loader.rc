@@ -25,17 +25,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-#define VERSION_MAJOR               1
-#define VERSION_MINOR               0
-#define VERSION_PATCH               1111
-#define VERSION_BUILDNO             2222
-
-#define VERSION_BUILD_DESCRIPTION   "Dev Build"
-
-// All builds except release builds should set this to 0.
-// Release builds should set this to 1.
-#define VERSION_IS_RELEASEBUILD        0
-
+#define VERSION_MAJOR               XR_CURRENT_API_MAJOR_VERSION
+#define VERSION_MINOR               XR_CURRENT_API_MINOR_VERSION
+#define VERSION_PATCH               XR_CURRENT_API_PATCH_VERSION
+#define VERSION_BUILDNO             0
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,20 +43,10 @@
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
 
-#if VERSION_IS_RELEASEBUILD==1
-   #define VER_FILE_DESCRIPTION_STR    "OpenXR Loader"
-   #define VER_FILE_VERSION_STR        STRINGIZE(VERSION_MAJOR)        \
-                                       "." STRINGIZE(VERSION_MINOR)    \
-                                       "." STRINGIZE(VERSION_PATCH)    \
-                                       "." STRINGIZE(VERSION_BUILDNO)
-#else
-   #define VER_FILE_DESCRIPTION_STR    "OpenXR Loader - " VERSION_BUILD_DESCRIPTION
-   #define VER_FILE_VERSION_STR        STRINGIZE(VERSION_MAJOR)        \
-                                    "." STRINGIZE(VERSION_MINOR)    \
-                                    "." STRINGIZE(VERSION_PATCH)    \
-                                    "." STRINGIZE(VERSION_BUILDNO) \
-                                    "." VERSION_BUILD_DESCRIPTION
-#endif
+#define VER_FILE_VERSION_STR        STRINGIZE(VERSION_MAJOR)      \
+                                   "." STRINGIZE(VERSION_MINOR)   \
+                                   "." STRINGIZE(VERSION_PATCH)   \
+                                   "." STRINGIZE(VERSION_BUILDNO)
 
 
 VS_VERSION_INFO VERSIONINFO
@@ -84,9 +67,9 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileDescription", VER_FILE_DESCRIPTION_STR
+            VALUE "FileDescription", "OpenXR Loader"
             VALUE "FileVersion", VER_FILE_VERSION_STR
-            VALUE "LegalCopyright", "Copyright (C) 2015-2017"
+            VALUE "LegalCopyright", "Copyright (C) 2015-2020"
             VALUE "ProductName", "OpenXR Loader"
             VALUE "ProductVersion", VER_FILE_VERSION_STR
         END

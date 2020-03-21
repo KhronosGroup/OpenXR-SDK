@@ -436,6 +436,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateApiLayerInstance(const XrInstan
 
 XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermDestroyInstance(XrInstance instance) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrDestroyInstance", "Entering loader terminator");
+    LoaderLogger::GetInstance().RemoveLogRecordersForXrInstance(instance);
     XrResult result = RuntimeInterface::GetRuntime().DestroyInstance(instance);
     LoaderLogger::LogVerboseMessage("xrDestroyInstance", "Completed loader terminator");
     return result;
@@ -654,7 +655,7 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrTermCreateDebugUtilsMessengerEXT(XrInstan
         *messenger = reinterpret_cast<XrDebugUtilsMessengerEXT>(temp_mess_ptr);
     }
     if (XR_SUCCEEDED(result)) {
-        LoaderLogger::GetInstance().AddLogRecorder(MakeDebugUtilsLoaderLogRecorder(createInfo, *messenger));
+        LoaderLogger::GetInstance().AddLogRecorderForXrInstance(instance, MakeDebugUtilsLoaderLogRecorder(createInfo, *messenger));
         RuntimeInterface::GetRuntime().TrackDebugMessenger(instance, *messenger);
     }
     LoaderLogger::LogVerboseMessage("xrCreateDebugUtilsMessengerEXT", "Completed loader terminator");

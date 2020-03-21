@@ -20,6 +20,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(GNUInstallDirs)
+
 ### Dependencies
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL)
@@ -274,8 +276,17 @@ add_custom_target(xr_global_generated_files DEPENDS ${GENERATED_DEPENDS})
 set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
 set(COMMON_GENERATED_OUTPUT ${GENERATED_OUTPUT})
-
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+if(NOT MSVC)
+    include(CheckCXXCompilerFlag)
+    foreach(FLAG -Wall -Werror=unused-parameter -Werror=unused-argument)
+        string(REGEX REPLACE "[^A-Za-z0-9]" "" _flagvar "${FLAG}")
+        check_cxx_compiler_flag(${FLAG} SUPPORTS_${_flagvar})
+        if(SUPPORTS_WARNING_${_flagvar})
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAG}")
+        endif()
+    endforeach()
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+endif()
 
 if(BUILD_LOADER)
     add_subdirectory(loader)

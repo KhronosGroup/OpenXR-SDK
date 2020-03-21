@@ -31,7 +31,7 @@ bool FileSysUtilsIsDirectory(const std::string& path);
 // Determine if the provided path exists on the filesystem
 bool FileSysUtilsPathExists(const std::string& path);
 
-// Get the current directory of the executable
+// Get the current directory
 bool FileSysUtilsGetCurrentPath(std::string& path);
 
 // Get the parent path of a file

@@ -15,9 +15,9 @@
 # Author:
 #
 
-include(GNUInstallDirs)
-
 if(WIN32)
+    # Pass version fields as preprocessor for .rc resource version on Windows.
+    add_definitions(-DXR_CURRENT_API_MAJOR_VERSION=${MAJOR} -DXR_CURRENT_API_MINOR_VERSION=${MINOR} -DXR_CURRENT_API_PATCH_VERSION=${PATCH})
     set(openxr_loader_RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/loader.rc)
 endif()
 
@@ -183,6 +183,8 @@ elseif(WIN32)
         target_compile_options(openxr_loader PRIVATE /wd6386)
     endif()
 
+    target_link_libraries(openxr_loader PRIVATE advapi32)
+
     # Need to copy DLL to client directories so clients can easily load it.
     if(DYNAMIC_LOADER AND (CMAKE_GENERATOR MATCHES "^Visual Studio.*"))
         file(TO_NATIVE_PATH ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>/openxr_loader.dll COPY_DLL_SRC_PATH)
@@ -222,6 +224,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
                 -ffunction-sections
                 -fdata-sections
     )
+    # Make build depend on the version script/export map
+    target_sources(openxr_loader PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.map)
+    # Add the linker flag.
+    set_target_properties(openxr_loader PROPERTIES LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.map")
     # For GCC version 7.1 or greater, we need to disable the implicit fallthrough warning since
     # there's no consistent way to satisfy all compilers until they all accept the C++17 standard
     if(CMAKE_COMPILER_IS_GNUCC AND NOT (CMAKE_CXX_COMPILER_VERSION LESS 7.1))

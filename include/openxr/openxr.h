@@ -35,7 +35,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 6)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 7)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -278,9 +278,12 @@ typedef enum XrStructureType {
     XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR = 1000028002,
     XR_TYPE_VISIBILITY_MASK_KHR = 1000031000,
     XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR = 1000031001,
+    XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX = 1000033000,
+    XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX = 1000033003,
     XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT = 1000039000,
     XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT = 1000039001,
     XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT = 1000046000,
+    XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC = 1000059000,
     XR_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrStructureType;
 
@@ -1533,6 +1536,35 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(
 #endif
 
 
+#define XR_EXTX_overlay 1
+#define XR_EXTX_overlay_SPEC_VERSION      3
+#define XR_EXTX_OVERLAY_EXTENSION_NAME    "XR_EXTX_overlay"
+typedef XrFlags64 XrOverlaySessionCreateFlagsEXTX;
+
+// Flag bits for XrOverlaySessionCreateFlagsEXTX
+static const XrOverlaySessionCreateFlagsEXTX XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_EXTX = 0x00000001;
+
+typedef XrFlags64 XrOverlayMainSessionFlagsEXTX;
+
+// Flag bits for XrOverlayMainSessionFlagsEXTX
+static const XrOverlayMainSessionFlagsEXTX XR_MAIN_SESSION_BIT_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_EXTX = 0x00000001;
+
+typedef struct XrSessionCreateInfoOverlayEXTX {
+    XrStructureType                    type;
+    const void* XR_MAY_ALIAS           next;
+    XrOverlaySessionCreateFlagsEXTX    createFlags;
+    uint32_t                           sessionLayersPlacement;
+} XrSessionCreateInfoOverlayEXTX;
+
+typedef struct XrEventDataMainSessionVisibilityChangedEXTX {
+    XrStructureType                  type;
+    const void* XR_MAY_ALIAS         next;
+    XrBool32                         visible;
+    XrOverlayMainSessionFlagsEXTX    flags;
+} XrEventDataMainSessionVisibilityChangedEXTX;
+
+
+
 #define XR_VARJO_quad_views 1
 #define XR_VARJO_quad_views_SPEC_VERSION  1
 #define XR_VARJO_QUAD_VIEWS_EXTENSION_NAME "XR_VARJO_quad_views"
@@ -1649,9 +1681,26 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceLocationEXT(
 #endif
 
 
+#define XR_MSFT_hand_interaction 1
+#define XR_MSFT_hand_interaction_SPEC_VERSION 1
+#define XR_MSFT_HAND_INTERACTION_EXTENSION_NAME "XR_MSFT_hand_interaction"
+
+
 #define XR_EXT_win32_appcontainer_compatible 1
 #define XR_EXT_win32_appcontainer_compatible_SPEC_VERSION 1
 #define XR_EXT_WIN32_APPCONTAINER_COMPATIBLE_EXTENSION_NAME "XR_EXT_win32_appcontainer_compatible"
+
+
+#define XR_EPIC_view_configuration_fov 1
+#define XR_EPIC_view_configuration_fov_SPEC_VERSION 1
+#define XR_EPIC_VIEW_CONFIGURATION_FOV_EXTENSION_NAME "XR_EPIC_view_configuration_fov"
+typedef struct XrViewConfigurationViewFovEPIC {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrFovf                      recommendedMutableFov;
+    XrFovf                      maxMutableFov;
+} XrViewConfigurationViewFovEPIC;
+
 
 #ifdef __cplusplus
 }
