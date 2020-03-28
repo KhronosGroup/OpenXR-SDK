@@ -13,6 +13,34 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.8 (2020-03-27)
+
+Patch release for the 1.0 series.
+
+- Registry
+  - `XR_EXTX_overlay`: upgrade overlay bit names to match the convention, and
+    increase extension version number. This is a **source-incompatible change** to
+    a provisional multi-vendor extension.
+    ([internal MR 1697](https://gitlab.khronos.org/openxr/openxr/merge_requests/1697),
+    [internal issue 1318](https://gitlab.khronos.org/openxr/openxr/issues/1318),
+    [internal issue 42](https://gitlab.khronos.org/openxr/openxr/issues/42),
+    [internal MR 171](https://gitlab.khronos.org/openxr/openxr/merge_requests/171))
+  - Introduce `XR_EXT_eye_gaze_interaction` extension for eye gaze interaction
+    profile.
+    ([internal MR 1556](https://gitlab.khronos.org/openxr/openxr/merge_requests/1556))
+  - Add SPDX license identifier tag to registry schema.
+    ([internal MR 1686](https://gitlab.khronos.org/openxr/openxr/merge_requests/1686))
+  - Add missing error codes to `xrCreateActionSet`, `xrCreateAction`, and
+    `xrGetInputSourceLocalizedName`.
+    ([internal MR 1698](https://gitlab.khronos.org/openxr/openxr/merge_requests/1698))
+- SDK
+  - Add SPDX license identifier tags to nearly all (code) files, including
+    generated files.
+    ([internal MR 1686](https://gitlab.khronos.org/openxr/openxr/merge_requests/1686))
+  - Fix build system behavior with MSVC building in Release mode: only attempt
+    to copy PDB files if they exist.
+    ([internal MR 1701](https://gitlab.khronos.org/openxr/openxr/merge_requests/1701))
+
 ## OpenXR SDK 1.0.7 (2020-03-20)
 
 Patch release for the 1.0 series.
@@ -37,9 +65,9 @@ changed somewhat.
     ([internal MR 1665](https://gitlab.khronos.org/openxr/openxr/merge_requests/1665))
 - SDK
   - loader: Add linker export map/version script to avoid exporting implementation
-    symbols from C++ on non-MSVC platforms. ([internal MR
-    1641](https://gitlab.khronos.org/openxr/openxr/merge_requests/1641), [OpenXR-
-    SDK-Source/#159](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/159))
+    symbols from C++ on non-MSVC platforms.
+    ([internal MR 1641](https://gitlab.khronos.org/openxr/openxr/merge_requests/1641),
+    [OpenXR-SDK-Source/#159](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/159))
   - Add tracking and destruction of debug messengers in the loader.
     ([internal MR 1668](https://gitlab.khronos.org/openxr/openxr/merge_requests/1668),
     [OpenXR-SDK-Source/#29](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/29),

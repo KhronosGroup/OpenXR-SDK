@@ -58,6 +58,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="PLUTO"      author="Pluto VR"                contact="Jared Cheshier @Jared, Sophia Baldonado @sophia"/>
         <tag name="QCOM"       author="Qualcomm Technologies"   contact="Armelle @alaine_qcom, Martin Renschler @martinr"/>
         <tag name="STARBREEZE" author="Starbreeze"              contact="David Srour @dsrour"/>
+        <tag name="TOBII"      author="Tobii"                   contact="Denny Rönngren @denron"/>
         <tag name="VALVE"      author="Valve"                   contact="Joe Ludwig @JoeLudwig"/>
         <tag name="VARJO"      author="Varjo"                   contact="Sergiy Dubovik @dubik, Rémi Arnaud @VarjoRemi"/>
     </tags>
@@ -114,7 +115,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 7)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 8)</type>
 
         <!-- 
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1011,6 +1012,19 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <type>void</type>*                                            userData);
         </type>
 
+        <!-- types for XR_EXT_eye_gaze_interaction -->
+        <type category="struct" name="XrSystemEyeGazeInteractionPropertiesEXT" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsEyeGazeInteraction</name></member>
+        </type>
+
+        <type category="struct" name="XrEyeGazeSampleTimeEXT" structextends="XrSpaceLocation">
+            <member values="XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*   <name>next</name></member>
+            <member><type>XrTime</type>  <name>time</name></member>
+        </type>
+
         <!-- types for XR_MSFT_spatial_anchor -->
         <type category="struct" name="XrSpatialAnchorCreateInfoMSFT">
             <member values="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"><type>XrStructureType</type><name>type</name></member>
@@ -1337,10 +1351,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum bitpos="3"     name="XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT"  comment="Indicates the message is related to a non-conformant runtime result"/>
     </enums>
     <enums name="XrOverlayMainSessionFlagBitsEXTX" type="bitmask">
-        <enum bitpos="0"     name="XR_MAIN_SESSION_BIT_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_EXTX"  comment="Indicates the main session enabled XR_KHR_extra_layer_info_depth"/>
+        <enum bitpos="0"     name="XR_OVERLAY_MAIN_SESSION_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_BIT_EXTX"  comment="Indicates the main session enabled XR_KHR_extra_layer_info_depth"/>
     </enums>
     <enums name="XrOverlaySessionCreateFlagBitsEXTX" type="bitmask">
-        <enum bitpos="0"     name="XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_EXTX"  comment="Indicates the runtime does not need to attempt to lock the overlay session displayTime to the main session displayTime"/>
+        <enum bitpos="0"     name="XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_BIT_EXTX"  comment="Indicates the runtime does not need to attempt to lock the overlay session displayTime to the main session displayTime"/>
     </enums>
 
 
@@ -1630,7 +1644,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param>const <type>XrActionStateGetInfo</type>* <name>getInfo</name></param>
             <param><type>XrActionStatePose</type>* <name>state</name></param>
         </command>
-        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_LIMIT_REACHED,XR_ERROR_HANDLE_INVALID,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_NAME_DUPLICATED,XR_ERROR_NAME_INVALID,XR_ERROR_PATH_FORMAT_INVALID">
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_LIMIT_REACHED,XR_ERROR_HANDLE_INVALID,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_NAME_DUPLICATED,XR_ERROR_LOCALIZED_NAME_DUPLICATED,XR_ERROR_NAME_INVALID,XR_ERROR_LOCALIZED_NAME_INVALID,XR_ERROR_PATH_FORMAT_INVALID">
             <proto><type>XrResult</type> <name>xrCreateActionSet</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
             <param>const <type>XrActionSetCreateInfo</type>* <name>createInfo</name></param>
@@ -1640,7 +1654,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <proto><type>XrResult</type> <name>xrDestroyActionSet</name></proto>
             <param externsync="true_with_children"><type>XrActionSet</type> <name>actionSet</name></param>
         </command>
-        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_ACTIONSETS_ALREADY_ATTACHED,XR_ERROR_LIMIT_REACHED,XR_ERROR_HANDLE_INVALID,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_PATH_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_NAME_DUPLICATED,XR_ERROR_NAME_INVALID,XR_ERROR_PATH_FORMAT_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_ACTIONSETS_ALREADY_ATTACHED,XR_ERROR_LIMIT_REACHED,XR_ERROR_HANDLE_INVALID,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_PATH_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_NAME_DUPLICATED,XR_ERROR_LOCALIZED_NAME_DUPLICATED,XR_ERROR_NAME_INVALID,XR_ERROR_LOCALIZED_NAME_INVALID,XR_ERROR_PATH_FORMAT_INVALID,XR_ERROR_PATH_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrCreateAction</name></proto>
             <param><type>XrActionSet</type> <name>actionSet</name></param>
             <param>const <type>XrActionCreateInfo</type>* <name>createInfo</name></param>
@@ -1679,7 +1693,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>uint32_t</type>* <name>sourceCountOutput</name></param>
             <param optional="true" len="sourceCapacityInput"><type>XrPath</type>* <name>sources</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_ACTIONSET_NOT_ATTACHED">
             <proto><type>XrResult</type> <name>xrGetInputSourceLocalizedName</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrInputSourceLocalizedNameGetInfo</type>* <name>getInfo</name></param>
@@ -2321,12 +2335,16 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <!-- Reserved space for Eye tracking extension -->
-    <extension name="XR_EXT_eye_tracking" number="31" type="instance" supported="disabled">
-        <require>
-            <enum value="1" name="XR_EXT_eye_tracking_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_eye_tracking&quot;" name="XR_EXT_EYE_TRACKING_EXTENSION_NAME"/>
-        </require>
+    <!-- Eye gaze interaction extension -->
+    <extension name="XR_EXT_eye_gaze_interaction" number="31" type="instance" supported="openxr">
+      <require>
+        <enum value="1" name="XR_EXT_eye_gaze_interaction_SPEC_VERSION"/>
+        <enum value="&quot;XR_EXT_eye_gaze_interaction&quot;" name="XR_EXT_EYE_GAZE_INTERACTION_EXTENSION_NAME"/>
+        <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT"/>
+        <enum offset="1" extends="XrStructureType" name="XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT"/>
+        <type name="XrSystemEyeGazeInteractionPropertiesEXT" />
+        <type name="XrEyeGazeSampleTimeEXT" />
+      </require>
     </extension>
 
     <!-- Visibility mask extension -->
@@ -2354,7 +2372,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     <!-- Overlay preview extension -->
     <extension name="XR_EXTX_overlay" number="34" type="instance" provisional="true" supported="openxr">
         <require>
-            <enum value="3" name="XR_EXTX_overlay_SPEC_VERSION"/>
+            <enum value="4" name="XR_EXTX_overlay_SPEC_VERSION"/>
             <enum value="&quot;XR_EXTX_overlay&quot;"         name="XR_EXTX_OVERLAY_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"       name="XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX"/>
             <enum offset="3" extends="XrStructureType"       name="XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX"/>

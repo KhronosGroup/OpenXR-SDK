@@ -4,6 +4,8 @@
 /*
 ** Copyright (c) 2017-2020 The Khronos Group Inc.
 **
+** SPDX-License-Identifier: Apache-2.0
+**
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
 ** You may obtain a copy of the License at
@@ -35,7 +37,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 7)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 8)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -276,6 +278,8 @@ typedef enum XrStructureType {
     XR_TYPE_GRAPHICS_BINDING_D3D12_KHR = 1000028000,
     XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR = 1000028001,
     XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR = 1000028002,
+    XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT = 1000030000,
+    XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT = 1000030001,
     XR_TYPE_VISIBILITY_MASK_KHR = 1000031000,
     XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR = 1000031001,
     XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX = 1000033000,
@@ -1536,18 +1540,35 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(
 #endif
 
 
+#define XR_EXT_eye_gaze_interaction 1
+#define XR_EXT_eye_gaze_interaction_SPEC_VERSION 1
+#define XR_EXT_EYE_GAZE_INTERACTION_EXTENSION_NAME "XR_EXT_eye_gaze_interaction"
+typedef struct XrSystemEyeGazeInteractionPropertiesEXT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsEyeGazeInteraction;
+} XrSystemEyeGazeInteractionPropertiesEXT;
+
+typedef struct XrEyeGazeSampleTimeEXT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrTime                time;
+} XrEyeGazeSampleTimeEXT;
+
+
+
 #define XR_EXTX_overlay 1
-#define XR_EXTX_overlay_SPEC_VERSION      3
+#define XR_EXTX_overlay_SPEC_VERSION      4
 #define XR_EXTX_OVERLAY_EXTENSION_NAME    "XR_EXTX_overlay"
 typedef XrFlags64 XrOverlaySessionCreateFlagsEXTX;
 
 // Flag bits for XrOverlaySessionCreateFlagsEXTX
-static const XrOverlaySessionCreateFlagsEXTX XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_EXTX = 0x00000001;
+static const XrOverlaySessionCreateFlagsEXTX XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_BIT_EXTX = 0x00000001;
 
 typedef XrFlags64 XrOverlayMainSessionFlagsEXTX;
 
 // Flag bits for XrOverlayMainSessionFlagsEXTX
-static const XrOverlayMainSessionFlagsEXTX XR_MAIN_SESSION_BIT_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_EXTX = 0x00000001;
+static const XrOverlayMainSessionFlagsEXTX XR_OVERLAY_MAIN_SESSION_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_BIT_EXTX = 0x00000001;
 
 typedef struct XrSessionCreateInfoOverlayEXTX {
     XrStructureType                    type;
