@@ -22,6 +22,15 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(CheckCXXCompilerFlag)
+
+if("${CMAKE_MAJOR_VERSION}" EQUAL 3 AND "${CMAKE_MINOR_VERSION}" GREATER 7)
+    check_cxx_compiler_flag(-std=c++17 HAVE_FLAG_STD_CXX17)
+    if(HAVE_FLAG_STD_CXX17)
+        set(CMAKE_CXX_STANDARD 17)
+    endif()
+endif()
+
 include(GNUInstallDirs)
 
 ### Dependencies

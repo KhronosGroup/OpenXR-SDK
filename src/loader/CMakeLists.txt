@@ -143,11 +143,19 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     set_target_properties(openxr_loader PROPERTIES SOVERSION "${MAJOR}" VERSION "${MAJOR}.${MINOR}.${PATCH}")
-    target_link_libraries(
-        openxr_loader
-        PRIVATE stdc++fs
-        PUBLIC m
-    )
+
+    if(HAVE_FLAG_STD_CXX17)
+        target_link_libraries(
+            openxr_loader
+            PUBLIC m
+        )
+    else()
+        target_link_libraries(
+            openxr_loader
+            PRIVATE stdc++fs
+            PUBLIC m
+        )
+    endif()
 
     add_custom_target(
         libopenxr_loader.so.${MAJOR}.${MINOR} ALL
