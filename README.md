@@ -7,6 +7,8 @@ It contains all generated source files and headers pre-generated for minimum dep
 The authoritative public repository for this project is located at
 <https://github.com/KhronosGroup/OpenXR-SDK>.
 
+test
+
 The public repository containing the scripts that generate the files in this repository
 is located at
 <https://github.com/KhronosGroup/OpenXR-SDK-Source>.
