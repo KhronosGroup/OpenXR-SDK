@@ -378,6 +378,22 @@ XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimeToTimespecTimeKHR(
 #endif
 #endif /* XR_USE_TIMESPEC */
 
+#ifdef XR_USE_PLATFORM_EGL
+
+#define XR_MNDX_egl_enable 1
+#define XR_MNDX_egl_enable_SPEC_VERSION   1
+#define XR_MNDX_EGL_ENABLE_EXTENSION_NAME "XR_MNDX_egl_enable"
+typedef struct XrGraphicsBindingEGLMNDX {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    PFNEGLGETPROCADDRESSPROC    getProcAddress;
+    EGLDisplay                  display;
+    EGLConfig                   config;
+    EGLContext                  context;
+} XrGraphicsBindingEGLMNDX;
+
+#endif /* XR_USE_PLATFORM_EGL */
+
 #ifdef __cplusplus
 }
 #endif

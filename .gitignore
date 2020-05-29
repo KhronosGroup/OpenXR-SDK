@@ -28,6 +28,8 @@ out/build/
 # VS misc
 *.sln
 *.pyproj
+CMakeSettings.json
+CppProperties.json
 
 # Don't ignore pipeline stuff
 !.azure-pipelines/

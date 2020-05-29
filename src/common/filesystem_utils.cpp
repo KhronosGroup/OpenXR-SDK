@@ -25,6 +25,7 @@
 #include "platform_utils.hpp"
 
 #include <cstring>
+#include <string>
 
 #if defined DISABLE_STD_FILESYSTEM
 #define USE_EXPERIMENTAL_FS 0

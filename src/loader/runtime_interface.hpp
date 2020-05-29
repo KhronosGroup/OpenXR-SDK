@@ -40,7 +40,7 @@ class RuntimeInterface {
     // Helper functions for loading and unloading the runtime (but only when necessary)
     static XrResult LoadRuntime(const std::string& openxr_command);
     static void UnloadRuntime(const std::string& openxr_command);
-    static RuntimeInterface& GetRuntime() { return *(_single_runtime_interface.get()); }
+    static RuntimeInterface& GetRuntime() { return *(GetInstance().get()); }
     static XrResult GetInstanceProcAddr(XrInstance instance, const char* name, PFN_xrVoidFunction* function);
 
     // Get the direct dispatch table to this runtime, without API layers or loader terminators.
@@ -65,7 +65,11 @@ class RuntimeInterface {
     RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instance_proc_addr);
     void SetSupportedExtensions(std::vector<std::string>& supported_extensions);
 
-    static std::unique_ptr<RuntimeInterface> _single_runtime_interface;
+    static std::unique_ptr<RuntimeInterface>& GetInstance() {
+        static std::unique_ptr<RuntimeInterface> instance;
+        return instance;
+    }
+
     static uint32_t _single_runtime_count;
     LoaderPlatformLibraryHandle _runtime_library;
     PFN_xrGetInstanceProcAddr _get_instance_proc_addr;

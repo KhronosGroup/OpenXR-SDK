@@ -33,7 +33,7 @@
 #include <sstream>
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 // Anonymous namespace to keep these types private

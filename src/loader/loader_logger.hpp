@@ -122,8 +122,8 @@ class LoaderLogRecorder {
 class LoaderLogger {
    public:
     static LoaderLogger& GetInstance() {
-        std::call_once(LoaderLogger::_once_flag, []() { _instance.reset(new LoaderLogger); });
-        return *(_instance.get());
+        static LoaderLogger instance;
+        return instance;
     }
 
     void AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder);
@@ -183,9 +183,6 @@ class LoaderLogger {
 
    private:
     LoaderLogger();
-
-    static std::unique_ptr<LoaderLogger> _instance;
-    static std::once_flag _once_flag;
 
     // List of *all* available recorder objects (including created specifically for an Instance)
     std::vector<std::unique_ptr<LoaderLogRecorder>> _recorders;

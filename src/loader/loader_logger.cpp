@@ -38,9 +38,6 @@
 #include <utility>
 #include <vector>
 
-std::unique_ptr<LoaderLogger> LoaderLogger::_instance;
-std::once_flag LoaderLogger::_once_flag;
-
 bool LoaderLogRecorder::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT /*message_severity*/,
                                              XrDebugUtilsMessageTypeFlagsEXT /*message_type*/,
                                              const XrDebugUtilsMessengerCallbackDataEXT* /*callback_data*/) {

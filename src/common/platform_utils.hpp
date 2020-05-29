@@ -143,7 +143,7 @@ static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std:
 
 #elif defined(XR_OS_WINDOWS)
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 inline void LogError(const std::string& error) { OutputDebugStringA(error.c_str()); }
 #else
 #define LogError(x)

@@ -44,17 +44,19 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="ARM"        author="Arm Limited"             contact="Andreas Loeve Selvik @selvik, Sam Martin @sammartin"/>
         <tag name="COLLABORA"  author="Collabora"               contact="Ryan Pavlik @rpavlik"/>
         <tag name="EPIC"       author="Epic"                    contact="Nick Whiting @whitingn"/>
-        <tag name="EXT"        author="Multivendor"             contact="Kaye Mason @chaleur"/>
+        <tag name="EXT"        author="Multivendor"             contact="Ryan Pavlik @rpavlik"/>
         <tag name="EXTX"       author="Multivendor experimental"             contact="Brad Grantham @bradgrantham-lunarg"/>
         <tag name="GOOGLE"     author="Google"                  contact="Kaye Mason @chaleur"/>
+        <tag name="HUAWEI"     author="Huawei"                  contact="Yihong Huang @rachelhuang"/>
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
-        <tag name="KHR"        author="Khronos"                 contact="Nick Whiting @whitingn"/>
-        <tag name="LUNARG"     author="LunarG"                  contact="Mark Young @marky_lunarg, Karl Schultz @karlschultz"/>
+        <tag name="KHR"        author="Khronos"                 contact="Brent Insko @insko"/>
+        <tag name="LUNARG"     author="LunarG"                  contact="Brad Grantham @bradgrantham-lunarg"/>
         <tag name="MAGICLEAP"  author="Magic Leap"              contact="Blake Taylor @theblindprogramm3r"/>
-        <tag name="MND"        author="Monado Project"          contact="Ryan Pavlik @rpavlik"/>
+        <tag name="MND"        author="Monado Project"          contact="Jakob Bornecrantz @wallbraker, Ryan Pavlik @rpavlik"/>
+        <tag name="MNDX"       author="Monado Project experimental" contact="Jakob Bornecrantz @wallbraker, Ryan Pavlik @rpavlik"/>
         <tag name="MSFT"       author="Microsoft"               contact="Alex Turner @alexturn, Yin Li @yl_msft, Bryce Hutchings @brycehutchings, Lachlan Ford @laford_msft, Minmin Gong @gongminmin "/>
         <tag name="NV"         author="NVIDIA Corporation"      contact="Satish Salian @ssalian, Robert Menzel"/>
-        <tag name="OCULUS"     author="Oculus"                  contact="Cass Everitt @casseveritt, Paul Pedriana @ppedriana"/>
+        <tag name="OCULUS"     author="Oculus"                  contact="Cass Everitt @casseveritt, Ed Hutchins @eahutchins"/>
         <tag name="PLUTO"      author="Pluto VR"                contact="Jared Cheshier @Jared, Sophia Baldonado @sophia"/>
         <tag name="QCOM"       author="Qualcomm Technologies"   contact="Armelle @alaine_qcom, Martin Renschler @martinr"/>
         <tag name="STARBREEZE" author="Starbreeze"              contact="David Srour @dsrour"/>
@@ -79,6 +81,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type requires="EGL/egl.h" name="EGLDisplay"/>
         <type requires="EGL/egl.h" name="EGLConfig"/>
         <type requires="EGL/egl.h" name="EGLContext"/>
+        <type requires="EGL/egl.h" name="PFNEGLGETPROCADDRESSPROC"/>
         <type requires="GL/glxext.h" name="GLXFBConfig"/>
         <type requires="GL/glxext.h" name="GLXDrawable"/>
         <type requires="GL/glxext.h" name="GLXContext"/>
@@ -115,9 +118,9 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 8)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 9)</type>
 
-        <!-- 
+        <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
         each <type>. This is why XR_MAY_ALIAS appears multiple times below, but only once with
         the <name> tags wrapping it. It does not particularly matter which of the copies of
@@ -188,6 +191,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type category="define">
 #define <name>XR_MAX_EVENT_DATA_SIZE</name> sizeof(XrEventDataBuffer)</type>
 
+        <!-- XR_EXT_hand_tracking -->
+        <type category="define">
+#define <name>XR_HAND_JOINT_COUNT_EXT</name> 26</type>
+
         <!-- Value types -->
         <type category="basetype">typedef <type>uint32_t</type> <name>XrBool32</name>;</type>
         <type category="basetype">typedef <type>uint64_t</type> <name>XrFlags64</name>;</type>
@@ -241,6 +248,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSpace</name>)</type>
         <type category="handle" parent="XrInstance"><type>XR_DEFINE_HANDLE</type>(<name>XrDebugUtilsMessengerEXT</name>)</type>
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSpatialAnchorMSFT</name>)</type>
+        <!-- XR_EXT_hand_tracking -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrHandTrackerEXT</name>)</type>
 
         <!-- enums and flag bits generated from corresponding <enums> tags below -->
         <type name="XrStructureType" category="enum"/>
@@ -278,6 +287,9 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
 
         <!-- enums for XR_KHR_visibility_mask -->
         <type name="XrVisibilityMaskTypeKHR" category="enum"/>
+
+        <!-- enums for XR_MSFT_spatial_graph_bridge -->
+        <type name="XrSpatialGraphNodeTypeMSFT" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -607,8 +619,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member values="XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                            <name>next</name></member>
             <member><type>XrPosef</type>                                <name>pose</name></member>
-            <member><type>XrFovf</type>                                  <name>fov</name></member>
-            <member><type>XrSwapchainSubImage</type>                   <name>subImage</name></member>
+            <member><type>XrFovf</type>                                 <name>fov</name></member>
+            <member><type>XrSwapchainSubImage</type>                    <name>subImage</name></member>
         </type>
         <type category="struct" name="XrCompositionLayerProjection" parentstruct="XrCompositionLayerBaseHeader">
             <member values="XR_TYPE_COMPOSITION_LAYER_PROJECTION"><type>XrStructureType</type> <name>type</name></member>
@@ -1027,7 +1039,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
 
         <!-- types for XR_MSFT_spatial_anchor -->
         <type category="struct" name="XrSpatialAnchorCreateInfoMSFT">
-            <member values="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"><type>XrStructureType</type><name>type</name></member>
+            <member values="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>XrSpace</type>     <name>space</name></member>
             <member><type>XrPosef</type>     <name>pose</name></member>
@@ -1038,6 +1050,162 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*                     <name>next</name></member>
             <member><type>XrSpatialAnchorMSFT</type>             <name>anchor</name></member>
             <member><type>XrPosef</type>                         <name>poseInAnchorSpace</name></member>
+        </type>
+
+        <!-- types for XR_MNDX_egl_enable -->
+        <type category="struct" name="XrGraphicsBindingEGLMNDX" structextends="XrSessionCreateInfo">
+            <member values="XR_TYPE_GRAPHICS_BINDING_EGL_MNDX"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>PFNEGLGETPROCADDRESSPROC</type> <name>getProcAddress</name></member>
+            <member><type>EGLDisplay</type> <name>display</name></member>
+            <member><type>EGLConfig</type> <name>config</name></member>
+            <member><type>EGLContext</type> <name>context</name></member>
+        </type>
+
+        <!-- types for XR_MSFT_spatial_graph_bridge -->
+        <type category="struct" name="XrSpatialGraphNodeSpaceCreateInfoMSFT">
+            <member values="XR_TYPE_SPATIAL_GRAPH_NODE_SPACE_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                            <name>next</name></member>
+            <member><type>XrSpatialGraphNodeTypeMSFT</type>             <name>nodeType</name></member>
+            <member><type>uint8_t</type>                                <name>nodeId</name>[16]</member>
+            <member><type>XrPosef</type>                                <name>pose</name></member>
+        </type>
+
+        <!-- XR_EXT_hand_tracking -->
+        <type name="XrHandEXT" category="enum"/>
+        <type name="XrHandJointEXT" category="enum"/>
+        <type name="XrHandJointSetEXT" category="enum"/>
+
+        <type category="struct" name="XrSystemHandTrackingPropertiesEXT" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsHandTracking</name></member>
+        </type>
+        <type category="struct" name="XrHandTrackerCreateInfoEXT">
+            <member values="XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member> <!-- Pointer to next structure -->
+            <member><type>XrHandEXT</type> <name>hand</name></member>
+            <member><type>XrHandJointSetEXT</type> <name>handJointSet</name></member>
+        </type>
+        <type category="struct" name="XrHandJointsLocateInfoEXT">
+            <member values="XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type> <name>baseSpace</name></member>
+            <member><type>XrTime</type> <name>time</name></member>
+        </type>
+        <type category="struct" name="XrHandJointLocationEXT">
+            <member><type>XrSpaceLocationFlags</type> <name>locationFlags</name></member>
+            <member><type>XrPosef</type> <name>pose</name></member>
+            <member><type>float</type> <name>radius</name></member>
+        </type>
+        <type category="struct" name="XrHandJointVelocityEXT">
+            <member><type>XrSpaceVelocityFlags</type> <name>velocityFlags</name></member>
+            <member><type>XrVector3f</type> <name>linearVelocity</name></member>
+            <member><type>XrVector3f</type> <name>angularVelocity</name></member>
+        </type>
+        <type category="struct" name="XrHandJointLocationsEXT">
+            <member values="XR_TYPE_HAND_JOINT_LOCATIONS_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type> <name>isActive</name></member>
+            <member><type>uint32_t</type> <name>jointCount</name></member>
+            <member len="jointCount"><type>XrHandJointLocationEXT</type>* <name>jointLocations</name></member>
+        </type>
+        <type category="struct" name="XrHandJointVelocitiesEXT" structextends="XrHandJointLocationsEXT">
+            <member values="XR_TYPE_HAND_JOINT_VELOCITIES_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>uint32_t</type> <name>jointCount</name></member>
+            <member len="jointCount"><type>XrHandJointVelocityEXT</type>* <name>jointVelocities</name></member>
+        </type>
+
+        <!-- XR_MSFT_hand_tracking_mesh -->
+        <type name="XrHandPoseTypeMSFT" category="enum"/>
+        <type category="struct" name="XrHandMeshSpaceCreateInfoMSFT">
+            <member values="XR_TYPE_HAND_MESH_SPACE_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                     <name>next</name></member>
+            <member><type>XrHandPoseTypeMSFT</type>              <name>handPoseType</name></member>
+            <member><type>XrPosef</type>                         <name>poseInHandMeshSpace</name></member>
+        </type>
+        <type category="struct" name="XrHandMeshUpdateInfoMSFT">
+            <member values="XR_TYPE_HAND_MESH_UPDATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrTime</type> <name>time</name></member>
+            <member><type>XrHandPoseTypeMSFT</type> <name>handPoseType</name></member>
+        </type>
+        <type category="struct" name="XrHandMeshMSFT">
+            <member values="XR_TYPE_HAND_MESH_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type> <name>isActive</name></member>
+            <member><type>XrBool32</type> <name>indexBufferChanged</name></member>
+            <member><type>XrBool32</type> <name>vertexBufferChanged</name></member>
+            <member><type>XrHandMeshIndexBufferMSFT</type> <name>indexBuffer</name></member>
+            <member><type>XrHandMeshVertexBufferMSFT</type> <name>vertexBuffer</name></member>
+        </type>
+        <type category="struct" name="XrHandMeshIndexBufferMSFT">
+            <member optional="true"><type>uint32_t</type> <name>indexBufferKey</name></member>
+            <member><type>uint32_t</type> <name>indexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type> <name>indexCountOutput</name></member>
+            <member len="indexCapacityInput"><type>uint32_t</type>* <name>indices</name></member>
+        </type>
+        <type category="struct" name="XrHandMeshVertexBufferMSFT">
+            <member optional="true"><type>XrTime</type> <name>vertexUpdateTime</name></member>
+            <member><type>uint32_t</type> <name>vertexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type> <name>vertexCountOutput</name></member>
+            <member len="vertexCapacityInput"><type>XrHandMeshVertexMSFT</type>* <name>vertices</name></member>
+        </type>
+        <type category="struct" name="XrHandMeshVertexMSFT">
+            <member><type>XrVector3f</type> <name>position</name></member>
+            <member><type>XrVector3f</type> <name>normal</name></member>
+        </type>
+        <type category="struct" name="XrSystemHandTrackingMeshPropertiesMSFT" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_HAND_TRACKING_MESH_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsHandTrackingMesh</name></member>
+            <member><type>uint32_t</type> <name>maxHandMeshIndexCount</name></member>
+            <member><type>uint32_t</type> <name>maxHandMeshVertexCount</name></member>
+        </type>
+        <type category="struct" name="XrHandPoseTypeInfoMSFT" structextends="XrHandTrackerCreateInfoMSFT">
+            <member values="XR_TYPE_HAND_POSE_TYPE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member> <!-- Pointer to next structure -->
+            <member><type>XrHandPoseTypeMSFT</type> <name>handPoseType</name></member>
+        </type>
+
+        <!-- XR_MSFT_secondary_view_configuration -->
+        <type category="struct" name="XrSecondaryViewConfigurationSessionBeginInfoMSFT" structextends="XrSessionBeginInfo">
+            <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SESSION_BEGIN_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>uint32_t</type> <name>viewConfigurationCount</name></member>
+            <member len="viewConfigurationCount">const <type>XrViewConfigurationType</type>* <name>enabledViewConfigurationTypes</name></member>
+        </type>
+        <type category="struct" name="XrSecondaryViewConfigurationStateMSFT">
+            <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_STATE_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrViewConfigurationType</type> <name>viewConfigurationType</name></member>
+            <member><type>XrBool32</type> <name>active</name></member>
+        </type>
+        <type category="struct" name="XrSecondaryViewConfigurationFrameStateMSFT" structextends="XrFrameState">
+            <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_STATE_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>uint32_t</type> <name>viewConfigurationCount</name></member>
+            <member len="viewConfigurationCount"><type>XrSecondaryViewConfigurationStateMSFT</type>* <name>viewConfigurationStates</name></member>
+        </type>
+        <type category="struct" name="XrSecondaryViewConfigurationFrameEndInfoMSFT" structextends="XrFrameEndInfo">
+            <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_END_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>uint32_t</type> <name>viewConfigurationCount</name></member>
+            <member len="viewConfigurationCount">const <type>XrSecondaryViewConfigurationLayerInfoMSFT</type>* <name>viewConfigurationLayersInfo</name></member>
+        </type>
+        <type category="struct" name="XrSecondaryViewConfigurationLayerInfoMSFT">
+            <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrViewConfigurationType</type> <name>viewConfigurationType</name></member>
+            <member><type>XrEnvironmentBlendMode</type> <name>environmentBlendMode</name></member>
+            <member><type>uint32_t</type> <name>layerCount</name></member>
+            <member len="layerCount">const <type>XrCompositionLayerBaseHeader</type>* const* <name>layers</name></member>
+        </type>
+        <type category="struct" name="XrSecondaryViewConfigurationSwapchainCreateInfoMSFT" structextends="XrSwapchainCreateInfo">
+            <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrViewConfigurationType</type> <name>viewConfigurationType</name></member>
         </type>
 
     </types>
@@ -1288,6 +1456,49 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum value="3"    name="XR_VISIBILITY_MASK_TYPE_LINE_LOOP_KHR"             comment="line loop; traces the outline of the area the viewer can see."/>
     </enums>
 
+    <!-- XR_EXT_hand_tracking -->
+    <enums name="XrHandEXT" type="enum">
+        <enum value="1" name="XR_HAND_LEFT_EXT"/>
+        <enum value="2" name="XR_HAND_RIGHT_EXT"/>
+    </enums>
+    <enums name="XrHandJointEXT" type="enum">
+        <enum value="0" name="XR_HAND_JOINT_PALM_EXT"/>
+        <enum value="1" name="XR_HAND_JOINT_WRIST_EXT"/>
+        <enum value="2" name="XR_HAND_JOINT_THUMB_METACARPAL_EXT"/>
+        <enum value="3" name="XR_HAND_JOINT_THUMB_PROXIMAL_EXT"/>
+        <enum value="4" name="XR_HAND_JOINT_THUMB_DISTAL_EXT"/>
+        <enum value="5" name="XR_HAND_JOINT_THUMB_TIP_EXT"/>
+        <enum value="6" name="XR_HAND_JOINT_INDEX_METACARPAL_EXT"/>
+        <enum value="7" name="XR_HAND_JOINT_INDEX_PROXIMAL_EXT"/>
+        <enum value="8" name="XR_HAND_JOINT_INDEX_INTERMEDIATE_EXT"/>
+        <enum value="9" name="XR_HAND_JOINT_INDEX_DISTAL_EXT"/>
+        <enum value="10" name="XR_HAND_JOINT_INDEX_TIP_EXT"/>
+        <enum value="11" name="XR_HAND_JOINT_MIDDLE_METACARPAL_EXT"/>
+        <enum value="12" name="XR_HAND_JOINT_MIDDLE_PROXIMAL_EXT"/>
+        <enum value="13" name="XR_HAND_JOINT_MIDDLE_INTERMEDIATE_EXT"/>
+        <enum value="14" name="XR_HAND_JOINT_MIDDLE_DISTAL_EXT"/>
+        <enum value="15" name="XR_HAND_JOINT_MIDDLE_TIP_EXT"/>
+        <enum value="16" name="XR_HAND_JOINT_RING_METACARPAL_EXT"/>
+        <enum value="17" name="XR_HAND_JOINT_RING_PROXIMAL_EXT"/>
+        <enum value="18" name="XR_HAND_JOINT_RING_INTERMEDIATE_EXT"/>
+        <enum value="19" name="XR_HAND_JOINT_RING_DISTAL_EXT"/>
+        <enum value="20" name="XR_HAND_JOINT_RING_TIP_EXT"/>
+        <enum value="21" name="XR_HAND_JOINT_LITTLE_METACARPAL_EXT"/>
+        <enum value="22" name="XR_HAND_JOINT_LITTLE_PROXIMAL_EXT"/>
+        <enum value="23" name="XR_HAND_JOINT_LITTLE_INTERMEDIATE_EXT"/>
+        <enum value="24" name="XR_HAND_JOINT_LITTLE_DISTAL_EXT"/>
+        <enum value="25" name="XR_HAND_JOINT_LITTLE_TIP_EXT"/>
+    </enums>
+    <enums name="XrHandJointSetEXT" type="enum">
+        <enum value="0" name="XR_HAND_JOINT_SET_DEFAULT_EXT"/>
+    </enums>
+
+    <!-- XR_MSFT_hand_tracking_mesh -->
+    <enums name="XrHandPoseTypeMSFT" type="enum">
+        <enum value="0" name="XR_HAND_POSE_TYPE_TRACKED_MSFT"/>
+        <enum value="1" name="XR_HAND_POSE_TYPE_REFERENCE_OPEN_PALM_MSFT"/>
+    </enums>
+
     <!-- Flags -->
     <enums name="XrInstanceCreateFlagBits" type="bitmask">
         <!-- This is currently empty, awaiting future flags. -->
@@ -1357,6 +1568,11 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum bitpos="0"     name="XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_BIT_EXTX"  comment="Indicates the runtime does not need to attempt to lock the overlay session displayTime to the main session displayTime"/>
     </enums>
 
+    <!-- enumes XR_MSFT_spatial_graph_bridge -->
+    <enums name="XrSpatialGraphNodeTypeMSFT" type="enum">
+        <enum value="1" name="XR_SPATIAL_GRAPH_NODE_TYPE_STATIC_MSFT" />
+        <enum value="2" name="XR_SPATIAL_GRAPH_NODE_TYPE_DYNAMIC_MSFT" />
+    </enums>
 
     <!-- SECTION: OpenXR command definitions -->
     <commands>
@@ -1907,6 +2123,49 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrPosef</type> <name>pose</name></param>
         </command>
 
+        <!--XR_MSFT_spatial_graph_bridge -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_POSE_INVALID">
+            <proto><type>XrResult</type> <name>xrCreateSpatialGraphNodeSpaceMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpatialGraphNodeSpaceCreateInfoMSFT</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>space</name></param>
+        </command>
+
+        <!-- XR_EXT_hand_tracking -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING"
+            errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateHandTrackerEXT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrHandTrackerCreateInfoEXT</type>* <name>createInfo</name></param>
+            <param><type>XrHandTrackerEXT</type>* <name>handTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrDestroyHandTrackerEXT</name></proto>
+            <param externsync="true_with_children"><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_TIME_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrLocateHandJointsEXT</name></proto>
+            <param><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
+            <param>const <type>XrHandJointsLocateInfoEXT</type>* <name>locateInfo</name></param>
+            <param><type>XrHandJointLocationsEXT</type>* <name>locations</name></param>
+        </command>
+
+        <!-- XR_MSFT_hand_tracking_mesh -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING"
+            errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_POSE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateHandMeshSpaceMSFT</name></proto>
+            <param><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
+            <param>const <type>XrHandMeshSpaceCreateInfoMSFT</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>space</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING"
+            errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_TIME_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrUpdateHandMeshMSFT</name></proto>
+            <param><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
+            <param>const <type>XrHandMeshUpdateInfoMSFT</type>* <name>updateInfo</name></param>
+            <param><type>XrHandMeshMSFT</type>* <name>handMesh</name></param>
+        </command>
+
     </commands>
 
     <!-- SECTION: OpenXR API interface definitions -->
@@ -1916,7 +2175,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         if they're expected to be in a next chain.)
         Types referenced by functions are included automatically.
     -->
-    
+
     <feature api="openxr" name="XR_VERSION_1_0" number="1.0">
         <require comment="Header boilerplate">
             <type name="openxr_platform_defines"/>
@@ -2502,17 +2761,24 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <command name="xrSetInputDeviceLocationEXT"/>
         </require>
     </extension>
-    <extension name="XR_MND_egl_enable" number="49" type="instance" supported="disabled">
+
+    <extension name="XR_MNDX_egl_enable" number="49" type="instance" provisional="true" protect="XR_USE_PLATFORM_EGL" supported="openxr">
         <require>
-            <enum value="1" name="XR_MND_egl_enable_SPEC_VERSION"/>
-            <enum value="&quot;XR_MND_egl_enable&quot;" name="XR_MND_EGL_ENABLE_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MNDX_egl_enable_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_egl_enable&quot;" name="XR_MNDX_EGL_ENABLE_EXTENSION_NAME"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_GRAPHICS_BINDING_EGL_MNDX"/>
+            <type name="XrGraphicsBindingEGLMNDX"/>
         </require>
     </extension>
 
-    <extension name="XR_MSFT_extension_50" number="50" type="instance" supported="disabled">
+    <extension name="XR_MSFT_spatial_graph_bridge" number="50" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_50_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_50&quot;" name="XR_MSFT_extension_50_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MSFT_spatial_graph_bridge_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_spatial_graph_bridge&quot;" name="XR_MSFT_SPATIAL_GRAPH_BRIDGE_EXTENSION_NAME"/>
+            <type name="XrSpatialGraphNodeTypeMSFT" />
+            <type name="XrSpatialGraphNodeSpaceCreateInfoMSFT" />
+            <command name="xrCreateSpatialGraphNodeSpaceMSFT" />
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SPATIAL_GRAPH_NODE_SPACE_CREATE_INFO_MSFT"/>
         </require>
     </extension>
 
@@ -2523,54 +2789,122 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_extension_52" number="52" type="instance" supported="disabled">
+    <extension name="XR_EXT_hand_tracking" number="52" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_52_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_52&quot;" name="XR_MSFT_extension_52_EXTENSION_NAME"/>
+            <enum value="2" name="XR_EXT_hand_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_hand_tracking&quot;" name="XR_EXT_HAND_TRACKING_EXTENSION_NAME"/>
+
+            <command name="xrCreateHandTrackerEXT"/>
+            <command name="xrDestroyHandTrackerEXT"/>
+            <command name="xrLocateHandJointsEXT"/>
+
+            <type name="XrHandEXT"/>
+            <type name="XrHandJointEXT"/>
+            <type name="XrHandJointSetEXT"/>
+
+            <type name="XrSystemHandTrackingPropertiesEXT"/>
+            <type name="XrHandTrackerCreateInfoEXT"/>
+            <type name="XrHandJointsLocateInfoEXT"/>
+            <type name="XrHandJointLocationEXT"/>
+            <type name="XrHandJointVelocityEXT"/>
+            <type name="XrHandJointLocationsEXT"/>
+            <type name="XrHandJointVelocitiesEXT"/>
+            <type name="XR_HAND_JOINT_COUNT_EXT"/>
+
+            <enum offset="0" extends="XrObjectType" name="XR_OBJECT_TYPE_HAND_TRACKER_EXT" comment="XrHandTrackerEXT"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_HAND_JOINT_LOCATIONS_EXT"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_HAND_JOINT_VELOCITIES_EXT"/>
         </require>
     </extension>
-    <extension name="XR_MSFT_extension_53" number="53" type="instance" supported="disabled">
+
+    <extension name="XR_MSFT_hand_tracking_mesh" number="53"
+            requires="XR_EXT_hand_tracking" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_53_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_53&quot;" name="XR_MSFT_extension_53_EXTENSION_NAME"/>
+            <enum value="2" name="XR_MSFT_hand_tracking_mesh_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_hand_tracking_mesh&quot;" name="XR_MSFT_HAND_TRACKING_MESH_EXTENSION_NAME"/>
+
+            <command name="xrCreateHandMeshSpaceMSFT"/>
+            <command name="xrUpdateHandMeshMSFT"/>
+
+            <type name="XrSystemHandTrackingMeshPropertiesMSFT"/>
+            <type name="XrHandMeshSpaceCreateInfoMSFT"/>
+            <type name="XrHandMeshUpdateInfoMSFT"/>
+            <type name="XrHandMeshMSFT"/>
+            <type name="XrHandMeshIndexBufferMSFT"/>
+            <type name="XrHandMeshVertexBufferMSFT"/>
+            <type name="XrHandMeshVertexMSFT"/>
+            <type name="XrHandPoseTypeMSFT"/>
+            <type name="XrHandPoseTypeInfoMSFT"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_HAND_TRACKING_MESH_PROPERTIES_MSFT"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_HAND_MESH_SPACE_CREATE_INFO_MSFT"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_HAND_MESH_UPDATE_INFO_MSFT"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_HAND_MESH_MSFT"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_HAND_POSE_TYPE_INFO_MSFT"/>
         </require>
     </extension>
-    <extension name="XR_MSFT_extension_54" number="54" type="instance" supported="disabled">
+
+    <extension name="XR_MSFT_secondary_view_configuration" number="54" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_54_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_54&quot;" name="XR_MSFT_extension_54_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MSFT_secondary_view_configuration_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_secondary_view_configuration&quot;" name="XR_MSFT_SECONDARY_VIEW_CONFIGURATION_EXTENSION_NAME"/>
+            <type name="XrSecondaryViewConfigurationSessionBeginInfoMSFT" />
+            <type name="XrSecondaryViewConfigurationStateMSFT" />
+            <type name="XrSecondaryViewConfigurationFrameStateMSFT"/>
+            <type name="XrSecondaryViewConfigurationFrameEndInfoMSFT"/>
+            <type name="XrSecondaryViewConfigurationLayerInfoMSFT"/>
+            <type name="XrSecondaryViewConfigurationSwapchainCreateInfoMSFT" />
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SESSION_BEGIN_INFO_MSFT"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_STATE_MSFT"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_STATE_MSFT"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_END_INFO_MSFT"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT"/>
+            <enum offset="5" extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT"/>
+            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_SECONDARY_VIEW_CONFIGURATION_TYPE_NOT_ENABLED_MSFT"
+                comment="The secondary view configuration was not enabled when creating the session."/>
         </require>
     </extension>
-    <extension name="XR_MSFT_extension_55" number="55" type="instance" supported="disabled">
+
+    <extension name="XR_MSFT_first_person_observer" number="55" type="instance" requires="XR_MSFT_secondary_view_configuration" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_55_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_55&quot;" name="XR_MSFT_extension_55_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MSFT_first_person_observer_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_first_person_observer&quot;" name="XR_MSFT_FIRST_PERSON_OBSERVER_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrViewConfigurationType" name="XR_VIEW_CONFIGURATION_TYPE_SECONDARY_MONO_FIRST_PERSON_OBSERVER_MSFT"/>
         </require>
     </extension>
+
     <extension name="XR_MSFT_extension_56" number="56" type="instance" supported="disabled">
         <require>
             <enum value="1" name="XR_MSFT_extension_56_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_56&quot;" name="XR_MSFT_extension_56_EXTENSION_NAME"/>
         </require>
     </extension>
+
     <extension name="XR_MSFT_extension_57" number="57" type="instance" supported="disabled">
         <require>
             <enum value="1" name="XR_MSFT_extension_57_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_57&quot;" name="XR_MSFT_extension_57_EXTENSION_NAME"/>
         </require>
     </extension>
+
     <extension name="XR_EXT_win32_appcontainer_compatible" number="58" type="instance" supported="openxr">
         <require>
             <enum value="1" name="XR_EXT_win32_appcontainer_compatible_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_win32_appcontainer_compatible&quot;" name="XR_EXT_WIN32_APPCONTAINER_COMPATIBLE_EXTENSION_NAME"/>
         </require>
     </extension>
+
     <extension name="XR_MAGICLEAP_extension_59" number="59" type="instance" supported="disabled">
         <require>
           <enum value="1" name="XR_MAGICLEAP_extension_59_SPEC_VERSION"/>
           <enum value="&quot;XR_MAGICLEAP_extension_59&quot;" name="XR_MAGICLEAP_extension_59_EXTENSION_NAME"/>
         </require>
     </extension>
+
     <extension name="XR_EPIC_view_configuration_fov" number="60" type="instance" supported="openxr">
         <require>
             <enum value="1" name="XR_EPIC_view_configuration_fov_SPEC_VERSION"/>
@@ -2580,5 +2914,61 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
+    <extension name="XR_MSFT_extension_63" number="63" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_63_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_63&quot;" name="XR_MSFT_extension_63_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_64" number="64" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_64_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_64&quot;" name="XR_MSFT_extension_64_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_65" number="65" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_65_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_65&quot;" name="XR_MSFT_extension_65_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_66" number="66" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_66_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_66&quot;" name="XR_MSFT_extension_66_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_67" number="67" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_MSFT_extension_67_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_67&quot;" name="XR_MSFT_extension_67_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_LUNARG_extension_68" number="68" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_LUNARG_extension_68_SPEC_VERSION"/>
+            <enum value="&quot;XR_LUNARG_extension_68&quot;" name="XR_LUNARG_extension_68_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_LUNARG_extension_69" number="69" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_LUNARG_extension_69_SPEC_VERSION"/>
+            <enum value="&quot;XR_LUNARG_extension_69&quot;" name="XR_LUNARG_extension_69_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_HUAWEI_controller_interaction" number="70" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_HUAWEI_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_HUAWEI_controller_interaction&quot;" name="XR_HUAWEI_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
+        </require>
+    </extension>
     </extensions>
+
 </registry>

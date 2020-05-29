@@ -17,20 +17,29 @@
 # Author:
 #
 
+if(POLICY CMP0075)
+    cmake_policy(SET CMP0075 NEW)
+endif()
+
 # Entire project uses C++14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GNUInstallDirs)
+include(StdFilesystemFlags)
 
 ### Dependencies
 set(OpenGL_GL_PREFERENCE GLVND)
-find_package(OpenGL)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+    # OpenGL package will be found for UWP apps but gl.h excludes UWP apps so it isn't actually usable.
+    find_package(OpenGL)
+endif()
+
 if(OPENGL_FOUND)
     add_definitions(-DXR_USE_GRAPHICS_API_OPENGL)
     message(STATUS "Enabling OpenGL support")
-elseif(BUILD_ALL_EXTENSIONS)
+elseif(BUILD_ALL_EXTENSIONS AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
     message(FATAL_ERROR "OpenGL not found")
 endif()
 
@@ -57,6 +66,7 @@ option(
     "Enable exception handling in the loader. Leave this on unless your standard library is built to not throw."
     ON
 )
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     option(DYNAMIC_LOADER "Build the loader as a .dll library" OFF)
 else()
@@ -68,7 +78,7 @@ endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests" AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
     option(BUILD_TESTS "Build tests" ON)
 endif()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance" AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance")
     option(BUILD_CONFORMANCE_TESTS "Build conformance tests" ON)
 endif()
 include(CMakeDependentOption)
@@ -76,12 +86,20 @@ include(CMakeDependentOption)
 cmake_dependent_option(
     BUILD_WITH_SYSTEM_JSONCPP "Use system jsoncpp instead of vendored source" ON "JSONCPP_FOUND" OFF
 )
+cmake_dependent_option(BUILD_WITH_STD_FILESYSTEM "Use std::[experimental::]filesystem." ON
+       "HAVE_FILESYSTEM_WITHOUT_LIB OR HAVE_FILESYSTEM_NEEDING_LIB" OFF)
 
 # Several files use these compile-time OS switches
 if(WIN32)
     add_definitions(-DXR_OS_WINDOWS)
+    add_definitions(-DNOMINMAX)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DXR_OS_LINUX)
+endif()
+
+# /EHsc (support for C++ exceptions) is default in most configurations but seems missing when building arm/arm64.
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 endif()
 
 # This is a little helper library for setting up OpenGL
@@ -107,6 +125,11 @@ endif()
 # Several files use these compile-time platform switches
 if(WIN32)
     add_definitions(-DXR_USE_PLATFORM_WIN32)
+    # TODO remove once work is done to get more stuff building for UWP.
+    if (CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+        set(BUILD_TESTS OFF)
+        set(BUILD_CONFORMANCE_TESTS OFF)
+    endif()
 elseif(PRESENTATION_BACKEND MATCHES "xlib")
     add_definitions(-DXR_USE_PLATFORM_XLIB)
 elseif(PRESENTATION_BACKEND MATCHES "xcb")
@@ -179,8 +202,26 @@ function(compile_glsl run_target_name)
 endfunction()
 
 if(WIN32)
-    add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
-    add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
+    # This is too simple of detection to be worth separating into a find module
+    find_library(D3D_DXGI_LIBRARY dxgi)
+    find_library(D3D_COMPILER_LIBRARY d3dcompiler)
+    find_path(D3D_D3D11_INCLUDE_DIR d3d11.h)
+    find_library(D3D_D3D11_LIBRARY d3d11)
+    if(D3D_D3D11_INCLUDE_DIR AND D3D_D3D11_LIBRARY AND D3D_DXGI_LIBRARY AND D3D_COMPILER_LIBRARY)
+        set(D3D_D3D11_FOUND ON)
+        set(D3D_D3D11_LIBRARIES ${D3D_D3D11_LIBRARY} ${D3D_DXGI_LIBRARY} ${D3D_COMPILER_LIBRARY})
+        add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
+    endif()
+
+    find_path(D3D_D3D12_INCLUDE_DIR d3d12.h)
+    find_library(D3D_D3D12_LIBRARY d3d12)
+    if(D3D_D3D12_INCLUDE_DIR AND D3D_D3D12_LIBRARY AND D3D_DXGI_LIBRARY)
+        set(D3D_D3D12_FOUND ON)
+        set(D3D_D3D12_LIBRARIES ${D3D_D3D12_LIBRARY} ${D3D_DXGI_LIBRARY} ${D3D_COMPILER_LIBRARY})
+        add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
+    endif()
+
+    find_path(D3D_DIRECTXCOLORS_INCLUDE_DIR DirectXColors.h)
 endif()
 
 # Check for the existence of the secure_getenv or __secure_getenv commands
@@ -201,7 +242,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/version.cmake)
 
 # Path separators ( : or ; ) are not handled well in CMake.
 # This seems like a reasonable approach.
-if(WIN32)
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
     set(CODEGEN_PYTHON_PATH
         "${PROJECT_SOURCE_DIR}/specification/scripts;${PROJECT_SOURCE_DIR}/src/scripts;$ENV{PYTHONPATH}"
     )
@@ -280,11 +321,16 @@ set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLD
 set(COMMON_GENERATED_OUTPUT ${GENERATED_OUTPUT})
 if(NOT MSVC)
     include(CheckCXXCompilerFlag)
-    foreach(FLAG -Wall -Werror=unused-parameter -Werror=unused-argument)
+    include(CheckCCompilerFlag)
+    foreach(FLAG -Wall -Werror=unused-parameter -Werror=unused-argument -Wpointer-arith)
         string(REGEX REPLACE "[^A-Za-z0-9]" "" _flagvar "${FLAG}")
         check_cxx_compiler_flag(${FLAG} SUPPORTS_${_flagvar})
-        if(SUPPORTS_WARNING_${_flagvar})
+        if(SUPPORTS_${_flagvar})
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAG}")
+        endif()
+        check_c_compiler_flag(${FLAG} SUPPORTS_C_${_flagvar})
+        if(SUPPORTS_C_${_flagvar})
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAG}")
         endif()
     endforeach()
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")

@@ -59,8 +59,6 @@ add_library(openxr_loader ${LIBRARY_TYPE}
     runtime_interface.cpp
     runtime_interface.hpp
     ${GENERATED_OUTPUT}
-    ${PROJECT_SOURCE_DIR}/src/common/filesystem_utils.cpp
-    ${PROJECT_SOURCE_DIR}/src/common/filesystem_utils.hpp
     ${PROJECT_SOURCE_DIR}/src/common/hex_and_handles.h
     ${PROJECT_SOURCE_DIR}/src/common/object_info.cpp
     ${PROJECT_SOURCE_DIR}/src/common/object_info.h
@@ -81,6 +79,10 @@ else()
         PRIVATE
         ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/include
     )
+    if(SUPPORTS_Werrorunusedparameter)
+        # Don't error on this - triggered by jsoncpp
+        target_compile_options(openxr_loader PRIVATE -Wno-unused-parameter)
+    endif()
 endif()
 set_target_properties(openxr_loader PROPERTIES FOLDER ${LOADER_FOLDER})
 
@@ -117,6 +119,7 @@ target_link_libraries(
 )
 
 target_compile_definitions(openxr_loader PRIVATE API_NAME="OpenXR")
+openxr_add_filesystem_utils(openxr_loader)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(FALLBACK_CONFIG_DIRS
@@ -143,11 +146,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     set_target_properties(openxr_loader PROPERTIES SOVERSION "${MAJOR}" VERSION "${MAJOR}.${MINOR}.${PATCH}")
-    target_link_libraries(
-        openxr_loader
-        PRIVATE stdc++fs
-        PUBLIC m
-    )
 
     add_custom_target(
         libopenxr_loader.so.${MAJOR}.${MINOR} ALL
@@ -212,14 +210,17 @@ elseif(WIN32)
     endif()
 endif()
 
+# Copy loader to conformance_cli binary folder if built as dynamic
+if(DYNAMIC_LOADER AND BUILD_CONFORMANCE_TESTS)
+    add_custom_command(TARGET openxr_loader POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:openxr_loader> $<TARGET_PROPERTY:conformance_cli,BINARY_DIR>
+    )
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(
         openxr_loader
-        PRIVATE -Wall
-                -Wextra
-                -Wno-unused-parameter
-                -Wno-missing-field-initializers
-                -Wpointer-arith
+        PRIVATE -Wextra
                 -fno-strict-aliasing
                 -fno-builtin-memcmp
                 "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>"

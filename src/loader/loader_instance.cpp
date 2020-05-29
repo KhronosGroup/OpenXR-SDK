@@ -44,22 +44,25 @@
 #include <vector>
 
 namespace {
-std::unique_ptr<LoaderInstance> g_current_loader_instance;
+std::unique_ptr<LoaderInstance>& GetSetCurrentLoaderInstance() {
+    static std::unique_ptr<LoaderInstance> current_loader_instance;
+    return current_loader_instance;
 }
+}  // namespace
 
 namespace ActiveLoaderInstance {
 XrResult Set(std::unique_ptr<LoaderInstance> loader_instance, const char* log_function_name) {
-    if (g_current_loader_instance != nullptr) {
+    if (GetSetCurrentLoaderInstance() != nullptr) {
         LoaderLogger::LogErrorMessage(log_function_name, "Active XrInstance handle already exists");
         return XR_ERROR_LIMIT_REACHED;
     }
 
-    g_current_loader_instance = std::move(loader_instance);
+    GetSetCurrentLoaderInstance() = std::move(loader_instance);
     return XR_SUCCESS;
 }
 
 XrResult Get(LoaderInstance** loader_instance, const char* log_function_name) {
-    *loader_instance = g_current_loader_instance.get();
+    *loader_instance = GetSetCurrentLoaderInstance().get();
     if (*loader_instance == nullptr) {
         LoaderLogger::LogErrorMessage(log_function_name, "No active XrInstance handle.");
         return XR_ERROR_HANDLE_INVALID;
@@ -68,9 +71,9 @@ XrResult Get(LoaderInstance** loader_instance, const char* log_function_name) {
     return XR_SUCCESS;
 }
 
-bool IsAvailable() { return g_current_loader_instance != nullptr; }
+bool IsAvailable() { return GetSetCurrentLoaderInstance() != nullptr; }
 
-void Remove() { g_current_loader_instance.release(); }
+void Remove() { GetSetCurrentLoaderInstance().release(); }
 }  // namespace ActiveLoaderInstance
 
 // Extensions that are supported by the loader, but may not be supported
