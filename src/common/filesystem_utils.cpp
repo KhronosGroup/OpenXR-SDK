@@ -127,6 +127,11 @@ bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute)
     return true;
 }
 
+bool FileSysUtilsGetCanonicalPath(const std::string& path, std::string& canonical) {
+    canonical = FS_PREFIX::canonical(path).string();
+    return true;
+}
+
 bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& child, std::string& combined) {
     FS_PREFIX::path parent_path(parent);
     FS_PREFIX::path child_path(child);
@@ -203,6 +208,15 @@ bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute) {
     wchar_t tmp_path[MAX_PATH];
     if (0 != GetFullPathNameW(utf8_to_wide(path).c_str(), MAX_PATH, tmp_path, NULL)) {
+        absolute = wide_to_utf8(tmp_path);
+        return true;
+    }
+    return false;
+}
+
+bool FileSysUtilsGetCanonicalPath(const std::string& path, std::string& absolute) {
+    wchar_t tmp_path[MAX_PATH];
+    if (0 != PathCanonicalizeW(utf8_to_wide(path).c_str(), tmp_path)) {
         absolute = wide_to_utf8(tmp_path);
         return true;
     }
@@ -292,9 +306,14 @@ bool FileSysUtilsGetParentPath(const std::string& file_path, std::string& parent
 }
 
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute) {
+    // canonical path is absolute
+    return FileSysUtilsGetCanonicalPath(path, absolute);
+}
+
+bool FileSysUtilsGetCanonicalPath(const std::string& path, std::string& canonical) {
     char buf[PATH_MAX];
     if (nullptr != realpath(path.c_str(), buf)) {
-        absolute = buf;
+        canonical = buf;
         return true;
     }
     return false;

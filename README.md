@@ -1,5 +1,11 @@
 # OpenXR™ Software Development Kit (SDK) Project
 
+<!--
+Copyright (c) 2017-2020 The Khronos Group Inc
+
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 This repository contains OpenXR headers, as well as source code and build scripts
 for the OpenXR loader.
 It contains all generated source files and headers pre-generated for minimum dependencies.

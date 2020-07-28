@@ -1,0 +1,23 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: OpenXR
+Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
+Source: https://khronos.org/registry/OpenXR/
+
+Files: changes/*
+Copyright: 2019-2020, The Khronos Group Inc.
+License: CC-BY-4.0
+
+Files: src/external/jsoncpp/*
+Copyright: 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
+License: MIT OR LicenseRef-jsoncpp-public-domain
+Comment: Unmodified, vendored copy of jsoncpp 1.8.4
+
+Files: external/python/jinja2/*
+  external/python/Jinja2-2.10.1.dist-info/*
+Copyright: 2013-2019 by the Jinja team
+License: BSD-3-Clause
+
+Files: external/python/markupsafe/*
+  external/python/MarkupSafe-1.1.1.dist-info/*
+Copyright: 2010 Pallets
+License: BSD-3-Clause

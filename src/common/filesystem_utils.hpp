@@ -45,6 +45,9 @@ bool FileSysUtilsIsAbsolutePath(const std::string& path);
 // Get the absolute path for a provided file
 bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute);
 
+// Get the absolute path for a provided file
+bool FileSysUtilsGetCanonicalPath(const std::string& path, std::string& canonical);
+
 // Combine a parent and child directory
 bool FileSysUtilsCombinePaths(const std::string& parent, const std::string& child, std::string& combined);
 

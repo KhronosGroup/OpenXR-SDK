@@ -4,19 +4,7 @@
 /*
 ** Copyright (c) 2017-2020 The Khronos Group Inc.
 **
-** SPDX-License-Identifier: Apache-2.0
-**
-** Licensed under the Apache License, Version 2.0 (the "License");
-** you may not use this file except in compliance with the License.
-** You may obtain a copy of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
+** SPDX-License-Identifier: Apache-2.0 OR MIT
 */
 
 /*
@@ -37,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 9)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 10)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -307,6 +295,8 @@ typedef enum XrStructureType {
     XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT = 1000053004,
     XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT = 1000053005,
     XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC = 1000059000,
+    XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT = 1000063000,
+    XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE = 1000079000,
     XR_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrStructureType;
 
@@ -419,6 +409,7 @@ static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_TRANSFER_SRC_BIT = 0x00000
 static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_TRANSFER_DST_BIT = 0x00000010;
 static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_SAMPLED_BIT = 0x00000020;
 static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_MUTABLE_FORMAT_BIT = 0x00000040;
+static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND = 0x00000080;
 
 typedef XrFlags64 XrCompositionLayerFlags;
 
@@ -2011,12 +2002,12 @@ typedef struct XrSecondaryViewConfigurationSwapchainCreateInfoMSFT {
 
 
 #define XR_EPIC_view_configuration_fov 1
-#define XR_EPIC_view_configuration_fov_SPEC_VERSION 1
+#define XR_EPIC_view_configuration_fov_SPEC_VERSION 2
 #define XR_EPIC_VIEW_CONFIGURATION_FOV_EXTENSION_NAME "XR_EPIC_view_configuration_fov"
 typedef struct XrViewConfigurationViewFovEPIC {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
-    XrFovf                      recommendedMutableFov;
+    XrFovf                      recommendedFov;
     XrFovf                      maxMutableFov;
 } XrViewConfigurationViewFovEPIC;
 
@@ -2025,6 +2016,37 @@ typedef struct XrViewConfigurationViewFovEPIC {
 #define XR_HUAWEI_controller_interaction 1
 #define XR_HUAWEI_controller_interaction_SPEC_VERSION 1
 #define XR_HUAWEI_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_HUAWEI_controller_interaction"
+
+
+#define XR_VALVE_analog_threshold 1
+#define XR_VALVE_analog_threshold_SPEC_VERSION 1
+#define XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME "XR_VALVE_analog_threshold"
+typedef struct XrInteractionProfileAnalogThresholdVALVE {
+    XrStructureType              type;
+    const void* XR_MAY_ALIAS     next;
+    XrAction                     action;
+    XrPath                       binding;
+    float                        onThreshold;
+    float                        offThreshold;
+    const XrHapticBaseHeader*    onHaptic;
+    const XrHapticBaseHeader*    offHaptic;
+} XrInteractionProfileAnalogThresholdVALVE;
+
+
+
+#define XR_EXT_samsung_odyssey_controller 1
+#define XR_EXT_samsung_odyssey_controller_SPEC_VERSION 1
+#define XR_EXT_SAMSUNG_ODYSSEY_CONTROLLER_EXTENSION_NAME "XR_EXT_samsung_odyssey_controller"
+
+
+#define XR_EXT_hp_mixed_reality_controller 1
+#define XR_EXT_hp_mixed_reality_controller_SPEC_VERSION 1
+#define XR_EXT_HP_MIXED_REALITY_CONTROLLER_EXTENSION_NAME "XR_EXT_hp_mixed_reality_controller"
+
+
+#define XR_MND_swapchain_usage_input_attachment_bit 1
+#define XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION 2
+#define XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME "XR_MND_swapchain_usage_input_attachment_bit"
 
 #ifdef __cplusplus
 }

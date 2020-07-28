@@ -30,29 +30,31 @@ include(GNUInstallDirs)
 include(StdFilesystemFlags)
 
 ### Dependencies
-set(OpenGL_GL_PREFERENCE GLVND)
+
+# Skip detection of OpenGL/Vulkan for UWP "WindowsStore" build, otherwise the OpenGL package will be found for UWP
+# apps but gl.h isn't compatible. Similarly, there is no ARM/ARM64 support in the Windows Vulkan SDK.
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-    # OpenGL package will be found for UWP apps but gl.h excludes UWP apps so it isn't actually usable.
+    set(OpenGL_GL_PREFERENCE GLVND)
     find_package(OpenGL)
-endif()
 
-if(OPENGL_FOUND)
-    add_definitions(-DXR_USE_GRAPHICS_API_OPENGL)
-    message(STATUS "Enabling OpenGL support")
-elseif(BUILD_ALL_EXTENSIONS AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-    message(FATAL_ERROR "OpenGL not found")
-endif()
+    if(OPENGL_FOUND)
+        add_definitions(-DXR_USE_GRAPHICS_API_OPENGL)
+        message(STATUS "Enabling OpenGL support")
+    elseif(BUILD_ALL_EXTENSIONS)
+        message(FATAL_ERROR "OpenGL not found")
+    endif()
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.7.0)
-    # Find the Vulkan headers
-    find_package(VulkanHeaders)
-    find_package(Vulkan)
-endif()
-if(VulkanHeaders_FOUND)
-    add_definitions(-DXR_USE_GRAPHICS_API_VULKAN)
-    message(STATUS "Enabling Vulkan support")
-elseif(BUILD_ALL_EXTENSIONS)
-    message(FATAL_ERROR "Vulkan headers not found")
+    if(NOT CMAKE_VERSION VERSION_LESS 3.7.0)
+        # Find the Vulkan headers
+        find_package(VulkanHeaders)
+        find_package(Vulkan)
+    endif()
+    if(VulkanHeaders_FOUND)
+        add_definitions(-DXR_USE_GRAPHICS_API_VULKAN)
+        message(STATUS "Enabling Vulkan support")
+    elseif(BUILD_ALL_EXTENSIONS)
+        message(FATAL_ERROR "Vulkan headers not found")
+    endif()
 endif()
 
 find_package(Threads REQUIRED)
@@ -72,13 +74,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
     option(DYNAMIC_LOADER "Build the loader as a .dll library" ON)
 endif()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/api_layers")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/api_layers/CMakeLists.txt")
     option(BUILD_API_LAYERS "Build API layers" ON)
 endif()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests" AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt" AND NOT CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
     option(BUILD_TESTS "Build tests" ON)
 endif()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance/CMakeLists.txt")
     option(BUILD_CONFORMANCE_TESTS "Build conformance tests" ON)
 endif()
 include(CMakeDependentOption)
@@ -128,7 +130,6 @@ if(WIN32)
     # TODO remove once work is done to get more stuff building for UWP.
     if (CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
         set(BUILD_TESTS OFF)
-        set(BUILD_CONFORMANCE_TESTS OFF)
     endif()
 elseif(PRESENTATION_BACKEND MATCHES "xlib")
     add_definitions(-DXR_USE_PLATFORM_XLIB)
@@ -156,6 +157,8 @@ endif()
 if(BUILD_WITH_WAYLAND_HEADERS)
     target_compile_definitions(openxr-all-supported INTERFACE XR_USE_PLATFORM_WAYLAND)
 endif()
+# openxr-all-supported is a dependency of openxr_loader so it should be added to the export set
+install(TARGETS openxr-all-supported EXPORT openxr_loader_export)
 
 # Find glslc shader compiler.
 # On Android, the NDK includes the binary, so no external dependency.
@@ -170,8 +173,11 @@ else()
     file(GLOB glslc_folders $ENV{VULKAN_SDK}/*)
     find_program(GLSL_COMPILER glslc PATHS ${glslc_folders})
 endif()
+find_program(GLSLANG_VALIDATOR glslangValidator)
 if(GLSL_COMPILER)
     message(STATUS "Found glslc: ${GLSL_COMPILER}")
+elseif(GLSLANG_VALIDATOR)
+    message(STATUS "Found glslangValidator: ${GLSLANG_VALIDATOR}")
 else()
     message(STATUS "Could NOT find glslc, using precompiled .spv files")
 endif()
@@ -188,6 +194,14 @@ function(compile_glsl run_target_name)
                 COMMAND ${GLSL_COMPILER} -mfmt=c -fshader-stage=${glsl_stage} ${in_file} -o ${out_file}
                 DEPENDS ${in_file}
             )
+        elseif(GLSLANG_VALIDATOR)
+            # Run glslangValidator if we can find it
+            add_custom_command(
+                OUTPUT ${out_file}
+                COMMAND ${GLSLANG_VALIDATOR} -V -S ${glsl_stage} ${in_file} -x -o ${out_file}
+                DEPENDS ${in_file}
+                VERBATIM
+            )
         else()
             # Use the precompiled .spv files
             get_filename_component(glsl_src_dir ${in_file} DIRECTORY)
@@ -202,26 +216,11 @@ function(compile_glsl run_target_name)
 endfunction()
 
 if(WIN32)
-    # This is too simple of detection to be worth separating into a find module
-    find_library(D3D_DXGI_LIBRARY dxgi)
-    find_library(D3D_COMPILER_LIBRARY d3dcompiler)
-    find_path(D3D_D3D11_INCLUDE_DIR d3d11.h)
-    find_library(D3D_D3D11_LIBRARY d3d11)
-    if(D3D_D3D11_INCLUDE_DIR AND D3D_D3D11_LIBRARY AND D3D_DXGI_LIBRARY AND D3D_COMPILER_LIBRARY)
-        set(D3D_D3D11_FOUND ON)
-        set(D3D_D3D11_LIBRARIES ${D3D_D3D11_LIBRARY} ${D3D_DXGI_LIBRARY} ${D3D_COMPILER_LIBRARY})
-        add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
-    endif()
-
-    find_path(D3D_D3D12_INCLUDE_DIR d3d12.h)
-    find_library(D3D_D3D12_LIBRARY d3d12)
-    if(D3D_D3D12_INCLUDE_DIR AND D3D_D3D12_LIBRARY AND D3D_DXGI_LIBRARY)
-        set(D3D_D3D12_FOUND ON)
-        set(D3D_D3D12_LIBRARIES ${D3D_D3D12_LIBRARY} ${D3D_DXGI_LIBRARY} ${D3D_COMPILER_LIBRARY})
+    add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
+    if(MSVC)
+        # Not available in MinGW right now
         add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
     endif()
-
-    find_path(D3D_DIRECTXCOLORS_INCLUDE_DIR DirectXColors.h)
 endif()
 
 # Check for the existence of the secure_getenv or __secure_getenv commands
@@ -235,7 +234,11 @@ add_definitions(-DOPENXR_HAVE_COMMON_CONFIG)
 # Be able to find pre-generated files, if used.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_definitions(-DXR_USE_TIMESPEC)
+include(CheckSymbolExists)
+check_symbol_exists(timespec_get time.h HAVE_TIMESPEC_GET)
+if(HAVE_TIMESPEC_GET)
+    add_definitions(-DXR_USE_TIMESPEC)
+endif()
 
 # Set up the OpenXR version variables, used by several targets in this project.
 include(${CMAKE_CURRENT_SOURCE_DIR}/version.cmake)

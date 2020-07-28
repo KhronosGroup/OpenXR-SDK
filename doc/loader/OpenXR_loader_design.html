@@ -443,9 +443,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>OpenXR<sup>&#174;</sup>  Loader - Design and Operation [DRAFT] (with all published extensions)</h1>
 <div class="details">
 <span id="author" class="author">Copyright (c) 2017-2020 The Khronos Group Inc.</span><br>
-<span id="revnumber">version 1.0.9,</span>
-<span id="revdate">Fri, 29 May 2020 22:02:25 +0000</span>
-<br><span id="revremark">from git ref release-1.0.9 commit: 8e2dca6301551425145e3b87abb63a68f9c8dadb</span>
+<span id="revnumber">version 1.0.10,</span>
+<span id="revdate">Tue, 28 Jul 2020 19:43:56 +0000</span>
+<br><span id="revremark">from git ref release-1.0.10 commit: ebcf879c04fce7c4b519024a72a0edf5a03c32f0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4217,16 +4217,11 @@ call if it requires a list of available runtime manifest files.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-c++" data-lang="c++">static XrResult RuntimeManifestFile::FindManifestFiles(
-            ManifestFileType type,
             std::vector&lt;std::unique_ptr&lt;RuntimeManifestFile&gt;&gt; &amp;manifest_files);</code></pre>
 </div>
 </div>
 <div class="ulist">
 <ul>
-<li>
-<p><code>type</code> indicates the specific type of manifest file being searched for.
-In this case, it <strong class="purple">must</strong> be <code>MANIFEST_TYPE_RUNTIME</code>.</p>
-</li>
 <li>
 <p><code>manifest_files</code> is a vector that will be used to store a unique_ptr to
 each valid runtime manifest file found.</p>
@@ -5561,8 +5556,8 @@ ease of discovery.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.9<br>
-Last updated 2020-05-29 22:00:04 UTC
+Version 1.0.10<br>
+Last updated 2020-07-28 19:42:05 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

@@ -3,24 +3,7 @@
     <comment>
 Copyright (c) 2017-2020 The Khronos Group Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and/or associated documentation files (the
-"Materials"), to deal in the Materials without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Materials, and to
-permit persons to whom the Materials are furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Materials.
-
-THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
+SPDX-License-Identifier: Apache-2.0 OR MIT
 
 ------------------------------------------------------------------------
 
@@ -46,6 +29,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="EPIC"       author="Epic"                    contact="Nick Whiting @whitingn"/>
         <tag name="EXT"        author="Multivendor"             contact="Ryan Pavlik @rpavlik"/>
         <tag name="EXTX"       author="Multivendor experimental"             contact="Brad Grantham @bradgrantham-lunarg"/>
+        <tag name="FB"         author="Facebook"                contact="Cass Everitt @casseveritt, Ed Hutchins @eahutchins"/>
         <tag name="GOOGLE"     author="Google"                  contact="Kaye Mason @chaleur"/>
         <tag name="HUAWEI"     author="Huawei"                  contact="Yihong Huang @rachelhuang"/>
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
@@ -85,7 +69,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type requires="GL/glxext.h" name="GLXFBConfig"/>
         <type requires="GL/glxext.h" name="GLXDrawable"/>
         <type requires="GL/glxext.h" name="GLXContext"/>
-        <type requires="GL/wglext.h" name="HGLRC"/>
+        <type requires="GL/wglext.h" name="HGLRC"/>        
+        <type requires="unknwn.h" name="IUnknown"/>
         <type requires="wayland-client.h" name="wl_display"/>
         <type requires="windows.h" name="HDC"/>
         <type requires="windows.h" name="LUID"/>
@@ -118,7 +103,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 9)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 10)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1009,8 +994,20 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type category="struct" name="XrViewConfigurationViewFovEPIC" structextends="XrViewConfigurationView">
             <member values="XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
-            <member><type>XrFovf</type>                <name>recommendedMutableFov</name></member>
+            <member><type>XrFovf</type>                <name>recommendedFov</name></member>
             <member><type>XrFovf</type>                <name>maxMutableFov</name></member>
+        </type>
+
+        <!-- struct types for XR_VALVE_analog_threshold -->
+        <type category="struct" name="XrInteractionProfileAnalogThresholdVALVE" structextends="XrInteractionProfileSuggestedBinding">
+            <member values="XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*           <name>next</name></member>
+            <member><type>XrAction</type>              <name>action</name></member>
+            <member><type>XrPath</type>                <name>binding</name></member>
+            <member><type>float</type>                 <name>onThreshold</name></member>
+            <member><type>float</type>                 <name>offThreshold</name></member>
+            <member optional="true">const <type>XrHapticBaseHeader</type>* <name>onHaptic</name></member>
+            <member optional="true">const <type>XrHapticBaseHeader</type>* <name>offHaptic</name></member>
         </type>
 
         <!-- The PFN_xrVoidFunction type are used by XrGetInstanceProcAddr below -->
@@ -1206,6 +1203,14 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member values="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>XrViewConfigurationType</type> <name>viewConfigurationType</name></member>
+        </type>
+
+        <!-- XR_MSFT_holographic_window_attachment -->
+        <type category="struct" name="XrHolographicWindowAttachmentMSFT" structextends="XrSessionCreateInfo" protect="XR_USE_PLATFORM_WIN32">
+            <member values="XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>IUnknown</type>* <name>holographicSpace</name></member>
+            <member><type>IUnknown</type>* <name>coreWindow</name></member>
         </type>
 
     </types>
@@ -2907,7 +2912,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_EPIC_view_configuration_fov" number="60" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_EPIC_view_configuration_fov_SPEC_VERSION"/>
+            <enum value="2" name="XR_EPIC_view_configuration_fov_SPEC_VERSION"/>
             <enum value="&quot;XR_EPIC_view_configuration_fov&quot;" name="XR_EPIC_VIEW_CONFIGURATION_FOV_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC"/>
             <type name="XrViewConfigurationViewFovEPIC"/>
@@ -2921,10 +2926,12 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_extension_64" number="64" type="instance" supported="disabled">
+    <extension name="XR_MSFT_holographic_window_attachment" number="64" type="instance" supported="openxr" protect="XR_USE_PLATFORM_WIN32">
         <require>
-            <enum value="1" name="XR_MSFT_extension_64_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_64&quot;" name="XR_MSFT_extension_64_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MSFT_holographic_window_attachment_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_holographic_window_attachment&quot;" name="XR_MSFT_HOLOGRAPHIC_WINDOW_ATTACHMENT_EXTENSION_NAME"/>
+            <type name="XrHolographicWindowAttachmentMSFT" />
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT"/>
         </require>
     </extension>
 
@@ -2967,6 +2974,197 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_HUAWEI_controller_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_HUAWEI_controller_interaction&quot;" name="XR_HUAWEI_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_71" number="71" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_71_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_71&quot;" name="XR_FB_extension_71_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_72" number="72" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_72_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_72&quot;" name="XR_FB_extension_72_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_73" number="73" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_73_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_73&quot;" name="XR_FB_extension_73_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_74" number="74" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_74_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_74&quot;" name="XR_FB_extension_74_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_75" number="75" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_75_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_75&quot;" name="XR_FB_extension_75_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_76" number="76" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_76_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_76&quot;" name="XR_FB_extension_76_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_77" number="77" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_77_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_77&quot;" name="XR_FB_extension_77_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_78" number="78" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_78_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_78&quot;" name="XR_FB_extension_78_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_79" number="79" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_79_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_79&quot;" name="XR_VALVE_extension_79_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_analog_threshold" number="80" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_VALVE_analog_threshold_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_analog_threshold&quot;" name="XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE"/>
+            <type name="XrInteractionProfileAnalogThresholdVALVE"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_81" number="81" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_81_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_81&quot;" name="XR_VALVE_extension_81_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_82" number="82" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_82_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_82&quot;" name="XR_VALVE_extension_82_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_83" number="83" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_83_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_83&quot;" name="XR_VALVE_extension_83_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_84" number="84" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_84_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_84&quot;" name="XR_VALVE_extension_84_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_85" number="85" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_85_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_85&quot;" name="XR_VALVE_extension_85_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_86" number="86" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_86_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_86&quot;" name="XR_VALVE_extension_86_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_87" number="87" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_87_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_87&quot;" name="XR_VALVE_extension_87_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_VALVE_extension_88" number="88" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_VALVE_extension_88_SPEC_VERSION"/>
+            <enum value="&quot;XR_VALVE_extension_88&quot;" name="XR_VALVE_extension_88_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_89" number="89" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_KHR_extension_89_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_89&quot;" name="XR_KHR_extension_89_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_90" number="90" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_KHR_extension_90_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_90&quot;" name="XR_KHR_extension_90_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_91" number="91" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_KHR_extension_91_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_91&quot;" name="XR_KHR_extension_91_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_92" number="92" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_KHR_extension_92_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_92&quot;" name="XR_KHR_extension_92_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_93" number="93" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_EXT_extension_93_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_93&quot;" name="XR_EXT_extension_93_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_EXT_extension_94" number="94" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_EXT_extension_94_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_94&quot;" name="XR_EXT_extension_94_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_samsung_odyssey_controller" number="95" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_EXT_samsung_odyssey_controller_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_samsung_odyssey_controller&quot;" name="XR_EXT_SAMSUNG_ODYSSEY_CONTROLLER_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_hp_mixed_reality_controller" number="96" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_EXT_hp_mixed_reality_controller_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_hp_mixed_reality_controller&quot;" name="XR_EXT_HP_MIXED_REALITY_CONTROLLER_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MND_swapchain_usage_input_attachment_bit" number="97" type="instance" supported="openxr">
+        <require>
+            <enum value="2" name="XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
+            <enum value="&quot;XR_MND_swapchain_usage_input_attachment_bit&quot;" name="XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME"/>
+            <enum bitpos="7" extends="XrSwapchainUsageFlagBits" name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND" comment="Specifies that the image can: be used as a input attachment."/>
         </require>
     </extension>
     </extensions>

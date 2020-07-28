@@ -590,9 +590,15 @@ void RuntimeManifestFile::CreateIfValid(std::string const &filename,
             }
         } else {
             // Otherwise, treat the library path as a relative path based on the JSON file.
+            std::string canonical_path;
             std::string combined_path;
             std::string file_parent;
-            if (!FileSysUtilsGetParentPath(filename, file_parent) ||
+            // Search relative to the real manifest file, not relative to the symlink
+            if (!FileSysUtilsGetCanonicalPath(filename, canonical_path)) {
+                // Give relative to the non-canonical path a chance
+                canonical_path = filename;
+            }
+            if (!FileSysUtilsGetParentPath(canonical_path, file_parent) ||
                 !FileSysUtilsCombinePaths(file_parent, lib_path, combined_path) || !FileSysUtilsPathExists(combined_path)) {
                 error_ss << filename << " library " << combined_path << " does not appear to exist";
                 LoaderLogger::LogErrorMessage("", error_ss.str());

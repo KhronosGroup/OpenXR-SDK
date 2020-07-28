@@ -70,7 +70,6 @@ class RuntimeInterface {
         return instance;
     }
 
-    static uint32_t _single_runtime_count;
     LoaderPlatformLibraryHandle _runtime_library;
     PFN_xrGetInstanceProcAddr _get_instance_proc_addr;
     std::unordered_map<XrInstance, std::unique_ptr<XrGeneratedDispatchTable>> _dispatch_table_map;

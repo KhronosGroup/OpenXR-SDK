@@ -1,3 +1,7 @@
+# Copyright (c) 2017-2020 The Khronos Group Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 set(PRESENTATION_BACKENDS xlib xcb wayland)
 set(PRESENTATION_BACKEND
     xlib
@@ -17,7 +21,7 @@ find_package(X11)
 find_package(PkgConfig)
 
 if(PKG_CONFIG_FOUND)
-    pkg_search_module(XCB xcb)
+    pkg_search_module(XCB xcb xcb-glx)
 
     pkg_search_module(WAYLAND_CLIENT wayland-client)
 endif()

@@ -37,12 +37,9 @@
 #include <utility>
 #include <vector>
 
-uint32_t RuntimeInterface::_single_runtime_count = 0;
-
 XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
     // If something's already loaded, we're done here.
     if (GetInstance() != nullptr) {
-        _single_runtime_count++;
         return XR_SUCCESS;
     }
 
@@ -150,7 +147,6 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 
             // Use this runtime
             GetInstance().reset(new RuntimeInterface(runtime_library, runtime_info.getInstanceProcAddr));
-            _single_runtime_count++;
 
             // Grab the list of extensions this runtime supports for easy filtering after the
             // xrCreateInstance call
@@ -183,13 +179,10 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 }
 
 void RuntimeInterface::UnloadRuntime(const std::string& openxr_command) {
-    if (_single_runtime_count == 1) {
-        _single_runtime_count = 0;
+    if (GetInstance()) {
+        LoaderLogger::LogInfoMessage(openxr_command, "RuntimeInterface::UnloadRuntime - Unloading RuntimeInterface");
         GetInstance().reset();
-    } else if (_single_runtime_count > 0) {
-        --_single_runtime_count;
     }
-    LoaderLogger::LogInfoMessage(openxr_command, "RuntimeInterface being unloaded.");
 }
 
 XrResult RuntimeInterface::GetInstanceProcAddr(XrInstance instance, const char* name, PFN_xrVoidFunction* function) {

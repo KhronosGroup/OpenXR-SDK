@@ -235,19 +235,15 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
     }
 
     for (std::unique_ptr<ApiLayerManifestFile>& manifest_file : layer_manifest_files) {
-        bool enabled = false;
-
         // Always add implicit layers.  They would only be in this list if they were enabled
         // (i.e. the disable environment variable is not set).
-        if (manifest_file->Type() == MANIFEST_TYPE_IMPLICIT_API_LAYER) {
-            enabled = true;
-        } else {
-            // Only add explicit layers if they are called out by the application
-            for (uint32_t layer = 0; layer < enabled_api_layers.size(); ++layer) {
-                if (enabled_api_layers[layer] == manifest_file->LayerName()) {
-                    layer_found[layer] = true;
-                    enabled = true;
-                }
+        bool enabled = (manifest_file->Type() == MANIFEST_TYPE_IMPLICIT_API_LAYER);
+
+        // Check if this layer is explicitly enabled.
+        for (uint32_t layer = 0; layer < enabled_api_layers.size(); ++layer) {
+            if (enabled_api_layers[layer] == manifest_file->LayerName()) {
+                layer_found[layer] = true;
+                enabled = true;
             }
         }
 
