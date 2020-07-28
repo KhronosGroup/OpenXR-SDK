@@ -46,3 +46,4 @@ CppProperties.json
 !.cmake-format.json
 !.gitlab-ci.yml
 !.reuse
+!.*.license
