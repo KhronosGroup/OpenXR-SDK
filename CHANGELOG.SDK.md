@@ -46,7 +46,7 @@ file. This is still in progress but mostly complete.
     ([internal MR 1835](https://gitlab.khronos.org/openxr/openxr/merge_requests/1835))
   - Add `XR_VALVE_analog_threshold` vendor extension.
     ([internal MR 1859](https://gitlab.khronos.org/openxr/openxr/merge_requests/1859))
-  - Add `XR_MND_swapchain_input_attachment` vendor extension.
+  - Add `XR_MND_swapchain_usage_input_attachment_bit` vendor extension.
     ([internal MR 1865](https://gitlab.khronos.org/openxr/openxr/merge_requests/1865))
   - Reserve extension numbers 71 to 78 for Facebook extensions.
     ([internal MR 1839](https://gitlab.khronos.org/openxr/openxr/merge_requests/1839))
