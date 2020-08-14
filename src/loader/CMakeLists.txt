@@ -183,7 +183,7 @@ elseif(WIN32)
         target_compile_options(openxr_loader PRIVATE /wd6386)
     endif()
 
-    target_link_libraries(openxr_loader PRIVATE advapi32)
+    target_link_libraries(openxr_loader PUBLIC advapi32 pathcch)
 
     # Need to copy DLL to client directories so clients can easily load it.
     if(DYNAMIC_LOADER AND (CMAKE_GENERATOR MATCHES "^Visual Studio.*"))
@@ -253,7 +253,7 @@ export(
 
 if((CMAKE_SYSTEM_NAME STREQUAL "Windows") OR (CMAKE_SYSTEM_NAME STREQUAL "WindowsStore"))
     set(TARGET_DESTINATION cmake)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+else()
     set(TARGET_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/openxr/)
 endif()
 

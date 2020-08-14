@@ -48,7 +48,6 @@ struct JsonVersion {
 struct ExtensionListing {
     std::string name;
     uint32_t extension_version;
-    std::vector<std::string> entrypoints;
 };
 
 // ManifestFile class -
@@ -63,7 +62,6 @@ class ManifestFile {
     const std::string &Filename() const { return _filename; }
     const std::string &LibraryPath() const { return _library_path; }
     void GetInstanceExtensionProperties(std::vector<XrExtensionProperties> &props);
-    void GetDeviceExtensionProperties(std::vector<XrExtensionProperties> &props);
     const std::string &GetFunctionName(const std::string &func_name) const;
 
    protected:
@@ -76,7 +74,6 @@ class ManifestFile {
     ManifestFileType _type;
     std::string _library_path;
     std::vector<ExtensionListing> _instance_extensions;
-    std::vector<ExtensionListing> _device_extensions;
     std::unordered_map<std::string, std::string> _functions_renamed;
 };
 

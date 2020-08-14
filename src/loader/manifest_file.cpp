@@ -472,12 +472,6 @@ void ManifestFile::GetInstanceExtensionProperties(std::vector<XrExtensionPropert
     GetExtensionProperties(_instance_extensions, props);
 }
 
-// Return any device extensions found in the manifest files in the proper form for
-// OpenXR (XrExtensionProperties).
-void ManifestFile::GetDeviceExtensionProperties(std::vector<XrExtensionProperties> &props) {
-    GetExtensionProperties(_device_extensions, props);
-}
-
 const std::string &ManifestFile::GetFunctionName(const std::string &func_name) const {
     if (!_functions_renamed.empty()) {
         auto found = _functions_renamed.find(func_name);
@@ -494,28 +488,23 @@ RuntimeManifestFile::RuntimeManifestFile(const std::string &filename, const std:
 static void ParseExtension(Json::Value const &ext, std::vector<ExtensionListing> &extensions) {
     Json::Value ext_name = ext["name"];
     Json::Value ext_version = ext["extension_version"];
-    Json::Value ext_entries = ext["entrypoints"];
-    if (ext_name.isString() && ext_version.isUInt() && ext_entries.isArray()) {
+
+    // Allow "extension_version" as a String or a UInt to maintain backwards compatibility, even though it should be a String.
+    // Internal Issue 1411: https://gitlab.khronos.org/openxr/openxr/-/issues/1411
+    // Internal MR !1867: https://gitlab.khronos.org/openxr/openxr/-/merge_requests/1867
+    if (ext_name.isString() && (ext_version.isString() || ext_version.isUInt())) {
         ExtensionListing ext_listing = {};
         ext_listing.name = ext_name.asString();
-        ext_listing.extension_version = ext_version.asUInt();
-        for (const auto &entrypoint : ext_entries) {
-            if (entrypoint.isString()) {
-                ext_listing.entrypoints.push_back(entrypoint.asString());
-            }
+        if (ext_version.isUInt()) {
+            ext_listing.extension_version = ext_version.asUInt();
+        } else {
+            ext_listing.extension_version = atoi(ext_version.asString().c_str());
         }
         extensions.push_back(ext_listing);
     }
 }
 
 void ManifestFile::ParseCommon(Json::Value const &root_node) {
-    const Json::Value &dev_exts = root_node["device_extensions"];
-    if (!dev_exts.isNull() && dev_exts.isArray()) {
-        for (const auto &ext : dev_exts) {
-            ParseExtension(ext, _device_extensions);
-        }
-    }
-
     const Json::Value &inst_exts = root_node["instance_extensions"];
     if (!inst_exts.isNull() && inst_exts.isArray()) {
         for (const auto &ext : inst_exts) {

@@ -89,7 +89,7 @@ typedef struct XrVulkanSwapchainFormatListCreateInfoKHR {
 #ifdef XR_USE_GRAPHICS_API_OPENGL
 
 #define XR_KHR_opengl_enable 1
-#define XR_KHR_opengl_enable_SPEC_VERSION 8
+#define XR_KHR_opengl_enable_SPEC_VERSION 9
 #define XR_KHR_OPENGL_ENABLE_EXTENSION_NAME "XR_KHR_opengl_enable"
 #ifdef XR_USE_PLATFORM_WIN32
 typedef struct XrGraphicsBindingOpenGLWin32KHR {
@@ -159,7 +159,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetOpenGLGraphicsRequirementsKHR(
 #ifdef XR_USE_GRAPHICS_API_OPENGL_ES
 
 #define XR_KHR_opengl_es_enable 1
-#define XR_KHR_opengl_es_enable_SPEC_VERSION 6
+#define XR_KHR_opengl_es_enable_SPEC_VERSION 7
 #define XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME "XR_KHR_opengl_es_enable"
 #ifdef XR_USE_PLATFORM_ANDROID
 typedef struct XrGraphicsBindingOpenGLESAndroidKHR {
@@ -197,7 +197,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetOpenGLESGraphicsRequirementsKHR(
 #ifdef XR_USE_GRAPHICS_API_VULKAN
 
 #define XR_KHR_vulkan_enable 1
-#define XR_KHR_vulkan_enable_SPEC_VERSION 6
+#define XR_KHR_vulkan_enable_SPEC_VERSION 7
 #define XR_KHR_VULKAN_ENABLE_EXTENSION_NAME "XR_KHR_vulkan_enable"
 typedef struct XrGraphicsBindingVulkanKHR {
     XrStructureType             type;
@@ -258,7 +258,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsRequirementsKHR(
 #ifdef XR_USE_GRAPHICS_API_D3D11
 
 #define XR_KHR_D3D11_enable 1
-#define XR_KHR_D3D11_enable_SPEC_VERSION  4
+#define XR_KHR_D3D11_enable_SPEC_VERSION  5
 #define XR_KHR_D3D11_ENABLE_EXTENSION_NAME "XR_KHR_D3D11_enable"
 typedef struct XrGraphicsBindingD3D11KHR {
     XrStructureType             type;
@@ -292,7 +292,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetD3D11GraphicsRequirementsKHR(
 #ifdef XR_USE_GRAPHICS_API_D3D12
 
 #define XR_KHR_D3D12_enable 1
-#define XR_KHR_D3D12_enable_SPEC_VERSION  6
+#define XR_KHR_D3D12_enable_SPEC_VERSION  7
 #define XR_KHR_D3D12_ENABLE_EXTENSION_NAME "XR_KHR_D3D12_enable"
 typedef struct XrGraphicsBindingD3D12KHR {
     XrStructureType             type;

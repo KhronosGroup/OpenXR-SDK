@@ -5,18 +5,20 @@
 if(MSVC AND MSVC_VERSION GREATER 1890)
     set(HAVE_FILESYSTEM_WITHOUT_LIB
         ON
-        CACHE INTERNAL "" FORCE)
+        CACHE INTERNAL "" FORCE
+    )
     if(MSVC_VERSION GREATER 1910)
         # Visual Studio 2017 Update 3 added new filesystem impl,
         # which only works in C++17 mode.
         set(HAVE_FILESYSTEM_NEEDS_17
             ON
-            CACHE INTERNAL "" FORCE)
+            CACHE INTERNAL "" FORCE
+        )
     endif()
 else()
     include(CheckCXXSourceCompiles)
 
-    # This is just dummy code that is known to not compile if std::filesystem isn't working right
+    # This is just example code that is known to not compile if std::filesystem isn't working right
     set(_stdfs_test_source
         "int main() {
         (void)is_regular_file(\"/\");
@@ -50,7 +52,8 @@ else()
         #endif
 
         #endif
-    ")
+    "
+    )
     set(_stdfs_source
         "${_stdfs_conditions}
     #ifdef USE_FINAL_FS
@@ -61,7 +64,7 @@ else()
     "
     )
     set(_stdfs_experimental_source
-    "${_stdfs_conditions}
+        "${_stdfs_conditions}
     #ifdef USE_EXPERIMENTAL_FS
     #include <experimental/filesystem>
     using namespace std::experimental::filesystem;
@@ -113,7 +116,9 @@ else()
     set(CMAKE_TRY_COMPILE_TARGET_TYPE EXECUTABLE)
     check_cxx_source_compiles("${_stdfs_needlib_source}" HAVE_FILESYSTEM_WITHOUT_LIB)
     set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
-    check_cxx_source_compiles("${_stdfs_needlib_source}" HAVE_FILESYSTEM_NEEDING_LIB)
+    check_cxx_source_compiles("${_stdfs_needlib_source}" HAVE_FILESYSTEM_NEEDING_LIBSTDCXXFS)
+    set(CMAKE_REQUIRED_LIBRARIES c++fs)
+    check_cxx_source_compiles("${_stdfs_needlib_source}" HAVE_FILESYSTEM_NEEDING_LIBCXXFS)
     unset(CMAKE_REQUIRED_LIBRARIES)
     unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
 
@@ -129,8 +134,12 @@ function(openxr_add_filesystem_utils TARGET_NAME)
             set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 17)
             set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD_REQUIRED TRUE)
         endif()
-        if(HAVE_FILESYSTEM_NEEDING_LIB AND NOT HAVE_FILESYSTEM_WITHOUT_LIB)
-            target_link_libraries(${TARGET_NAME} PRIVATE stdc++fs)
+        if(NOT HAVE_FILESYSTEM_WITHOUT_LIB)
+            if(HAVE_FILESYSTEM_NEEDING_LIBSTDCXXFS)
+                target_link_libraries(${TARGET_NAME} PRIVATE stdc++fs)
+            elseif(HAVE_FILESYSTEM_NEEDING_LIBCXXFS)
+                target_link_libraries(${TARGET_NAME} PRIVATE c++fs)
+            endif()
         endif()
     endif()
 endfunction()

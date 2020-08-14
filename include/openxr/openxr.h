@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 10)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 11)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -180,6 +180,7 @@ typedef enum XrResult {
     XR_ERROR_ACTIONSETS_ALREADY_ATTACHED = -47,
     XR_ERROR_LOCALIZED_NAME_DUPLICATED = -48,
     XR_ERROR_LOCALIZED_NAME_INVALID = -49,
+    XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING = -50,
     XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR = -1000003000,
     XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR = -1000003001,
     XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT = -1000039001,

@@ -88,6 +88,10 @@
 #endif
 
 #if defined(XR_USE_PLATFORM_WIN32)
+#include <PathCch.h>
+#endif
+
+#if defined(XR_USE_PLATFORM_WIN32)
 #define PATH_SEPARATOR ';'
 #define DIRECTORY_SYMBOL '\\'
 #define ALTERNATE_DIRECTORY_SYMBOL '/'
@@ -128,7 +132,18 @@ bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute)
 }
 
 bool FileSysUtilsGetCanonicalPath(const std::string& path, std::string& canonical) {
+#if defined(XR_USE_PLATFORM_WIN32)
+    // std::filesystem::canonical fails on UWP and must be avoided. This alternative will not
+    // follow symbolic links but symbolic links are not needed on Windows since the loader uses
+    // the registry as a form of indirection instead.
+    wchar_t canonical_wide_path[MAX_PATH];
+    if (FAILED(PathCchCanonicalize(canonical_wide_path, MAX_PATH, utf8_to_wide(path).c_str()))) {
+        return false;
+    }
+    canonical = wide_to_utf8(canonical_wide_path);
+#else
     canonical = FS_PREFIX::canonical(path).string();
+#endif
     return true;
 }
 
@@ -216,7 +231,7 @@ bool FileSysUtilsGetAbsolutePath(const std::string& path, std::string& absolute)
 
 bool FileSysUtilsGetCanonicalPath(const std::string& path, std::string& absolute) {
     wchar_t tmp_path[MAX_PATH];
-    if (0 != PathCanonicalizeW(utf8_to_wide(path).c_str(), tmp_path)) {
+    if (SUCCEEDED(PathCchCanonicalize(tmp_path, MAX_PATH, utf8_to_wide(path).c_str()))) {
         absolute = wide_to_utf8(tmp_path);
         return true;
     }
