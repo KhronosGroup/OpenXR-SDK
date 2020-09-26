@@ -80,7 +80,7 @@ typedef unsigned __int64 uint64_t;
 #endif
 #endif
 
-// Identifies if the current compiler has C++11 support enabled. 
+// Identifies if the current compiler has C++11 support enabled.
 // Does not by itself identify if any given C++11 feature is present.
 #if !defined(XR_CPP11_ENABLED) && defined(__cplusplus)
 #if defined(__GNUC__) && defined(__GXX_EXPERIMENTAL_CXX0X__)

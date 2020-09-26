@@ -75,7 +75,7 @@ typedef struct XrInstanceCreateInfoAndroidKHR {
 #ifdef XR_USE_GRAPHICS_API_VULKAN
 
 #define XR_KHR_vulkan_swapchain_format_list 1
-#define XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION 2
+#define XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION 3
 #define XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME "XR_KHR_vulkan_swapchain_format_list"
 typedef struct XrVulkanSwapchainFormatListCreateInfoKHR {
     XrStructureType             type;
@@ -365,6 +365,97 @@ XRAPI_ATTR XrResult XRAPI_CALL xrConvertTimeToTimespecTimeKHR(
     struct timespec*                            timespecTime);
 #endif
 #endif /* XR_USE_TIMESPEC */
+
+#ifdef XR_USE_PLATFORM_ANDROID
+
+#define XR_KHR_loader_init_android 1
+#define XR_KHR_loader_init_android_SPEC_VERSION 1
+#define XR_KHR_LOADER_INIT_ANDROID_EXTENSION_NAME "XR_KHR_loader_init_android"
+typedef struct XrLoaderInitInfoAndroidKHR {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    void* XR_MAY_ALIAS          applicationVM;
+    void* XR_MAY_ALIAS          applicationContext;
+} XrLoaderInitInfoAndroidKHR;
+
+#endif /* XR_USE_PLATFORM_ANDROID */
+
+#ifdef XR_USE_GRAPHICS_API_VULKAN
+
+#define XR_KHR_vulkan_enable2 1
+#define XR_KHR_vulkan_enable2_SPEC_VERSION 1
+#define XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME "XR_KHR_vulkan_enable2"
+typedef XrFlags64 XrVulkanInstanceCreateFlagsKHR;
+
+// Flag bits for XrVulkanInstanceCreateFlagsKHR
+
+typedef XrFlags64 XrVulkanDeviceCreateFlagsKHR;
+
+// Flag bits for XrVulkanDeviceCreateFlagsKHR
+
+typedef struct XrVulkanInstanceCreateInfoKHR {
+    XrStructureType                   type;
+    const void* XR_MAY_ALIAS          next;
+    XrSystemId                        systemId;
+    XrVulkanInstanceCreateFlagsKHR    createFlags;
+    PFN_vkGetInstanceProcAddr         pfnGetInstanceProcAddr;
+    const VkInstanceCreateInfo*       vulkanCreateInfo;
+    const VkAllocationCallbacks*      vulkanAllocator;
+} XrVulkanInstanceCreateInfoKHR;
+
+typedef struct XrVulkanDeviceCreateInfoKHR {
+    XrStructureType                 type;
+    const void* XR_MAY_ALIAS        next;
+    XrSystemId                      systemId;
+    XrVulkanDeviceCreateFlagsKHR    createFlags;
+    PFN_vkGetInstanceProcAddr       pfnGetInstanceProcAddr;
+    VkPhysicalDevice                vulkanPhysicalDevice;
+    const VkDeviceCreateInfo*       vulkanCreateInfo;
+    const VkAllocationCallbacks*    vulkanAllocator;
+} XrVulkanDeviceCreateInfoKHR;
+
+typedef XrGraphicsBindingVulkanKHR XrGraphicsBindingVulkan2KHR;
+
+typedef struct XrVulkanGraphicsDeviceGetInfoKHR {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSystemId                  systemId;
+    VkInstance                  vulkanInstance;
+} XrVulkanGraphicsDeviceGetInfoKHR;
+
+typedef XrSwapchainImageVulkanKHR XrSwapchainImageVulkan2KHR;
+
+typedef XrGraphicsRequirementsVulkanKHR XrGraphicsRequirementsVulkan2KHR;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateVulkanInstanceKHR)(XrInstance                          instance, const XrVulkanInstanceCreateInfoKHR*createInfo, VkInstance*                         vulkanInstance, VkResult*                           vulkanResult);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateVulkanDeviceKHR)(XrInstance                          instance, const XrVulkanDeviceCreateInfoKHR*  createInfo, VkDevice*                           vulkanDevice, VkResult*                           vulkanResult);
+typedef XrResult (XRAPI_PTR *PFN_xrGetVulkanGraphicsDevice2KHR)(XrInstance                              instance, const XrVulkanGraphicsDeviceGetInfoKHR* getInfo, VkPhysicalDevice*                       vulkanPhysicalDevice);
+typedef XrResult (XRAPI_PTR *PFN_xrGetVulkanGraphicsRequirements2KHR)(XrInstance instance, XrSystemId systemId, XrGraphicsRequirementsVulkanKHR* graphicsRequirements);
+
+#ifndef XR_NO_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateVulkanInstanceKHR(
+    XrInstance                                  instance,
+    const XrVulkanInstanceCreateInfoKHR*        createInfo,
+    VkInstance*                                 vulkanInstance,
+    VkResult*                                   vulkanResult);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateVulkanDeviceKHR(
+    XrInstance                                  instance,
+    const XrVulkanDeviceCreateInfoKHR*          createInfo,
+    VkDevice*                                   vulkanDevice,
+    VkResult*                                   vulkanResult);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsDevice2KHR(
+    XrInstance                                  instance,
+    const XrVulkanGraphicsDeviceGetInfoKHR*     getInfo,
+    VkPhysicalDevice*                           vulkanPhysicalDevice);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetVulkanGraphicsRequirements2KHR(
+    XrInstance                                  instance,
+    XrSystemId                                  systemId,
+    XrGraphicsRequirementsVulkanKHR*            graphicsRequirements);
+#endif
+#endif /* XR_USE_GRAPHICS_API_VULKAN */
 
 #ifdef XR_USE_PLATFORM_EGL
 

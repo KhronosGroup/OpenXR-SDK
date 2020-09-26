@@ -19,6 +19,48 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.12 (2020-09-25)
+
+This release features a number of new ratified KHR extensions, as well as a new
+vendor extension.
+
+- Registry
+  - Add ratified `XR_KHR_vulkan_enable2` Khronos extension.
+    ([internal MR 1627](https://gitlab.khronos.org/openxr/openxr/merge_requests/1627),
+    [internal issue 1249](https://gitlab.khronos.org/openxr/openxr/issues/1249),
+    [internal issue 1283](https://gitlab.khronos.org/openxr/openxr/issues/1283),
+    [internal MR 1863](https://gitlab.khronos.org/openxr/openxr/merge_requests/1863))
+  - Add ratified `XR_KHR_loader_init` Khronos extension.
+    ([internal MR 1744](https://gitlab.khronos.org/openxr/openxr/merge_requests/1744))
+  - Add ratified `XR_KHR_loader_init_android` Khronos extension.
+    ([internal MR 1744](https://gitlab.khronos.org/openxr/openxr/merge_requests/1744))
+  - Add ratified `XR_KHR_composition_layer_equirect2` Khronos extension.
+    ([internal MR 1746](https://gitlab.khronos.org/openxr/openxr/merge_requests/1746))
+  - Add ratified `XR_KHR_composition_layer_color_scale_bias` Khronos extension.
+    ([internal MR 1762](https://gitlab.khronos.org/openxr/openxr/merge_requests/1762))
+  - Add `XR_MSFT_controller_model` extension.
+    ([internal MR 1832](https://gitlab.khronos.org/openxr/openxr/merge_requests/1832))
+  - Add vendor tag `LIV` for LIV Inc.
+    ([internal MR 1896](https://gitlab.khronos.org/openxr/openxr/merge_requests/1896))
+  - Fix `structextends` attribute of `XrHandPoseTypeInfoMSFT`.
+    ([OpenXR-SDK-Source/#207](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/207))
+  - schema: Update to permit aliases for commands and struct types. (Already
+    supported by tooling.)
+    ([internal MR 1627](https://gitlab.khronos.org/openxr/openxr/merge_requests/1627))
+- SDK
+  - cmake: fix openxr_loader target export when installing both Release and Debug
+    config on Windows.
+    ([OpenXR-SDK-Source/#206](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/206))
+  - hello_xr: Support the new `XR_KHR_vulkan_enable2` extension.
+    ([internal MR 1627](https://gitlab.khronos.org/openxr/openxr/merge_requests/1627))
+  - hello_xr: Use the `XR_KHR_loader_init_android` extension on Android.
+    ([internal MR 1903](https://gitlab.khronos.org/openxr/openxr/merge_requests/1903))
+  - layers: Fix ARM builds by re-adding function attributes.
+    ([OpenXR-SDK-Source/#193](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/193))
+- Misc
+  - Clean up trailing whitespace, byte-order marks, anda ensure trailing newlines.
+    ([OpenXR-SDK-Source/#208](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/208))
+
 ## OpenXR SDK 1.0.11 (2020-08-14)
 
 This release is mainly for SDK improvements, with only small changes to the

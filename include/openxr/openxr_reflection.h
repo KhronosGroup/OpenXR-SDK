@@ -89,6 +89,7 @@ XR_ENUM_STR(XrResult);
     _(XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR, -1000003001) \
     _(XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT, -1000039001) \
     _(XR_ERROR_SECONDARY_VIEW_CONFIGURATION_TYPE_NOT_ENABLED_MSFT, -1000053000) \
+    _(XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT, -1000055000) \
     _(XR_RESULT_MAX_ENUM, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrStructureType(_) \
@@ -177,6 +178,7 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR, 1000031001) \
     _(XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX, 1000033000) \
     _(XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX, 1000033003) \
+    _(XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR, 1000034000) \
     _(XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT, 1000039000) \
     _(XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT, 1000039001) \
     _(XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT, 1000046000) \
@@ -198,9 +200,19 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_END_INFO_MSFT, 1000053003) \
     _(XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT, 1000053004) \
     _(XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT, 1000053005) \
+    _(XR_TYPE_CONTROLLER_MODEL_KEY_STATE_MSFT, 1000055000) \
+    _(XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT, 1000055001) \
+    _(XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT, 1000055002) \
+    _(XR_TYPE_CONTROLLER_MODEL_NODE_STATE_MSFT, 1000055003) \
+    _(XR_TYPE_CONTROLLER_MODEL_STATE_MSFT, 1000055004) \
     _(XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC, 1000059000) \
     _(XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT, 1000063000) \
     _(XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE, 1000079000) \
+    _(XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR, 1000089000) \
+    _(XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR, 1000090000) \
+    _(XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR, 1000090001) \
+    _(XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR, 1000090003) \
+    _(XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR, 1000091000) \
     _(XR_STRUCTURE_TYPE_MAX_ENUM, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrFormFactor(_) \
@@ -395,6 +407,10 @@ XR_ENUM_STR(XrResult);
     _(XR_INPUT_SOURCE_LOCALIZED_NAME_USER_PATH_BIT, 0x00000001) \
     _(XR_INPUT_SOURCE_LOCALIZED_NAME_INTERACTION_PROFILE_BIT, 0x00000002) \
     _(XR_INPUT_SOURCE_LOCALIZED_NAME_COMPONENT_BIT, 0x00000004) \
+
+#define XR_LIST_BITS_XrVulkanInstanceCreateFlagsKHR(_)
+
+#define XR_LIST_BITS_XrVulkanDeviceCreateFlagsKHR(_)
 
 #define XR_LIST_BITS_XrDebugUtilsMessageSeverityFlagsEXT(_) \
     _(XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT, 0x00000001) \
@@ -1038,6 +1054,60 @@ XR_ENUM_STR(XrResult);
     _(viewConfigurationType) \
     _(viewIndex) \
 
+#define XR_LIST_STRUCT_XrCompositionLayerColorScaleBiasKHR(_) \
+    _(type) \
+    _(next) \
+    _(colorScale) \
+    _(colorBias) \
+
+#define XR_LIST_STRUCT_XrLoaderInitInfoBaseHeaderKHR(_) \
+    _(type) \
+    _(next) \
+
+#define XR_LIST_STRUCT_XrLoaderInitInfoAndroidKHR(_) \
+    _(type) \
+    _(next) \
+    _(applicationVM) \
+    _(applicationContext) \
+
+#define XR_LIST_STRUCT_XrVulkanInstanceCreateInfoKHR(_) \
+    _(type) \
+    _(next) \
+    _(systemId) \
+    _(createFlags) \
+    _(pfnGetInstanceProcAddr) \
+    _(vulkanCreateInfo) \
+    _(vulkanAllocator) \
+
+#define XR_LIST_STRUCT_XrVulkanDeviceCreateInfoKHR(_) \
+    _(type) \
+    _(next) \
+    _(systemId) \
+    _(createFlags) \
+    _(pfnGetInstanceProcAddr) \
+    _(vulkanPhysicalDevice) \
+    _(vulkanCreateInfo) \
+    _(vulkanAllocator) \
+
+#define XR_LIST_STRUCT_XrVulkanGraphicsDeviceGetInfoKHR(_) \
+    _(type) \
+    _(next) \
+    _(systemId) \
+    _(vulkanInstance) \
+
+#define XR_LIST_STRUCT_XrCompositionLayerEquirect2KHR(_) \
+    _(type) \
+    _(next) \
+    _(layerFlags) \
+    _(space) \
+    _(eyeVisibility) \
+    _(subImage) \
+    _(pose) \
+    _(radius) \
+    _(centralHorizontalAngle) \
+    _(upperVerticalAngle) \
+    _(lowerVerticalAngle) \
+
 #define XR_LIST_STRUCT_XrEventDataPerfSettingsEXT(_) \
     _(type) \
     _(next) \
@@ -1261,6 +1331,36 @@ XR_ENUM_STR(XrResult);
     _(next) \
     _(viewConfigurationType) \
 
+#define XR_LIST_STRUCT_XrControllerModelKeyStateMSFT(_) \
+    _(type) \
+    _(next) \
+    _(modelKey) \
+
+#define XR_LIST_STRUCT_XrControllerModelNodePropertiesMSFT(_) \
+    _(type) \
+    _(next) \
+    _(parentNodeName) \
+    _(nodeName) \
+
+#define XR_LIST_STRUCT_XrControllerModelPropertiesMSFT(_) \
+    _(type) \
+    _(next) \
+    _(nodeCapacityInput) \
+    _(nodeCountOutput) \
+    _(nodeProperties) \
+
+#define XR_LIST_STRUCT_XrControllerModelNodeStateMSFT(_) \
+    _(type) \
+    _(next) \
+    _(nodePose) \
+
+#define XR_LIST_STRUCT_XrControllerModelStateMSFT(_) \
+    _(type) \
+    _(next) \
+    _(nodeCapacityInput) \
+    _(nodeCountOutput) \
+    _(nodeStates) \
+
 #define XR_LIST_STRUCT_XrViewConfigurationViewFovEPIC(_) \
     _(type) \
     _(next) \
@@ -1341,6 +1441,8 @@ XR_ENUM_STR(XrResult);
     _(XrCompositionLayerEquirectKHR, XR_TYPE_COMPOSITION_LAYER_EQUIRECT_KHR) \
     _(XrVisibilityMaskKHR, XR_TYPE_VISIBILITY_MASK_KHR) \
     _(XrEventDataVisibilityMaskChangedKHR, XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR) \
+    _(XrCompositionLayerColorScaleBiasKHR, XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR) \
+    _(XrCompositionLayerEquirect2KHR, XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR) \
     _(XrEventDataPerfSettingsEXT, XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT) \
     _(XrDebugUtilsObjectNameInfoEXT, XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT) \
     _(XrDebugUtilsLabelEXT, XR_TYPE_DEBUG_UTILS_LABEL_EXT) \
@@ -1370,6 +1472,11 @@ XR_ENUM_STR(XrResult);
     _(XrSecondaryViewConfigurationLayerInfoMSFT, XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT) \
     _(XrSecondaryViewConfigurationFrameEndInfoMSFT, XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_END_INFO_MSFT) \
     _(XrSecondaryViewConfigurationSwapchainCreateInfoMSFT, XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT) \
+    _(XrControllerModelKeyStateMSFT, XR_TYPE_CONTROLLER_MODEL_KEY_STATE_MSFT) \
+    _(XrControllerModelNodePropertiesMSFT, XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT) \
+    _(XrControllerModelPropertiesMSFT, XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT) \
+    _(XrControllerModelNodeStateMSFT, XR_TYPE_CONTROLLER_MODEL_NODE_STATE_MSFT) \
+    _(XrControllerModelStateMSFT, XR_TYPE_CONTROLLER_MODEL_STATE_MSFT) \
     _(XrViewConfigurationViewFovEPIC, XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC) \
     _(XrInteractionProfileAnalogThresholdVALVE, XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE) \
 
@@ -1408,33 +1515,6 @@ XR_ENUM_STR(XrResult);
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL(_)
 #endif
 
-#if defined(XR_USE_GRAPHICS_API_OPENGL) && defined(XR_USE_PLATFORM_WIN32)
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_WIN32(_) \
-    _(XrGraphicsBindingOpenGLWin32KHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR) \
-
-
-#else
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_WIN32(_)
-#endif
-
-#if defined(XR_USE_GRAPHICS_API_OPENGL) && defined(XR_USE_PLATFORM_XCB)
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_XCB(_) \
-    _(XrGraphicsBindingOpenGLXcbKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_XCB_KHR) \
-
-
-#else
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_XCB(_)
-#endif
-
-#if defined(XR_USE_GRAPHICS_API_OPENGL) && defined(XR_USE_PLATFORM_XLIB)
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_XLIB(_) \
-    _(XrGraphicsBindingOpenGLXlibKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR) \
-
-
-#else
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_XLIB(_)
-#endif
-
 #if defined(XR_USE_GRAPHICS_API_OPENGL_ES)
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES(_) \
     _(XrSwapchainImageOpenGLESKHR, XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR) \
@@ -1445,12 +1525,24 @@ XR_ENUM_STR(XrResult);
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES(_)
 #endif
 
+#if defined(XR_USE_GRAPHICS_API_OPENGL_ES) && defined(XR_USE_PLATFORM_ANDROID)
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES_XR_USE_PLATFORM_ANDROID(_) \
+    _(XrGraphicsBindingOpenGLESAndroidKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_ES_ANDROID_KHR) \
+
+
+#else
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES_XR_USE_PLATFORM_ANDROID(_)
+#endif
+
 #if defined(XR_USE_GRAPHICS_API_VULKAN)
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_VULKAN(_) \
     _(XrVulkanSwapchainFormatListCreateInfoKHR, XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR) \
     _(XrGraphicsBindingVulkanKHR, XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR) \
     _(XrSwapchainImageVulkanKHR, XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR) \
     _(XrGraphicsRequirementsVulkanKHR, XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR) \
+    _(XrVulkanInstanceCreateInfoKHR, XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR) \
+    _(XrVulkanDeviceCreateInfoKHR, XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR) \
+    _(XrVulkanGraphicsDeviceGetInfoKHR, XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR) \
 
 
 #else
@@ -1460,19 +1552,11 @@ XR_ENUM_STR(XrResult);
 #if defined(XR_USE_PLATFORM_ANDROID)
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_ANDROID(_) \
     _(XrInstanceCreateInfoAndroidKHR, XR_TYPE_INSTANCE_CREATE_INFO_ANDROID_KHR) \
+    _(XrLoaderInitInfoAndroidKHR, XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR) \
 
 
 #else
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_ANDROID(_)
-#endif
-
-#if defined(XR_USE_PLATFORM_ANDROID) && defined(XR_USE_GRAPHICS_API_OPENGL_ES)
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_ANDROID_XR_USE_GRAPHICS_API_OPENGL_ES(_) \
-    _(XrGraphicsBindingOpenGLESAndroidKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_ES_ANDROID_KHR) \
-
-
-#else
-#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_ANDROID_XR_USE_GRAPHICS_API_OPENGL_ES(_)
 #endif
 
 #if defined(XR_USE_PLATFORM_EGL)
@@ -1502,21 +1586,48 @@ XR_ENUM_STR(XrResult);
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_WIN32(_)
 #endif
 
+#if defined(XR_USE_PLATFORM_WIN32) && defined(XR_USE_GRAPHICS_API_OPENGL)
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_WIN32_XR_USE_GRAPHICS_API_OPENGL(_) \
+    _(XrGraphicsBindingOpenGLWin32KHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR) \
+
+
+#else
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_WIN32_XR_USE_GRAPHICS_API_OPENGL(_)
+#endif
+
+#if defined(XR_USE_PLATFORM_XCB) && defined(XR_USE_GRAPHICS_API_OPENGL)
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_XCB_XR_USE_GRAPHICS_API_OPENGL(_) \
+    _(XrGraphicsBindingOpenGLXcbKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_XCB_KHR) \
+
+
+#else
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_XCB_XR_USE_GRAPHICS_API_OPENGL(_)
+#endif
+
+#if defined(XR_USE_PLATFORM_XLIB) && defined(XR_USE_GRAPHICS_API_OPENGL)
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_XLIB_XR_USE_GRAPHICS_API_OPENGL(_) \
+    _(XrGraphicsBindingOpenGLXlibKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR) \
+
+
+#else
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_XLIB_XR_USE_GRAPHICS_API_OPENGL(_)
+#endif
+
 #define XR_LIST_STRUCTURE_TYPES(_) \
     XR_LIST_STRUCTURE_TYPES_CORE(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_D3D11(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_D3D12(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL(_) \
-    XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_WIN32(_) \
-    XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_XCB(_) \
-    XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_XLIB(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES(_) \
+    XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES_XR_USE_PLATFORM_ANDROID(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_VULKAN(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_ANDROID(_) \
-    XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_ANDROID_XR_USE_GRAPHICS_API_OPENGL_ES(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_EGL(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_WAYLAND_XR_USE_GRAPHICS_API_OPENGL(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_WIN32(_) \
+    XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_WIN32_XR_USE_GRAPHICS_API_OPENGL(_) \
+    XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_XCB_XR_USE_GRAPHICS_API_OPENGL(_) \
+    XR_LIST_STRUCTURE_TYPES_XR_USE_PLATFORM_XLIB_XR_USE_GRAPHICS_API_OPENGL(_) \
 
 
 #define XR_LIST_EXTENSIONS(_) \
@@ -1539,6 +1650,7 @@ XR_ENUM_STR(XrResult);
     _(XR_EXT_eye_gaze_interaction, 31) \
     _(XR_KHR_visibility_mask, 32) \
     _(XR_EXTX_overlay, 34) \
+    _(XR_KHR_composition_layer_color_scale_bias, 35) \
     _(XR_KHR_win32_convert_performance_counter_time, 36) \
     _(XR_KHR_convert_timespec_time, 37) \
     _(XR_VARJO_quad_views, 38) \
@@ -1555,11 +1667,16 @@ XR_ENUM_STR(XrResult);
     _(XR_MSFT_hand_tracking_mesh, 53) \
     _(XR_MSFT_secondary_view_configuration, 54) \
     _(XR_MSFT_first_person_observer, 55) \
+    _(XR_MSFT_controller_model, 56) \
     _(XR_EXT_win32_appcontainer_compatible, 58) \
     _(XR_EPIC_view_configuration_fov, 60) \
     _(XR_MSFT_holographic_window_attachment, 64) \
     _(XR_HUAWEI_controller_interaction, 70) \
     _(XR_VALVE_analog_threshold, 80) \
+    _(XR_KHR_loader_init, 89) \
+    _(XR_KHR_loader_init_android, 90) \
+    _(XR_KHR_vulkan_enable2, 91) \
+    _(XR_KHR_composition_layer_equirect2, 92) \
     _(XR_EXT_samsung_odyssey_controller, 95) \
     _(XR_EXT_hp_mixed_reality_controller, 96) \
     _(XR_MND_swapchain_usage_input_attachment_bit, 97) \

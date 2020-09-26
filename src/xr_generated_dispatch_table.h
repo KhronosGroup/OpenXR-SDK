@@ -155,6 +155,23 @@ struct XrGeneratedDispatchTable {
     PFN_xrConvertTimeToTimespecTimeKHR ConvertTimeToTimespecTimeKHR;
 #endif // defined(XR_USE_TIMESPEC)
 
+    // ---- XR_KHR_loader_init extension commands
+    PFN_xrInitializeLoaderKHR InitializeLoaderKHR;
+
+    // ---- XR_KHR_vulkan_enable2 extension commands
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    PFN_xrCreateVulkanInstanceKHR CreateVulkanInstanceKHR;
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    PFN_xrCreateVulkanDeviceKHR CreateVulkanDeviceKHR;
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    PFN_xrGetVulkanGraphicsDevice2KHR GetVulkanGraphicsDevice2KHR;
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    PFN_xrGetVulkanGraphicsRequirements2KHR GetVulkanGraphicsRequirements2KHR;
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+
     // ---- XR_EXT_performance_settings extension commands
     PFN_xrPerfSettingsSetPerformanceLevelEXT PerfSettingsSetPerformanceLevelEXT;
 
@@ -193,6 +210,12 @@ struct XrGeneratedDispatchTable {
     // ---- XR_MSFT_hand_tracking_mesh extension commands
     PFN_xrCreateHandMeshSpaceMSFT CreateHandMeshSpaceMSFT;
     PFN_xrUpdateHandMeshMSFT UpdateHandMeshMSFT;
+
+    // ---- XR_MSFT_controller_model extension commands
+    PFN_xrGetControllerModelKeyMSFT GetControllerModelKeyMSFT;
+    PFN_xrLoadControllerModelMSFT LoadControllerModelMSFT;
+    PFN_xrGetControllerModelPropertiesMSFT GetControllerModelPropertiesMSFT;
+    PFN_xrGetControllerModelStateMSFT GetControllerModelStateMSFT;
 };
 
 

@@ -126,7 +126,7 @@ def fix_sources_eol(dist_dir):
     """
     print('Preparing exported source file EOL for distribution...')
     prune_dirs = antglob.prune_dirs + 'scons-local* ./build* ./libs ./dist'
-    win_sources = antglob.glob(dist_dir, 
+    win_sources = antglob.glob(dist_dir,
         includes = '**/*.sln **/*.vcproj',
         prune_dirs = prune_dirs)
     unix_sources = antglob.glob(dist_dir,
@@ -261,7 +261,7 @@ Generates the document tarball.
 Tags the sandbox revision with release_version.
 Update 'version' file to next_dev_version and commit.
 
-Performs an svn export of tag release version, and build a source tarball.    
+Performs an svn export of tag release version, and build a source tarball.
 
 Must be started in the project top directory.
 
@@ -323,11 +323,11 @@ Warning: --force should only be used when developing/testing the release script.
         doc_distcheck_dir = 'dist/doccheck'
         tarball.decompress(doc_tarball_path, doc_distcheck_dir)
         doc_distcheck_top_dir = os.path.join(doc_distcheck_dir, doc_dirname)
-        
+
         export_dir = 'dist/export'
         svn_export(tag_url, export_dir)
         fix_sources_eol(export_dir)
-        
+
         source_dir = 'jsoncpp-src-' + release_version
         source_tarball_path = 'dist/%s.tar.gz' % source_dir
         print('Generating source tarball to', source_tarball_path)
@@ -380,11 +380,11 @@ Warning: --force should only be used when developing/testing the release script.
             print('No upload user specified. Web site and download tarball were not uploaded.')
             print('Tarball can be found at:', doc_tarball_path)
 
-        # Set next version number and commit            
+        # Set next version number and commit
         set_version(next_version)
         svn_commit('Released ' + release_version)
     else:
         sys.stderr.write(msg + '\n')
- 
+
 if __name__ == '__main__':
     main()

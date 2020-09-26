@@ -155,6 +155,20 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrConvertTimeToTimespecTimeKHR", (PFN_xrVoidFunction*)&table->ConvertTimeToTimespecTimeKHR));
 #endif // defined(XR_USE_TIMESPEC)
 
+    // ---- XR_KHR_vulkan_enable2 extension commands
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    (get_inst_proc_addr(instance, "xrCreateVulkanInstanceKHR", (PFN_xrVoidFunction*)&table->CreateVulkanInstanceKHR));
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    (get_inst_proc_addr(instance, "xrCreateVulkanDeviceKHR", (PFN_xrVoidFunction*)&table->CreateVulkanDeviceKHR));
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    (get_inst_proc_addr(instance, "xrGetVulkanGraphicsDevice2KHR", (PFN_xrVoidFunction*)&table->GetVulkanGraphicsDevice2KHR));
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+#if defined(XR_USE_GRAPHICS_API_VULKAN)
+    (get_inst_proc_addr(instance, "xrGetVulkanGraphicsRequirements2KHR", (PFN_xrVoidFunction*)&table->GetVulkanGraphicsRequirements2KHR));
+#endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+
     // ---- XR_EXT_performance_settings extension commands
     (get_inst_proc_addr(instance, "xrPerfSettingsSetPerformanceLevelEXT", (PFN_xrVoidFunction*)&table->PerfSettingsSetPerformanceLevelEXT));
 
@@ -193,6 +207,12 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     // ---- XR_MSFT_hand_tracking_mesh extension commands
     (get_inst_proc_addr(instance, "xrCreateHandMeshSpaceMSFT", (PFN_xrVoidFunction*)&table->CreateHandMeshSpaceMSFT));
     (get_inst_proc_addr(instance, "xrUpdateHandMeshMSFT", (PFN_xrVoidFunction*)&table->UpdateHandMeshMSFT));
+
+    // ---- XR_MSFT_controller_model extension commands
+    (get_inst_proc_addr(instance, "xrGetControllerModelKeyMSFT", (PFN_xrVoidFunction*)&table->GetControllerModelKeyMSFT));
+    (get_inst_proc_addr(instance, "xrLoadControllerModelMSFT", (PFN_xrVoidFunction*)&table->LoadControllerModelMSFT));
+    (get_inst_proc_addr(instance, "xrGetControllerModelPropertiesMSFT", (PFN_xrVoidFunction*)&table->GetControllerModelPropertiesMSFT));
+    (get_inst_proc_addr(instance, "xrGetControllerModelStateMSFT", (PFN_xrVoidFunction*)&table->GetControllerModelStateMSFT));
 }
 
 

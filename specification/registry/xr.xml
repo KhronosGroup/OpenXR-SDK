@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <registry>
     <comment>
 Copyright (c) 2017-2020 The Khronos Group Inc.
@@ -13,7 +13,7 @@ machine-readable definition of the API, parameter and member validation
 language incorporated into the Specification and reference pages, and other
 material which is registered by Khronos, such as tags used by extension and
 layer authors. The only authoritative version of xr.xml is the one
-maintained in the master branch of the Khronos OpenXR GitHub project.
+maintained in the default branch of the Khronos OpenXR GitHub project.
     </comment>
 
     <!-- SECTION: OpenXR vendor IDs for physical devices without PCI vendor IDs -->
@@ -35,6 +35,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
         <tag name="KHR"        author="Khronos"                 contact="Brent Insko @insko"/>
         <tag name="LUNARG"     author="LunarG"                  contact="Brad Grantham @bradgrantham-lunarg"/>
+        <tag name="LIV"        author="LIV"                     contact="Arthur Brainville @Ybalrid, Steffan Donal @liv_ruu"/>
         <tag name="MAGICLEAP"  author="Magic Leap"              contact="Blake Taylor @theblindprogramm3r"/>
         <tag name="MND"        author="Monado Project"          contact="Jakob Bornecrantz @wallbraker, Ryan Pavlik @rpavlik"/>
         <tag name="MNDX"       author="Monado Project experimental" contact="Jakob Bornecrantz @wallbraker, Ryan Pavlik @rpavlik"/>
@@ -85,11 +86,16 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type requires="xcb/xcb.h" name="xcb_connection_t"/>
         <type requires="xcb/xcb.h" name="xcb_visualid_t"/>
         <type requires="xcb/xcb.h" name="xcb_window_t"/>
+        <type requires="vulkan/vulkan.h" name="PFN_vkGetInstanceProcAddr"/>
+        <type requires="vulkan/vulkan.h" name="VkAllocationCallbacks"/>
         <type requires="vulkan/vulkan.h" name="VkDevice"/>
+        <type requires="vulkan/vulkan.h" name="VkDeviceCreateInfo"/>
         <type requires="vulkan/vulkan.h" name="VkFormat"/>
         <type requires="vulkan/vulkan.h" name="VkImage"/>
         <type requires="vulkan/vulkan.h" name="VkInstance"/>
+        <type requires="vulkan/vulkan.h" name="VkInstanceCreateInfo"/>
         <type requires="vulkan/vulkan.h" name="VkPhysicalDevice"/>
+        <type requires="vulkan/vulkan.h" name="VkResult"/>
         <type requires="time.h" name="timespec"/>
 
         <type category="define">#define <name>XR_MAKE_VERSION</name>(major, minor, patch) \
@@ -104,7 +110,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 11)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 12)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -181,6 +187,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type category="define">
 #define <name>XR_HAND_JOINT_COUNT_EXT</name> 26</type>
 
+        <!-- XR_MSFT_controller_model -->
+        <type category="define">
+#define <name>XR_NULL_CONTROLLER_MODEL_KEY_MSFT</name> 0</type>
+
         <!-- Value types -->
         <type category="basetype">typedef <type>uint32_t</type> <name>XrBool32</name>;</type>
         <type category="basetype">typedef <type>uint64_t</type> <name>XrFlags64</name>;</type>
@@ -191,6 +201,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <!-- Atoms, allocated by the runtime (if implementation requires) and never freed -->
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrPath</name>)</type>
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrSystemId</name>)</type>
+        <!-- XR_MSFT_controller_model -->
+        <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrControllerModelKeyMSFT</name>)</type>
 
         <!-- Basic C types, pulled in via openxr_platform_defines.h -->
         <type requires="openxr_platform_defines" name="void"/>
@@ -215,6 +227,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type bitvalues="XrSpaceLocationFlagBits"       category="bitmask">typedef <type>XrFlags64</type> <name>XrSpaceLocationFlags</name>;</type>
         <type bitvalues="XrSpaceVelocityFlagBits"       category="bitmask">typedef <type>XrFlags64</type> <name>XrSpaceVelocityFlags</name>;</type>
         <type bitvalues="XrInputSourceLocalizedNameFlagBits"            category="bitmask">typedef <type>XrFlags64</type> <name>XrInputSourceLocalizedNameFlags</name>;</type>
+
+        <!-- Bitmask types for XR_KHR_vulkan_enable2 -->
+        <type bitvalues="XrVulkanInstanceCreateFlagBitsKHR"    category="bitmask">typedef <type>XrFlags64</type> <name>XrVulkanInstanceCreateFlagsKHR</name>;</type>
+        <type bitvalues="XrVulkanDeviceCreateFlagBitsKHR"      category="bitmask">typedef <type>XrFlags64</type> <name>XrVulkanDeviceCreateFlagsKHR</name>;</type>
 
         <!-- Bitmask types for XR_EXT_debug_utils -->
         <type bitvalues="XrDebugUtilsMessageSeverityFlagBitsEXT"    category="bitmask">typedef <type>XrFlags64</type> <name>XrDebugUtilsMessageSeverityFlagsEXT</name>;</type>
@@ -262,6 +278,10 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <type name="XrPerfSettingsSubDomainEXT" category="enum"/>
         <type name="XrPerfSettingsLevelEXT" category="enum"/>
         <type name="XrPerfSettingsNotificationLevelEXT" category="enum"/>
+
+        <!-- enums and flag bits for XR_KHR_vulkan_enable2 -->
+        <type name="XrVulkanInstanceCreateFlagBitsKHR" category="enum"/>
+        <type name="XrVulkanDeviceCreateFlagBitsKHR" category="enum"/>
 
         <!-- enums and flag bits for XR_EXT_debug_utils -->
         <type name="XrDebugUtilsMessageSeverityFlagBitsEXT" category="enum"/>
@@ -967,6 +987,36 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member><type>D3D_FEATURE_LEVEL</type>  <name>minFeatureLevel</name></member>
         </type>
 
+        <!-- XR_KHR_vulkan_enable2 structs -->
+        <type category="struct" name="XrVulkanInstanceCreateInfoKHR">
+            <member values="XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                    <name>next</name></member>
+            <member><type>XrSystemId</type>                     <name>systemId</name></member>
+            <member><type>XrVulkanInstanceCreateFlagsKHR</type> <name>createFlags</name></member>
+            <member><type>PFN_vkGetInstanceProcAddr</type>      <name>pfnGetInstanceProcAddr</name></member>
+            <member>const <type>VkInstanceCreateInfo</type>*    <name>vulkanCreateInfo</name></member>
+            <member>const <type>VkAllocationCallbacks</type>*   <name>vulkanAllocator</name></member>
+        </type>
+        <type category="struct" name="XrVulkanDeviceCreateInfoKHR">
+            <member values="XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                    <name>next</name></member>
+            <member><type>XrSystemId</type>                     <name>systemId</name></member>
+            <member><type>XrVulkanDeviceCreateFlagsKHR</type>   <name>createFlags</name></member>
+            <member><type>PFN_vkGetInstanceProcAddr</type>      <name>pfnGetInstanceProcAddr</name></member>
+            <member><type>VkPhysicalDevice</type>               <name>vulkanPhysicalDevice</name></member>
+            <member>const <type>VkDeviceCreateInfo</type>*      <name>vulkanCreateInfo</name></member>
+            <member>const <type>VkAllocationCallbacks</type>*   <name>vulkanAllocator</name></member>
+        </type>
+        <type category="struct" name="XrGraphicsBindingVulkan2KHR" alias="XrGraphicsBindingVulkanKHR" />
+        <type category="struct" name="XrVulkanGraphicsDeviceGetInfoKHR">
+            <member values="XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*         <name>next</name></member>
+            <member><type>XrSystemId</type>          <name>systemId</name></member>
+            <member><type>VkInstance</type>          <name>vulkanInstance</name></member>
+        </type>
+        <type category="struct" name="XrSwapchainImageVulkan2KHR" alias="XrSwapchainImageVulkanKHR" />
+        <type category="struct" name="XrGraphicsRequirementsVulkan2KHR" alias="XrGraphicsRequirementsVulkanKHR" />
+
         <!-- XR_EXTX_overlay structs -->
         <type category="struct" name="XrSessionCreateInfoOverlayEXTX" structextends="XrSessionCreateInfo">
             <member values="XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX"><type>XrStructureType</type> <name>type</name></member>
@@ -1161,7 +1211,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member><type>uint32_t</type> <name>maxHandMeshIndexCount</name></member>
             <member><type>uint32_t</type> <name>maxHandMeshVertexCount</name></member>
         </type>
-        <type category="struct" name="XrHandPoseTypeInfoMSFT" structextends="XrHandTrackerCreateInfoMSFT">
+        <type category="struct" name="XrHandPoseTypeInfoMSFT" structextends="XrHandTrackerCreateInfoEXT">
             <member values="XR_TYPE_HAND_POSE_TYPE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member> <!-- Pointer to next structure -->
             <member><type>XrHandPoseTypeMSFT</type> <name>handPoseType</name></member>
@@ -1212,6 +1262,75 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>IUnknown</type>* <name>holographicSpace</name></member>
             <member><type>IUnknown</type>* <name>coreWindow</name></member>
+        </type>
+
+        <!-- XR_KHR_loader_init -->
+        <type category="struct" name="XrLoaderInitInfoBaseHeaderKHR">
+            <member><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                <name>next</name></member>
+        </type>
+
+        <!-- XR_KHR_loader_init_android -->
+        <type category="struct" name="XrLoaderInitInfoAndroidKHR" parentstruct="XrLoaderInitInfoBaseHeaderKHR">
+            <member values="XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                <name>next</name></member>
+            <member><type>void</type>*                      <name>applicationVM</name></member>
+            <member><type>void</type>*                      <name>applicationContext</name></member>
+        </type>
+
+        <!-- XR_KHR_composition_layer_equirect2 -->
+        <type category="struct" name="XrCompositionLayerEquirect2KHR" parentstruct="XrCompositionLayerBaseHeader">
+            <member values="XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                            <name>next</name></member>
+            <member optional="true"><type>XrCompositionLayerFlags</type> <name>layerFlags</name></member>
+            <member><type>XrSpace</type>                                <name>space</name></member>
+            <member><type>XrEyeVisibility</type>                        <name>eyeVisibility</name></member>
+            <member><type>XrSwapchainSubImage</type>                    <name>subImage</name></member>
+            <member><type>XrPosef</type>                                <name>pose</name></member>
+            <member><type>float</type>                                  <name>radius</name></member>
+            <member><type>float</type>                                  <name>centralHorizontalAngle</name></member>
+            <member><type>float</type>                                  <name>upperVerticalAngle</name></member>
+            <member><type>float</type>                                  <name>lowerVerticalAngle</name></member>
+        </type>
+
+        <!-- XR_KHR_composition_layer_color_scale_bias -->
+        <type category="struct" name="XrCompositionLayerColorScaleBiasKHR" structextends="XrCompositionLayerBaseHeader">
+            <member values="XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                     <name>next</name></member>
+            <member><type>XrColor4f</type>                       <name>colorScale</name></member>
+            <member><type>XrColor4f</type>                       <name>colorBias</name></member>
+        </type>
+
+        <!-- XR_MSFT_controller_model -->
+        <type category="struct" name="XrControllerModelKeyStateMSFT">
+            <member values="XR_TYPE_CONTROLLER_MODEL_KEY_STATE_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrControllerModelKeyMSFT</type> <name>modelKey</name></member>
+        </type>
+        <type category="struct" name="XrControllerModelNodePropertiesMSFT">
+            <member values="XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>char</type> <name>parentNodeName</name>[XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT]</member>
+            <member><type>char</type> <name>nodeName</name>[XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT]</member>
+        </type>
+        <type category="struct" name="XrControllerModelPropertiesMSFT">
+            <member values="XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member optional="true"><type>uint32_t</type> <name>nodeCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type> <name>nodeCountOutput</name></member>
+            <member optional="true" len="nodeCapacityInput"><type>XrControllerModelNodePropertiesMSFT</type>* <name>nodeProperties</name></member>
+        </type>
+        <type category="struct" name="XrControllerModelNodeStateMSFT">
+            <member values="XR_TYPE_CONTROLLER_MODEL_NODE_STATE_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrPosef</type> <name>nodePose</name></member>
+        </type>
+        <type category="struct" name="XrControllerModelStateMSFT">
+            <member values="XR_TYPE_CONTROLLER_MODEL_STATE_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member optional="true"><type>uint32_t</type> <name>nodeCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type> <name>nodeCountOutput</name></member>
+            <member optional="true" len="nodeCapacityInput"><type>XrControllerModelNodeStateMSFT</type>* <name>nodeStates</name></member>
         </type>
 
     </types>
@@ -1556,6 +1675,14 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     </enums>
 
     <!-- flags for XR_EXT_debug_utils -->
+    <enums name="XrVulkanInstanceCreateFlagBitsKHR" type="bitmask">
+        <!-- This is currently empty, awaiting future flags. -->
+    </enums>
+    <enums name="XrVulkanDeviceCreateFlagBitsKHR" type="bitmask">
+        <!-- This is currently empty, awaiting future flags. -->
+    </enums>
+
+    <!-- flags for XR_EXT_debug_utils -->
     <enums name="XrDebugUtilsMessageSeverityFlagBitsEXT" type="bitmask">
         <enum bitpos="0"     name="XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT"  comment="Most verbose output severity, typically used for debugging."/>
         <enum bitpos="4"     name="XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT"     comment="General info message"/>
@@ -1568,6 +1695,8 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         <enum bitpos="2"     name="XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT"  comment="Indicates the message is related to a potential performance situation"/>
         <enum bitpos="3"     name="XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT"  comment="Indicates the message is related to a non-conformant runtime result"/>
     </enums>
+
+    <!-- flags for XR_EXTX_overlay -->
     <enums name="XrOverlayMainSessionFlagBitsEXTX" type="bitmask">
         <enum bitpos="0"     name="XR_OVERLAY_MAIN_SESSION_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_BIT_EXTX"  comment="Indicates the main session enabled XR_KHR_extra_layer_info_depth"/>
     </enums>
@@ -2045,6 +2174,29 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrTime</type>* <name>time</name></param>
         </command>
 
+        <!-- commands for XR_KHR_vulkan_enable2 -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SYSTEM_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateVulkanInstanceKHR</name></proto>
+            <param><type>XrInstance</type>                          <name>instance</name></param>
+            <param>const <type>XrVulkanInstanceCreateInfoKHR</type>*<name>createInfo</name></param>
+            <param><type>VkInstance</type>*                         <name>vulkanInstance</name></param>
+            <param><type>VkResult</type>*                           <name>vulkanResult</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SYSTEM_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateVulkanDeviceKHR</name></proto>
+            <param><type>XrInstance</type>                          <name>instance</name></param>
+            <param>const <type>XrVulkanDeviceCreateInfoKHR</type>*  <name>createInfo</name></param>
+            <param><type>VkDevice</type>*                           <name>vulkanDevice</name></param>
+            <param><type>VkResult</type>*                           <name>vulkanResult</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_SYSTEM_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetVulkanGraphicsDevice2KHR</name></proto>
+            <param><type>XrInstance</type>                              <name>instance</name></param>
+            <param>const <type>XrVulkanGraphicsDeviceGetInfoKHR</type>* <name>getInfo</name></param>
+            <param><type>VkPhysicalDevice</type>*                       <name>vulkanPhysicalDevice</name></param>
+        </command>
+        <command name="xrGetVulkanGraphicsRequirements2KHR" alias="xrGetVulkanGraphicsRequirementsKHR" />
+
         <!-- commands for XR_KHR_convert_timespec_time -->
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_TIME_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrConvertTimeToTimespecTimeKHR</name></proto>
@@ -2130,6 +2282,13 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrPosef</type> <name>pose</name></param>
         </command>
 
+        <!-- commands for XR_KHR_loader_init -->
+        <command successcodes="XR_SUCCESS"
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+            <proto><type>XrResult</type> <name>xrInitializeLoaderKHR</name></proto>
+            <param>const <type>XrLoaderInitInfoBaseHeaderKHR</type>* <name>loaderInitInfo</name></param>
+        </command>
+
         <!--XR_MSFT_spatial_graph_bridge -->
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_POSE_INVALID">
             <proto><type>XrResult</type> <name>xrCreateSpatialGraphNodeSpaceMSFT</name></proto>
@@ -2171,6 +2330,34 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
             <param><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
             <param>const <type>XrHandMeshUpdateInfoMSFT</type>* <name>updateInfo</name></param>
             <param><type>XrHandMeshMSFT</type>* <name>handMesh</name></param>
+        </command>
+
+        <!-- XR_MSFT_controller_model -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_PATH_INVALID">
+            <proto><type>XrResult</type> <name>xrGetControllerModelKeyMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>topLevelUserPath</name></param>
+            <param><type>XrControllerModelKeyStateMSFT</type>* <name>controllerModelKeyState</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+            <proto><type>XrResult</type> <name>xrLoadControllerModelMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrControllerModelKeyMSFT</type> <name>modelKey</name></param>
+            <param optional="true"><type>uint32_t</type> <name>bufferCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>bufferCountOutput</name></param>
+            <param optional="true" len="bufferCapacityInput"><type>uint8_t</type>* <name>buffer</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+            <proto><type>XrResult</type> <name>xrGetControllerModelPropertiesMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrControllerModelKeyMSFT</type> <name>modelKey</name></param>
+            <param><type>XrControllerModelPropertiesMSFT</type>* <name>properties</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+            <proto><type>XrResult</type> <name>xrGetControllerModelStateMSFT</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrControllerModelKeyMSFT</type> <name>modelKey</name></param>
+            <param><type>XrControllerModelStateMSFT</type>* <name>state</name></param>
         </command>
 
     </commands>
@@ -2407,7 +2594,7 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     <!-- Vulkan image format list extension -->
     <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" requires="XR_KHR_vulkan_enable" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN">
         <require>
-            <enum value="2" name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
+            <enum value="3" name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_swapchain_format_list&quot;" name="XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME"/>
             <enum offset="0"  extends="XrStructureType" name="XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR"/>
             <type name="XrVulkanSwapchainFormatListCreateInfoKHR"/>
@@ -2648,11 +2835,13 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
     </extension>
 
 
-    <!-- Reserved space for additional per-layer color modulation info -->
-    <extension name="XR_KHR_composition_layer_color_modulation" number="35" type="instance" supported="disabled">
+    <!-- per-layer color scale and bias -->
+    <extension name="XR_KHR_composition_layer_color_scale_bias" number="35" type="instance" supported="openxr">
         <require>
-            <enum value="4" name="XR_KHR_composition_layer_color_modulation_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_composition_layer_color_modulation&quot;" name="XR_KHR_COMPOSITION_LAYER_COLOR_MODULATION_EXTENSION_NAME"/>
+            <enum value="5" name="XR_KHR_composition_layer_color_scale_bias_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_composition_layer_color_scale_bias&quot;" name="XR_KHR_COMPOSITION_LAYER_COLOR_SCALE_BIAS_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType"       name="XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR"/>
+            <type name="XrCompositionLayerColorScaleBiasKHR"/>
         </require>
     </extension>
 
@@ -2884,10 +3073,33 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_extension_56" number="56" type="instance" supported="disabled">
+    <extension name="XR_MSFT_controller_model" number="56" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_extension_56_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_56&quot;" name="XR_MSFT_extension_56_EXTENSION_NAME"/>
+            <enum value="2" name="XR_MSFT_controller_model_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_controller_model&quot;" name="XR_MSFT_CONTROLLER_MODEL_EXTENSION_NAME"/>
+
+            <type name="XrControllerModelKeyStateMSFT" />
+            <type name="XrControllerModelNodePropertiesMSFT" />
+            <type name="XrControllerModelPropertiesMSFT" />
+            <type name="XrControllerModelNodeStateMSFT" />
+            <type name="XrControllerModelStateMSFT" />
+            <type name="XrControllerModelKeyMSFT"/>
+            <type name="XR_NULL_CONTROLLER_MODEL_KEY_MSFT"/>
+
+            <command name="xrGetControllerModelKeyMSFT" />
+            <command name="xrLoadControllerModelMSFT" />
+            <command name="xrGetControllerModelPropertiesMSFT" />
+            <command name="xrGetControllerModelStateMSFT" />
+
+            <enum value="64" name="XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_KEY_STATE_MSFT"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_NODE_STATE_MSFT"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_STATE_MSFT"/>
+            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT" comment="The controller model key is invalid."/>
+
         </require>
     </extension>
 
@@ -3107,31 +3319,53 @@ maintained in the master branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_KHR_extension_89" number="89" type="instance" supported="disabled">
+    <extension name="XR_KHR_loader_init" number="89" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_KHR_extension_89_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_extension_89&quot;" name="XR_KHR_extension_89_EXTENSION_NAME"/>
+            <enum value="1" name="XR_KHR_loader_init_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_loader_init&quot;" name="XR_KHR_LOADER_INIT_EXTENSION_NAME"/>
+            <type name="XrLoaderInitInfoBaseHeaderKHR"/>
+            <command name="xrInitializeLoaderKHR"/>
         </require>
     </extension>
 
-    <extension name="XR_KHR_extension_90" number="90" type="instance" supported="disabled">
+    <extension name="XR_KHR_loader_init_android" number="90" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" requires="XR_KHR_loader_init">
         <require>
-            <enum value="1" name="XR_KHR_extension_90_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_extension_90&quot;" name="XR_KHR_extension_90_EXTENSION_NAME"/>
+            <enum value="1" name="XR_KHR_loader_init_android_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_loader_init_android&quot;" name="XR_KHR_LOADER_INIT_ANDROID_EXTENSION_NAME"/>
+            <type name="XrLoaderInitInfoAndroidKHR"/>
+            <enum offset="0"  extends="XrStructureType"  name="XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR"/>
         </require>
     </extension>
 
-    <extension name="XR_KHR_extension_91" number="91" type="instance" supported="disabled">
+    <extension name="XR_KHR_vulkan_enable2" number="91" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr">
         <require>
-            <enum value="1" name="XR_KHR_extension_91_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_extension_91&quot;" name="XR_KHR_extension_91_EXTENSION_NAME"/>
+            <enum value="1" name="XR_KHR_vulkan_enable2_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_vulkan_enable2&quot;" name="XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType"      name="XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR"/>
+            <enum offset="1" extends="XrStructureType"      name="XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR"/>
+            <enum offset="3" extends="XrStructureType"      name="XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR"/>
+            <enum            extends="XrStructureType"      name="XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR"        alias="XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR"/>
+            <enum            extends="XrStructureType"      name="XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR"         alias="XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR"/>
+            <enum            extends="XrStructureType"      name="XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR"   alias="XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR"/>
+            <type name="XrVulkanInstanceCreateInfoKHR"/>
+            <type name="XrVulkanDeviceCreateInfoKHR"/>
+            <type name="XrGraphicsBindingVulkan2KHR"/>
+            <type name="XrVulkanGraphicsDeviceGetInfoKHR"/>
+            <type name="XrSwapchainImageVulkan2KHR"/>
+            <type name="XrGraphicsRequirementsVulkan2KHR"/>
+            <command name="xrCreateVulkanInstanceKHR"/>
+            <command name="xrCreateVulkanDeviceKHR"/>
+            <command name="xrGetVulkanGraphicsDevice2KHR"/>
+            <command name="xrGetVulkanGraphicsRequirements2KHR"/>
         </require>
     </extension>
 
-    <extension name="XR_KHR_extension_92" number="92" type="instance" supported="disabled">
+    <extension name="XR_KHR_composition_layer_equirect2" number="92" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_KHR_extension_92_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_extension_92&quot;" name="XR_KHR_extension_92_EXTENSION_NAME"/>
+            <enum value="1" name="XR_KHR_composition_layer_equirect2_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_composition_layer_equirect2&quot;" name="XR_KHR_COMPOSITION_LAYER_EQUIRECT2_EXTENSION_NAME"/>
+            <type name="XrCompositionLayerEquirect2KHR"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR"/>
         </require>
     </extension>
 
