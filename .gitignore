@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 /build/
-/build*/
+build*/
 CMakeLists.txt.user
 *.orig
 .*
@@ -35,6 +35,11 @@ out/build/
 CMakeSettings.json
 CppProperties.json
 
+# Gradle
+.cxx/
+.gradle/
+local.properties
+
 # Don't ignore these things
 !.azure-pipelines/
 !.clang-format
@@ -47,3 +52,4 @@ CppProperties.json
 !.gitlab-ci.yml
 !.reuse
 !.*.license
+!.azure-pipelines/nuget/NugetTemplate/build

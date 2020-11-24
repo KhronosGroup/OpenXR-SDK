@@ -118,9 +118,13 @@ LoaderLogger::LoaderLogger() {
     // present as "none" then we don't.
     if (debug_string != "none") {
         AddLogRecorder(MakeStdErrLoaderLogRecorder(nullptr));
+#ifdef __ANDROID__
+        // Add a logcat logger by default.
+        AddLogRecorder(MakeLogcatLoaderLogRecorder());
+#endif  // __ANDROID__
     }
 
-#if _WIN32
+#ifdef _WIN32
     // Add an debugger logger by default so that we at least get errors out to the debugger.
     AddLogRecorder(MakeDebuggerLoaderLogRecorder(nullptr));
 #endif

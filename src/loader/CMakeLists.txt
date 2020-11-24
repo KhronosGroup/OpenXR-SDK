@@ -105,7 +105,7 @@ target_include_directories(
             ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-if(VulkanHeaders_FOUND)
+if(Vulkan_FOUND)
     target_include_directories(openxr_loader PRIVATE ${Vulkan_INCLUDE_DIRS})
 endif()
 if(NOT BUILD_LOADER_WITH_EXCEPTION_HANDLING)
@@ -115,8 +115,14 @@ endif()
 target_link_libraries(
     openxr_loader
     PRIVATE openxr-all-supported ${CMAKE_DL_LIBS}
-    PUBLIC ${CMAKE_THREAD_LIBS_INIT}
+    PUBLIC Threads::Threads
 )
+if(ANDROID)
+    target_link_libraries(
+        openxr_loader
+        PRIVATE
+        ${ANDROID_LOG_LIBRARY})
+endif()
 
 target_compile_definitions(openxr_loader PRIVATE API_NAME="OpenXR")
 openxr_add_filesystem_utils(openxr_loader)
@@ -211,7 +217,7 @@ elseif(WIN32)
 endif()
 
 # Copy loader to conformance_cli binary folder if built as dynamic
-if(DYNAMIC_LOADER AND BUILD_CONFORMANCE_TESTS)
+if(DYNAMIC_LOADER AND BUILD_CONFORMANCE_CLI)
     add_custom_command(TARGET openxr_loader POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:openxr_loader> $<TARGET_PROPERTY:conformance_cli,BINARY_DIR>
     )
@@ -251,7 +257,7 @@ export(
     NAMESPACE OpenXR::
 )
 
-if((CMAKE_SYSTEM_NAME STREQUAL "Windows") OR (CMAKE_SYSTEM_NAME STREQUAL "WindowsStore"))
+if(WIN32 AND NOT INSTALL_TO_ARCHITECTURE_PREFIXES)
     set(TARGET_DESTINATION cmake)
 else()
     set(TARGET_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/openxr/)
@@ -282,3 +288,30 @@ install(
           ${CMAKE_CURRENT_BINARY_DIR}/OpenXRConfigVersion.cmake
     DESTINATION ${TARGET_DESTINATION}
 )
+
+if(WIN32 AND DYNAMIC_LOADER)
+    install(FILES $<TARGET_PDB_FILE:openxr_loader> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
+endif()
+
+# Make the "meta" cmake config/version file to redirect to the right arch/build
+if(WIN32 AND INSTALL_TO_ARCHITECTURE_PREFIXES)
+    set(TARGET_SUBDIR cmake/openxr)
+    set(WARNING "This is a generated file - do not edit!")
+    set(FN OpenXRConfig)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/metaconfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/metaconfig.cmake
+        @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metaconfig.cmake
+        DESTINATION .
+        RENAME OpenXRConfig.cmake
+    )
+
+    set(FN OpenXRConfigVersion)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/metaconfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/metaconfigversion.cmake
+        @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metaconfigversion.cmake
+        DESTINATION .
+        RENAME OpenXRConfigVersion.cmake
+    )
+endif()

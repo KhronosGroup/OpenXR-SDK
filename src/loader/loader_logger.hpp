@@ -69,6 +69,7 @@ enum XrLoaderLogType {
     XR_LOADER_LOG_STDOUT,
     XR_LOADER_LOG_DEBUG_UTILS,
     XR_LOADER_LOG_DEBUGGER,
+    XR_LOADER_LOG_LOGCAT,
 };
 
 class LoaderLogRecorder {

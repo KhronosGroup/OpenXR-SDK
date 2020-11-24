@@ -31,7 +31,17 @@
 #include <mutex>
 #include <memory>
 
+#ifdef XR_USE_PLATFORM_ANDROID
+#define XR_KHR_LOADER_INIT_SUPPORT
+#endif
+
+class RuntimeManifestFile;
 struct XrGeneratedDispatchTable;
+
+#ifdef XR_KHR_LOADER_INIT_SUPPORT
+//! Initialize loader, where required.
+XrResult InitializeLoader(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo);
+#endif
 
 class RuntimeInterface {
    public:
@@ -64,6 +74,8 @@ class RuntimeInterface {
    private:
     RuntimeInterface(LoaderPlatformLibraryHandle runtime_library, PFN_xrGetInstanceProcAddr get_instance_proc_addr);
     void SetSupportedExtensions(std::vector<std::string>& supported_extensions);
+    static void TryLoadingSingleRuntime(const std::string& openxr_command, std::unique_ptr<RuntimeManifestFile>& manifest_file,
+                                        bool& any_loaded, XrResult& last_error);
 
     static std::unique_ptr<RuntimeInterface>& GetInstance() {
         static std::unique_ptr<RuntimeInterface> instance;

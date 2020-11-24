@@ -84,6 +84,14 @@ inline bool IsMissingNullTerminator(const char (&str)[max_length]) {
 }
 
 // ---- Core 1.0 manual loader trampoline functions
+#ifdef XR_KHR_LOADER_INIT_SUPPORT  // platforms that support XR_KHR_loader_init.
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *loaderInitInfo)
+    XRLOADER_ABI_TRY {
+    LoaderLogger::LogVerboseMessage("xrInitializeLoaderKHR", "Entering loader trampoline");
+    return InitializeLoader(loaderInitInfo);
+}
+XRLOADER_ABI_CATCH_FALLBACK
+#endif
 
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
                                                                            uint32_t *propertyCountOutput,
@@ -730,9 +738,10 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance in
     }
 
     if (instance == XR_NULL_HANDLE) {
-        // Null instance is allowed for 3 specific API entry points, otherwise return error
+        // Null instance is allowed for a few specific API entry points, otherwise return error
         if (strcmp(name, "xrCreateInstance") != 0 && strcmp(name, "xrEnumerateApiLayerProperties") != 0 &&
-            strcmp(name, "xrEnumerateInstanceExtensionProperties") != 0) {
+            strcmp(name, "xrEnumerateInstanceExtensionProperties") != 0 && strcmp(name, "xrInitializeLoaderKHR") != 0) {
+            // TODO why is xrGetInstanceProcAddr not listed in here?
             std::string error_str = "XR_NULL_HANDLE for instance but query for ";
             error_str += name;
             error_str += " requires a valid instance";
@@ -746,6 +755,13 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance in
     if (strcmp(name, "xrGetInstanceProcAddr") == 0) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(xrGetInstanceProcAddr);
         return XR_SUCCESS;
+    } else if (strcmp(name, "xrInitializeLoaderKHR") == 0) {
+#ifdef XR_KHR_LOADER_INIT_SUPPORT
+        *function = reinterpret_cast<PFN_xrVoidFunction>(xrInitializeLoaderKHR);
+        return XR_SUCCESS;
+#else
+        return XR_ERROR_FUNCTION_UNSUPPORTED;
+#endif
     } else if (strcmp(name, "xrEnumerateApiLayerProperties") == 0) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(xrEnumerateApiLayerProperties);
         return XR_SUCCESS;

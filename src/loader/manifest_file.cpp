@@ -213,7 +213,7 @@ static void ReadDataFilesInSearchPaths(ManifestFileType type, const std::string 
         override_active = true;
     } else {
         override_active = false;
-#ifndef XR_OS_WINDOWS
+#if !defined(XR_OS_WINDOWS) && !defined(XR_OS_ANDROID)
         const char home_additional[] = ".local/share/";
 
         // Determine how much space is needed to generate the full search path

@@ -38,7 +38,7 @@
 #endif
 
 // Environment variables
-#if defined(XR_OS_LINUX) || defined(XR_OS_APPLE)
+#if defined(XR_OS_LINUX) || defined(XR_OS_APPLE) || defined(XR_OS_ANDROID)
 
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -48,7 +48,7 @@ static void AddEnvironmentApiLayers(std::vector<std::string>& enabled_layers) {
 
     // Handle any path listings in the string (separated by the appropriate path separator)
     while (found != std::string::npos) {
-        cur_search = layers.substr(last_found, found);
+        cur_search = layers.substr(last_found, found - last_found);
         enabled_layers.push_back(cur_search);
         last_found = found + 1;
         found = layers.find_first_of(PATH_SEPARATOR, last_found);

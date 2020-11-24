@@ -216,6 +216,23 @@ struct XrGeneratedDispatchTable {
     PFN_xrLoadControllerModelMSFT LoadControllerModelMSFT;
     PFN_xrGetControllerModelPropertiesMSFT GetControllerModelPropertiesMSFT;
     PFN_xrGetControllerModelStateMSFT GetControllerModelStateMSFT;
+
+    // ---- XR_MSFT_perception_anchor_interop extension commands
+#if defined(XR_USE_PLATFORM_WIN32)
+    PFN_xrCreateSpatialAnchorFromPerceptionAnchorMSFT CreateSpatialAnchorFromPerceptionAnchorMSFT;
+#endif // defined(XR_USE_PLATFORM_WIN32)
+#if defined(XR_USE_PLATFORM_WIN32)
+    PFN_xrTryGetPerceptionAnchorFromSpatialAnchorMSFT TryGetPerceptionAnchorFromSpatialAnchorMSFT;
+#endif // defined(XR_USE_PLATFORM_WIN32)
+
+    // ---- XR_FB_display_refresh_rate extension commands
+    PFN_xrEnumerateDisplayRefreshRatesFB EnumerateDisplayRefreshRatesFB;
+    PFN_xrGetDisplayRefreshRateFB GetDisplayRefreshRateFB;
+    PFN_xrRequestDisplayRefreshRateFB RequestDisplayRefreshRateFB;
+
+    // ---- XR_FB_color_space extension commands
+    PFN_xrEnumerateColorSpacesFB EnumerateColorSpacesFB;
+    PFN_xrSetColorSpaceFB SetColorSpaceFB;
 };
 
 

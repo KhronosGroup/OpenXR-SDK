@@ -443,9 +443,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>OpenXR<sup>&#174;</sup>  Loader - Design and Operation [DRAFT] (with all published extensions)</h1>
 <div class="details">
 <span id="author" class="author">Copyright (c) 2017-2020 The Khronos Group Inc.</span><br>
-<span id="revnumber">version 1.0.12,</span>
-<span id="revdate">Sat, 26 Sep 2020 02:20:57 +0000</span>
-<br><span id="revremark">from git ref release-1.0.12 commit: 6b66bbaabdca7479852cf50fa1149452b7cbe299</span>
+<span id="revnumber">version 1.0.13,</span>
+<span id="revdate">Tue, 24 Nov 2020 18:07:54 +0000</span>
+<br><span id="revremark">from git ref release-1.0.13 commit: 64bdb76a8c2a40f95d4845a1dbc136d463c42a3a</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -594,7 +594,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Copyright (c) 2017-2020 The Khronos Group Inc. All Rights reserved.</p>
+<p>Copyright (c) 2017-2020 The Khronos Group Inc.
+All Rights reserved.</p>
 </div>
 <!-- toc disabled -->
 </div>
@@ -603,14 +604,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="openblock partintro">
 <div class="content">
 <div class="paragraph">
-<p>This document contains the necessary information for understanding how
-to develop for, and interact with, the OpenXR loader.  Intended use of
-this document is as a detailed design document and a tool for learning
-general OpenXR loader behavior.</p>
+<p>This document contains the necessary information for understanding how to
+develop for, and interact with, the OpenXR loader.
+Intended use of this document is as a detailed design document and a tool
+for learning general OpenXR loader behavior.</p>
 </div>
 <div class="paragraph">
-<p>In the event of any discrepancies between this document and
-the (<a href="https://www.khronos.org/registry/OpenXR">OpenXR specification</a>), that document is authoritative.</p>
+<p>In the event of any discrepancies between this document and the
+(<a href="https://www.khronos.org/registry/OpenXR">OpenXR specification</a>), that
+document is authoritative.</p>
 </div>
 </div>
 </div>
@@ -647,19 +649,21 @@ described in RFC 2119.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The general concepts in this document are applicable to the loaders available
-for Windows and Linux based systems.</p>
+<p>The general concepts in this document are applicable to the loaders
+available for Windows and Linux based systems.</p>
 </div>
 <div class="paragraph">
-<p>First, let&#8217;s look at the OpenXR environment as a whole.  The OpenXR application
-is at the start of the execution chain, and interfaces directly with the OpenXR
-loader.  The <a href="#openxr-loader">loader</a>, in turn, detects, loads, and interacts
-with any number of OpenXR <a href="#openxr-runtimes">runtimes</a> and
-<a href="#openxr-api-layers">API layers</a>.  Each OpenXR runtime controls a complete VR/XR/MR
-system that an application can choose to interact with.  The loader may inject
-any number of optional API layers between the application and the runtime to
-augment behavior.  As a result, any OpenXR command may involve executing code
-in a number of different modules, including the loader, API layers, and runtimes.</p>
+<p>First, let&#8217;s look at the OpenXR environment as a whole.
+The OpenXR application is at the start of the execution chain, and
+interfaces directly with the OpenXR loader.
+The <a href="#openxr-loader">loader</a>, in turn, detects, loads, and interacts with
+any number of OpenXR <a href="#openxr-runtimes">runtimes</a> and <a href="#openxr-api-layers">API layers</a>.
+Each OpenXR runtime controls a complete VR/XR/MR system that an application
+can choose to interact with.
+The loader may inject any number of optional API layers between the
+application and the runtime to augment behavior.
+As a result, any OpenXR command may involve executing code in a number of
+different modules, including the loader, API layers, and runtimes.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -671,26 +675,26 @@ in a number of different modules, including the loader, API layers, and runtimes
 <h3 id="_who_should_read_this_document">2.1. Who Should Read This Document</h3>
 <div class="paragraph">
 <p>While this document is primarily targeted at developers of
-<a href="https://www.khronos.org/openxr">OpenXR</a> runtimes or API layers, and those wishing
-to contribute to the OpenXR loader; the information contained in it may be
-useful to anyone wanting a better understanding of OpenXR.</p>
+<a href="https://www.khronos.org/openxr">OpenXR</a> runtimes or API layers, and those
+wishing to contribute to the OpenXR loader; the information contained in it
+may be useful to anyone wanting a better understanding of OpenXR.</p>
 </div>
 <div class="paragraph">
-<p>The <a href="#openxr-spec">OpenXR API Specification</a> should be used as the
-primary means of understanding the OpenXR API and all care has been made
-to not conflict with any element of that document.  In any case where this
-document and the <a href="#openxr-spec">OpenXR API Specification</a> differ, behavior
-as defined by the OpenXR specification <strong class="purple">must</strong> be considered the correct
-standard.</p>
+<p>The <a href="#openxr-spec">OpenXR API Specification</a> should be used as the primary
+means of understanding the OpenXR API and all care has been made to not
+conflict with any element of that document.
+In any case where this document and the <a href="#openxr-spec">OpenXR API
+Specification</a> differ, behavior as defined by the OpenXR specification
+<strong class="purple">must</strong> be considered the correct standard.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="openxr-loader">2.2. OpenXR Loader</h3>
 <div class="paragraph">
 <p>The loader is critical to detecting, exposing, and possibly loading any
-available OpenXR runtime or API layer on the system.  Once setup, the loader is
-also responsible with managing the proper dispatching of OpenXR commands to
-each of these components.</p>
+available OpenXR runtime or API layer on the system.
+Once setup, the loader is also responsible with managing the proper
+dispatching of OpenXR commands to each of these components.</p>
 </div>
 <div class="paragraph">
 <p>This document is intended to provide an overview of the necessary interfaces
@@ -710,8 +714,8 @@ between the loader and:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>In addition, this document also covers various
-<a href="#loader-internals">internal design</a> elements of the OpenXR loader.</p>
+<p>In addition, this document also covers various <a href="#loader-internals">internal
+design</a> elements of the OpenXR loader.</p>
 </div>
 <div class="sect3">
 <h4 id="_goals_of_the_loader">2.2.1. Goals of the Loader</h4>
@@ -725,8 +729,8 @@ between the loader and:</p>
 system.</p>
 </li>
 <li>
-<p>It <strong class="purple">must</strong> support OpenXR API layers (optional modules that can be enabled by an
-application, developer, or standard system settings).</p>
+<p>It <strong class="purple">must</strong> support OpenXR API layers (optional modules that can be enabled
+by an application, developer, or standard system settings).</p>
 </li>
 <li>
 <p>It <strong class="purple">must</strong> strive to reduce its overall memory and performance impact to an
@@ -739,15 +743,17 @@ OpenXR application.</p>
 <div class="sect2">
 <h3 id="openxr-api-layers">2.3. OpenXR API Layers</h3>
 <div class="paragraph">
-<p>API layers are optional components that augment the OpenXR system.  They may
-intercept, evaluate, modify, and insert existing OpenXR commands on their
-way from the application down to the runtime.  API layers are implemented as
-libraries that are enabled in a variety of ways (including by application
-request).  All API layers are enabled in an OpenXR system during the
-<code>xrCreateInstance</code> call.  Each API layer may choose to hook (intercept) any
-OpenXR command which in turn may be ignored or augmented.  An API layer does
-not need to intercept all OpenXR commands but only intercept those
-commands it desires.</p>
+<p>API layers are optional components that augment the OpenXR system.
+They may intercept, evaluate, modify, and insert existing OpenXR commands on
+their way from the application down to the runtime.
+API layers are implemented as libraries that are enabled in a variety of
+ways (including by application request).
+All API layers are enabled in an OpenXR system during the <code>xrCreateInstance</code>
+call.
+Each API layer may choose to hook (intercept) any OpenXR command which in
+turn may be ignored or augmented.
+An API layer does not need to intercept all OpenXR commands but only
+intercept those commands it desires.</p>
 </div>
 <div class="paragraph">
 <p>Some examples of features that API layers may expose include:</p>
@@ -766,40 +772,43 @@ commands it desires.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Because API layers are optional, you may choose to enable API layers for debugging
-your application, but then disable any API layer usage when you release your
-product.</p>
+<p>Because API layers are optional, you may choose to enable API layers for
+debugging your application, but then disable any API layer usage when you
+release your product.</p>
 </div>
 <div class="paragraph">
 <p>For more information on how the OpenXR interacts with API layers, refer to
-the <a href="#api-layer-interaction">"API Layer Interaction"</a> section of this document.</p>
+the <a href="#api-layer-interaction">"API Layer Interaction"</a> section of this
+document.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="openxr-runtimes">2.4. OpenXR Runtimes</h3>
 <div class="paragraph">
-<p>OpenXR works with multiple runtimes each supporting one or more devices. Each
-OpenXR runtime controls a complete VR/AR/MR system. Multiple runtimes may be
-installed on a system, with one being <em>active</em> at any given time. The loader
-discovers the active runtime on the system and loads it.
-When an <code>XrInstance</code> is created during <code>xrCreateInstance</code>, the active runtime
-is associated with the instance.</p>
+<p>OpenXR works with multiple runtimes each supporting one or more devices.
+Each OpenXR runtime controls a complete VR/AR/MR system.
+Multiple runtimes may be installed on a system, with one being <em>active</em> at
+any given time.
+The loader discovers the active runtime on the system and loads it.
+When an <code>XrInstance</code> is created during <code>xrCreateInstance</code>, the active
+runtime is associated with the instance.</p>
 </div>
 <div class="paragraph">
-<p>For more information on how the OpenXR interacts with runtimes, refer to
-the <a href="#runtime-interaction">"Runtime Interaction"</a> section of this document.</p>
+<p>For more information on how the OpenXR interacts with runtimes, refer to the
+<a href="#runtime-interaction">"Runtime Interaction"</a> section of this document.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="openxr-objects">2.5. OpenXR Objects</h3>
 <div class="paragraph">
 <p>OpenXR uses an object model to control the scope of a particular action or
-operation.  The object to be acted on is usually the first parameter of an
-OpenXR call.  Under the covers, this object is a unique handle to either a
-class or structure.  The contents of each class/structure vary, but each
-has a means of looking up a dispatch table which is
-used to direct the functional flow through any enabled API layers and into the
-appropriate runtime.</p>
+operation.
+The object to be acted on is usually the first parameter of an OpenXR call.
+Under the covers, this object is a unique handle to either a class or
+structure.
+The contents of each class/structure vary, but each has a means of looking
+up a dispatch table which is used to direct the functional flow through any
+enabled API layers and into the appropriate runtime.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -811,9 +820,10 @@ appropriate runtime.</p>
 <div class="title">Note</div>
 <div class="paragraph">
 <p>Some OpenXR commands don&#8217;t actually take an object, such as
-<code>xrEnumerateApiLayerProperties</code> and <code>xrEnumerateInstanceExtensionProperties</code>.
-These commands typically only provide information for other commands which do
-take an object.</p>
+<code>xrEnumerateApiLayerProperties</code> and
+<code>xrEnumerateInstanceExtensionProperties</code>.
+These commands typically only provide information for other commands which
+do take an object.</p>
 </div>
 </td>
 </tr>
@@ -823,20 +833,22 @@ take an object.</p>
 <div class="sect2">
 <h3 id="openxr-call-chains">2.6. OpenXR Call Chains</h3>
 <div class="paragraph">
-<p>When an (optional) API layer is loaded, the loader links together a <em>call chain</em>
-that includes each function selected by the layer. At <code>xrCreateInstance</code> time the
-loader initializes all enabled API layers and creates call
-chains for each OpenXR command, with each entry of the resulting dispatch table
-pointing to the first element of that chain. The loader builds an individual
-dispatch table for the <code>XrInstance</code> that is created.</p>
+<p>When an (optional) API layer is loaded, the loader links together a <em>call
+chain</em> that includes each function selected by the layer.
+At <code>xrCreateInstance</code> time the loader initializes all enabled API layers and
+creates call chains for each OpenXR command, with each entry of the
+resulting dispatch table pointing to the first element of that chain.
+The loader builds an individual dispatch table for the <code>XrInstance</code> that is
+created.</p>
 </div>
 <div class="paragraph">
 <p>When an application calls an OpenXR command, this typically will first hit a
-<em>trampoline</em> function in the loader.  These <em>trampoline</em> functions are small,
-simple functions that jump to the appropriate dispatch table entry for the
-object they are given.  Some functions also require an additional loader
-function called a <em>terminator</em>, which is called after all enabled API layers to
-process data before proceeding to the appropriate runtime.</p>
+<em>trampoline</em> function in the loader.
+These <em>trampoline</em> functions are small, simple functions that jump to the
+appropriate dispatch table entry for the object they are given.
+Some functions also require an additional loader function called a
+<em>terminator</em>, which is called after all enabled API layers to process data
+before proceeding to the appropriate runtime.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -845,8 +857,8 @@ process data before proceeding to the appropriate runtime.</p>
 <div class="title">Figure 2. Example Call Chain</div>
 </div>
 <div class="paragraph">
-<p>The loader only allows a single outstanding <code>XrInstance</code> and uses the generated
-dispatch table for that <code>XrInstance</code> for all OpenXR API commands.</p>
+<p>The loader only allows a single outstanding <code>XrInstance</code> and uses the
+generated dispatch table for that <code>XrInstance</code> for all OpenXR API commands.</p>
 </div>
 </div>
 </div>
@@ -855,13 +867,14 @@ dispatch table for that <code>XrInstance</code> for all OpenXR API commands.</p>
 <h2 id="application-interaction">3. Application Interaction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>An application requests a specific version of the OpenXR API when creating an
-instance by writing to the "apiVersion" member of the <code>XrApplicationInfo</code>
-structure which, in turn, is passed into the <code>XrInstanceCreateInfo</code> structure.
-If either the loader or the active runtime do not support the requested version,
-they may return an error and fail instance creation.  Refer to the
-<a href="#openxr-spec">OpenXR API Specification</a> documentation on <code>xrCreateInstance</code>
-for more information about this.</p>
+<p>An application requests a specific version of the OpenXR API when creating
+an instance by writing to the "apiVersion" member of the <code>XrApplicationInfo</code>
+structure which, in turn, is passed into the <code>XrInstanceCreateInfo</code>
+structure.
+If either the loader or the active runtime do not support the requested
+version, they may return an error and fail instance creation.
+Refer to the <a href="#openxr-spec">OpenXR API Specification</a> documentation on
+<code>xrCreateInstance</code> for more information about this.</p>
 </div>
 <div class="sect2">
 <h3 id="interfacing-with-openxr-functions">3.1. Interfacing with OpenXR Functions</h3>
@@ -872,13 +885,15 @@ through the loader:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Directly linking to the core OpenXR commands exposed and exported by the loader.</p>
+<p>Directly linking to the core OpenXR commands exposed and exported by the
+loader.</p>
 </li>
 <li>
-<p>Creating an application-managed dispatch table of OpenXR commands by querying
-the loader for function pointers via <code>xrGetInstanceProcAddr</code>. This method
-supports core OpenXR commands, commands of (enabled) OpenXR extensions supported by the runtime,
-and any commands exposed by enabled API layers.</p>
+<p>Creating an application-managed dispatch table of OpenXR commands by
+querying the loader for function pointers via <code>xrGetInstanceProcAddr</code>.
+This method supports core OpenXR commands, commands of (enabled) OpenXR
+extensions supported by the runtime, and any commands exposed by enabled API
+layers.</p>
 </li>
 </ol>
 </div>
@@ -886,14 +901,14 @@ and any commands exposed by enabled API layers.</p>
 <h4 id="openxr-direct-exports">3.1.1. OpenXR Direct Exports</h4>
 <div class="paragraph">
 <p>The loader library on Windows and Linux will directly export all core OpenXR
-commands for the OpenXR version it supports. When an application links directly
-to the loader library in this way, the OpenXR calls are simple <em>trampoline</em>
-functions that jump to the appropriate dispatch table entry for the object
-provided.</p>
+commands for the OpenXR version it supports.
+When an application links directly to the loader library in this way, the
+OpenXR calls are simple <em>trampoline</em> functions that jump to the appropriate
+dispatch table entry for the object provided.</p>
 </div>
 <div class="paragraph">
-<p>The specific list, in alphabetical order, of OpenXR commands directly exported by the loader for API
-version 1.0 are:</p>
+<p>The specific list, in alphabetical order, of OpenXR commands directly
+exported by the loader for API version 1.0 are:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1065,9 +1080,9 @@ version 1.0 are:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>When an OpenXR application chooses to use one of the exports directly exposed
-from the OpenXR loader, the call chain will look like one of the following (if
-the user has enabled two API layers):</p>
+<p>When an OpenXR application chooses to use one of the exports directly
+exposed from the OpenXR loader, the call chain will look like one of the
+following (if the user has enabled two API layers):</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -1077,33 +1092,36 @@ the user has enabled two API layers):</p>
 </div>
 <div class="paragraph">
 <p>The "Special Instance" call chain is used in several places where the loader
-has to perform some work before and after any API layers, but prior to calling the
-enabled runtime.  <code>xrCreateInstance</code>, <code>xrDestroyInstance</code>, and
-<code>xrGetInstanceProcAddr</code> are three of the main commands that fall into this
-group. Most commands do not require a terminator and will use the
-second call chain.</p>
+has to perform some work before and after any API layers, but prior to
+calling the enabled runtime.
+<code>xrCreateInstance</code>, <code>xrDestroyInstance</code>, and <code>xrGetInstanceProcAddr</code> are
+three of the main commands that fall into this group.
+Most commands do not require a terminator and will use the second call
+chain.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="openxr-indirect-linking">3.1.2. OpenXR Indirect Linking</h4>
 <div class="paragraph">
 <p>With loader indirect linking an application dynamically generates its own
-dispatch table of OpenXR commands.  This method allows an application to
-fail gracefully if the loader cannot be found, or supports an older version
-of the API than the application. To do this, the application uses the
-appropriate platform specific dynamic symbol lookup (such as dlsym()) on the
-loader library to discover the address of the <code>xrGetInstanceProcAddr</code> command.
-Once discovered, this command can be used to query the addresses of all other
-OpenXR commands (such as <code>xrCreateInstance</code>,
+dispatch table of OpenXR commands.
+This method allows an application to fail gracefully if the loader cannot be
+found, or supports an older version of the API than the application.
+To do this, the application uses the appropriate platform specific dynamic
+symbol lookup (such as dlsym()) on the loader library to discover the
+address of the <code>xrGetInstanceProcAddr</code> command.
+Once discovered, this command can be used to query the addresses of all
+other OpenXR commands (such as <code>xrCreateInstance</code>,
 <code>xrEnumerateInstanceExtensionProperties</code> and
-<code>xrEnumerateApiLayerProperties</code>).  Then, the application would use its
-table of function pointers to make the call into the OpenXR API.</p>
+<code>xrEnumerateApiLayerProperties</code>).
+Then, the application would use its table of function pointers to make the
+call into the OpenXR API.</p>
 </div>
 <div class="paragraph">
-<p>One benefit when an application generates its own dispatch table is
-the removal of the loader trampoline call from most commands in a call chain,
-which could potentially increase performance.  In that case, most commands
-would use the following call chain:</p>
+<p>One benefit when an application generates its own dispatch table is the
+removal of the loader trampoline call from most commands in a call chain,
+which could potentially increase performance.
+In that case, most commands would use the following call chain:</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -1115,9 +1133,9 @@ would use the following call chain:</p>
 <div class="sect3">
 <h4 id="openxr-loader-library-name">3.1.3. OpenXR Loader Library Name</h4>
 <div class="paragraph">
-<p>The OpenXR loader&#8217;s dynamic library name is dependent on the user&#8217;s underlying
-operating system.  The following table shows the loader library names for
-common OSs:</p>
+<p>The OpenXR loader&#8217;s dynamic library name is dependent on the user&#8217;s
+underlying operating system.
+The following table shows the loader library names for common OSs:</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -1150,37 +1168,39 @@ versions of OpenXR.</p>
 <div class="sect2">
 <h3 id="application-api-layer-usage">3.2. Application API Layer Usage</h3>
 <div class="paragraph">
-<p>Applications desiring OpenXR functionality beyond what the core API offers may
-use various API layers or extensions. An API layer cannot introduce new OpenXR
-<em>core</em> API commands, but may introduce new extension-specific OpenXR commands
-that can be queried through the extension interface.</p>
+<p>Applications desiring OpenXR functionality beyond what the core API offers
+may use various API layers or extensions.
+An API layer cannot introduce new OpenXR <em>core</em> API commands, but may
+introduce new extension-specific OpenXR commands that can be queried through
+the extension interface.</p>
 </div>
 <div class="paragraph">
-<p>A common use of API layers is for validation which can be enabled by loading the
-API layer during application development, but not loading the API layer for
-application release. The overhead cost of validation is completely eliminated
-when the layer is not loaded.</p>
+<p>A common use of API layers is for validation which can be enabled by loading
+the API layer during application development, but not loading the API layer
+for application release.
+The overhead cost of validation is completely eliminated when the layer is
+not loaded.</p>
 </div>
 <div class="paragraph">
 <p>An application can discover which API layers are available to it with
-<code>xrEnumerateApiLayerProperties</code>.  This will report all API layers
-that have been discovered by the loader.  The loader looks in various locations
-to find API layers on the system.  For more information see the
-<a href="#api-layer-discovery">API Layer discovery</a> section below.</p>
+<code>xrEnumerateApiLayerProperties</code>.
+This will report all API layers that have been discovered by the loader.
+The loader looks in various locations to find API layers on the system.
+For more information see the <a href="#api-layer-discovery">API Layer discovery</a>
+section below.</p>
 </div>
 <div class="paragraph">
 <p>An API layer or layers may be enabled by an application by passing a list of
-names in the <code>enabledApiLayerNames</code> field of the <code>XrInstanceCreateInfo</code>
-at <code>xrCreateInstance</code> time.  During the <code>xrCreateInstance</code>, the loader
-constructs a <a href="#openxr-call-chains">call chain</a> that includes the application
-specified (enabled) API layers.</p>
+names in the <code>enabledApiLayerNames</code> field of the <code>XrInstanceCreateInfo</code> at
+<code>xrCreateInstance</code> time.
+During the <code>xrCreateInstance</code>, the loader constructs a <a href="#openxr-call-chains">call chain</a> that includes the application specified (enabled) API layers.</p>
 </div>
 <div class="paragraph">
-<p>Order is important in the <code>enabledApiLayerNames</code> array; array element 0 is the
-topmost (closest to the application) API layer inserted in the chain and the last
-array element is closest to the runtime.  See the
-<a href="#overall-api-layer-ordering">Overall API Layer Ordering</a> section for more information
-on API layer ordering.</p>
+<p>Order is important in the <code>enabledApiLayerNames</code> array; array element 0 is
+the topmost (closest to the application) API layer inserted in the chain and
+the last array element is closest to the runtime.
+See the <a href="#overall-api-layer-ordering">Overall API Layer Ordering</a> section
+for more information on API layer ordering.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1191,9 +1211,10 @@ on API layer ordering.</p>
 <td class="content">
 <div class="title">Important</div>
 <div class="paragraph">
-<p>Some API layers interact with other API layers in order to perform their tasks.
-Consult the appropriate API layer documentation when enabling an API layer to
-ensure that you are using it properly.</p>
+<p>Some API layers interact with other API layers in order to perform their
+tasks.
+Consult the appropriate API layer documentation when enabling an API layer
+to ensure that you are using it properly.</p>
 </div>
 </td>
 </tr>
@@ -1207,7 +1228,8 @@ with the <code>xrCreateInstance</code> function) or by setting a
 <a href="#forced-loading-of-api-layers">loader environment variable</a>.</p>
 </div>
 <div class="paragraph">
-<p>Implicit API layers are API layers which are enabled simply because they exist.
+<p>Implicit API layers are API layers which are enabled simply because they
+exist.
 An implicit layer found by the loader will be loaded by default, unless
 specifically disabled.</p>
 </div>
@@ -1217,11 +1239,12 @@ specifically disabled.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A performance monitoring API layer which is enabled while using an external tool.</p>
+<p>A performance monitoring API layer which is enabled while using an
+external tool.</p>
 </li>
 <li>
-<p>An application environment API layer (e.g. Steam or a game console) that enables
-additional features/tools for applications.</p>
+<p>An application environment API layer (e.g. Steam or a game console) that
+enables additional features/tools for applications.</p>
 </li>
 <li>
 <p>A tracing API layer designed to record API commands for future playback.</p>
@@ -1229,29 +1252,32 @@ additional features/tools for applications.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Because implicit API layers are enabled automatically, they have an additional
-requirement over explicit API layers in that they must specify a
+<p>Because implicit API layers are enabled automatically, they have an
+additional requirement over explicit API layers in that they must specify a
 "disable environment variable" in the API layer&#8217;s
-<a href="#api-layer-manifest-file-format">JSON manifest file</a>, with key name <code>disable_environment</code>.
-This environment variable when present will disable the implicit API layer. Implicit
-API layers are not otherwise visible to or controllable by applications.</p>
+<a href="#api-layer-manifest-file-format">JSON manifest file</a>, with key name
+<code>disable_environment</code>.
+This environment variable when present will disable the implicit API layer.
+Implicit API layers are not otherwise visible to or controllable by
+applications.</p>
 </div>
 <div class="paragraph">
-<p>Optionally, an implicit API layers may specify an "enable environment variable",
-in which case the loader will load the implicit API layer only when the
-enable environment variable is defined in the user&#8217;s execution environment. If
-both enable and disable environment variables are present in the environment,
-the layer will be disabled.</p>
+<p>Optionally, an implicit API layers may specify an "enable environment
+variable", in which case the loader will load the implicit API layer only
+when the enable environment variable is defined in the user&#8217;s execution
+environment.
+If both enable and disable environment variables are present in the
+environment, the layer will be disabled.</p>
 </div>
 <div class="paragraph">
-<p>Both the enable and disable environment variables are specified in the API layer&#8217;s
-JSON manifest file, which is created by the API layer developer.</p>
+<p>Both the enable and disable environment variables are specified in the API
+layer&#8217;s JSON manifest file, which is created by the API layer developer.</p>
 </div>
 <div class="paragraph">
-<p>Discovery of system-installed implicit and explicit API layers is described later in
-the <a href="#api-layer-discovery">API Layer Discovery Section</a>. For now, simply know that what
-distinguishes an API layer as implicit or explicit is dependent on the operating
-system, as shown in the table below.</p>
+<p>Discovery of system-installed implicit and explicit API layers is described
+later in the <a href="#api-layer-discovery">API Layer Discovery Section</a>.
+For now, simply know that what distinguishes an API layer as implicit or
+explicit is dependent on the operating system, as shown in the table below.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. OS Implicit API Layer Detection Method</caption>
@@ -1283,42 +1309,46 @@ system, as shown in the table below.</p>
 <div class="sect3">
 <h4 id="forcing-api-layer-folders">3.2.2. Forcing API Layer Folders (Desktop Only)</h4>
 <div class="paragraph">
-<p>Desktop developers may also override the way the loader searches for API layers.
-If the developer/user would like to find API layers in a non-standard location,
-they may define the "XR_API_LAYER_PATH" environmental variable. For more
-information on using "XR_API_LAYER_PATH", see the
-<a href="#overriding-the-default-api-layer-paths">Overriding the Default API Layer Paths</a>
-section under "API Layer Interaction".</p>
+<p>Desktop developers may also override the way the loader searches for API
+layers.
+If the developer/user would like to find API layers in a non-standard
+location, they may define the "XR_API_LAYER_PATH" environmental variable.
+For more information on using "XR_API_LAYER_PATH", see the
+<a href="#overriding-the-default-api-layer-paths">Overriding the Default API Layer
+Paths</a> section under "API Layer Interaction".</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="forced-loading-of-api-layers">3.2.3. Forced Loading of API Layers (Desktop Only)</h4>
 <div class="paragraph">
-<p>Desktop developers may want to enable API layers that are not enabled by the given
-application they are using. On Linux and Windows, the environment variable
-"XR_ENABLE_API_LAYERS" can be used to enable additional API layers which are
-not specified (enabled) by the application at <code>xrCreateInstance</code>.
+<p>Desktop developers may want to enable API layers that are not enabled by the
+given application they are using.
+On Linux and Windows, the environment variable "XR_ENABLE_API_LAYERS" can be
+used to enable additional API layers which are not specified (enabled) by
+the application at <code>xrCreateInstance</code>.
 "XR_ENABLE_API_LAYERS" is a colon (Linux)/semi-colon (Windows) separated
-list of API layer names to enable. Order is relevant with the first API layer in the
-list being the top-most API layer (closest to the application) and the last
-API layer in the list being the bottom-most API layer (closest to the driver).
+list of API layer names to enable.
+Order is relevant with the first API layer in the list being the top-most
+API layer (closest to the application) and the last API layer in the list
+being the bottom-most API layer (closest to the driver).
 See the <a href="#overall-api-layer-ordering">Overall API Layer Ordering</a> section
 for more information.</p>
 </div>
 <div class="paragraph">
-<p>Application specified API layers and user specified API layers (via environment
-variables) are aggregated and duplicates removed by the loader when enabling
-API layers.  API layers specified via environment variable are top-most (closest to the
-application) while API layers specified by the application are bottom-most. If an API
-layer name
-appears multiple times in the list of API layers to enable, all occurrences after
-the first are ignored.</p>
+<p>Application specified API layers and user specified API layers (via
+environment variables) are aggregated and duplicates removed by the loader
+when enabling API layers.
+API layers specified via environment variable are top-most (closest to the
+application) while API layers specified by the application are bottom-most.
+If an API layer name appears multiple times in the list of API layers to
+enable, all occurrences after the first are ignored.</p>
 </div>
 <div class="paragraph">
 <p>To use <code>XR_ENABLE_API_LAYERS</code>, simply define the environment variable with a
-properly delimited list of API layer names.  This is not the file name, but the name
-the API layers use when normally being enabled inside of <code>xrCreateInstance</code>.  This
-usually takes the form of:</p>
+properly delimited list of API layer names.
+This is not the file name, but the name the API layers use when normally
+being enabled inside of <code>xrCreateInstance</code>.
+This usually takes the form of:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1334,7 +1364,7 @@ usually takes the form of:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>This would produce the name of:  XR_APILAYER_LUNARG_test</p>
+<p>This would produce the name of: XR_APILAYER_LUNARG_test</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 1. Setting XR_ENABLE_API_LAYERS</div>
@@ -1361,8 +1391,8 @@ usually takes the form of:</p>
 <div class="sect3">
 <h4 id="overall-api-layer-ordering">3.2.4. Overall API Layer Ordering</h4>
 <div class="paragraph">
-<p>The overall ordering of all API layers by the loader based on the above looks
-as follows:</p>
+<p>The overall ordering of all API layers by the loader based on the above
+looks as follows:</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -1372,11 +1402,11 @@ as follows:</p>
 </div>
 <div class="paragraph">
 <p>As shown in the above image, any implicit API layers will first intercept
-OpenXR commands, followed by any explicit API layers enabled by environmental
-variables, finally being intercepted by any explicit API layers directly
-enabled by the application.  Whether or not the API layers continue into
-a loader <em>terminator</em> call, or directly into a runtime depends on the
-<a href="#openxr-call-chains">call chain</a>.</p>
+OpenXR commands, followed by any explicit API layers enabled by
+environmental variables, finally being intercepted by any explicit API
+layers directly enabled by the application.
+Whether or not the API layers continue into a loader <em>terminator</em> call, or
+directly into a runtime depends on the <a href="#openxr-call-chains">call chain</a>.</p>
 </div>
 <div class="paragraph">
 <p>Ordering may also be important internal to the list of explicit API layers.
@@ -1388,46 +1418,50 @@ or after the loader calls it.</p>
 <div class="sect2">
 <h3 id="application-usage-of-extensions">3.3. Application Usage of Extensions</h3>
 <div class="paragraph">
-<p>Extensions are optional functionality provided by the loader, an API layer, or a
-runtime. Extensions can modify the behavior of the OpenXR API and need to be
-specified and registered with Khronos.  These extensions can be created by a runtime
-vendor to expose new runtime and/or XR hardware functionality, or by an
-API layer writer to expose some internal feature, or by the loader to add
-additional loader functionality.  Information about various extensions can be
-found in the <a href="#openxr-spec">OpenXR API Specification</a>, and <code>openxr.h</code> header
-file.</p>
+<p>Extensions are optional functionality provided by the loader, an API layer,
+or a runtime.
+Extensions can modify the behavior of the OpenXR API and need to be
+specified and registered with Khronos.
+These extensions can be created by a runtime vendor to expose new runtime
+and/or XR hardware functionality, or by an API layer writer to expose some
+internal feature, or by the loader to add additional loader functionality.
+Information about various extensions can be found in the
+<a href="#openxr-spec">OpenXR API Specification</a>, and <code>openxr.h</code> header file.</p>
 </div>
 <div class="paragraph">
 <p>To use extension functionality, the application <strong class="purple">should</strong> call
-<code>xrEnumerateInstanceExtensionProperties</code> to determine if the extension is available.
+<code>xrEnumerateInstanceExtensionProperties</code> to determine if the extension is
+available.
 Then it <strong class="purple">must</strong> enable the extension in <code>xrCreateInstance</code>.</p>
 </div>
 <div class="paragraph">
-<p>If an application fails to determine whether an extension is
-available, and calls <code>xrCreateInstance</code> with that extension name in the list,
-the <code>xrCreateInstance</code> call will fail if it&#8217;s not supported.</p>
+<p>If an application fails to determine whether an extension is available, and
+calls <code>xrCreateInstance</code> with that extension name in the list, the
+<code>xrCreateInstance</code> call will fail if it&#8217;s not supported.</p>
 </div>
 <div class="paragraph">
-<p>When calling <code>xrEnumerateInstanceExtensionProperties</code> with NULL
-passed in for "layerName", the loader discovers and aggregates all extensions
-from implicit API layers (if allowable by OS), runtimes, and itself before
-reporting them to the application.  If "layerName" is not NULL, and
-"layerName" is equal to a discovered API layer module name (which may belong to
-either an implicit or explicit API layer) then only extensions from that API layer are
-enumerated.</p>
+<p>When calling <code>xrEnumerateInstanceExtensionProperties</code> with NULL passed in
+for "layerName", the loader discovers and aggregates all extensions from
+implicit API layers (if allowable by OS), runtimes, and itself before
+reporting them to the application.
+If "layerName" is not NULL, and "layerName" is equal to a discovered API
+layer module name (which may belong to either an implicit or explicit API
+layer) then only extensions from that API layer are enumerated.</p>
 </div>
 <div class="paragraph">
 <p>Duplicate extensions (e.g. an implicit API layer and runtime might report
-support for the same extension) are eliminated by the loader.  For duplicates,
-the runtime version is reported and the API layer version is culled.</p>
+support for the same extension) are eliminated by the loader.
+For duplicates, the runtime version is reported and the API layer version is
+culled.</p>
 </div>
 <div class="paragraph">
-<p>If an application fails to enable the extension using the "enabledExtensionNames"
-field in the <code>XrInstanceCreateInfo</code> structure passed into <code>xrCreateInstance</code>
-and then attempts to use that extension, it <strong class="purple">may</strong> result in undefined behavior.
-For example, querying an extension command using <code>xrGetInstanceProcAddr</code> might
-appear to succeed without having the extension enabled, only to then crash when
-calling that command.</p>
+<p>If an application fails to enable the extension using the
+"enabledExtensionNames" field in the <code>XrInstanceCreateInfo</code> structure passed
+into <code>xrCreateInstance</code> and then attempts to use that extension, it <strong class="purple">may</strong>
+result in undefined behavior.
+For example, querying an extension command using <code>xrGetInstanceProcAddr</code>
+might appear to succeed without having the extension enabled, only to then
+crash when calling that command.</p>
 </div>
 </div>
 </div>
@@ -1441,12 +1475,14 @@ calling that command.</p>
 <div class="sect2">
 <h3 id="api-layer-call-chains-and-distributed-dispatch">4.1. API Layer Call Chains and Distributed Dispatch</h3>
 <div class="paragraph">
-<p>Remember, an API layer does not need to intercept all commands, instead, it can
-choose to intercept only a subset.  Normally, when an API layer intercepts a given
-OpenXR command, it will call down the <a href="#openxr-call-chains">call chain</a> as
-needed. The loader and all enabled API layers that participate in a call chain
+<p>Remember, an API layer does not need to intercept all commands, instead, it
+can choose to intercept only a subset.
+Normally, when an API layer intercepts a given OpenXR command, it will call
+down the <a href="#openxr-call-chains">call chain</a> as needed.
+The loader and all enabled API layers that participate in a call chain
 cooperate to ensure the correct sequencing of calls from one entity to the
-next. This group effort for call chain sequencing is hereinafter referred to as
+next.
+This group effort for call chain sequencing is hereinafter referred to as
 <strong>distributed dispatch</strong>.</p>
 </div>
 <div class="paragraph">
@@ -1457,9 +1493,10 @@ implementation in the call chain (provided to the API layer through
 <code>nextGetInstanceProcAddr</code>).</p>
 </div>
 <div class="paragraph">
-<p>In distributed dispatch each API layer is responsible for properly calling the next
-entity in the call chain. This means that a dispatch mechanism is required for
-all OpenXR commands that an API layer intercepts.</p>
+<p>In distributed dispatch each API layer is responsible for properly calling
+the next entity in the call chain.
+This means that a dispatch mechanism is required for all OpenXR commands
+that an API layer intercepts.</p>
 </div>
 <div class="paragraph">
 <p>For example, if the enabled API layers intercepted only certain functions,
@@ -1480,26 +1517,28 @@ the call chain would look as follows:</p>
 <td class="content">
 <div class="title">Note</div>
 <div class="paragraph">
-<p>In the above example, notice that "API Layer A" fails to pass along the information for
-"xrFunction6".  This may not be an error since some commands expect to only work with
-one specific API layer (<code>xrEnumerateInstanceExtensionProperties</code> when "layerName" is set).
-However, a badly designed API layer could do something similar for other commands.</p>
+<p>In the above example, notice that "API Layer A" fails to pass along the
+information for "xrFunction6".
+This may not be an error since some commands expect to only work with one
+specific API layer (<code>xrEnumerateInstanceExtensionProperties</code> when
+"layerName" is set).
+However, a badly designed API layer could do something similar for other
+commands.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The loader is responsible for dispatching all core and instance extension OpenXR
-functions to the first entity in the call chain.</p>
+<p>The loader is responsible for dispatching all core and instance extension
+OpenXR functions to the first entity in the call chain.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="api-layer-discovery">4.2. API Layer Discovery</h3>
 <div class="paragraph">
-<p>As mentioned in the
-<a href="#implicit-vs-explicit-api-layers">Implicit vs Explicit API Layers</a> section,
-API layers can be categorized into two categories:</p>
+<p>As mentioned in the <a href="#implicit-vs-explicit-api-layers">Implicit vs Explicit
+API Layers</a> section, API layers can be categorized into two categories:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1512,26 +1551,31 @@ API layers can be categorized into two categories:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The main difference between the two is that implicit API layers are automatically
-enabled, unless overridden, and explicit API layers must be manually enabled.</p>
+<p>The main difference between the two is that implicit API layers are
+automatically enabled, unless overridden, and explicit API layers must be
+manually enabled.</p>
 </div>
 <div class="paragraph">
-<p>On any system, the loader looks in specific areas for information on the
-API layers that it can load.  The process of finding the available API layers on
-a system is known as "API Layer Discovery".  During "API Layer Discovery",
-the loader determines what API layers are available and then grabs some basic
-information about each API layer: the name, the version, and any
-extensions it supports.  This information is then provided back
-to the application through the <code>xrEnumerateApiLayerProperties</code> command.</p>
+<p>On any system, the loader looks in specific areas for information on the API
+layers that it can load.
+The process of finding the available API layers on a system is known as "API
+Layer Discovery".
+During "API Layer Discovery", the loader determines what API layers are
+available and then grabs some basic information about each API layer: the
+name, the version, and any extensions it supports.
+This information is then provided back to the application through the
+<code>xrEnumerateApiLayerProperties</code> command.</p>
 </div>
 <div class="paragraph">
-<p>This section specifies the minimal conventions and rules an API layer must follow,
-especially with regards to interacting with the loader and other API layers.</p>
+<p>This section specifies the minimal conventions and rules an API layer must
+follow, especially with regards to interacting with the loader and other API
+layers.</p>
 </div>
 <div class="paragraph">
-<p>On Windows and Linux systems, JSON formatted manifest files are used to store
-API layer information.  In order to find OpenXR API layers, the OpenXR loader will read
-the JSON files to identify the names and attributes of API layers and their
+<p>On Windows and Linux systems, JSON formatted manifest files are used to
+store API layer information.
+In order to find OpenXR API layers, the OpenXR loader will read the JSON
+files to identify the names and attributes of API layers and their
 extensions.</p>
 </div>
 <div class="sect3">
@@ -1543,7 +1587,8 @@ The OpenXR loader will search specific areas of the computer for the
 corresponding JSON manifest files that are used to identify the names and
 attributes of OpenXR API layers.
 The use of manifest files allows the loader to avoid actively loading the
-shared library files until the application request causes them to be activated.</p>
+shared library files until the application request causes them to be
+activated.</p>
 </div>
 <div class="paragraph">
 <p>The following sections define the standard locations the OpenXR loader
@@ -1644,10 +1689,10 @@ JSON manifest files in the following locations:</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>When the OpenXR loader scans each of the appropriate registry keys based on the
-Binary Target size, the loader will search under specific sub-keys for the
-correct JSON manifest files based on the type of content stored in the manifest
-file.</p>
+<p>When the OpenXR loader scans each of the appropriate registry keys based on
+the Binary Target size, the loader will search under specific sub-keys for
+the correct JSON manifest files based on the type of content stored in the
+manifest file.</p>
 </div>
 <div class="paragraph">
 <p>Additionally, the major version of the OpenXR API is used to separate up
@@ -1655,8 +1700,8 @@ each group of elements so that they don&#8217;t conflict with one another in the
 future.</p>
 </div>
 <div class="paragraph">
-<p>Finally, each API layer type has their own sub-key under which their
-list of available layers resides:</p>
+<p>Finally, each API layer type has their own sub-key under which their list of
+available layers resides:</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 70%;">
 <caption class="title">Table 3. Sub-Key Suffix for Manifest Search</caption>
@@ -1682,8 +1727,8 @@ list of available layers resides:</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>The following example shows possible keys searched for OpenXR 1.x
-explicit API layers for a 64-bit loader on a 64-bit system.</p>
+<p>The following example shows possible keys searched for OpenXR 1.x explicit
+API layers for a 64-bit loader on a 64-bit system.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 2. OpenXR 1.x Explicit Layer Windows' Registry Locations</div>
@@ -1701,8 +1746,8 @@ HKEY_CURRENT_USER\SOFTWARE\Khronos\OpenXR\1\ApiLayers\Explicit</pre>
 <code>ApiLayers\Implicit</code> to each of the keys found.</p>
 </div>
 <div class="paragraph">
-<p>Similar to the above example, this example shows the possible keys
-searched for OpenXR 1.x implicit API layers for the same system as above.</p>
+<p>Similar to the above example, this example shows the possible keys searched
+for OpenXR 1.x implicit API layers for the same system as above.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 3. OpenXR 1.x Implicit Layer Windows' Registry Locations</div>
@@ -1716,7 +1761,8 @@ HKEY_CURRENT_USER\SOFTWARE\Khronos\OpenXR\1\ApiLayers\Implicit</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Each registry value under the above keys <strong class="purple">must</strong> be defined in the following way:</p>
+<p>Each registry value under the above keys <strong class="purple">must</strong> be defined in the following
+way:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1729,12 +1775,12 @@ file (including the ".json" suffix)</p>
 <div class="ulist">
 <ul>
 <li>
-<p>In order for the loader to attempt to load the binary associated with this,
-the value <strong class="purple">must</strong> be 0.</p>
+<p>In order for the loader to attempt to load the binary associated with
+this, the value <strong class="purple">must</strong> be 0.</p>
 </li>
 <li>
-<p>To disable this manifest file so that the loader does not attempt
-to use it, set the value to a non-zero value.</p>
+<p>To disable this manifest file so that the loader does not attempt to use
+it, set the value to a non-zero value.</p>
 </li>
 </ul>
 </div>
@@ -1743,9 +1789,10 @@ to use it, set the value to a non-zero value.</p>
 </div>
 <div class="paragraph">
 <p>For each value in these keys which has DWORD data set to 0, the loader opens
-the manifest file specified by the name of the value.  The OpenXR loader will
-then obtain information about the library, including the name and pathname
-of the shared library (".dll") file which defines the actual API layer binary.</p>
+the manifest file specified by the name of the value.
+The OpenXR loader will then obtain information about the library, including
+the name and pathname of the shared library (".dll") file which defines the
+actual API layer binary.</p>
 </div>
 <div class="paragraph">
 <p>For example, let us assume the registry contains the following data:</p>
@@ -1761,19 +1808,19 @@ of the shared library (".dll") file which defines the actual API layer binary.</
 </div>
 <div class="paragraph">
 <p>In this case, the loader will step through each entry, and check the value.
-If the value is 0, then the loader will attempt to load the API layer manifest
-file.
+If the value is 0, then the loader will attempt to load the API layer
+manifest file.
 In this case, the loader will open the first and last listings, but not the
 middle one.
-This is because the value of 1 for layer_b.json disables the layer from being
-loaded.</p>
+This is because the value of 1 for layer_b.json disables the layer from
+being loaded.</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="linux-manifest-search-paths">Linux Manifest Search Paths</h5>
 <div class="paragraph">
-<p>On Linux, the OpenXR loader will scan for JSON manifest files using
-the following base folders:</p>
+<p>On Linux, the OpenXR loader will scan for JSON manifest files using the
+following base folders:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 4. Typical Linux Manifest File Search Directories</caption>
@@ -1841,12 +1888,12 @@ build time.</p>
 </div>
 <div class="paragraph">
 <p>When the OpenXR loader scans the directories defined by each of the above
-environmental variables, it pulls out each individual path (tokenizing
-the value based on the colon (:) separator), and then appends
-additional sub-path information on the end of each based on the type of
-manifest file being searched for.
-The following table shows the sub-path information added onto the end of each
-path based on the JSON manifest file type:</p>
+environmental variables, it pulls out each individual path (tokenizing the
+value based on the colon (:) separator), and then appends additional
+sub-path information on the end of each based on the type of manifest file
+being searched for.
+The following table shows the sub-path information added onto the end of
+each path based on the JSON manifest file type:</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 70%;">
 <caption class="title">Table 5. Sub-Folder Suffix for Manifest Search</caption>
@@ -1876,9 +1923,9 @@ path based on the JSON manifest file type:</p>
 version the API layers are associated with.</p>
 </div>
 <div class="paragraph">
-<p>The following example shows possible search paths for OpenXR 1.x
-explicit API layers (depending on the environmental variables
-defined on a user&#8217;s system).</p>
+<p>The following example shows possible search paths for OpenXR 1.x explicit
+API layers (depending on the environmental variables defined on a user&#8217;s
+system).</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 4. OpenXR 1.x Linux Explicit Layer Search Paths</div>
@@ -1921,13 +1968,14 @@ $HOME/.local/share/openxr/1/api_layers/implicit.d</pre>
 <h5 id="overriding-the-default-api-layer-paths">Overriding the Default API Layer Paths</h5>
 <div class="paragraph">
 <p>There may be times that a developer wishes to force the loader to use their
-own explicit API layers (or specific explicit API layers).  In order to
-support this, the desktop loader can be forced to look in specific paths
-for explicit API layers with the <code>XR_API_LAYER_PATH</code> environment variable.
+own explicit API layers (or specific explicit API layers).
+In order to support this, the desktop loader can be forced to look in
+specific paths for explicit API layers with the <code>XR_API_LAYER_PATH</code>
+environment variable.
 Simply set it to a properly delimited list of paths that you want the loader
-to search for explicit API layer JSON Manfiest files.  While relative paths
-may work, it is preferable to use absolute paths when defining this
-environment variable to reduce issues.</p>
+to search for explicit API layer JSON Manfiest files.
+While relative paths may work, it is preferable to use absolute paths when
+defining this environment variable to reduce issues.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1938,9 +1986,10 @@ environment variable to reduce issues.</p>
 <td class="content">
 <div class="title">Important</div>
 <div class="paragraph">
-<p>If the "XR_API_LAYER_PATH" environmental variable is defined, then the desktop
-loader will not look in the standard locations to find explicit API layers,
-instead looking only at the paths defined in that environment variable.
+<p>If the "XR_API_LAYER_PATH" environmental variable is defined, then the
+desktop loader will not look in the standard locations to find explicit API
+layers, instead looking only at the paths defined in that environment
+variable.
 Implicit API layers will always be discovered using the standard paths.</p>
 </div>
 </td>
@@ -1972,18 +2021,21 @@ Implicit API layers will always be discovered using the standard paths.</p>
 <div class="sect4">
 <h5 id="api-layer-manifest-file-format">API Layer Manifest File Format</h5>
 <div class="paragraph">
-<p>On Windows and Linux, the desktop loader uses manifest files to discover
-API layers.  The desktop loader doesn&#8217;t load the API layer libraries (e.g. DLL or .so
-files) for each of the enabled API layers except during <code>xrCreateInstance</code> when it
-sets up the call chain.  This is to reduce the likelihood of loading a
-malicious API layer into memory.  Instead, details are read from the manifest
-file, which are then provided for applications to determine what API layers
-should actually be loaded.</p>
+<p>On Windows and Linux, the desktop loader uses manifest files to discover API
+layers.
+The desktop loader doesn&#8217;t load the API layer libraries (e.g. DLL or .so
+files) for each of the enabled API layers except during <code>xrCreateInstance</code>
+when it sets up the call chain.
+This is to reduce the likelihood of loading a malicious API layer into
+memory.
+Instead, details are read from the manifest file, which are then provided
+for applications to determine what API layers should actually be loaded.</p>
 </div>
 <div class="paragraph">
-<p>The following section discusses the details of the API layer manifest JSON file
-format.  The JSON file itself does not have any requirements for naming. The
-only requirement is that the filename extension is ".json".</p>
+<p>The following section discusses the details of the API layer manifest JSON
+file format.
+The JSON file itself does not have any requirements for naming.
+The only requirement is that the filename extension is ".json".</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 7. API Layer Manifest Examples</div>
@@ -2028,12 +2080,8 @@ only requirement is that the filename extension is ".json".</p>
                "extension_version": "1"
            }
        ],
-       "enable_environment": {
-           "ENABLE_XR_API_LAYER_TEST_1": ""
-       }
-       "disable_environment": {
-           "DISABLE_XR_API_LAYER_TEST_1": ""
-       }
+       "enable_environment": "ENABLE_XR_API_LAYER_TEST_1",
+       "disable_environment": "DISABLE_XR_API_LAYER_TEST_1"
    }
 }</code></pre>
 </div>
@@ -2173,8 +2221,8 @@ only requirement is that the filename extension is ".json".</p>
 <div class="title">Note</div>
 <div class="paragraph">
 <p>If the same API layer shared library supports multiple, incompatible
-versions of text manifest file format versions, it must have separate
-JSON files for each (all of which may point to the same shared library).</p>
+versions of text manifest file format versions, it must have separate JSON
+files for each (all of which may point to the same shared library).</p>
 </div>
 </td>
 </tr>
@@ -2183,15 +2231,17 @@ JSON files for each (all of which may point to the same shared library).</p>
 <div class="sect5">
 <h6 id="api-layer-manifest-file-version-history">API Layer Manifest File Version History</h6>
 <div class="paragraph">
-<p>The current highest supported API layer manifest file format supported is 1.0.0.
+<p>The current highest supported API layer manifest file format supported is
+1.0.0.
 Information about each version is detailed in the following sub-sections:</p>
 </div>
 <div class="paragraph">
 <p><em>API Layer Manifest File Version 1.0.0</em></p>
 </div>
 <div class="paragraph">
-<p>The initial version of the API layer manifest file specified the basic format and
-fields of an API layer JSON file.  The fields of the 1.0.0 file format include:</p>
+<p>The initial version of the API layer manifest file specified the basic
+format and fields of an API layer JSON file.
+The fields of the 1.0.0 file format include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2237,13 +2287,13 @@ fields of an API layer JSON file.  The fields of the 1.0.0 file format include:<
 <div class="sect2">
 <h3 id="loader-api-layer-interface-negotiation">4.3. Loader/API Layer Interface Negotiation</h3>
 <div class="paragraph">
-<p>Now that an API layer has been discovered, an application can choose to load it (or
-it is loaded by default if it is an implicit API layer).  When the loader attempts
-to load the API layer, the first thing it does is attempt to negotiate the version
-of the loader to API layer interface.  In order to negotiate the loader/API layer
-interface version, the API layer must implement the
-<code>xrNegotiateLoaderApiLayerInterface</code> function (or a renamed version of this
-function identified in the manifest file).</p>
+<p>Now that an API layer has been discovered, an application can choose to load
+it (or it is loaded by default if it is an implicit API layer).
+When the loader attempts to load the API layer, the first thing it does is
+attempt to negotiate the version of the loader to API layer interface.
+In order to negotiate the loader/API layer interface version, the API layer
+must implement the <code>xrNegotiateLoaderApiLayerInterface</code> function (or a
+renamed version of this function identified in the manifest file).</p>
 </div>
 <div id="xrNegotiateLoaderApiLayerInterface" class="listingblock">
 <div class="content">
@@ -2260,9 +2310,9 @@ function identified in the manifest file).</p>
 <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> structure.</p>
 </li>
 <li>
-<p><code>layerName</code> <strong class="purple">must</strong> be NULL or a valid C-style NULL-terminated
-string listing the name of an API layer which the loader is attempting
-to negotiate with.</p>
+<p><code>layerName</code> <strong class="purple">must</strong> be NULL or a valid C-style NULL-terminated string
+listing the name of an API layer which the loader is attempting to
+negotiate with.</p>
 </li>
 <li>
 <p><code>layerRequest</code> must be a valid pointer to a
@@ -2272,16 +2322,19 @@ to negotiate with.</p>
 </div>
 <div class="paragraph">
 <p>This function should be directly exported by an API layer so that using
-"GetProcAddress" on Windows or "dlsym" on Linux, should return a valid function
-pointer to it.  If the function succeeds, the API layer <strong class="purple">must</strong> return <code>XR_SUCCESS</code>.
-If the function fails, the API layer <strong class="purple">must</strong> return <code>XR_ERROR_INITIALIZATION_FAILED</code>.
-The entire <a href="#loader-api-layer-negotiation-process">negotiation process</a> is defined
-in more detail below.</p>
+"GetProcAddress" on Windows or "dlsym" on Linux, should return a valid
+function pointer to it.
+If the function succeeds, the API layer <strong class="purple">must</strong> return <code>XR_SUCCESS</code>.
+If the function fails, the API layer <strong class="purple">must</strong> return
+<code>XR_ERROR_INITIALIZATION_FAILED</code>.
+The entire <a href="#loader-api-layer-negotiation-process">negotiation process</a> is
+defined in more detail below.</p>
 </div>
 <div class="paragraph">
 <p>The <code>XrNegotiateLoaderInfo</code> struct is defined in the
-<code>src/common/loader_interfaces.h</code> header.  It is used to pass information
-about the loader to an API layer during the negotiation process.</p>
+<code>src/common/loader_interfaces.h</code> header.
+It is used to pass information about the loader to an API layer during the
+negotiation process.</p>
 </div>
 <div id="XrNegotiateLoaderInfo" class="listingblock">
 <div class="content">
@@ -2299,18 +2352,20 @@ about the loader to an API layer during the negotiation process.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>structType</code> <strong class="purple">must</strong> be a valid value of <a href="#XrLoaderInterfaceStructs">XrLoaderInterfaceStructs</a>.
-In this case, it <strong class="purple">must</strong> specifically be <code>XR_LOADER_INTERFACE_STRUCT_LOADER_INFO</code>.</p>
+<p><code>structType</code> <strong class="purple">must</strong> be a valid value of
+<a href="#XrLoaderInterfaceStructs">XrLoaderInterfaceStructs</a>.
+In this case, it <strong class="purple">must</strong> specifically be
+<code>XR_LOADER_INTERFACE_STRUCT_LOADER_INFO</code>.</p>
 </li>
 <li>
 <p><code>structVersion</code> <strong class="purple">must</strong> be a valid version of the structure.
 The <code>loader_interfaces.h</code> header uses the value
-<code>XR_LOADER_INFO_STRUCT_VERSION</code> to describe the current latest
-version of this structure.</p>
+<code>XR_LOADER_INFO_STRUCT_VERSION</code> to describe the current latest version
+of this structure.</p>
 </li>
 <li>
-<p><code>structSize</code> <strong class="purple">must</strong> be the size in bytes of the current version
-of the structure (i.e. sizeof(XrNegotiateLoaderInfo)).</p>
+<p><code>structSize</code> <strong class="purple">must</strong> be the size in bytes of the current version of
+the structure (i.e. sizeof(XrNegotiateLoaderInfo)).</p>
 </li>
 <li>
 <p><code>minInterfaceVersion</code> is the minimum
@@ -2324,21 +2379,21 @@ supported by the loader, currently defined using
 <code>XR_CURRENT_LOADER_API_LAYER_VERSION</code>.</p>
 </li>
 <li>
-<p><code>minApiVersion</code> is the minimum supported version of the
-OpenXR API by this loader as formatted by <code>XR_MAKE_VERSION</code>
-defined in <code>openxr.h</code>.  Patch is ignored.</p>
+<p><code>minApiVersion</code> is the minimum supported version of the OpenXR API
+by this loader as formatted by <code>XR_MAKE_VERSION</code> defined in <code>openxr.h</code>.
+Patch is ignored.</p>
 </li>
 <li>
-<p><code>maxApiVersion</code> is the maximum supported version of the
-OpenXR API by this loader as formatted by <code>XR_MAKE_VERSION</code>
-defined in <code>openxr.h</code>.  Patch is ignored.</p>
+<p><code>maxApiVersion</code> is the maximum supported version of the OpenXR API
+by this loader as formatted by <code>XR_MAKE_VERSION</code> defined in <code>openxr.h</code>.
+Patch is ignored.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
 <p>You&#8217;ll notice the structures are similar to other OpenXR structures.
-The "structType" field, in this case takes a new enum defined just for internal
-loader interfacing use.</p>
+The "structType" field, in this case takes a new enum defined just for
+internal loader interfacing use.</p>
 </div>
 <div class="paragraph">
 <p>The <code>XrLoaderInterfaceStructs</code> enumeration is also defined in the
@@ -2357,13 +2412,14 @@ loader interfacing use.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Just like standard OpenXR structs, the <code>XrLoaderInterfaceStructs</code> enum defines
-the set of valid structures and can grow in the future.</p>
+<p>Just like standard OpenXR structs, the <code>XrLoaderInterfaceStructs</code> enum
+defines the set of valid structures and can grow in the future.</p>
 </div>
 <div class="paragraph">
 <p>The <code>XrNegotiateApiLayerRequest</code> can also be found in the
-<code>src/common/loader_interfaces.h</code> header.  It is used to pass information
-about the API layer back to the loader during the negotiation process.</p>
+<code>src/common/loader_interfaces.h</code> header.
+It is used to pass information about the API layer back to the loader during
+the negotiation process.</p>
 </div>
 <div id="XrNegotiateApiLayerRequest" class="listingblock">
 <div class="content">
@@ -2381,8 +2437,10 @@ about the API layer back to the loader during the negotiation process.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>structType</code> <strong class="purple">must</strong> be a valid value of <a href="#XrLoaderInterfaceStructs">XrLoaderInterfaceStructs</a>.
-In this case, it <strong class="purple">must</strong> specifically be <code>XR_LOADER_INTERFACE_STRUCT_API_LAYER_REQUEST</code>.</p>
+<p><code>structType</code> <strong class="purple">must</strong> be a valid value of
+<a href="#XrLoaderInterfaceStructs">XrLoaderInterfaceStructs</a>.
+In this case, it <strong class="purple">must</strong> specifically be
+<code>XR_LOADER_INTERFACE_STRUCT_API_LAYER_REQUEST</code>.</p>
 </li>
 <li>
 <p><code>structVersion</code> <strong class="purple">must</strong> be a valid version of the structure.
@@ -2391,31 +2449,32 @@ The <code>loader_interfaces.h</code> header uses the value
 version of this structure.</p>
 </li>
 <li>
-<p><code>structSize</code> <strong class="purple">must</strong> be the size in bytes of the current version
-of the structure (i.e. sizeof(XrNegotiateApiLayerRequest)).</p>
+<p><code>structSize</code> <strong class="purple">must</strong> be the size in bytes of the current version of
+the structure (i.e. sizeof(XrNegotiateApiLayerRequest)).</p>
 </li>
 <li>
 <p><code>layerInterfaceVersion</code> is the version of the
 <a href="#api-layer-interface-versions">loader/API layer interface version</a>
-being requested by the API layer.  Should not be outside of the bounds
-of the <code>XrNegotiateLoaderInfo</code>::`minInterfaceVersion` and
+being requested by the API layer.
+Should not be outside of the bounds of the
+<code>XrNegotiateLoaderInfo</code>::`minInterfaceVersion` and
 <code>XrNegotiateLoaderInfo</code>::`maxInterfaceVersion` values (inclusive).</p>
 </li>
 <li>
-<p><code>layerApiVersion</code> is the version of the OpenXR API supported by
-this API layer as formatted by <code>XR_MAKE_VERSION</code> defined in <code>openxr.h</code>.
+<p><code>layerApiVersion</code> is the version of the OpenXR API supported by this
+API layer as formatted by <code>XR_MAKE_VERSION</code> defined in <code>openxr.h</code>.
 Patch is ignored.</p>
 </li>
 <li>
 <p><code>getInstanceProcAddr</code> is a pointer to the API layer&#8217;s
 <code>xrGetInstanceProcAddr</code> command that will be used by the loader to
-complete a dispatch table to all valid OpenXR commands supported
-by the API layer.</p>
+complete a dispatch table to all valid OpenXR commands supported by the
+API layer.</p>
 </li>
 <li>
 <p><code>createLayerInstance</code> is a pointer to the API layer&#8217;s
-<code>xrCreateApiLayerInstance</code> command that will be used by the loader
-when a <code>xrCreateInstance</code> command is triggered and an API layer exists.
+<code>xrCreateApiLayerInstance</code> command that will be used by the loader when
+a <code>xrCreateInstance</code> command is triggered and an API layer exists.
 This is used because API layers need additional information at
 <code>xrCreateInstance</code> time.</p>
 </li>
@@ -2426,12 +2485,14 @@ This is used because API layers need additional information at
 <div class="paragraph">
 <p>Once the loader has obtained a valid address to the API layer&#8217;s
 <a href="#xrNegotiateLoaderApiLayerInterface">xrNegotiateLoaderApiLayerInterface</a> function, the loader will create a
-variable of type <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> and initialize it in the following ways:</p>
+variable of type <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> and initialize it in the
+following ways:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Set the structure "structType" to <code>XR_LOADER_INTERFACE_STRUCT_LOADER_INFO</code></p>
+<p>Set the structure "structType" to
+<code>XR_LOADER_INTERFACE_STRUCT_LOADER_INFO</code></p>
 </li>
 <li>
 <p>Set the structure "structVersion" to the current version,
@@ -2443,32 +2504,35 @@ variable of type <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> and 
 </li>
 <li>
 <p>Set "minInterfaceVersion" to the minimum
-<a href="#api-layer-interface-versions">loader/API layer interface version</a> that the
-loader supports</p>
+<a href="#api-layer-interface-versions">loader/API layer interface version</a> that
+the loader supports</p>
 </li>
 <li>
 <p>Set "maxInterfaceVersion" to the current version of the
-<a href="#api-layer-interface-versions">loader/API layer interface version</a> at the time of
-loader compilation</p>
+<a href="#api-layer-interface-versions">loader/API layer interface version</a> at
+the time of loader compilation</p>
 </li>
 <li>
-<p>Set "minApiVersion" to the minimum version of OpenXR supported by the loader</p>
+<p>Set "minApiVersion" to the minimum version of OpenXR supported by the
+loader</p>
 </li>
 <li>
-<p>Set "maxApiVersion" to the maximum version of OpenXR supported by the loader
-(the current version at the time of loader compilation).</p>
+<p>Set "maxApiVersion" to the maximum version of OpenXR supported by the
+loader (the current version at the time of loader compilation).</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
 <p>The loader also creates and initializes a variable of type
-<a href="#XrNegotiateApiLayerRequest">XrNegotiateApiLayerRequest</a> to allow the API layer to properly respond to the
-request.  The structure will be initialized by the loader in the following way:</p>
+<a href="#XrNegotiateApiLayerRequest">XrNegotiateApiLayerRequest</a> to allow the API layer to properly respond
+to the request.
+The structure will be initialized by the loader in the following way:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Set the structure "structType" to <code>XR_LOADER_INTERFACE_STRUCT_API_LAYER_REQUEST</code></p>
+<p>Set the structure "structType" to
+<code>XR_LOADER_INTERFACE_STRUCT_API_LAYER_REQUEST</code></p>
 </li>
 <li>
 <p>Set the structure "structVersion" to the current version,
@@ -2481,10 +2545,11 @@ request.  The structure will be initialized by the loader in the following way:<
 </ol>
 </div>
 <div class="paragraph">
-<p>The loader will leave the remaining fields uninitialized to allow each API layer to
-fill in the appropriate information for itself. The loader will then
-individually call each API layer&#8217;s <a href="#xrNegotiateLoaderApiLayerInterface">xrNegotiateLoaderApiLayerInterface</a> function
-and each API layer then <strong class="purple">must</strong> :</p>
+<p>The loader will leave the remaining fields uninitialized to allow each API
+layer to fill in the appropriate information for itself.
+The loader will then individually call each API layer&#8217;s
+<a href="#xrNegotiateLoaderApiLayerInterface">xrNegotiateLoaderApiLayerInterface</a> function and each API layer then
+<strong class="purple">must</strong> :</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2493,8 +2558,8 @@ and each API layer then <strong class="purple">must</strong> :</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Does the API layer support any
-<a href="#api-layer-interface-versions">loader/API layer interface version</a> between
+<p>Does the API layer support any <a href="#api-layer-interface-versions">loader/API
+layer interface version</a> between
 <code>loaderInfo</code>&#8594;<code>minInterfaceVersion</code> and
 <code>loaderInfo</code>&#8594;<code>maxInterfaceVersion</code>:</p>
 </li>
@@ -2511,22 +2576,22 @@ and each API layer then <strong class="purple">must</strong> :</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Fill in <code>layerRequest</code>&#8594;<code>layerInterfaceVersion</code> with the
-API layer interface version it desires to support.</p>
+<p>Fill in <code>layerRequest</code>&#8594;<code>layerInterfaceVersion</code> with the API
+layer interface version it desires to support.</p>
 </li>
 <li>
-<p>Fill in <code>layerRequest</code>&#8594;<code>layerApiVersion</code> with the API
-version of OpenXR it will execute under.</p>
+<p>Fill in <code>layerRequest</code>&#8594;<code>layerApiVersion</code> with the API version of
+OpenXR it will execute under.</p>
 </li>
 <li>
-<p>Fill in <code>layerRequest</code>&#8594;<code>getInstanceProcAddr</code> with a
-valid function pointer so that the loader can query function pointers to the
+<p>Fill in <code>layerRequest</code>&#8594;<code>getInstanceProcAddr</code> with a valid
+function pointer so that the loader can query function pointers to the
 remaining OpenXR commands supported by the API layer.</p>
 </li>
 <li>
-<p>Fill in <code>layerRequest</code>&#8594;<code>createLayerInstance</code> with a
-valid function pointer so that the loader can create the instance through
-the API layer call chain.</p>
+<p>Fill in <code>layerRequest</code>&#8594;<code>createLayerInstance</code> with a valid
+function pointer so that the loader can create the instance through the
+API layer call chain.</p>
 </li>
 </ul>
 </div>
@@ -2546,8 +2611,9 @@ the API layer call chain.</p>
 <div class="title">Note</div>
 <div class="paragraph">
 <p>The API layer <strong class="purple">must</strong> not call to another API layer while inside of the
-<code>xrNegotiateLoaderApiLayerInterface</code> function.  The loader will handle all API layer
-negotiations with each API layer individually.</p>
+<code>xrNegotiateLoaderApiLayerInterface</code> function.
+The loader will handle all API layer negotiations with each API layer
+individually.</p>
 </div>
 </td>
 </tr>
@@ -2557,8 +2623,8 @@ negotiations with each API layer individually.</p>
 <div class="sect3">
 <h4 id="api-layer-interface-versions">4.3.2. API Layer Interface Versions</h4>
 <div class="paragraph">
-<p>The current API layer interface is at version 1.  The following sections
-detail the differences between the various versions.</p>
+<p>The current API layer interface is at version 1.
+The following sections detail the differences between the various versions.</p>
 </div>
 <div class="sect4">
 <h5 id="api-layer-interface-version-1">API Layer Interface Version 1</h5>
@@ -2572,7 +2638,8 @@ detail the differences between the various versions.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Requires API layers to export <code>xrNegotiateLoaderApiLayerInterface</code> function.</p>
+<p>Requires API layers to export <code>xrNegotiateLoaderApiLayerInterface</code>
+function.</p>
 </li>
 </ul>
 </div>
@@ -2614,8 +2681,9 @@ signature <strong>identical</strong> to the OpenXR API for that command.</p>
 </div>
 </li>
 <li>
-<p>For any OpenXR command an API layer intercepts which has a non-void return value,
-an appropriate value <strong class="purple">must</strong> be returned by the API layer intercept command.</p>
+<p>For any OpenXR command an API layer intercepts which has a non-void return
+value, an appropriate value <strong class="purple">must</strong> be returned by the API layer intercept
+command.</p>
 </li>
 <li>
 <p>Most commands an API layer intercepts <strong class="purple">must</strong> call down the chain to the
@@ -2629,8 +2697,9 @@ behavior, then pass it down to the next entity.</p>
 <ul>
 <li>
 <p>If a layer does not call down to the next entity for a given command,
-undefined behavior may occur.  This is because the command will not be
-received by API layers and runtimes further down the call chain.</p>
+undefined behavior may occur.
+This is because the command will not be received by API layers and
+runtimes further down the call chain.</p>
 </li>
 <li>
 <p>One command that <strong class="purple">cannot</strong> call down the chain is:</p>
@@ -2664,8 +2733,8 @@ addition to those that are intercepted</p>
 <div class="ulist">
 <ul>
 <li>
-<p>If an API layer inserts new calls, that API layer <strong class="purple">must</strong> pass along all new commands
-to the next entity.</p>
+<p>If an API layer inserts new calls, that API layer <strong class="purple">must</strong> pass along all
+new commands to the next entity.</p>
 </li>
 </ul>
 </div>
@@ -2676,29 +2745,31 @@ to the next entity.</p>
 <div class="sect2">
 <h3 id="api-layer-conventions-and-rules">4.5. API Layer Conventions and Rules</h3>
 <div class="paragraph">
-<p>An API layer, when inserted into an otherwise compliant OpenXR implementation, must
-still result in a compliant OpenXR implementation.  The intention is for API layers
-to have a well-defined baseline behavior.  Therefore, it must follow some
-conventions and rules defined below:</p>
+<p>An API layer, when inserted into an otherwise compliant OpenXR
+implementation, must still result in a compliant OpenXR implementation.
+The intention is for API layers to have a well-defined baseline behavior.
+Therefore, it must follow some conventions and rules defined below:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>An API layer <strong class="purple">may</strong> be in a call chain with any number of API layers before or after it.</p>
+<p>An API layer <strong class="purple">may</strong> be in a call chain with any number of API layers before
+or after it.</p>
 </li>
 <li>
 <p>It <strong class="purple">must</strong> not make invalid calls to, or rely on undefined behaviors of, its
 lower API layers.</p>
 </li>
 <li>
-<p>If it changes the behavior of a function, it <strong class="purple">must</strong> ensure the API layers called
-prior to itself do not make invalid calls because of the changed behavior.</p>
+<p>If it changes the behavior of a function, it <strong class="purple">must</strong> ensure the API layers
+called prior to itself do not make invalid calls because of the changed
+behavior.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>For example, if an API layer chooses to intercept an object creation function,
-and then wraps the objects created by lower API layers, it <strong class="purple">must</strong> make sure
-the lower API layers never see the wrapped objects.</p>
+<p>For example, if an API layer chooses to intercept an object creation
+function, and then wraps the objects created by lower API layers, it
+<strong class="purple">must</strong> make sure the lower API layers never see the wrapped objects.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -2721,8 +2792,8 @@ parameter:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>If "layerName" is the name of this API layer, it <strong class="purple">must</strong> return the contents
-of the instance extensions it supports.</p>
+<p>If "layerName" is the name of this API layer, it <strong class="purple">must</strong> return the
+contents of the instance extensions it supports.</p>
 </li>
 <li>
 <p>If "layerName" is NULL and:</p>
@@ -2742,8 +2813,8 @@ contents to the list of extensions.</p>
 </div>
 </li>
 <li>
-<p>For any OpenXR command the API layer intercepts, <code>xrGetInstanceProcAddr</code> <strong class="purple">must</strong>
-return a pointer to a local entry-point.</p>
+<p>For any OpenXR command the API layer intercepts, <code>xrGetInstanceProcAddr</code>
+<strong class="purple">must</strong> return a pointer to a local entry-point.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -2760,13 +2831,14 @@ chain.</p>
 <h3 id="api-layer-create-instance-process">4.6. API Layer Create Instance Process</h3>
 <div class="paragraph">
 <p>After <a href="#loader-api-layer-interface-negotiation">interface negotiation</a> and
-any directed <code>xrEnumerateInstanceExtensionProperties</code> calls, the next
-time an API layer is invoked is during the loader&#8217;s <code>xrCreateInstance</code> call.  The
-API layer is only involved if it is in the enabled API layer list (this includes implicit,
-environment variable enabled, and application enabled API layers).  An API layer needs
-additional information during <code>xrCreateInstance</code> calls, so each API layer must
-implement the <code>xrCreateApiLayerInstance</code> command, which is a special API layer
-command.</p>
+any directed <code>xrEnumerateInstanceExtensionProperties</code> calls, the next time
+an API layer is invoked is during the loader&#8217;s <code>xrCreateInstance</code> call.
+The API layer is only involved if it is in the enabled API layer list (this
+includes implicit, environment variable enabled, and application enabled API
+layers).
+An API layer needs additional information during <code>xrCreateInstance</code> calls,
+so each API layer must implement the <code>xrCreateApiLayerInstance</code> command,
+which is a special API layer command.</p>
 </div>
 <div id="xrCreateApiLayerInstance" class="listingblock">
 <div class="content">
@@ -2783,19 +2855,20 @@ command.</p>
 passed into the standard <a href="#xrCreateInstance">xrCreateInstance</a> command.</p>
 </li>
 <li>
-<p><code>layerInfo</code> is a pointer to an <a href="#XrApiLayerCreateInfo">XrApiLayerCreateInfo</a> structure that
-contains special information required by a API layer during
-its create instance process.  This is generated by the loader.</p>
+<p><code>layerInfo</code> is a pointer to an <a href="#XrApiLayerCreateInfo">XrApiLayerCreateInfo</a> structure
+that contains special information required by a API layer during its
+create instance process.
+This is generated by the loader.</p>
 </li>
 <li>
-<p><code>instance</code> is a pointer to store the returned instance in, just
-as in the standard <code>xrCreateInstance</code> command.</p>
+<p><code>instance</code> is a pointer to store the returned instance in, just as
+in the standard <code>xrCreateInstance</code> command.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The <code>XrApiLayerCreateInfo</code> structure is defined in <code>src/common/loader_interfaces.h</code>
-and looks like:</p>
+<p>The <code>XrApiLayerCreateInfo</code> structure is defined in
+<code>src/common/loader_interfaces.h</code> and looks like:</p>
 </div>
 <div id="XrApiLayerCreateInfo" class="listingblock">
 <div class="content">
@@ -2816,8 +2889,8 @@ and looks like:</p>
 XR_LOADER_INTERFACE_STRUCT_API_LAYER_CREATE_INFO in this case.</p>
 </li>
 <li>
-<p><code>structVersion</code> is the version of the structure being supplied by the
-loader.</p>
+<p><code>structVersion</code> is the version of the structure being supplied by
+the loader.</p>
 </li>
 <li>
 <p><code>structSize</code> is the size of the structure supplied by the loader.</p>
@@ -2826,18 +2899,19 @@ loader.</p>
 <p><code>loaderInstance</code> is deprecated and must be ignored.</p>
 </li>
 <li>
-<p><code>settings_file_location</code> is the location of any API layer settings file
-that can be used.  This is currently unused.</p>
+<p><code>settings_file_location</code> is the location of any API layer settings
+file that can be used.
+This is currently unused.</p>
 </li>
 <li>
-<p><code>nextInfo</code> is a pointer to the <a href="#XrApiLayerNextInfo">XrApiLayerNextInfo</a> structure which
-contains information to work with the next API layer in the chain.</p>
+<p><code>nextInfo</code> is a pointer to the <a href="#XrApiLayerNextInfo">XrApiLayerNextInfo</a> structure
+which contains information to work with the next API layer in the chain.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The <code>XrApiLayerNextInfo</code> structure is also defined in <code>src/common/loader_interfaces.h</code>
-and looks like:</p>
+<p>The <code>XrApiLayerNextInfo</code> structure is also defined in
+<code>src/common/loader_interfaces.h</code> and looks like:</p>
 </div>
 <div id="XrApiLayerNextInfo" class="listingblock">
 <div class="content">
@@ -2859,34 +2933,39 @@ and looks like:</p>
 XR_LOADER_INTERFACE_STRUCT_API_LAYER_NEXT_INFO in this case.</p>
 </li>
 <li>
-<p><code>structVersion</code> is the version of the structure being supplied by the
-loader.</p>
+<p><code>structVersion</code> is the version of the structure being supplied by
+the loader.</p>
 </li>
 <li>
 <p><code>structSize</code> is the size of the structure supplied by the loader.</p>
 </li>
 <li>
-<p><code>layerName</code> is the name of the API layer which should be receiving this
-information.  The intent is to make sure the API layer chain information is
-behaving properly.</p>
+<p><code>layerName</code> is the name of the API layer which should be receiving
+this information.
+The intent is to make sure the API layer chain information is behaving
+properly.</p>
 </li>
 <li>
 <p><code>nextGetInstanceProcAddr</code> is a pointer to the next API layer&#8217;s
-<code>xrGetInstanceProcAddr</code>. This can be used to generate a dispatch table to
-the next commands in the chain.</p>
+<code>xrGetInstanceProcAddr</code>.
+This can be used to generate a dispatch table to the next commands in
+the chain.</p>
 </li>
 <li>
 <p><code>nextCreateLayerInstance</code> is a pointer to the next API layer&#8217;s
-<code>xrCreateApiLayerInstance</code> command.  This is to be called after the API layer has
-done any localized creation, but before the API layer records any command
-addresses from the next API layer using <code>xrGetInstanceProcAddr</code>.</p>
+<code>xrCreateApiLayerInstance</code> command.
+This is to be called after the API layer has done any localized
+creation, but before the API layer records any command addresses from
+the next API layer using <code>xrGetInstanceProcAddr</code>.</p>
 </li>
 <li>
-<p><code>next</code> is a pointer to the <code>XrApiLayerNextInfo</code> for the next API layer.
-If no API layer is after this, it will be NULL.  However, the loader implements
-a <code>xrTerminatorCreateLayerInstance</code> command to re-direct the call-chain
-back to the runtime&#8217;s <code>xrCreateInstance</code> command, so this should be the
-last command to receive this information.</p>
+<p><code>next</code> is a pointer to the <code>XrApiLayerNextInfo</code> for the next API
+layer.
+If no API layer is after this, it will be NULL.
+However, the loader implements a <code>xrTerminatorCreateLayerInstance</code>
+command to re-direct the call-chain back to the runtime&#8217;s
+<code>xrCreateInstance</code> command, so this should be the last command to
+receive this information.</p>
 </li>
 </ul>
 </div>
@@ -2904,8 +2983,8 @@ structure</p>
 </li>
 <li>
 <p>The loader will go through each API layer in reverse order (i.e. starting with
-the layer closest to the runtime and ending with the API layer closest to the
-application):</p>
+the layer closest to the runtime and ending with the API layer closest to
+the application):</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
@@ -2919,8 +2998,8 @@ command addresses.</p>
 <ol class="lowerroman" type="i">
 <li>
 <p>If this is the first API layer (the one closest to the runtime) we want it
-to enter the loader again when we&#8217;re done.  So, the loader sets the
-following:</p>
+to enter the loader again when we&#8217;re done.
+So, the loader sets the following:</p>
 <div class="olist upperalpha">
 <ol class="upperalpha" type="A">
 <li>
@@ -2979,8 +3058,9 @@ passing in the pointer to the created <a href="#XrApiLayerCreateInfo">XrApiLayer
 </li>
 <li>
 <p>The API layer then updates it&#8217;s version of the <a href="#XrApiLayerCreateInfo">XrApiLayerCreateInfo</a> structure
-setting <code>nextInfo</code> to point to the <a href="#XrApiLayerNextInfo">XrApiLayerNextInfo</a> for the next API layer
-(i.e. <code>XrApiLayerCreateInfo&#8594;nextInfo = XrApiLayerCreateInfo&#8594;nextInfo&#8594;next;</code>).</p>
+setting <code>nextInfo</code> to point to the <a href="#XrApiLayerNextInfo">XrApiLayerNextInfo</a> for the
+next API layer (i.e. <code>XrApiLayerCreateInfo&#8594;nextInfo =
+XrApiLayerCreateInfo&#8594;nextInfo&#8594;next;</code>).</p>
 </li>
 <li>
 <p>The API layer may validate that it is getting the correct next information by
@@ -2988,16 +3068,17 @@ checking that the <code>layerName</code> matches.</p>
 </li>
 <li>
 <p>The API layer then uses the information out of its <code>XrApiLayerNextInfo</code> to call
-down the call-chain to the next <code>xrCreateApiLayerInstance</code>, using a pointer
-to its <a href="#XrApiLayerCreateInfo">XrApiLayerCreateInfo</a> structure instead of the one that was passed
-in during its <code>xrCreateApiLayerInstance</code> command.</p>
+down the call-chain to the next <code>xrCreateApiLayerInstance</code>, using a
+pointer to its <a href="#XrApiLayerCreateInfo">XrApiLayerCreateInfo</a> structure instead of the one
+that was passed in during its <code>xrCreateApiLayerInstance</code> command.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
 <p>If the call passes, this API layer may choose to setup its own dispatch table to
-the next API layer&#8217;s commands using the returned <code>XrInstance</code>, the next API layer&#8217;s
-<code>xrGetInstanceProcAddr</code> and the <code>GeneratedXrPopulateDispatchTable</code> utility
-command provided in the generated <code>xr_generated_dispatch_table.h</code> header.</p>
+the next API layer&#8217;s commands using the returned <code>XrInstance</code>, the next
+API layer&#8217;s <code>xrGetInstanceProcAddr</code> and the
+<code>GeneratedXrPopulateDispatchTable</code> utility command provided in the
+generated <code>xr_generated_dispatch_table.h</code> header.</p>
 </li>
 </ol>
 </div>
@@ -3022,8 +3103,8 @@ runtime to properly interact.</p>
 <div class="paragraph">
 <p>OpenXR may have a choice of multiple runtimes on a user&#8217;s system.
 The selection of the active runtime is handled external to the loader.
-The loader is responsible for discovering only the active OpenXR runtime on the
-system, and loading it properly.
+The loader is responsible for discovering only the active OpenXR runtime on
+the system, and loading it properly.
 The standard process in which the loader discovers the active runtime on a
 system is platform dependent.</p>
 </div>
@@ -3033,8 +3114,8 @@ system is platform dependent.</p>
 <p>The means of identifying the active runtime used by an OpenXR application
 vary based on the underlying operating system and is detailed in the
 sub-sections below.
-This information is also important if the active runtime needs to be
-changed by an external entity (on those platforms that support updating).</p>
+This information is also important if the active runtime needs to be changed
+by an external entity (on those platforms that support updating).</p>
 </div>
 <div class="sect4">
 <h5 id="_linux_active_runtime_location">Linux Active Runtime Location</h5>
@@ -3051,15 +3132,17 @@ directory (typically <code>/etc</code>), under the relative path:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>&lt;major_api_version&gt; should be replaced with the integer value for
-the corresponding OpenXR API version.</p>
+<p>&lt;major_api_version&gt; should be replaced with the integer value for the
+corresponding OpenXR API version.</p>
 </div>
 <div class="paragraph">
 <p>The JSON file is named "active_runtime.json" and contains the necessary
-information on how OpenXR components can load the appropriate runtime library.</p>
+information on how OpenXR components can load the appropriate runtime
+library.</p>
 </div>
 <div class="paragraph">
-<p>For example, a globally-configured OpenXR 1.x active runtime file might be at:</p>
+<p>For example, a globally-configured OpenXR 1.x active runtime file might be
+at:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3067,18 +3150,18 @@ information on how OpenXR components can load the appropriate runtime library.</
 </div>
 </div>
 <div class="paragraph">
-<p>When multiple such files exist, <code>XDG_CONFIG_HOME</code> is preferred,
-followed by the elements of <code>XDG_CONFIG_DIRS</code> in order, followed by
-the system&#8217;s global configuration directory. This allows the user&#8217;s
-preference to easily override a global default.</p>
+<p>When multiple such files exist, <code>XDG_CONFIG_HOME</code> is preferred, followed by
+the elements of <code>XDG_CONFIG_DIRS</code> in order, followed by the system&#8217;s global
+configuration directory.
+This allows the user&#8217;s preference to easily override a global default.</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="_windows_active_runtime_location">Windows Active Runtime Location</h5>
 <div class="paragraph">
 <p>The Windows OpenXR active runtime information is actually located in the
-Windows Registry (not to be confused with the OpenXR registry) under
-the key:</p>
+Windows Registry (not to be confused with the OpenXR registry) under the
+key:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3086,8 +3169,8 @@ the key:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Where &lt;major_api_version&gt; should be replaced with the integer value for
-the corresponding OpenXR API major version.</p>
+<p>Where &lt;major_api_version&gt; should be replaced with the integer value for the
+corresponding OpenXR API major version.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -3098,8 +3181,8 @@ the corresponding OpenXR API major version.</p>
 <td class="content">
 <div class="title">Important</div>
 <div class="paragraph">
-<p>If using a 32-bit application on a 64-bit Windows install, "WOW6432Node"
-is added before "SOFTWARE", in the above path like so:</p>
+<p>If using a 32-bit application on a 64-bit Windows install, "WOW6432Node" is
+added before "SOFTWARE", in the above path like so:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3121,7 +3204,8 @@ registry value is:</p>
 </div>
 <div class="paragraph">
 <p>Under that registry key, the value "ActiveRuntime" is defined as a string
-value and should be defined to full directory path of the runtime&#8217;s JSON file.</p>
+value and should be defined to full directory path of the runtime&#8217;s JSON
+file.</p>
 </div>
 <div class="paragraph">
 <p>An example "ActiveRuntime" value might look something like the following:</p>
@@ -3136,8 +3220,8 @@ value and should be defined to full directory path of the runtime&#8217;s JSON f
 <div class="sect3">
 <h4 id="runtime-manifest-file-format">5.1.2. Runtime Manifest File Format</h4>
 <div class="paragraph">
-<p>As mentioned before, the OpenXR loader on Windows and Linux uses manifest files
-to discover the active runtime.
+<p>As mentioned before, the OpenXR loader on Windows and Linux uses manifest
+files to discover the active runtime.
 The loader only loads the actual runtime library when necessary.
 Because of this, the manifest files contain important information about the
 runtime.
@@ -3221,9 +3305,9 @@ requirement of using the ".json" extension.</p>
 <td class="content">
 <div class="title">Note</div>
 <div class="paragraph">
-<p>If the same runtime shared library supports multiple, incompatible
-versions of OpenXR API, it must have separate JSON files for each
-API major version (all of which may point to the same shared library).</p>
+<p>If the same runtime shared library supports multiple, incompatible versions
+of OpenXR API, it must have separate JSON files for each API major version
+(all of which may point to the same shared library).</p>
 </div>
 </td>
 </tr>
@@ -3232,15 +3316,17 @@ API major version (all of which may point to the same shared library).</p>
 <div class="sect4">
 <h5 id="runtime-manifest-file-version-history">Runtime Manifest File Version History</h5>
 <div class="paragraph">
-<p>The current highest supported runtime manifest file format supported is 1.0.0.
+<p>The current highest supported runtime manifest file format supported is
+1.0.0.
 Information about each version is detailed in the following sub-sections:</p>
 </div>
 <div class="paragraph">
 <p><em>Runtime Manifest File Version 1.0.0</em></p>
 </div>
 <div class="paragraph">
-<p>The initial version of the runtime manifest file specified the basic format and
-fields of a runtime JSON file.  The fields of the 1.0.0 file format include:</p>
+<p>The initial version of the runtime manifest file specified the basic format
+and fields of a runtime JSON file.
+The fields of the 1.0.0 file format include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3260,18 +3346,17 @@ fields of a runtime JSON file.  The fields of the 1.0.0 file format include:</p>
 <div class="sect3">
 <h4 id="loader-distribution">5.1.3. Loader Distribution</h4>
 <div class="paragraph">
-<p>Any application using the OpenXR API is responsible with making sure it
-can properly execute on a user&#8217;s system.
+<p>Any application using the OpenXR API is responsible with making sure it can
+properly execute on a user&#8217;s system.
 Some OpenXR environments may not use an OpenXR loader but instead provide
 libraries which directly link with their runtime.
-Other runtime or platform vendors may choose to provide a separate
-OpenXR loader for debug or developmental reasons.
-Whatever the scenario, if an application uses an OpenXR loader, then
-that application is responsible for packaging the OpenXR loader in a
-location that will not interfere with other applications.
-If an engine or platform provides an OpenXR loader for applications,
-it <strong class="purple">must</strong> provide documentation on how to properly package the necessary
-files.</p>
+Other runtime or platform vendors may choose to provide a separate OpenXR
+loader for debug or developmental reasons.
+Whatever the scenario, if an application uses an OpenXR loader, then that
+application is responsible for packaging the OpenXR loader in a location
+that will not interfere with other applications.
+If an engine or platform provides an OpenXR loader for applications, it
+<strong class="purple">must</strong> provide documentation on how to properly package the necessary files.</p>
 </div>
 </div>
 <div class="sect3">
@@ -3292,10 +3377,10 @@ This could be for many reasons including:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>In order to support this, the loader can be forced to look at specific runtime
-with the <code>XR_RUNTIME_JSON</code> environment variable.
-In order to use the setting, simply set it to the full global path location of
-the desired runtime manifest file.</p>
+<p>In order to support this, the loader can be forced to look at specific
+runtime with the <code>XR_RUNTIME_JSON</code> environment variable.
+In order to use the setting, simply set it to the full global path location
+of the desired runtime manifest file.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -3306,10 +3391,10 @@ the desired runtime manifest file.</p>
 <td class="content">
 <div class="title">Important</div>
 <div class="paragraph">
-<p>If the "XR_RUNTIME_JSON" variable is defined, then the loader will not look in
-the standard location for the active runtime.
-Instead, the loader will only utilize the filename defined in the environment
-variable.</p>
+<p>If the "XR_RUNTIME_JSON" variable is defined, then the loader will not look
+in the standard location for the active runtime.
+Instead, the loader will only utilize the filename defined in the
+environment variable.</p>
 </div>
 </td>
 </tr>
@@ -3342,13 +3427,15 @@ variable.</p>
 <h3 id="loader-runtime-interface-negotiation">5.2. Loader/Runtime Interface Negotiation</h3>
 <div class="paragraph">
 <p>The OpenXR symbols exported by a runtime must not clash with the loader&#8217;s
-exported OpenXR symbols.  Because of this, all runtimes must export only the
-following command with beginning with the <code>xr</code> prefix.  This command is not a
-part of the OpenXR API itself, only a private interface between the loader and
-runtimes for version 1 and higher interfaces. In order to negotiate the
-loader/runtime interface version, the runtime must implement the
-<code>xrNegotiateLoaderRuntimeInterface</code>` function (or a renamed version of this
-function identified in the manifest file).</p>
+exported OpenXR symbols.
+Because of this, all runtimes must export only the following command with
+beginning with the <code>xr</code> prefix.
+This command is not a part of the OpenXR API itself, only a private
+interface between the loader and runtimes for version 1 and higher
+interfaces.
+In order to negotiate the loader/runtime interface version, the runtime must
+implement the <code>xrNegotiateLoaderRuntimeInterface</code>` function (or a
+renamed version of this function identified in the manifest file).</p>
 </div>
 <div id="xrNegotiateLoaderRuntimeInterface" class="listingblock">
 <div class="content">
@@ -3371,30 +3458,31 @@ function identified in the manifest file).</p>
 </div>
 <div class="paragraph">
 <p>This function should be directly exported by a runtime so that using
-"GetProcAddress" on Windows or "dlsym" on Linux, should return a valid function
-pointer to it (see
-<a href="#runtime-exporting-of-commands">Runtime Exporting of Commands</a> for more
-information).</p>
+"GetProcAddress" on Windows or "dlsym" on Linux, should return a valid
+function pointer to it (see <a href="#runtime-exporting-of-commands">Runtime
+Exporting of Commands</a> for more information).</p>
 </div>
 <div class="paragraph">
 <p>If the function succeeds, the runtime should return <code>XR_SUCCESS</code>.
 If the function fails, the runtime should return
-<code>XR_ERROR_INITIALIZATION_FAILED</code>.  The entire
-<a href="#loader-runtime-negotiation-process">negotiation process</a> is defined in more
-detail below.</p>
+<code>XR_ERROR_INITIALIZATION_FAILED</code>.
+The entire <a href="#loader-runtime-negotiation-process">negotiation process</a> is
+defined in more detail below.</p>
 </div>
 <div class="paragraph">
 <p>The <code>XrNegotiateLoaderInfo</code> struct is defined in the
-<code>src/common/loader_interfaces.h</code> header.  It is used to pass information
-about the loader to a runtime during the negotiation process.  See the
-definition of <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> under the
+<code>src/common/loader_interfaces.h</code> header.
+It is used to pass information about the loader to a runtime during the
+negotiation process.
+See the definition of <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> under the
 <a href="#loader-api-layer-interface-negotiation">layer negotiation</a> section for
 more information.</p>
 </div>
 <div class="paragraph">
 <p>The <code>XrNegotiateRuntimeRequest</code> can also be found in the
-<code>src/common/loader_interfaces.h</code> header.  It is used to pass information
-about the runtime back to the loader during the negotiation process.</p>
+<code>src/common/loader_interfaces.h</code> header.
+It is used to pass information about the runtime back to the loader during
+the negotiation process.</p>
 </div>
 <div id="XrNegotiateRuntimeRequest" class="listingblock">
 <div class="content">
@@ -3411,24 +3499,27 @@ about the runtime back to the loader during the negotiation process.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>structType</code> <strong class="purple">must</strong> be a valid value of <a href="#XrLoaderInterfaceStructs">XrLoaderInterfaceStructs</a>.
-In this case, it must specifically be <code>XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST</code>.</p>
+<p><code>structType</code> <strong class="purple">must</strong> be a valid value of
+<a href="#XrLoaderInterfaceStructs">XrLoaderInterfaceStructs</a>.
+In this case, it must specifically be
+<code>XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST</code>.</p>
 </li>
 <li>
 <p><code>structVersion</code> <strong class="purple">must</strong> be a valid version of the structure.
 The <code>loader_interfaces.h</code> header uses the value
-<code>XR_RUNTIME_INFO_STRUCT_VERSION</code> to describe the current latest
-version of this structure.</p>
+<code>XR_RUNTIME_INFO_STRUCT_VERSION</code> to describe the current latest version
+of this structure.</p>
 </li>
 <li>
-<p><code>structSize</code> <strong class="purple">must</strong> be the size in bytes of the current version
-of the structure (i.e. sizeof(XrNegotiateRuntimeRequest))</p>
+<p><code>structSize</code> <strong class="purple">must</strong> be the size in bytes of the current version of
+the structure (i.e. sizeof(XrNegotiateRuntimeRequest))</p>
 </li>
 <li>
 <p><code>runtimeInterfaceVersion</code> is the version of the
-<a href="#runtime-interface-versions">loader/runtime interface version</a>
-being requested by the runtime.  Should not be outside of the bounds
-of the <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a>::`minInterfaceVersion` and
+<a href="#runtime-interface-versions">loader/runtime interface version</a> being
+requested by the runtime.
+Should not be outside of the bounds of the
+<a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a>::`minInterfaceVersion` and
 <code>XrNegotiateLoaderInfo</code>::`maxInterfaceVersion` values (inclusive).</p>
 </li>
 <li>
@@ -3438,9 +3529,8 @@ Patch is ignored.</p>
 </li>
 <li>
 <p><code>getInstanceProcAddr</code> is a pointer to the runtime&#8217;s
-<code>xrGetInstanceProcAddr</code> call that will be used by the loader to
-complete a dispatch table to all valid OpenXR commands supported
-by the runtime.</p>
+<code>xrGetInstanceProcAddr</code> call that will be used by the loader to complete
+a dispatch table to all valid OpenXR commands supported by the runtime.</p>
 </li>
 </ul>
 </div>
@@ -3455,10 +3545,10 @@ by the runtime.</p>
 <div class="paragraph">
 <p>Remember, during the call to <code>xrNegotiateLoaderRuntimeInterface</code>, the
 runtime <strong class="purple">must</strong> grab control of the active runtime manifest file.
-Functions that should be used to grab control of the manifest file are defined
-in the common code as described in the
-<a href="#active-runtime-file-management">Active Runtime File Management</a>
-section of this document.
+Functions that should be used to grab control of the manifest file are
+defined in the common code as described in the
+<a href="#active-runtime-file-management">Active Runtime File Management</a> section
+of this document.
 The runtime <strong class="purple">must</strong> also determine when to release control of this file.
 This may be due to the last instance an application created is destroyed,
 the application is exiting, or some period of inactivity occurs.</p>
@@ -3472,12 +3562,14 @@ the application is exiting, or some period of inactivity occurs.</p>
 <div class="paragraph">
 <p>Once the loader has obtained a valid address to the runtime&#8217;s
 <a href="#xrNegotiateLoaderRuntimeInterface">xrNegotiateLoaderRuntimeInterface</a> function, the loader will create a
-variable of type <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> and initialize it in the following ways:</p>
+variable of type <a href="#XrNegotiateLoaderInfo">XrNegotiateLoaderInfo</a> and initialize it in the
+following ways:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Set the structure "structType" to <code>XR_LOADER_INTERFACE_STRUCT_LOADER_INFO</code></p>
+<p>Set the structure "structType" to
+<code>XR_LOADER_INTERFACE_STRUCT_LOADER_INFO</code></p>
 </li>
 <li>
 <p>Set the structure "structVersion" to the current version,
@@ -3494,27 +3586,30 @@ loader supports</p>
 </li>
 <li>
 <p>Set "maxInterfaceVersion" to the current version of the
-<a href="#runtime-interface-versions">loader/runtime interface</a>
-at the time of loader compilation</p>
+<a href="#runtime-interface-versions">loader/runtime interface</a> at the time of
+loader compilation</p>
 </li>
 <li>
-<p>Set "minApiVersion" to the minimum version of OpenXR supported by the loader</p>
+<p>Set "minApiVersion" to the minimum version of OpenXR supported by the
+loader</p>
 </li>
 <li>
-<p>Set "maxApiVersion" to the maximum version of OpenXR supported by the loader
-(the current version at the time of loader compilation).</p>
+<p>Set "maxApiVersion" to the maximum version of OpenXR supported by the
+loader (the current version at the time of loader compilation).</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
 <p>The loader will also create an initialize a variable of type
-<a href="#XrNegotiateRuntimeRequest">XrNegotiateRuntimeRequest</a> to allow the runtime to properly respond to the
-request.  The structure will be initialized by the loader in the following way:</p>
+<a href="#XrNegotiateRuntimeRequest">XrNegotiateRuntimeRequest</a> to allow the runtime to properly respond to
+the request.
+The structure will be initialized by the loader in the following way:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Set the structure "structType" to <code>XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST</code></p>
+<p>Set the structure "structType" to
+<code>XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST</code></p>
 </li>
 <li>
 <p>Set the structure "structVersion" to the current version,
@@ -3527,10 +3622,11 @@ request.  The structure will be initialized by the loader in the following way:<
 </ol>
 </div>
 <div class="paragraph">
-<p>The loader will leave the remaining fields uninitialized to allow each runtime
-to fill in the appropriate information for itself. The loader will then
-individually call each runtime&#8217;s <a href="#xrNegotiateLoaderRuntimeInterface">xrNegotiateLoaderRuntimeInterface</a>
-function and each runtime then <strong class="purple">must</strong> :</p>
+<p>The loader will leave the remaining fields uninitialized to allow each
+runtime to fill in the appropriate information for itself.
+The loader will then individually call each runtime&#8217;s
+<a href="#xrNegotiateLoaderRuntimeInterface">xrNegotiateLoaderRuntimeInterface</a> function and each runtime then <strong class="purple">must</strong>
+:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3539,10 +3635,9 @@ function and each runtime then <strong class="purple">must</strong> :</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Does the runtime support any
-<a href="#runtime-interface-versions">loader/runtime interface version</a> between
-<code>loaderInfo</code>&#8594;<code>minInterfaceVersion</code> and
-<code>loaderInfo</code>&#8594;<code>maxInterfaceVersion</code>:</p>
+<p>Does the runtime support any <a href="#runtime-interface-versions">loader/runtime
+interface version</a> between <code>loaderInfo</code>&#8594;<code>minInterfaceVersion</code>
+and <code>loaderInfo</code>&#8594;<code>maxInterfaceVersion</code>:</p>
 </li>
 <li>
 <p><strong>AND</strong> does the runtime support any OpenXR API version between
@@ -3565,8 +3660,8 @@ runtime interface version it desires to support</p>
 version of OpenXR it will execute under.</p>
 </li>
 <li>
-<p>Fill in <code>runtimeRequest</code>&#8594;<code>getInstanceProcAddr</code> with a
-valid function pointer so that the loader can query function pointers to the
+<p>Fill in <code>runtimeRequest</code>&#8594;<code>getInstanceProcAddr</code> with a valid
+function pointer so that the loader can query function pointers to the
 remaining OpenXR commands supported by the runtime.</p>
 </li>
 </ul>
@@ -3582,9 +3677,9 @@ remaining OpenXR commands supported by the runtime.</p>
 <h4 id="runtime-exporting-of-commands">5.2.2. Runtime Exporting of Commands</h4>
 <div class="paragraph">
 <p>The <a href="#xrNegotiateLoaderRuntimeInterface">xrNegotiateLoaderRuntimeInterface</a> should be directly exported by a
-runtime so that using "GetProcAddress" on Windows or "dlsym" on Linux, should
-return a valid function pointer to it.  However, <strong>all other OpenXR entry-points</strong>
-<strong class="purple">must</strong> either:</p>
+runtime so that using "GetProcAddress" on Windows or "dlsym" on Linux,
+should return a valid function pointer to it.
+However, <strong>all other OpenXR entry-points</strong> <strong class="purple">must</strong> either:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3598,21 +3693,21 @@ return a valid function pointer to it.  However, <strong>all other OpenXR entry-
 </div>
 <div class="paragraph">
 <p>This requirement is especially for runtime libraries that include other
-functionality (such as OpenGL) and thus could be loaded by the
-application prior to when the OpenXR loader library is loaded by the
-application.</p>
+functionality (such as OpenGL) and thus could be loaded by the application
+prior to when the OpenXR loader library is loaded by the application.</p>
 </div>
 <div class="paragraph">
 <p>Beware of interposing by dynamic OS library loaders if the official OpenXR
-names are used. On Linux, if official names are used, the runtime library must be
-linked with -Bsymbolic.</p>
+names are used.
+On Linux, if official names are used, the runtime library must be linked
+with -Bsymbolic.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="runtime-interface-versions">5.2.3. Runtime Interface Versions</h4>
 <div class="paragraph">
-<p>The current Runtime Interface is at version 1.  The following sections
-detail the differences between the various versions.</p>
+<p>The current Runtime Interface is at version 1.
+The following sections detail the differences between the various versions.</p>
 </div>
 <div class="sect4">
 <h5 id="runtime-interface-version-1">Runtime Interface Version 1</h5>
@@ -3639,10 +3734,10 @@ detail the differences between the various versions.</p>
 <h4 id="android-runtime-negotiation">5.2.4. Android Runtime Negotiation</h4>
 <div class="paragraph">
 <p>The Android loader uses the same protocol for initializing the dispatch
-table as described above. The only difference is that the Android
-loader queries API layer and extension information directly from the
-respective libraries and does not use the json manifest files used
-by the Windows and Linux loaders.</p>
+table as described above.
+The only difference is that the Android loader queries API layer and
+extension information directly from the respective libraries and does not
+use the json manifest files used by the Windows and Linux loaders.</p>
 </div>
 </div>
 </div>
@@ -3668,8 +3763,9 @@ by the Windows and Linux loaders.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The OpenXR desktop loader is primarily developed by Khronos, who also owns
-the copyright to it.  This decision was reached in order to allow quicker
-development and releasing of loader changes for all supported platforms.</p>
+the copyright to it.
+This decision was reached in order to allow quicker development and
+releasing of loader changes for all supported platforms.</p>
 </div>
 <div class="paragraph">
 <p>However, the OpenXR loader is an Open Source project that does accept
@@ -3678,18 +3774,19 @@ contributions from the OpenXR community.</p>
 <div class="sect2">
 <h3 id="_building_instructions">6.1. Building Instructions</h3>
 <div class="paragraph">
-<p>The latest instructions for building the OpenXR source can always be found in
-the BUILDING.md file.  It is actively maintained
-and should be used instead of documenting the build steps in this file in
-order to reduce unnecessary duplication.</p>
+<p>The latest instructions for building the OpenXR source can always be found
+in the BUILDING.md file.
+It is actively maintained and should be used instead of documenting the
+build steps in this file in order to reduce unnecessary duplication.</p>
 </div>
 <div class="sect3">
 <h4 id="cmake-usage">6.1.1. CMake Usage</h4>
 <div class="paragraph">
-<p>All OpenXR source utilizes the CMake tool to generate platform-specific build
-files.  Currently, the loader requires CMake version 3.5.1 or newer.
-CMake may be obtained from either the <a href="https://cmake.org/">CMake web-site</a>
-or often using your computer&#8217;s software update mechanism.</p>
+<p>All OpenXR source utilizes the CMake tool to generate platform-specific
+build files.
+Currently, the loader requires CMake version 3.5.1 or newer.
+CMake may be obtained from either the <a href="https://cmake.org/">CMake web-site</a> or
+often using your computer&#8217;s software update mechanism.</p>
 </div>
 <div class="paragraph">
 <p>The CMake files of interest exist in several locations:</p>
@@ -3778,16 +3875,16 @@ generate the header yourself (preferred), or supply equivalent definitions:</p>
 <div class="sect2">
 <h3 id="_contributing_to_the_loader">6.2. Contributing to the Loader</h3>
 <div class="paragraph">
-<p>Khronos would be pleased if you decided to contribute to the loader
-source code.</p>
+<p>Khronos would be pleased if you decided to contribute to the loader source
+code.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="coding-standard">6.3. Coding Standard</h3>
 <div class="paragraph">
 <p>The following sections define what coding standard is in place for the
-OpenXR loader code.  Every attempt <strong class="purple">must</strong> be made to follow these rules
-when adding new code.</p>
+OpenXR loader code.
+Every attempt <strong class="purple">must</strong> be made to follow these rules when adding new code.</p>
 </div>
 <div class="sect3">
 <h4 id="_general_format_of_code">6.3.1. General Format of Code</h4>
@@ -3811,23 +3908,23 @@ when adding new code.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Clang-format is <strong class="purple">required</strong> to be executed prior to committing new code whenever
-possible.</p>
+<p>Clang-format is <strong class="purple">required</strong> to be executed prior to committing new code
+whenever possible.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_language_selection">6.3.2. Language Selection</h4>
 <div class="paragraph">
 <p>Internally, the loader is implemented using the C++ language, taking
-advantage of C++11 standard features.  Since the OpenXR API is exposed
-using C, all exported commands <strong class="purple">must</strong> be properly wrapped using <code>extern "C" {</code>
-and <code>}</code>.</p>
+advantage of C++11 standard features.
+Since the OpenXR API is exposed using C, all exported commands <strong class="purple">must</strong> be
+properly wrapped using <code>extern "C" {</code> and <code>}</code>.</p>
 </div>
 <div class="paragraph">
 <div class="title">types</div>
-<p>The loader code <strong class="purple">should</strong> use the standard types defined by <code>stdint.h</code> in order
-to avoid using platform-specific type defines whenever possible.  Some
-commonly used types include:</p>
+<p>The loader code <strong class="purple">should</strong> use the standard types defined by <code>stdint.h</code> in
+order to avoid using platform-specific type defines whenever possible.
+Some commonly used types include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3847,8 +3944,8 @@ commonly used types include:</p>
 </div>
 <div class="paragraph">
 <p>In some cases, it may not be possible to use these generic type, like when
-calling a platform-specific function.  In those cases, this requirement is
-waived.</p>
+calling a platform-specific function.
+In those cases, this requirement is waived.</p>
 </div>
 <div class="paragraph">
 <div class="title">Standard Template Library Usage</div>
@@ -3872,9 +3969,9 @@ waived.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Instead, any time you use a function, variable, type or other component coming from
-a namespace, you must list the full namespace of that item.  Some examples are
-as follows:</p>
+<p>Instead, any time you use a function, variable, type or other component
+coming from a namespace, you must list the full namespace of that item.
+Some examples are as follows:</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 11. Valid Namespace Usage</div>
@@ -3893,24 +3990,28 @@ std::experimental::filesystem::path search_path;</code></pre>
 <p>The OpenXR loader itself does not internally throw C++ exceptions,
 for compatibility with environments where exceptions are forbidden.
 However, since it exposes a C ABI, and the standard library facilities used
-may throw exceptions, functions exposed to the ABI (those with names matching OpenXR functions)
-<strong class="purple">must</strong> have <code>XRLOADER_ABI_TRY</code> before the opening <code>{</code> of the function body
-and <code>XRLOADER_ABI_CATCH_FALLBACK</code> after the closing <code>}</code> of the function body.
-(This is done automatically for those functions whose trampoline is entirely generated.)
-In normal cases, these two macros are defined by <code>exception_handling.hpp</code> to expand to <code>try</code>
-and a full <code>catch</code> clause, respectively. This prevents any exceptions from escaping,
-in what&#8217;s known as a "function-try-block".</p>
+may throw exceptions, functions exposed to the ABI (those with names
+matching OpenXR functions) <strong class="purple">must</strong> have <code>XRLOADER_ABI_TRY</code> before the opening
+<code>{</code> of the function body and <code>XRLOADER_ABI_CATCH_FALLBACK</code> after the closing
+<code>}</code> of the function body.
+(This is done automatically for those functions whose trampoline is entirely
+generated.) In normal cases, these two macros are defined by
+<code>exception_handling.hpp</code> to expand to <code>try</code> and a full <code>catch</code> clause,
+respectively.
+This prevents any exceptions from escaping, in what&#8217;s known as a
+"function-try-block".</p>
 </div>
 <div class="paragraph">
-<p>In very limited cases, you may choose to disable exception handling through the provided CMake option
-or by defining <code>XRLOADER_DISABLE_EXCEPTION_HANDLING</code>.
+<p>In very limited cases, you may choose to disable exception handling through
+the provided CMake option or by defining
+<code>XRLOADER_DISABLE_EXCEPTION_HANDLING</code>.
 The only two reasons you may define this are:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Due to a platform or project policy, you&#8217;re using a custom standard-library build
-that has exception throwing disabled.</p>
+<p>Due to a platform or project policy, you&#8217;re using a custom
+standard-library build that has exception throwing disabled.</p>
 </li>
 <li>
 <p>You&#8217;re developing or debugging the loader and want exceptions to go
@@ -3920,15 +4021,16 @@ uncaught to trigger a debugger.</p>
 </div>
 <div class="paragraph">
 <div class="title">Experimental Filesystem Usage</div>
-<p>In order to simplify the file management, especially with regards to loading JSON
-manifest files or finding dynamic library files, the experimental/filesystem is used.
-This is a set of features which are part of the upcoming C++17 feature set
-designed to make file management easier.</p>
+<p>In order to simplify the file management, especially with regards to loading
+JSON manifest files or finding dynamic library files, the
+experimental/filesystem is used.
+This is a set of features which are part of the upcoming C++17
+feature set designed to make file management easier.</p>
 </div>
 <div class="paragraph">
 <p>Since no compiler currently supports C++17, most have enabled a chunk
-of functionality using the "experimental" namespace.  When used, you can
-find elements of this functionality with the prefix
+of functionality using the "experimental" namespace.
+When used, you can find elements of this functionality with the prefix
 <code>std::experimental::filesystem</code>.</p>
 </div>
 <div class="exampleblock">
@@ -3967,20 +4069,22 @@ follow a set of naming rules, providing a consistent scheme for developers.</p>
 <div class="paragraph">
 <p>Names of all identifiers <strong class="purple">should</strong> generally be written with full words,
 avoiding abbreviations whenever possible, as a concise description of what
-that identifier is.  Abbreviation is preferred in cases where the identifier
-name becomes excessive in length (usually when exceeding 25 characters).</p>
+that identifier is.
+Abbreviation is preferred in cases where the identifier name becomes
+excessive in length (usually when exceeding 25 characters).</p>
 </div>
 <div class="paragraph">
 <p>For example, the class containing the loader&#8217;s version of OpenXR instance
 information is <code>LoaderInstance</code>.</p>
 </div>
 <div class="paragraph">
-<p>Names inside the loader not directly associated with an OpenXR identifier
-or command <strong class="purple">must</strong> not begin with the reserved letters <code>xr</code> in any combination
-of upper or lower-case characters.  The <code>xr</code> prefix is solely reserved for
-all OpenXR API elements (both hidden and exposed) and defines the OpenXR
-namespace.  Therefore, it <strong class="purple">must</strong> only be in cases of exposing commands for
-the OpenXR API.</p>
+<p>Names inside the loader not directly associated with an OpenXR identifier or
+command <strong class="purple">must</strong> not begin with the reserved letters <code>xr</code> in any combination of
+upper or lower-case characters.
+The <code>xr</code> prefix is solely reserved for all OpenXR API elements (both hidden
+and exposed) and defines the OpenXR namespace.
+Therefore, it <strong class="purple">must</strong> only be in cases of exposing commands for the OpenXR
+API.</p>
 </div>
 <div class="paragraph">
 <p>Also, as a general rule, Hungarian notation <strong class="purple">should</strong> not be avoided whenever
@@ -3990,10 +4094,10 @@ possible.</p>
 <div class="sect4">
 <h5 id="_naming_of_files_and_directories">Naming of Files and Directories</h5>
 <div class="paragraph">
-<p>All files and files <strong class="purple">must</strong> be named with lower-snake-case names.  Additionally,
-any C-language files <strong class="purple">must</strong> end with either .c or .h, while any C++
-files <strong class="purple">must</strong> end with either .cpp or .hpp to differentiate them.  Python
-scripts, must be named with a .py suffix.</p>
+<p>All files and files <strong class="purple">must</strong> be named with lower-snake-case names.
+Additionally, any C-language files <strong class="purple">must</strong> end with either .c or .h, while any
+C++ files <strong class="purple">must</strong> end with either .cpp or .hpp to differentiate them.
+Python scripts, must be named with a .py suffix.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 13. Filenames</div>
@@ -4011,8 +4115,8 @@ loader_interfaces.h</code></pre>
 <div class="sect4">
 <h5 id="_naming_of_defines">Naming of #Defines</h5>
 <div class="paragraph">
-<p>All #defines <strong class="purple">must</strong> be named in all-caps upper-snake-case and must be
-defined to a specific value.</p>
+<p>All #defines <strong class="purple">must</strong> be named in all-caps upper-snake-case and must be defined
+to a specific value.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 14. #define Values</div>
@@ -4030,7 +4134,8 @@ defined to a specific value.</p>
 <h5 id="_variable_naming">Variable Naming</h5>
 <div class="paragraph">
 <div class="title">Local Variables</div>
-<p>All local variables and function/method parameters <strong class="purple">must</strong> use lower-snake-case.</p>
+<p>All local variables and function/method parameters <strong class="purple">must</strong> use
+lower-snake-case.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 15. Variable Names</div>
@@ -4062,8 +4167,8 @@ prefix of <code>g_</code> required to identify them as global variables.</p>
 <div class="sect4">
 <h5 id="_function_and_parameter_naming">Function and Parameter Naming</h5>
 <div class="paragraph">
-<p>Functions <strong class="purple">must</strong> use lower-camel-case for their naming and function parameters
-<strong class="purple">must</strong> use lower-snake-case for their naming.</p>
+<p>Functions <strong class="purple">must</strong> use lower-camel-case for their naming and function
+parameters <strong class="purple">must</strong> use lower-snake-case for their naming.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 17. Function and Parameter Naming</div>
@@ -4086,12 +4191,13 @@ void thisOtherFunction2() {
 <p>Structures and Enumerations <strong class="purple">must</strong> be named using upper-camel-case.</p>
 </div>
 <div class="paragraph">
-<p>Inside of an enumeration, the values <strong class="purple">must</strong> use the first one or two whole-words
-as a prefix (the XR, if present, may be optionally used), and <strong class="purple">must</strong> be defined
-in all-upper-snake-case with underscores ('_') being inserted between a
-lower-case and upper-case character in the enumeration name.  Additionally,
-at least the first value in the enumeration list <strong class="purple">must</strong> be defined to an integer
-value.</p>
+<p>Inside of an enumeration, the values <strong class="purple">must</strong> use the first one or two
+whole-words as a prefix (the XR, if present, may be optionally used), and
+<strong class="purple">must</strong> be defined in all-upper-snake-case with underscores ('_') being
+inserted between a lower-case and upper-case character in the enumeration
+name.
+Additionally, at least the first value in the enumeration list <strong class="purple">must</strong> be
+defined to an integer value.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 18. Structure/Enumeration Naming</div>
@@ -4127,8 +4233,8 @@ enum XrLoaderInterfaceStructs {
 <p>The class name <strong class="purple">must</strong> be upper-camel-case</p>
 </li>
 <li>
-<p>Class methods <strong class="purple">must</strong> be lower-camel-case and parameters <strong class="purple">must</strong> be lower-snake-case
-(just as functions defined above)</p>
+<p>Class methods <strong class="purple">must</strong> be lower-camel-case and parameters <strong class="purple">must</strong> be
+lower-snake-case (just as functions defined above)</p>
 </li>
 <li>
 <p>Class members <strong class="purple">must</strong> be lower-snake-case with a preceding underscore ('_')</p>
@@ -4159,12 +4265,12 @@ enum XrLoaderInterfaceStructs {
 <h2 id="loader-design">7. Loader Design</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section of the document is focused on the internal design of
-the OpenXR loader provided in the <code>src/loader</code> folder.</p>
+<p>This section of the document is focused on the internal design of the OpenXR
+loader provided in the <code>src/loader</code> folder.</p>
 </div>
 <div class="paragraph">
-<p>The OpenXR loader is composed of several classes.  The overall class
-diagram looks roughly like the following:</p>
+<p>The OpenXR loader is composed of several classes.
+The overall class diagram looks roughly like the following:</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
@@ -4179,16 +4285,18 @@ diagram looks roughly like the following:</p>
 <div class="paragraph">
 <p>The Desktop OpenXR loader uses JSON manifest files for information about
 available <a href="#api-layer-manifest-file-format">API layers</a> and
-<a href="#runtime-manifest-file-format">runtimes</a>.  All the functionality for finding,
-parsing, and processing the various manifest file formats are found in the
-three manifest file classes: <code>ManifestFile</code>, <code>RuntimeManifestFile</code>, and
-<code>ApiLayerManifestFile</code>.  All three classes are defined in the <code>manifest_file</code>
-header (.hpp) and source (.cpp) files.</p>
+<a href="#runtime-manifest-file-format">runtimes</a>.
+All the functionality for finding, parsing, and processing the various
+manifest file formats are found in the three manifest file classes:
+<code>ManifestFile</code>, <code>RuntimeManifestFile</code>, and <code>ApiLayerManifestFile</code>.
+All three classes are defined in the <code>manifest_file</code> header (.hpp) and
+source (.cpp) files.</p>
 </div>
 <div id="manifestfile" class="paragraph">
 <div class="title">ManifestFile</div>
 <p><code>ManifestFile</code> is the base class containing the majority of common code.
-It only performs a minimal set of validation and provides accessor functions.
+It only performs a minimal set of validation and provides accessor
+functions.
 These functions perform all the work using two primary sources:</p>
 </div>
 <div class="ulist">
@@ -4207,12 +4315,13 @@ processing and validating the manifest files once located.</p>
 <div class="title">RuntimeManifestFile</div>
 <p><code>RuntimeManifestFile</code> is a derived class (with <a href="#manifestfile">ManifestFile</a>
 as the parent) which handles specifically finding and parsing any
-<a href="#runtime-manifest-file-format">runtime manifest files</a>.  It implements a
-static function <code>FindManifestFiles</code> which is to be used as a factory method
-for finding all available runtime manifest files, creating an instance of
-<code>RuntimeManifestFiles</code> for each, and saving them if they appear to be valid.
-This is the command that any OpenXR command inside the loader should
-call if it requires a list of available runtime manifest files.</p>
+<a href="#runtime-manifest-file-format">runtime manifest files</a>.
+It implements a static function <code>FindManifestFiles</code> which is to be used
+as a factory method for finding all available runtime manifest files,
+creating an instance of <code>RuntimeManifestFiles</code> for each, and saving them if
+they appear to be valid.
+This is the command that any OpenXR command inside the loader should call if
+it requires a list of available runtime manifest files.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4223,16 +4332,18 @@ call if it requires a list of available runtime manifest files.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr to
-each valid runtime manifest file found.</p>
+<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr
+to each valid runtime manifest file found.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
 <p>The <code>RuntimeManifestFile</code> also provides a utility function for creating an
-instance of itself if it determines everything is valid inside the JSON file.
-<code>CreateIfValid</code> not only validates the JSON format, but also verifies that
-the specific fields required by the RuntimeManifestFile class are available.</p>
+instance of itself if it determines everything is valid inside the JSON
+file.
+<code>CreateIfValid</code> not only validates the JSON format, but also verifies
+that the specific fields required by the RuntimeManifestFile class are
+available.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4244,28 +4355,30 @@ the specific fields required by the RuntimeManifestFile class are available.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>filename</code> indicates the absolute file name path to the manifest file
-that needs to be loaded and verified.</p>
+<p><code>filename</code> indicates the absolute file name path to the manifest
+file that needs to be loaded and verified.</p>
 </li>
 <li>
-<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr to
-each valid runtime manifest file found.  If this call determines the file
-exists and is valid, it will create an instance of <code>RuntimeManifestFile</code>
-and add it to this vector.</p>
+<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr
+to each valid runtime manifest file found.
+If this call determines the file exists and is valid, it will create an
+instance of <code>RuntimeManifestFile</code> and add it to this vector.</p>
 </li>
 </ul>
 </div>
 <div id="apilayermanifestfile" class="paragraph">
 <div class="title">ApiLayerManifestFile</div>
-<p>Similar to <a href="#runtimemanifestfile">RuntimeManifestFile</a>, <code>ApiLayerManifestFile</code> is a
-derived class (with <a href="#manifestfile">ManifestFile</a> as the parent).  This class
-handles specifically finding and parsing any
-<a href="#api-layer-manifest-file-format">API layer manifest files</a>.  It also implements a
-static function <code>FindManifestFiles</code> which is to be used as a factory method
-for finding all available API layer manifest files, creating an instance of
-<code>ApiLayerManifestFiles</code> for each, and saving them if they appear to be valid.
-This is the command that any OpenXR command inside the loader should
-call if it requires a list of available API layer manifest files.</p>
+<p>Similar to <a href="#runtimemanifestfile">RuntimeManifestFile</a>,
+<code>ApiLayerManifestFile</code> is a derived class (with
+<a href="#manifestfile">ManifestFile</a> as the parent).
+This class handles specifically finding and parsing any
+<a href="#api-layer-manifest-file-format">API layer manifest files</a>.
+It also implements a static function <code>FindManifestFiles</code> which is to be
+used as a factory method for finding all available API layer manifest files,
+creating an instance of <code>ApiLayerManifestFiles</code> for each, and saving them if
+they appear to be valid.
+This is the command that any OpenXR command inside the loader should call if
+it requires a list of available API layer manifest files.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4277,21 +4390,24 @@ call if it requires a list of available API layer manifest files.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>type</code> indicates the specific type of manifest file being searched for.
+<p><code>type</code> indicates the specific type of manifest file being searched
+for.
 In this case, it <strong class="purple">must</strong> be either <code>MANIFEST_TYPE_IMPLICIT_API_LAYER</code> or
 <code>MANIFEST_TYPE_EXPLICIT_API_LAYER</code>.</p>
 </li>
 <li>
-<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr to
-each valid API layer manifest file found.</p>
+<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr
+to each valid API layer manifest file found.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
 <p>The <code>ApiLayerManifestFile</code> also provides a utility function for creating an
-instance of itself if it determines everything is valid inside the JSON file.
-<code>CreateIfValid</code> not only validates the JSON format, but also verifies that
-the specific fields required by the ApiLayerManifestFile class are available.</p>
+instance of itself if it determines everything is valid inside the JSON
+file.
+<code>CreateIfValid</code> not only validates the JSON format, but also verifies
+that the specific fields required by the ApiLayerManifestFile class are
+available.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4303,14 +4419,14 @@ the specific fields required by the ApiLayerManifestFile class are available.</p
 <div class="ulist">
 <ul>
 <li>
-<p><code>filename</code> indicates the absolute file name path to the manifest file
-that needs to be loaded and verified.</p>
+<p><code>filename</code> indicates the absolute file name path to the manifest
+file that needs to be loaded and verified.</p>
 </li>
 <li>
-<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr to
-each valid runtime manifest file found.  If this call determines the file
-exists and is valid, it will create an instance of <code>ApiLayerManifestFile</code>
-and add it to this vector.</p>
+<p><code>manifest_files</code> is a vector that will be used to store a unique_ptr
+to each valid runtime manifest file found.
+If this call determines the file exists and is valid, it will create an
+instance of <code>ApiLayerManifestFile</code> and add it to this vector.</p>
 </li>
 </ul>
 </div>
@@ -4319,23 +4435,24 @@ and add it to this vector.</p>
 <h4 id="_library_interface_classes">7.1.2. Library Interface Classes</h4>
 <div class="paragraph">
 <p>The OpenXR loader is responsible with interfacing with other libraries to
-complete its tasks.  Typically, there will be some interface negotiation
-between these other libraries and the loader (see
-<a href="#loader-api-layer-interface-negotiation">Loader/Layer Interface Negotiation</a>
-or
-<a href="#loader-runtime-interface-negotiation">Loader/Runtime Interface Negotiation</a>
-for more information).   The Interface classes are responsible with using
-the contents of a ManifestFile to setup the interface.  Each Interface
-class must be used with the appropriate ManifestFile type to properly interface
-with a specific type of library.</p>
+complete its tasks.
+Typically, there will be some interface negotiation between these other
+libraries and the loader (see <a href="#loader-api-layer-interface-negotiation">Loader/Layer Interface Negotiation</a> or
+<a href="#loader-runtime-interface-negotiation">Loader/Runtime Interface
+Negotiation</a> for more information).
+The Interface classes are responsible with using the contents of a
+ManifestFile to setup the interface.
+Each Interface class must be used with the appropriate ManifestFile type to
+properly interface with a specific type of library.</p>
 </div>
 <div id="runtimeinterface" class="paragraph">
 <div class="title">RuntimeInterface</div>
-<p>The <code>RuntimeInterface</code> is tasked with working with runtime libraries.  Once
-the runtime manifest file information is found and parsed by the
+<p>The <code>RuntimeInterface</code> is tasked with working with runtime libraries.
+Once the runtime manifest file information is found and parsed by the
 <a href="#runtimemanifestfile">RuntimeManifestFile</a> class, it is passed along to
 this class which will load the appropriate library and perform the required
-<a href="#loader-runtime-interface-negotiation">Loader/Runtime Interface Negotiation</a>.</p>
+<a href="#loader-runtime-interface-negotiation">Loader/Runtime Interface
+Negotiation</a>.</p>
 </div>
 <div class="paragraph">
 <p>The <code>RuntimeInterface</code> implements a static function <code>LoadRuntime</code> which
@@ -4355,7 +4472,8 @@ been made.</p>
 </div>
 <div class="paragraph">
 <p>Likewise, the <code>RuntimeInterface</code> implements a static function
-<code>UnloadRuntime</code> which is to be used to unload the current active runtime.
+<code>UnloadRuntime</code> which is to be used to unload the current active
+runtime.
 This will reduce the reference count until it is 0 and then unload the
 active runtime library.</p>
 </div>
@@ -4376,8 +4494,9 @@ active runtime library.</p>
 </div>
 <div class="paragraph">
 <p>During <code>XrInstance</code> creation and destruction, the <code>RuntimeInterface</code> needs
-to work directly with the runtime library.  To do this, the <code>RuntimeInterface</code>
-has two methods that are used by the OpenXR loader:</p>
+to work directly with the runtime library.
+To do this, the <code>RuntimeInterface</code> has two methods that are used by the
+OpenXR loader:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4402,14 +4521,14 @@ OpenXR <code>xrCreateInstance</code> command that triggered this call.</p>
 <p>Store the runtime&#8217;s version of the <code>XrInstance</code></p>
 </li>
 <li>
-<p>Generate a dispatch table to all known OpenXR commands implemented by
-the runtime.</p>
+<p>Generate a dispatch table to all known OpenXR commands implemented by the
+runtime.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>To destroy a runtime&#8217;s instance as part of the <code>xrDestroyInstance</code>
-command, the loader calls <code>DestroyInstance</code>;</p>
+<p>To destroy a runtime&#8217;s instance as part of the <code>xrDestroyInstance</code> command,
+the loader calls <code>DestroyInstance</code>;</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4418,18 +4537,21 @@ command, the loader calls <code>DestroyInstance</code>;</p>
 </div>
 <div id="apilayerinterface" class="paragraph">
 <div class="title">ApiLayerInterface</div>
-<p>Similarly, the <code>ApiLayerInterface</code> class is tasked with working with API layer
-libraries.  Once the API layer manifest file information is found and parsed by the
+<p>Similarly, the <code>ApiLayerInterface</code> class is tasked with working with API
+layer libraries.
+Once the API layer manifest file information is found and parsed by the
 <a href="#apilayermanifestfile">ApiLayerManifestFile</a> class, it is passed along to
 this class which will load the appropriate library and perform the required
-<a href="#loader-api-layer-interface-negotiation">Loader/Layer Interface Negotiation</a>.</p>
+<a href="#loader-api-layer-interface-negotiation">Loader/Layer Interface
+Negotiation</a>.</p>
 </div>
 <div class="paragraph">
-<p>The <code>ApiLayerInterface</code> implements a static function <code>LoadApiLayers</code> which
-is to be used as a factory method for loading all available API layers,
-performing the appropriate negotiation, and then creating an instance of
-<code>ApiLayerInterface</code> for each. This is the command that any OpenXR command inside
-the loader should call if it requires load one or more API layers:</p>
+<p>The <code>ApiLayerInterface</code> implements a static function <code>LoadApiLayers</code>
+which is to be used as a factory method for loading all available API
+layers, performing the appropriate negotiation, and then creating an
+instance of <code>ApiLayerInterface</code> for each.
+This is the command that any OpenXR command inside the loader should call if
+it requires load one or more API layers:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4443,19 +4565,19 @@ the loader should call if it requires load one or more API layers:</p>
 <ul>
 <li>
 <p><code>manifest_files</code> is a vector of unique_ptr elements containing the
-loaded API layer manifest information.  The contents of this vector will be
-either transferred to a new <code>ApiLayerInterface</code> object placed in the
-<code>api_layer_interfaces</code> vector, or deleted when the call to this method
-completes.</p>
+loaded API layer manifest information.
+The contents of this vector will be either transferred to a new
+<code>ApiLayerInterface</code> object placed in the <code>api_layer_interfaces</code>
+vector, or deleted when the call to this method completes.</p>
 </li>
 <li>
-<p><code>enabled_layers</code> is a vector of names for all API layers that are enabled
-by the environment or the user.</p>
+<p><code>enabled_layers</code> is a vector of names for all API layers that are
+enabled by the environment or the user.</p>
 </li>
 <li>
 <p><code>api_layer_interfaces</code> is a vector that will be used to store a
-unique_ptr to a <code>ApiLayerInterface</code> object representing each valid API layer that
-is enabled and has completed loading and negotiation.</p>
+unique_ptr to a <code>ApiLayerInterface</code> object representing each valid API
+layer that is enabled and has completed loading and negotiation.</p>
 </li>
 </ul>
 </div>
@@ -4490,8 +4612,8 @@ During <code>xrCreateInstance</code> the loader code calls
 terminator for xrGetInstanceProcAddr.</p>
 </li>
 <li>
-<p><code>create_instance_term</code> is the function pointer to the
-terminator for xrCreateInstance.</p>
+<p><code>create_instance_term</code> is the function pointer to the terminator for
+xrCreateInstance.</p>
 </li>
 <li>
 <p><code>create_api_layer_instance_term</code> is the function pointer to the
@@ -4499,17 +4621,17 @@ terminator for xrCreateApiLayerInstance.</p>
 </li>
 <li>
 <p><code>api_layer_interfaces</code> is a vector that contains a unique_ptr to all
-<code>ApiLayerInterface</code> objects that are valid and enabled.  All of these
-pointers will be moved to the <code>LoaderInstance</code> on successful completion
-of the <code>CreateInstance</code> call.</p>
+<code>ApiLayerInterface</code> objects that are valid and enabled.
+All of these pointers will be moved to the <code>LoaderInstance</code> on
+successful completion of the <code>CreateInstance</code> call.</p>
 </li>
 <li>
 <p><code>info</code> is a pointer to the <code>XrInstanceCreateInfo</code> passed into the
 OpenXR <code>xrCreateInstance</code> command that triggered this call.</p>
 </li>
 <li>
-<p><code>instance</code> contains a returned pointer to the <code>XrInstance</code> that
-will be returned upon successful execution and associated with this
+<p><code>instance</code> contains a returned pointer to the <code>XrInstance</code> that will
+be returned upon successful execution and associated with this
 <code>LoaderInstance</code> object.</p>
 </li>
 </ul>
@@ -4537,8 +4659,8 @@ runtime.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>This table is built by using the generated <code>xrGetInstanceProcAddr</code>
-call chain</p>
+<p>This table is built by using the generated <code>xrGetInstanceProcAddr</code> call
+chain</p>
 </li>
 </ul>
 </div>
@@ -4548,22 +4670,22 @@ call chain</p>
 <div class="paragraph">
 <p>Because the loader knows what runtime need to be called as part of the
 create sequence, it inserts a terminator during the <code>xrCreateInstance</code>
-sequence called <code>loaderXrTermCreateInstance</code> after the last API layer in order
-to create the runtime instance.</p>
+sequence called <code>loaderXrTermCreateInstance</code> after the last API layer in
+order to create the runtime instance.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_logging_classes">7.1.4. Logging Classes</h4>
 <div class="paragraph">
 <div class="title">LoaderLogger</div>
-<p>The <code>LoaderLogger</code> class was created to provide global logging capability
-to the OpenXR loader.  It was implemented as a Singleton to reduce the
-overhead of passing pointers/references around to the various loader
-objects.</p>
+<p>The <code>LoaderLogger</code> class was created to provide global logging capability to
+the OpenXR loader.
+It was implemented as a Singleton to reduce the overhead of passing
+pointers/references around to the various loader objects.</p>
 </div>
 <div class="paragraph">
-<p>To get a reference to the <code>LoaderLogger</code> singleton, use the <code>GetInstance</code>
-method:</p>
+<p>To get a reference to the <code>LoaderLogger</code> singleton, use the
+<code>GetInstance</code> method:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4572,8 +4694,9 @@ method:</p>
 </div>
 <div class="paragraph">
 <p>The <code>LoaderLogger</code> works by sending all received messages to various
-instances of &lt;&lt;loaderlogrecorder, LoaderLogRecorder&gt; objects.  To add a
-<code>LoaderLogRecorder</code> to the <code>LoaderLogger</code>, call <code>AddLogRecorder</code>:</p>
+instances of &lt;&lt;loaderlogrecorder, LoaderLogRecorder&gt; objects.
+To add a <code>LoaderLogRecorder</code> to the <code>LoaderLogger</code>, call
+<code>AddLogRecorder</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4591,9 +4714,9 @@ derived object.</p>
 </div>
 <div class="paragraph">
 <p>Once added, general log messages will be passed to each of the
-<code>LoaderLogRecorder</code> stored in an internal vector.  Any source inside
-of the loader may trigger a log message by using the <code>LogMessage</code>
-command:</p>
+<code>LoaderLogRecorder</code> stored in an internal vector.
+Any source inside of the loader may trigger a log message by using the
+<code>LogMessage</code> command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4619,8 +4742,9 @@ command:</p>
 is "OpenXR-Loader"</p>
 </li>
 <li>
-<p><code>command_name</code> is the name of the OpenXR command associated with
-the message.  May be an empty string.</p>
+<p><code>command_name</code> is the name of the OpenXR command associated with the
+message.
+May be an empty string.</p>
 </li>
 <li>
 <p><code>message</code> is the message.</p>
@@ -4666,15 +4790,15 @@ May be an empty string.</p>
 <p><code>message</code> the message that needs to be logged</p>
 </li>
 <li>
-<p><code>objects</code> an optional array of OpenXR object handles that are related
-to the log message.</p>
+<p><code>objects</code> an optional array of OpenXR object handles that are
+related to the log message.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
 <p>It&#8217;s important to note that these static methods also take care of grabbing
-the <code>LoaderLogger</code>::<code>GetInstance</code>() and making the appropriate call
-to <code>LoaderLogger</code>::<code>LogMessage</code>().</p>
+the <code>LoaderLogger</code>::<code>GetInstance</code>() and making the appropriate call to
+<code>LoaderLogger</code>::<code>LogMessage</code>().</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 20. Using the Log Messages</div>
@@ -4699,22 +4823,24 @@ LoaderLogger::LogInfoMessage("", "Loaded all API layers");</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In these examples, the message does not correspond to a named command so an empty string is passed.</p>
+<p>In these examples, the message does not correspond to a named command so an
+empty string is passed.</p>
 </div>
 </div>
 </div>
 <div id="loaderlogrecorder" class="paragraph">
 <div class="title">LoaderLogRecorder</div>
 <p>The <code>LoaderLogRecorder</code> is a base class that defines the basics used for
-recording a log message somewhere.  <code>LoaderLogRecorder</code> provides no protections
-for multithreading logging.  Any required protections should be implemented
-by the derived class that is multithread sensitive (i.e. if a logger wrote to a
-file).</p>
+recording a log message somewhere.
+<code>LoaderLogRecorder</code> provides no protections for multithreading logging.
+Any required protections should be implemented by the derived class that is
+multithread sensitive (i.e. if a logger wrote to a file).</p>
 </div>
 <div class="paragraph">
 <p>The pure virtual method the base class defines that is used to record log
-messages is the <code>LogMessage</code> method.  Each derived class is responsible for
-defining exactly how log messages are recorded.</p>
+messages is the <code>LogMessage</code> method.
+Each derived class is responsible for defining exactly how log messages are
+recorded.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4726,11 +4852,12 @@ defining exactly how log messages are recorded.</p>
 </div>
 <div class="paragraph">
 <p>Some utility methods that the <code>LoaderLogRecorder</code> base class supplies allow
-controls over whether or not log messages are actually recorded.  Upon creation,
-a <code>LoaderLogRecorder</code> is set to actively record all messages that contain
-the appropriate flags.  However, if we want to pause recording to one or more
-of the <code>LoaderLogRecorders</code> at some point and then resume recording again
-later, the following utilities can be used:</p>
+controls over whether or not log messages are actually recorded.
+Upon creation, a <code>LoaderLogRecorder</code> is set to actively record all messages
+that contain the appropriate flags.
+However, if we want to pause recording to one or more of the
+<code>LoaderLogRecorders</code> at some point and then resume recording again later,
+the following utilities can be used:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4773,14 +4900,15 @@ providing three basic behaviors:</p>
 </div>
 <div class="paragraph">
 <p>The recorder created by <code>MakeStdErrLoaderLogRecorder()</code> handles recording
-all error messages that occur in the loader out to <code>std::cerr</code>.  This logger
-is always enabled and is intended to always provide error messages for easier
-issue diagnosis.</p>
+all error messages that occur in the loader out to <code>std::cerr</code>.
+This logger is always enabled and is intended to always provide error
+messages for easier issue diagnosis.</p>
 </div>
 <div class="paragraph">
-<p>The recorder created by <code>MakeStdOutLoaderLogRecorder()</code> records messages
-out to <code>std::cout</code>.  This logger is enabled when the
-<a href="#loader-debugging">XR_LOADER_DEBUG</a> environment variable is defined.</p>
+<p>The recorder created by <code>MakeStdOutLoaderLogRecorder()</code> records messages out
+to <code>std::cout</code>.
+This logger is enabled when the <a href="#loader-debugging">XR_LOADER_DEBUG</a>
+environment variable is defined.</p>
 </div>
 <div class="paragraph">
 <p>The recorder created by <code>MakeDebugUtilsLoaderLogRecorder()</code> triggers an
@@ -4790,7 +4918,8 @@ Two steps are required before the loader enables this class:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>The <code>XR_EXT_debug_utils</code> <strong class="purple">must</strong> be enabled during <code>xrCreateInstance</code> call.</p>
+<p>The <code>XR_EXT_debug_utils</code> <strong class="purple">must</strong> be enabled during <code>xrCreateInstance</code>
+call.</p>
 </li>
 <li>
 <p>The application <strong class="purple">must</strong> create a <code>XrDebugUtilsMessengerEXT</code> by</p>
@@ -4798,7 +4927,8 @@ Two steps are required before the loader enables this class:</p>
 <ul>
 <li>
 <p>Supplying an <code>XrDebugUtilsMessengerCreateInfoEXT</code> structure to the
-<code>XrInstanceCreateInfo</code>::<code>next</code> chain during <code>xrCreateInstance</code>, or</p>
+<code>XrInstanceCreateInfo</code>::<code>next</code> chain during
+<code>xrCreateInstance</code>, or</p>
 </li>
 <li>
 <p>Calling <code>xrCreateDebugUtilsMessengerEXT</code>.</p>
@@ -4815,17 +4945,20 @@ Two steps are required before the loader enables this class:</p>
 <div class="paragraph">
 <p>In order to allow the OpenXR loader to be as flexible as possible, we
 generate a large portion of the code automatically using the xr.xml registry
-file.  The generation process is triggered during the build.  This is done
-inside the <code>CMakelists.txt</code> files in both the <code>src</code> and <code>src/loader</code> folders,
-using the macro <code>run_xml_generate_dependency</code>.  This macro (defined in the
-<code>src/CMakelists.txt</code> file, triggers python and generates the source.  The
-generation scripts are based on the functionality originally defined in the
-of the <code>specification/scripts</code> folder, but here they&#8217;ve been extended to
+file.
+The generation process is triggered during the build.
+This is done inside the <code>CMakelists.txt</code> files in both the <code>src</code> and
+<code>src/loader</code> folders, using the macro <code>run_xml_generate_dependency</code>.
+This macro (defined in the <code>src/CMakelists.txt</code> file, triggers python and
+generates the source.
+The generation scripts are based on the functionality originally defined in
+the of the <code>specification/scripts</code> folder, but here they&#8217;ve been extended to
 generate loader source code.</p>
 </div>
 <div class="paragraph">
 <p>The loader automatic code generation scripts are found in the <code>src/scripts</code>
-folder.  The main script of interest for OpenXR loader code generation is
+folder.
+The main script of interest for OpenXR loader code generation is
 <code>automatic_source_generation.py</code> which generates 4 files during the build
 process:</p>
 </div>
@@ -4862,10 +4995,12 @@ process:</p>
 <h4 id="_xr_generated_dispatch_table_h">7.2.1. xr_generated_dispatch_table.h</h4>
 <div class="paragraph">
 <p>This C-style header contains the definition of the
-<code>XrGeneratedDispatchTable</code> structure.  This structure can be used to store
-function pointers for any OpenXR commands defined in the xr.xml at the time
-the loader was built.  It includes slots for both core and extension function
-pointers.  Currently, the loader uses this structure as well as the provided API Layers.</p>
+<code>XrGeneratedDispatchTable</code> structure.
+This structure can be used to store function pointers for any OpenXR
+commands defined in the xr.xml at the time the loader was built.
+It includes slots for both core and extension function pointers.
+Currently, the loader uses this structure as well as the provided API
+Layers.</p>
 </div>
 <div class="paragraph">
 <p>A partial listing from the generated table follows:</p>
@@ -4891,8 +5026,8 @@ within the structure to simplify naming as well as avoid any potential
 compilation conflicts.</p>
 </div>
 <div class="paragraph">
-<p>The <code>xr_generated_dispatch_table.h</code> header also includes a utility function that
-can be used to populate a dispatch table once it has been created:</p>
+<p>The <code>xr_generated_dispatch_table.h</code> header also includes a utility function
+that can be used to populate a dispatch table once it has been created:</p>
 </div>
 <div id="GeneratedXrPopulateDispatchTable" class="listingblock">
 <div class="content">
@@ -4905,19 +5040,22 @@ can be used to populate a dispatch table once it has been created:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>table</code> is a pointer to the <a href="#XrGeneratedDispatchTable">XrGeneratedDispatchTable</a> to populate.</p>
+<p><code>table</code> is a pointer to the <a href="#XrGeneratedDispatchTable">XrGeneratedDispatchTable</a> to
+populate.</p>
 </li>
 <li>
 <p><code>instance</code> is the instance required by <code>get_inst_proc_addr</code>.
-<strong>NOTE</strong>: This may have a value of <code>XR_NULL_HANDLE</code>, but many of the commands
-may be <code>NULL</code> if this is used.</p>
+<strong>NOTE</strong>: This may have a value of <code>XR_NULL_HANDLE</code>, but many of the
+commands may be <code>NULL</code> if this is used.</p>
 </li>
 <li>
-<p><code>get_inst_proc_addr</code> is a pointer to the <code>xrGetInstanceProcAddr</code> command
-to use to populate the table.  If you&#8217;re calling into the OpenXR loader,
-this would be the standard <code>xrGetInstanceProcAddr</code> call.  However, if you
-were calling this from an API layer, you would want to use the next level&#8217;s
-(API layer or runtime) implementation of <code>xrGetInstanceProcAddr</code>.</p>
+<p><code>get_inst_proc_addr</code> is a pointer to the <code>xrGetInstanceProcAddr</code>
+command to use to populate the table.
+If you&#8217;re calling into the OpenXR loader, this would be the standard
+<code>xrGetInstanceProcAddr</code> call.
+However, if you were calling this from an API layer, you would want to
+use the next level&#8217;s (API layer or runtime) implementation of
+<code>xrGetInstanceProcAddr</code>.</p>
 </li>
 </ul>
 </div>
@@ -4925,26 +5063,26 @@ were calling this from an API layer, you would want to use the next level&#8217;
 <div class="sect3">
 <h4 id="_xr_generated_dispatch_table_c">7.2.2. xr_generated_dispatch_table.c</h4>
 <div class="paragraph">
-<p>This file is paired with the above <code>xr_generated_dispatch_table.h</code> header and
-only implements the <a href="#GeneratedXrPopulateDispatchTable">GeneratedXrPopulateDispatchTable</a> function used to populate
-the elements of a dispatch table.</p>
+<p>This file is paired with the above <code>xr_generated_dispatch_table.h</code> header
+and only implements the <a href="#GeneratedXrPopulateDispatchTable">GeneratedXrPopulateDispatchTable</a> function used
+to populate the elements of a dispatch table.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_xr_loader_generated_hpp">7.2.3. xr_loader_generated.hpp</h4>
 <div class="paragraph">
 <p><code>xr_loader_generated.hpp</code> contains prototypes for all the manually defined
-instance command trampoline and terminator functions.  This is done so that
-they can be referenced in the <code>xr_loader_generated.cpp</code> source file which
-is used for <code>xrGetInstanceProcAddr</code> as well as setting up the loader
-dispatch table.</p>
+instance command trampoline and terminator functions.
+This is done so that they can be referenced in the <code>xr_loader_generated.cpp</code>
+source file which is used for <code>xrGetInstanceProcAddr</code> as well as setting up
+the loader dispatch table.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_xr_loader_generated_cpp">7.2.4. xr_loader_generated.cpp</h4>
 <div class="paragraph">
-<p>The <code>xr_loader_generated.cpp</code> source file contains the implementation
-of all generated OpenXR trampoline functions.</p>
+<p>The <code>xr_loader_generated.cpp</code> source file contains the implementation of all
+generated OpenXR trampoline functions.</p>
 </div>
 </div>
 </div>
@@ -5008,27 +5146,31 @@ implemented in the loader.</p>
 <div class="sect2">
 <h3 id="functional-flow">7.4. Functional Flow</h3>
 <div class="paragraph">
-<p>The loader supports a single XrInstance at a time in order to avoid
-tracking handle values and their relationship to the <code>LoaderInstance</code>. Every
-XR function call is assumed to be for the single XrInstance that has been
-created. This enables the loader to work with future extensions and handle types
+<p>The loader supports a single XrInstance at a time in order to avoid tracking
+handle values and their relationship to the <code>LoaderInstance</code>.
+Every XR function call is assumed to be for the single XrInstance that has
+been created.
+This enables the loader to work with future extensions and handle types
 without change.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="platform-specific-behavior">7.5. Platform-Specific Behavior</h3>
 <div class="paragraph">
-<p>The OpenXR loader design is intended to be flexible on supported on a variety
-of platforms.  However, the loader on certain platforms will require behavior
-not necessary in other environments.  This section describes the common
-platform-specific behavior expected in the OpenXR loader.</p>
+<p>The OpenXR loader design is intended to be flexible on supported on a
+variety of platforms.
+However, the loader on certain platforms will require behavior not necessary
+in other environments.
+This section describes the common platform-specific behavior expected in the
+OpenXR loader.</p>
 </div>
 <div class="sect3">
 <h4 id="library-handling">7.5.1. Library Handling</h4>
 <div class="paragraph">
 <p>The loader works with libraries and runtimes which are exposed as either a
-static or dynamic external library files.  Each operating system provides their
-own utilities for interfacing with these files, which the loader abstracts.
+static or dynamic external library files.
+Each operating system provides their own utilities for interfacing with
+these files, which the loader abstracts.
 Most loader platform code can be found in the following source file:</p>
 </div>
 <div class="listingblock">
@@ -5038,15 +5180,16 @@ Most loader platform code can be found in the following source file:</p>
 </div>
 <div class="paragraph">
 <p>The OpenXR loader uses a general handle define for all platform library
-functions.  This handle is identified as <code>LoaderPlatformLibraryHandle</code>
-and is used to interact with all the platform-specific library functions.</p>
+functions.
+This handle is identified as <code>LoaderPlatformLibraryHandle</code> and is used to
+interact with all the platform-specific library functions.</p>
 </div>
 <div class="paragraph">
 <div class="title">Opening A Platform-Specific Library File</div>
 <p>To open a platform-specific library file, and therefore retrieve the
-platform-specific <code>LoaderPlatformLibraryHandle</code> relative to that file,
-the loader calls the <code>LoaderPlatformLibraryOpen</code> function which
-has the following prototype:</p>
+platform-specific <code>LoaderPlatformLibraryHandle</code> relative to that file, the
+loader calls the <code>LoaderPlatformLibraryOpen</code> function which has the
+following prototype:</p>
 </div>
 <div id="LoaderPlatformLibraryOpen" class="listingblock">
 <div class="content">
@@ -5057,8 +5200,8 @@ has the following prototype:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>path</code> <strong class="purple">must</strong> be a constant string containing the absolute path to the
-library file that needs to be opened.</p>
+<p><code>path</code> <strong class="purple">must</strong> be a constant string containing the absolute path to
+the library file that needs to be opened.</p>
 </li>
 </ul>
 </div>
@@ -5077,15 +5220,15 @@ In the case of failure, the loader can call the
 <div class="ulist">
 <ul>
 <li>
-<p><code>path</code> <strong class="purple">must</strong> be a constant string containing the absolute path to the
-library file that the loader previously attempted to load using
+<p><code>path</code> <strong class="purple">must</strong> be a constant string containing the absolute path to
+the library file that the loader previously attempted to load using
 <a href="#LoaderPlatformLibraryOpen">LoaderPlatformLibraryOpen</a>.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The returned C-style character string contains any available platform-specific
-error code that may have occurred.</p>
+<p>The returned C-style character string contains any available
+platform-specific error code that may have occurred.</p>
 </div>
 <div class="paragraph">
 <div class="title">Closing A Platform-Specific Library File</div>
@@ -5101,8 +5244,8 @@ error code that may have occurred.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>library</code> <strong class="purple">must</strong> be valid <code>LoaderPlatformLibraryHandle</code> opened
-using <a href="#LoaderPlatformLibraryOpen">LoaderPlatformLibraryOpen</a></p>
+<p><code>library</code> <strong class="purple">must</strong> be valid <code>LoaderPlatformLibraryHandle</code> opened using
+<a href="#LoaderPlatformLibraryOpen">LoaderPlatformLibraryOpen</a></p>
 </li>
 </ul>
 </div>
@@ -5122,22 +5265,23 @@ function:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>library</code> <strong class="purple">must</strong> be valid <code>LoaderPlatformLibraryHandle</code> opened
-using <a href="#LoaderPlatformLibraryOpen">LoaderPlatformLibraryOpen</a>, but not yet closed using
+<p><code>library</code> <strong class="purple">must</strong> be valid <code>LoaderPlatformLibraryHandle</code> opened using
+<a href="#LoaderPlatformLibraryOpen">LoaderPlatformLibraryOpen</a>, but not yet closed using
 <a href="#LoaderPlatformLibraryClose">LoaderPlatformLibraryClose</a>.</p>
 </li>
 <li>
-<p><code>name</code> <strong class="purple">must</strong> contain the name of the library supplied
-function who&#8217;s function pointer is desired.</p>
+<p><code>name</code> <strong class="purple">must</strong> contain the name of the library supplied function who&#8217;s
+function pointer is desired.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
 <p>If the function succeeds, the returned value will be a valid function
-pointer address.  If the function fails, it will return NULL.  A NULL return
-value could imply that the function simply isn&#8217;t exported by the library,
-or that an error occurred during the platform call.  To determine what
-might have happened, the loader will call the
+pointer address.
+If the function fails, it will return NULL.
+A NULL return value could imply that the function simply isn&#8217;t exported by
+the library, or that an error occurred during the platform call.
+To determine what might have happened, the loader will call the
 <code>LoaderPlatformLibraryGetProcAddrError</code> function:</p>
 </div>
 <div id="LoaderPlatformLibraryGetProcAddrError" class="listingblock">
@@ -5156,22 +5300,23 @@ entry-point that was attempted to be queried during the previous
 </ul>
 </div>
 <div class="paragraph">
-<p>The returned C-style character string contains any available platform-specific
-error code that may have occurred.</p>
+<p>The returned C-style character string contains any available
+platform-specific error code that may have occurred.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="environment-variable-usage">7.5.2. Environment Variable Usage</h4>
 <div class="paragraph">
-<p>Several environment variables are used in the OpenXR loader, especially
-on the Desktop (Windows/Linux).  However, accessing environment variables
-is different based on each operating system, so we have added global
-interface functions to use for accessing environment variables.  These
-are defined in <code>src/common/platform_utils.hpp</code></p>
+<p>Several environment variables are used in the OpenXR loader, especially on
+the Desktop (Windows/Linux).
+However, accessing environment variables is different based on each
+operating system, so we have added global interface functions to use for
+accessing environment variables.
+These are defined in <code>src/common/platform_utils.hpp</code></p>
 </div>
 <div class="paragraph">
-<p><strong>NOTE:</strong> This is outside of the loader source to allow other items in
-the source folder to use these utilities.</p>
+<p><strong>NOTE:</strong> This is outside of the loader source to allow other items in the
+source folder to use these utilities.</p>
 </div>
 <div class="paragraph">
 <div class="title">Reading a Standard Environment Variable</div>
@@ -5193,13 +5338,13 @@ the name of the environment variable to get the value of.</p>
 </div>
 <div class="paragraph">
 <p>If the environment variable identified by <code>name</code> exists on the system,
-the C-style NULL-terminated string will be returned.  If the environment
-variable can not be found, an empty string is returned.</p>
+the C-style NULL-terminated string will be returned.
+If the environment variable can not be found, an empty string is returned.</p>
 </div>
 <div class="paragraph">
-<p>If you want to distinguish between an empty value and a variable not set at all,
-if the underlying platform distinguishes these cases,
-use <code>PlatformUtilsGetEnvSet</code>:</p>
+<p>If you want to distinguish between an empty value and a variable not set at
+all, if the underlying platform distinguishes these cases, use
+<code>PlatformUtilsGetEnvSet</code>:</p>
 </div>
 <div id="PlatformUtilsGetEnvSet" class="listingblock">
 <div class="content">
@@ -5213,8 +5358,9 @@ use <code>PlatformUtilsGetEnvSet</code>:</p>
 <div class="paragraph">
 <div class="title">Reading a Secure Environment Variable</div>
 <p>Access to certain environment variables needs to be done in a way that
-maintains operational security of the program.  To read a secure
-environment variable, the loader calls <code>PlatformUtilsGetSecureEnv</code>:</p>
+maintains operational security of the program.
+To read a secure environment variable, the loader calls
+<code>PlatformUtilsGetSecureEnv</code>:</p>
 </div>
 <div id="PlatformUtilsGetSecureEnv" class="listingblock">
 <div class="content">
@@ -5232,17 +5378,17 @@ the name of the environment variable to get the value of.</p>
 </div>
 <div class="paragraph">
 <p>If the platform supports secure environment variable reading, the
-appropriate method will be used.  Otherwise, it will fall back to the
-standard <a href="#PlatformUtilsGetEnv">PlatformUtilsGetEnv</a> call.</p>
+appropriate method will be used.
+Otherwise, it will fall back to the standard <a href="#PlatformUtilsGetEnv">PlatformUtilsGetEnv</a> call.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="active-runtime-file-management">7.5.3. Active Runtime File Management</h4>
 <div class="paragraph">
 <div class="title">Querying the Active Runtime File name</div>
-<p>Since the runtime file name can vary based on the supporting system,
-the command <code>PlatformGetGlobalRuntimeFileName</code> provides a quick
-mechanism for querying the name of the file.</p>
+<p>Since the runtime file name can vary based on the supporting system, the
+command <code>PlatformGetGlobalRuntimeFileName</code> provides a quick mechanism
+for querying the name of the file.</p>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -5262,8 +5408,8 @@ mechanism for querying the name of the file.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>major_version</code> is the major API version for the OpenXR
-you are querying the active runtime file name for.</p>
+<p><code>major_version</code> is the major API version for the OpenXR you are
+querying the active runtime file name for.</p>
 </li>
 <li>
 <p><code>file_name</code> is the returned name of the runtime file.
@@ -5279,15 +5425,16 @@ This is only valid if the command returns <code>true</code>.</p>
 <h2 id="loader-debugging">8. Loader Debugging</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There may be times that a developer wishes to debug the loader.  The following
-sections define useful tips in debugging the OpenXR loader.</p>
+<p>There may be times that a developer wishes to debug the loader.
+The following sections define useful tips in debugging the OpenXR loader.</p>
 </div>
 <div class="sect2">
 <h3 id="loader-logging">8.1. Loader Logging</h3>
 <div class="paragraph">
 <p>The user can define the <code>XR_LOADER_DEBUG</code> environment variable which will
-enable logging.  In order to use the setting, simply define the level of debug
-information you wish to see logged by the loader to std::cerr.</p>
+enable logging.
+In order to use the setting, simply define the level of debug information
+you wish to see logged by the loader to std::cerr.</p>
 </div>
 <div class="paragraph">
 <p>The available log levels are as follows:</p>
@@ -5329,8 +5476,8 @@ information you wish to see logged by the loader to std::cerr.</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Notice that each level logs not only messages of it&#8217;s type, but also those of
-any levels above it.</p>
+<p>Notice that each level logs not only messages of it&#8217;s type, but also those
+of any levels above it.</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 21. Setting XR_LOADER_DEBUG</div>
@@ -5357,14 +5504,16 @@ any levels above it.</p>
 <div class="sect2">
 <h3 id="_additional_debug_suggestions">8.2. Additional Debug Suggestions</h3>
 <div class="paragraph">
-<p>If you are seeing issues which may be related to the loader&#8217;s use of either an
-API layer or a runtime, there is another setting that may assist you in tracking
-down problems.  Manually define the environment variable <code>LD_BIND_NOW</code> to a
-value of 1.  This forces every dynamic library&#8217;s symbols to be fully
-resolved on load.  If there is a problem with either an API layer or a runtime
-missing symbols on your system, enabling this will expose the problem.  When
-enabled, this setting causes  the OpenXR loader to fail on loading the problem
-library.  It is recommended that you enable <code>LD_BIND_NOW</code> along with
+<p>If you are seeing issues which may be related to the loader&#8217;s use of either
+an API layer or a runtime, there is another setting that may assist you in
+tracking down problems.
+Manually define the environment variable <code>LD_BIND_NOW</code> to a value of 1.
+This forces every dynamic library&#8217;s symbols to be fully resolved on load.
+If there is a problem with either an API layer or a runtime missing symbols
+on your system, enabling this will expose the problem.
+When enabled, this setting causes the OpenXR loader to fail on loading the
+problem library.
+It is recommended that you enable <code>LD_BIND_NOW</code> along with
 <code>XR_LOADER_DEBUG=warn</code> to expose any important issues.</p>
 </div>
 </div>
@@ -5377,8 +5526,9 @@ library.  It is recommended that you enable <code>LD_BIND_NOW</code> along with
 <h3 id="_table_of_debug_environment_variables">9.1. Table of Debug Environment Variables</h3>
 <div class="paragraph">
 <p>The following are all the Debug Environment Variables available for use with
-the loader.  These are referenced throughout the text, but collected here for
-ease of discovery.</p>
+the loader.
+These are referenced throughout the text, but collected here for ease of
+discovery.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 10. Debug Environment Variables</caption>
@@ -5556,8 +5706,8 @@ ease of discovery.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.12<br>
-Last updated 2020-09-26 02:18:42 UTC
+Version 1.0.13<br>
+Last updated 2020-11-24 18:05:24 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

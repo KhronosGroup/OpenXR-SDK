@@ -19,6 +19,79 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.13 (2020-11-24)
+
+The SDK in this release features some fixes to the loader's layer parsing:
+upgrading is recommended. The hello_xr example has also been improved. The
+registry for this release features a new ratified Khronos extension which will
+serve as the basis of other extensions, as well as a number of new vendor
+extensions.
+
+- Registry
+  - Add `XR_HTC_vive_cosmos_controller_interaction` vendor extension.
+    ([internal MR 1907](https://gitlab.khronos.org/openxr/openxr/merge_requests/1907))
+  - Add `XR_FB_display_refresh_rate` vendor extension.
+    ([internal MR 1909](https://gitlab.khronos.org/openxr/openxr/merge_requests/1909))
+  - Add `XR_MSFT_perception_anchor_interop` vendor extension.
+    ([internal MR 1929](https://gitlab.khronos.org/openxr/openxr/merge_requests/1929))
+  - Added ratified `KHR_binding_modifications` Khronos extension.
+    ([internal MR 1878](https://gitlab.khronos.org/openxr/openxr/merge_requests/1878),
+    [internal issue 1413](https://gitlab.khronos.org/openxr/openxr/issues/1413))
+  - Reserve vendor extensions for HTC.
+    ([internal MR 1907](https://gitlab.khronos.org/openxr/openxr/merge_requests/1907))
+  - Reserve vendor extension numbers 109-120 for Facebook extensions.
+    ([internal MR 1913](https://gitlab.khronos.org/openxr/openxr/merge_requests/1913))
+- SDK
+  - Fix build errors under mingw-w64.
+    ([OpenXR-SDK-Source/#212](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/212))
+  - Include PDB symbols to go along with the openxr_loader.dll Windows artifacts.
+    ([OpenXR-SDK-Source/#225](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/225))
+  - `XrMatrix4x4f_CreateProjection`: Explicitly define matrix values as floats.
+    Prevents potential division by zero.
+    ([OpenXR-SDK-Source/#219](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/219))
+  - build: Normalize how we detect and utilize threading libraries in the build
+    process.
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - build: Search for OpenGL ES and other things needed on Android.
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - build: Normalize how we detect and utilize Vulkan in the build process.
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - build/ci: Have Windows loader artifacts organize themselves by
+    architecture/platform, and bundle the CMake config files and a "meta" CMake
+    config.
+    ([OpenXR-SDK-Source/#224](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/224),
+    [OpenXR-SDK-Source/#185](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/185))
+  - documentation: Make API Layer manifest example for "disable_environment" and
+    "enable_environment" match the loader behavior
+    ([internal MR 1917](https://gitlab.khronos.org/openxr/openxr/merge_requests/1917),
+    [OpenXR-SDK-Source/#213](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/213))
+  - hello_xr: Don't use subaction paths for quit_session action, it's unnecessary.
+    ([internal MR 1898](https://gitlab.khronos.org/openxr/openxr/merge_requests/1898))
+  - hello_xr: Add initial build system support for building for Android. (No gradle
+    support yet.)
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - hello_xr: Call `xrInitializeLoaderKHR` and dynamically load `openxr_loader` on
+    Android.
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - hello_xr: Fix printing of action bindings and make it prettier.
+    ([internal MR 1914](https://gitlab.khronos.org/openxr/openxr/merge_requests/1914))
+  - hello_xr: Fix break on Oculus Quest.
+    ([internal MR 1921](https://gitlab.khronos.org/openxr/openxr/merge_requests/1921))
+  - hello_xr: The D3D12 and Vulkan graphics plugins sometimes did not update their
+    swapchain image context maps due to rare key collisions.
+    ([OpenXR-SDK-Source/#217](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/217))
+  - loader: Stub in some preliminary code for Android loader support - not a
+    complete port.
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - loader: Add Android logcat logger.
+    ([internal MR 1910](https://gitlab.khronos.org/openxr/openxr/merge_requests/1910))
+  - loader: Fix parsing of XR_ENABLE_API_LAYERS environment variable
+    ([internal MR 1912](https://gitlab.khronos.org/openxr/openxr/merge_requests/1912))
+  - loader: Fix issues around `xrInitializeLoaderKHR`.
+    ([internal MR 1922](https://gitlab.khronos.org/openxr/openxr/merge_requests/1922))
+  - loader: Replace `#if _WIN32` with `#ifdef _WIN32`.
+    ([OpenXR-SDK-Source/#215](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/215))
+
 ## OpenXR SDK 1.0.12 (2020-09-25)
 
 This release features a number of new ratified KHR extensions, as well as a new

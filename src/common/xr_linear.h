@@ -494,46 +494,46 @@ inline static void XrMatrix4x4f_CreateProjection(XrMatrix4x4f* result, GraphicsA
 
     if (farZ <= nearZ) {
         // place the far plane at infinity
-        result->m[0] = 2 / tanAngleWidth;
-        result->m[4] = 0;
+        result->m[0] = 2.0f / tanAngleWidth;
+        result->m[4] = 0.0f;
         result->m[8] = (tanAngleRight + tanAngleLeft) / tanAngleWidth;
-        result->m[12] = 0;
+        result->m[12] = 0.0f;
 
-        result->m[1] = 0;
-        result->m[5] = 2 / tanAngleHeight;
+        result->m[1] = 0.0f;
+        result->m[5] = 2.0f / tanAngleHeight;
         result->m[9] = (tanAngleUp + tanAngleDown) / tanAngleHeight;
-        result->m[13] = 0;
+        result->m[13] = 0.0f;
 
-        result->m[2] = 0;
-        result->m[6] = 0;
-        result->m[10] = -1;
+        result->m[2] = 0.0f;
+        result->m[6] = 0.0f;
+        result->m[10] = -1.0f;
         result->m[14] = -(nearZ + offsetZ);
 
-        result->m[3] = 0;
-        result->m[7] = 0;
-        result->m[11] = -1;
-        result->m[15] = 0;
+        result->m[3] = 0.0f;
+        result->m[7] = 0.0f;
+        result->m[11] = -1.0f;
+        result->m[15] = 0.0f;
     } else {
         // normal projection
-        result->m[0] = 2 / tanAngleWidth;
-        result->m[4] = 0;
+        result->m[0] = 2.0f / tanAngleWidth;
+        result->m[4] = 0.0f;
         result->m[8] = (tanAngleRight + tanAngleLeft) / tanAngleWidth;
-        result->m[12] = 0;
+        result->m[12] = 0.0f;
 
-        result->m[1] = 0;
-        result->m[5] = 2 / tanAngleHeight;
+        result->m[1] = 0.0f;
+        result->m[5] = 2.0f / tanAngleHeight;
         result->m[9] = (tanAngleUp + tanAngleDown) / tanAngleHeight;
-        result->m[13] = 0;
+        result->m[13] = 0.0f;
 
-        result->m[2] = 0;
-        result->m[6] = 0;
+        result->m[2] = 0.0f;
+        result->m[6] = 0.0f;
         result->m[10] = -(farZ + offsetZ) / (farZ - nearZ);
         result->m[14] = -(farZ * (nearZ + offsetZ)) / (farZ - nearZ);
 
-        result->m[3] = 0;
-        result->m[7] = 0;
-        result->m[11] = -1;
-        result->m[15] = 0;
+        result->m[3] = 0.0f;
+        result->m[7] = 0.0f;
+        result->m[11] = -1.0f;
+        result->m[15] = 0.0f;
     }
 }
 

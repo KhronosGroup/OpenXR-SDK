@@ -31,6 +31,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="EXTX"       author="Multivendor experimental"             contact="Brad Grantham @bradgrantham-lunarg"/>
         <tag name="FB"         author="Facebook"                contact="Cass Everitt @casseveritt, Ed Hutchins @eahutchins"/>
         <tag name="GOOGLE"     author="Google"                  contact="Kaye Mason @chaleur"/>
+        <tag name="HTC"        author="HTC"                     contact="Chris Kuo @ggkuo, Kyle Chen @kylechen76"/>
         <tag name="HUAWEI"     author="Huawei"                  contact="Yihong Huang @rachelhuang"/>
         <tag name="INTEL"      author="Intel"                   contact="Javier Martinez @javier"/>
         <tag name="KHR"        author="Khronos"                 contact="Brent Insko @insko"/>
@@ -110,7 +111,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 12)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 13)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1031,6 +1032,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrOverlayMainSessionFlagsEXTX</type>                                                    <name>flags</name></member>
         </type>
 
+        <!-- XR_FB_display_refresh_rate structs -->
+        <type category="struct" name="XrEventDataDisplayRefreshRateChangedFB" parentstruct="XrEventDataBaseHeader">
+            <member values="XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                                     <name>next</name></member>
+            <member><type>float</type>                                                                           <name>fromDisplayRefreshRate</name></member>
+            <member><type>float</type>                                                                           <name>toDisplayRefreshRate</name></member>
+        </type>
+
         <!-- struct types for XR_EXT_view_configuration_depth_range -->
         <type category="struct" name="XrViewConfigurationDepthRangeEXT" structextends="XrViewConfigurationView">
             <member values="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"><type>XrStructureType</type> <name>type</name></member>
@@ -1059,6 +1068,19 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>float</type>                 <name>offThreshold</name></member>
             <member optional="true">const <type>XrHapticBaseHeader</type>* <name>onHaptic</name></member>
             <member optional="true">const <type>XrHapticBaseHeader</type>* <name>offHaptic</name></member>
+        </type>
+
+        <!-- struct types for XR_KHR_binding_modification -->
+        <type category="struct" name="XrBindingModificationsKHR" structextends="XrInteractionProfileSuggestedBinding">
+            <member values="XR_TYPE_BINDING_MODIFICATIONS_KHR"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*           <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>    <name>bindingModificationCount</name></member>
+            <member optional="true" len="bindingModificationCount">const <type>XrBindingModificationBaseHeaderKHR</type>* const*  <name>bindingModifications</name></member>
+        </type>
+
+        <type category="struct" name="XrBindingModificationBaseHeaderKHR">
+            <member noautovalidity="true"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*     <name>next</name></member>
         </type>
 
         <!-- The PFN_xrVoidFunction type are used by XrGetInstanceProcAddr below -->
@@ -1331,6 +1353,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member optional="true"><type>uint32_t</type> <name>nodeCapacityInput</name></member>
             <member optional="true"><type>uint32_t</type> <name>nodeCountOutput</name></member>
             <member optional="true" len="nodeCapacityInput"><type>XrControllerModelNodeStateMSFT</type>* <name>nodeStates</name></member>
+        </type>
+
+        <!-- XR_FB_color_space structs -->
+        <type name="XrColorSpaceFB" category="enum"/>
+        <type category="struct" name="XrSystemColorSpacePropertiesFB">
+          <member values="XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
+          <member><type>void</type>* <name>next</name></member>
+          <member><type>XrColorSpaceFB</type> <name>colorSpace</name></member>
         </type>
 
     </types>
@@ -1623,6 +1653,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <enums name="XrHandPoseTypeMSFT" type="enum">
         <enum value="0" name="XR_HAND_POSE_TYPE_TRACKED_MSFT"/>
         <enum value="1" name="XR_HAND_POSE_TYPE_REFERENCE_OPEN_PALM_MSFT"/>
+    </enums>
+
+    <!-- XR_FB_color_space -->
+    <enums name="XrColorSpaceFB" type="enum">
+        <enum value="0" name="XR_COLOR_SPACE_UNMANAGED_FB"/>
+        <enum value="1" name="XR_COLOR_SPACE_REC2020_FB"/>
+        <enum value="2" name="XR_COLOR_SPACE_REC709_FB"/>
+        <enum value="3" name="XR_COLOR_SPACE_RIFT_CV1_FB"/>
+        <enum value="4" name="XR_COLOR_SPACE_RIFT_S_FB"/>
+        <enum value="5" name="XR_COLOR_SPACE_QUEST_FB"/>
+        <enum value="6" name="XR_COLOR_SPACE_P3_FB"/>
+        <enum value="7" name="XR_COLOR_SPACE_ADOBE_RGB_FB"/>
     </enums>
 
     <!-- Flags -->
@@ -2197,7 +2239,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </command>
         <command name="xrGetVulkanGraphicsRequirements2KHR" alias="xrGetVulkanGraphicsRequirementsKHR" />
 
-        <!-- commands for XR_KHR_convert_timespec_time -->
+      <!-- commands for XR_KHR_convert_timespec_time -->
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_TIME_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrConvertTimeToTimespecTimeKHR</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
@@ -2360,6 +2402,52 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrControllerModelStateMSFT</type>* <name>state</name></param>
         </command>
 
+      <!-- XR_FB_display_refresh_rate -->
+      <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+        <proto><type>XrResult</type> <name>xrEnumerateDisplayRefreshRatesFB</name></proto>
+        <param><type>XrSession</type> <name>session</name></param>
+        <param optional="true"><type>uint32_t</type> <name>displayRefreshRateCapacityInput</name></param>
+        <param><type>uint32_t</type>* <name>displayRefreshRateCountOutput</name></param>
+        <param optional="true" len="displayRefreshRateCapacityInput"><type>float</type>* <name>displayRefreshRates</name></param>
+      </command>
+      <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+        <proto><type>XrResult</type> <name>xrGetDisplayRefreshRateFB</name></proto>
+        <param><type>XrSession</type> <name>session</name></param>
+        <param><type>float</type>* <name>displayRefreshRate</name></param>
+      </command>
+      <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_DISPLAY_REFRESH_RATE_UNSUPPORTED_FB,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+        <proto><type>XrResult</type> <name>xrRequestDisplayRefreshRateFB</name></proto>
+        <param><type>XrSession</type> <name>session</name></param>
+        <param><type>float</type> <name>displayRefreshRate</name></param>
+      </command>
+
+      <!-- XR_MSFT_perception_anchor_interop -->
+      <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+          <proto><type>XrResult</type> <name>xrCreateSpatialAnchorFromPerceptionAnchorMSFT</name></proto>
+          <param><type>XrSession</type> <name>session</name></param>
+          <param><type>IUnknown</type>* <name>perceptionAnchor</name></param>
+          <param><type>XrSpatialAnchorMSFT</type>* <name>anchor</name></param>
+      </command>
+      <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING">
+          <proto><type>XrResult</type> <name>xrTryGetPerceptionAnchorFromSpatialAnchorMSFT</name></proto>
+          <param><type>XrSession</type> <name>session</name></param>
+          <param><type>XrSpatialAnchorMSFT</type> <name>anchor</name></param>
+          <param><type>IUnknown</type>** <name>perceptionAnchor</name></param>
+      </command>
+
+      <!-- XR_FB_color_space -->
+      <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+        <proto><type>XrResult</type> <name>xrEnumerateColorSpacesFB</name></proto>
+        <param><type>XrSession</type> <name>session</name></param>
+        <param optional="true"><type>uint32_t</type> <name>colorSpaceCapacityInput</name></param>
+        <param><type>uint32_t</type>* <name>colorSpaceCountOutput</name></param>
+        <param optional="true" len="colorSpaceCapacityInput"><type>XrColorSpaceFB</type>* <name>colorSpaces</name></param>
+      </command>
+      <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+        <proto><type>XrResult</type> <name>xrSetColorSpaceFB</name></proto>
+        <param><type>XrSession</type> <name>session</name></param>
+        <param>const <type>XrColorSpaceFB</type> <name>colorspace</name></param>
+      </command>
     </commands>
 
     <!-- SECTION: OpenXR API interface definitions -->
@@ -3103,10 +3191,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_extension_57" number="57" type="instance" supported="disabled">
+    <extension name="XR_MSFT_perception_anchor_interop" number="57" type="instance" supported="openxr" requires="XR_MSFT_spatial_anchor" protect="XR_USE_PLATFORM_WIN32">
         <require>
-            <enum value="1" name="XR_MSFT_extension_57_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_57&quot;" name="XR_MSFT_extension_57_EXTENSION_NAME"/>
+            <enum value="1" name="XR_MSFT_perception_anchor_interop_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_perception_anchor_interop&quot;" name="XR_MSFT_PERCEPTION_ANCHOR_INTEROP_EXTENSION_NAME"/>
+
+            <command name="xrCreateSpatialAnchorFromPerceptionAnchorMSFT"/>
+            <command name="xrTryGetPerceptionAnchorFromSpatialAnchorMSFT"/>
+
         </require>
     </extension>
 
@@ -3429,6 +3521,164 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
+    <extension name="XR_FB_display_refresh_rate" number="102" type="instance" supported="openxr">
+        <require>
+          <enum value="1" name="XR_FB_display_refresh_rate_SPEC_VERSION"/>
+          <enum value="&quot;XR_FB_display_refresh_rate&quot;" name="XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME"/>
+
+          <type name="XrEventDataDisplayRefreshRateChangedFB"/>
+          <enum offset="0"  extends="XrStructureType"  name="XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB"/>
+ 
+          <command name="xrEnumerateDisplayRefreshRatesFB"/>
+          <command name="xrGetDisplayRefreshRateFB"/>
+          <command name="xrRequestDisplayRefreshRateFB"/>
+          <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_DISPLAY_REFRESH_RATE_UNSUPPORTED_FB" comment="The display refresh rate is not supported by the platform." />
+        </require>
+    </extension>
+
+    <extension name="XR_HTC_vive_cosmos_controller_interaction" number="103" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_HTC_vive_cosmos_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_vive_cosmos_controller_interaction&quot;" name="XR_HTC_VIVE_COSMOS_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_HTC_extension_104" number="104" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_HTC_extension_104_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_extension_104&quot;" name="XR_HTC_extension_104_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_HTC_extension_105" number="105" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_HTC_extension_105_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_extension_105&quot;" name="XR_HTC_extension_105_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_HTC_extension_106" number="106" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_HTC_extension_106_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_extension_106&quot;" name="XR_HTC_extension_106_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_HTC_extension_107" number="107" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_HTC_extension_107_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_extension_107&quot;" name="XR_HTC_extension_107_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    
+    <extension name="XR_HTC_extension_108" number="108" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_HTC_extension_108_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_extension_108&quot;" name="XR_HTC_extension_108_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    
+    <extension name="XR_FB_color_space" number="109" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_FB_color_space_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_color_space&quot;" name="XR_FB_COLOR_SPACE_EXTENSION_NAME"/>
+
+            <type name="XrColorSpaceFB"/>
+            <type name="XrSystemColorSpacePropertiesFB"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB"/>
+
+            <command name="xrEnumerateColorSpacesFB"/>
+            <command name="xrSetColorSpaceFB"/>
+            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB" comment="The color space is not supported by the runtime." />
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_110" number="110" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_110_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_110&quot;" name="XR_FB_extension_110_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_111" number="111" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_111_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_111&quot;" name="XR_FB_extension_111_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_112" number="112" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_112_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_112&quot;" name="XR_FB_extension_112_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_113" number="113" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_113_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_113&quot;" name="XR_FB_extension_113_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_114" number="114" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_114_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_114&quot;" name="XR_FB_extension_114_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_115" number="115" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_115_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_115&quot;" name="XR_FB_extension_115_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_116" number="116" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_116_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_116&quot;" name="XR_FB_extension_116_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_117" number="117" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_117_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_117&quot;" name="XR_FB_extension_117_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_118" number="118" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_118_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_118&quot;" name="XR_FB_extension_118_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_119" number="119" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_119_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_119&quot;" name="XR_FB_extension_119_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_120" number="120" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_FB_extension_120_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_120&quot;" name="XR_FB_extension_120_EXTENSION_NAME"/>
+        </require>
+    </extension>
+    <extension name="XR_KHR_binding_modification" number="121" type="instance" supported="openxr">
+        <require>
+            <enum value="1" name="XR_KHR_binding_modification_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_binding_modification&quot;" name="XR_KHR_BINDING_MODIFICATION_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_BINDING_MODIFICATIONS_KHR"/>
+            <type name="XrBindingModificationsKHR"/>
+            <type name="XrBindingModificationBaseHeaderKHR"/>
+        </require>
+    </extension>
     </extensions>
 
 </registry>

@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 12)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 13)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -186,6 +186,8 @@ typedef enum XrResult {
     XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT = -1000039001,
     XR_ERROR_SECONDARY_VIEW_CONFIGURATION_TYPE_NOT_ENABLED_MSFT = -1000053000,
     XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT = -1000055000,
+    XR_ERROR_DISPLAY_REFRESH_RATE_UNSUPPORTED_FB = -1000101000,
+    XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB = -1000108000,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
 } XrResult;
 
@@ -310,6 +312,9 @@ typedef enum XrStructureType {
     XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR = 1000090001,
     XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR = 1000090003,
     XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR = 1000091000,
+    XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB = 1000101000,
+    XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB = 1000108000,
+    XR_TYPE_BINDING_MODIFICATIONS_KHR = 1000120000,
     XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR = XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR,
     XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR = XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR,
     XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR,
@@ -1448,6 +1453,23 @@ typedef struct XrCompositionLayerEquirect2KHR {
 
 
 
+#define XR_KHR_binding_modification 1
+#define XR_KHR_binding_modification_SPEC_VERSION 1
+#define XR_KHR_BINDING_MODIFICATION_EXTENSION_NAME "XR_KHR_binding_modification"
+typedef struct XrBindingModificationBaseHeaderKHR {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrBindingModificationBaseHeaderKHR;
+
+typedef struct XrBindingModificationsKHR {
+    XrStructureType                                     type;
+    const void* XR_MAY_ALIAS                            next;
+    uint32_t                                            bindingModificationCount;
+    const XrBindingModificationBaseHeaderKHR* const*    bindingModifications;
+} XrBindingModificationsKHR;
+
+
+
 #define XR_EXT_performance_settings 1
 #define XR_EXT_performance_settings_SPEC_VERSION 1
 #define XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME "XR_EXT_performance_settings"
@@ -2183,6 +2205,79 @@ typedef struct XrInteractionProfileAnalogThresholdVALVE {
 #define XR_MND_swapchain_usage_input_attachment_bit 1
 #define XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION 2
 #define XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME "XR_MND_swapchain_usage_input_attachment_bit"
+
+
+#define XR_FB_display_refresh_rate 1
+#define XR_FB_display_refresh_rate_SPEC_VERSION 1
+#define XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME "XR_FB_display_refresh_rate"
+typedef struct XrEventDataDisplayRefreshRateChangedFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    float                       fromDisplayRefreshRate;
+    float                       toDisplayRefreshRate;
+} XrEventDataDisplayRefreshRateChangedFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrEnumerateDisplayRefreshRatesFB)(XrSession session, uint32_t displayRefreshRateCapacityInput, uint32_t* displayRefreshRateCountOutput, float* displayRefreshRates);
+typedef XrResult (XRAPI_PTR *PFN_xrGetDisplayRefreshRateFB)(XrSession session, float* displayRefreshRate);
+typedef XrResult (XRAPI_PTR *PFN_xrRequestDisplayRefreshRateFB)(XrSession session, float displayRefreshRate);
+
+#ifndef XR_NO_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateDisplayRefreshRatesFB(
+    XrSession                                   session,
+    uint32_t                                    displayRefreshRateCapacityInput,
+    uint32_t*                                   displayRefreshRateCountOutput,
+    float*                                      displayRefreshRates);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetDisplayRefreshRateFB(
+    XrSession                                   session,
+    float*                                      displayRefreshRate);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrRequestDisplayRefreshRateFB(
+    XrSession                                   session,
+    float                                       displayRefreshRate);
+#endif
+
+
+#define XR_HTC_vive_cosmos_controller_interaction 1
+#define XR_HTC_vive_cosmos_controller_interaction_SPEC_VERSION 1
+#define XR_HTC_VIVE_COSMOS_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_HTC_vive_cosmos_controller_interaction"
+
+
+#define XR_FB_color_space 1
+#define XR_FB_color_space_SPEC_VERSION    1
+#define XR_FB_COLOR_SPACE_EXTENSION_NAME  "XR_FB_color_space"
+
+typedef enum XrColorSpaceFB {
+    XR_COLOR_SPACE_UNMANAGED_FB = 0,
+    XR_COLOR_SPACE_REC2020_FB = 1,
+    XR_COLOR_SPACE_REC709_FB = 2,
+    XR_COLOR_SPACE_RIFT_CV1_FB = 3,
+    XR_COLOR_SPACE_RIFT_S_FB = 4,
+    XR_COLOR_SPACE_QUEST_FB = 5,
+    XR_COLOR_SPACE_P3_FB = 6,
+    XR_COLOR_SPACE_ADOBE_RGB_FB = 7,
+    XR_COLOR_SPACE_MAX_ENUM_FB = 0x7FFFFFFF
+} XrColorSpaceFB;
+typedef struct XrSystemColorSpacePropertiesFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrColorSpaceFB        colorSpace;
+} XrSystemColorSpacePropertiesFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrEnumerateColorSpacesFB)(XrSession session, uint32_t colorSpaceCapacityInput, uint32_t* colorSpaceCountOutput, XrColorSpaceFB* colorSpaces);
+typedef XrResult (XRAPI_PTR *PFN_xrSetColorSpaceFB)(XrSession session, const XrColorSpaceFB colorspace);
+
+#ifndef XR_NO_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateColorSpacesFB(
+    XrSession                                   session,
+    uint32_t                                    colorSpaceCapacityInput,
+    uint32_t*                                   colorSpaceCountOutput,
+    XrColorSpaceFB*                             colorSpaces);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetColorSpaceFB(
+    XrSession                                   session,
+    const XrColorSpaceFB                        colorspace);
+#endif
 
 #ifdef __cplusplus
 }

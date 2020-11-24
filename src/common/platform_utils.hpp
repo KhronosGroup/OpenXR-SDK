@@ -288,6 +288,46 @@ static inline bool PlatformUtilsSetEnv(const char* name, const char* value) {
     return (result != 0);
 }
 
+#elif defined(XR_OS_ANDROID)
+
+static inline bool PlatformUtilsGetEnvSet(const char* /* name */) {
+    // Stub func
+    return false;
+}
+
+static inline std::string PlatformUtilsGetEnv(const char* /* name */) {
+    // Stub func
+    return {};
+}
+
+static inline std::string PlatformUtilsGetSecureEnv(const char* /* name */) {
+    // Stub func
+    return {};
+}
+
+static inline bool PlatformUtilsSetEnv(const char* /* name */, const char* /* value */) {
+    // Stub func
+    return false;
+}
+
+#include <sys/stat.h>
+
+// Intended to be only used as a fallback on Android, with a more open, "native" technique used in most cases
+static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std::string& file_name) {
+    // Prefix for the runtime JSON file name
+    static const char* rt_dir_prefixes[] = {"/oem", "/vendor"};
+    static const std::string rt_filename = "/active_runtime.json";
+    static const std::string subdir = "/etc/openxr/";
+    for (const auto prefix : rt_dir_prefixes) {
+        auto path = prefix + subdir + std::to_string(major_version) + rt_filename;
+        struct stat buf;
+        if (0 == stat(path.c_str(), &buf)) {
+            file_name = path;
+            return true;
+        }
+    }
+    return false;
+}
 #else  // Not Linux, Apple, nor Windows
 
 static inline bool PlatformUtilsGetEnvSet(const char* /* name */) {

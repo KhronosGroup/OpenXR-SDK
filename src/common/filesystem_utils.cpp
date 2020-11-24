@@ -88,7 +88,7 @@
 #endif
 
 #if defined(XR_USE_PLATFORM_WIN32)
-#include <PathCch.h>
+#include <pathcch.h>
 #endif
 
 #if defined(XR_USE_PLATFORM_WIN32)
