@@ -4,7 +4,7 @@ Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
 Source: https://khronos.org/registry/OpenXR/
 
 Files: changes/*
-Copyright: 2019-2020, The Khronos Group Inc.
+Copyright: 2019-2021, The Khronos Group Inc.
 License: CC-BY-4.0
 
 Files: src/external/jsoncpp/*
@@ -13,11 +13,33 @@ License: MIT OR LicenseRef-jsoncpp-public-domain
 Comment: Unmodified, vendored copy of jsoncpp 1.8.4
 
 Files: external/python/jinja2/*
-  external/python/Jinja2-2.10.1.dist-info/*
+  external/python/Jinja2-2.10.3.dist-info/*
 Copyright: 2013-2019 by the Jinja team
+  2007 Pallets
 License: BSD-3-Clause
 
 Files: external/python/markupsafe/*
   external/python/MarkupSafe-1.1.1.dist-info/*
 Copyright: 2010 Pallets
 License: BSD-3-Clause
+
+Files: specification/sources/chapters/extensions/epic/*
+Copyright: 2020, Epic Games, Inc.
+License: CC-BY-4.0
+Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1422
+
+Files: specification/sources/chapters/extensions/fb/*
+Copyright: 2020, Facebook, Inc.
+License: CC-BY-4.0
+Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1418
+
+Files: specification/sources/chapters/extensions/valve/*
+Copyright: 2020, Valve
+License: CC-BY-4.0
+Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1421
+
+Files: specification/sources/chapters/extensions/ext/ext_performance_settings.adoc
+  specification/sources/chapters/extensions/ext/ext_thermal_query.adoc
+Copyright: 2017-2020, The Khronos Group Inc.
+License: CC-BY-4.0
+Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1419

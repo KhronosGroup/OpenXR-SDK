@@ -1,7 +1,7 @@
 # Changelog for OpenXR-SDK-Source and OpenXR-SDK Repo
 
 <!--
-Copyright (c) 2019-2020 The Khronos Group Inc.
+Copyright (c) 2019-2021, The Khronos Group Inc.
 
 SPDX-License-Identifier: CC-BY-4.0
 -->
@@ -18,6 +18,63 @@ collecting together the resolution of many Khronos internal issues,
 along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
+
+## OpenXR SDK 1.0.14 (2021-01-27)
+
+This release contains a collection of fixes and improvements, including one new
+vendor extension. Notably, we have relicensed all files that become part of the
+loader, so the loader may be "Apache-2.0 OR MIT" for downstream license
+compatibility.
+
+- Registry
+  - Add new `XR_FB_android_surface_swapchain_create` vendor extension.
+    ([internal MR 1939](https://gitlab.khronos.org/openxr/openxr/merge_requests/1939),
+    [internal issue 1493](https://gitlab.khronos.org/openxr/openxr/issues/1493),
+    [internal MR 1968](https://gitlab.khronos.org/openxr/openxr/merge_requests/1968))
+  - Add missing `optional` attributes to `XR_KHR_vulkan_enable2` structs. Fixes
+    validation layer.
+    ([OpenXR-Docs/#72](https://github.com/KhronosGroup/OpenXR-Docs/pull/72))
+  - Correction to `locationFlags` field in `XrHandJointLocationEXT` to be optional.
+    ([internal MR 1945](https://gitlab.khronos.org/openxr/openxr/merge_requests/1945))
+  - Reserve vendor extensions for Varjo.
+    ([internal MR 1935](https://gitlab.khronos.org/openxr/openxr/merge_requests/1935))
+  - Reserve vendor extensions for Magic Leap.
+    ([internal MR 1967](https://gitlab.khronos.org/openxr/openxr/merge_requests/1967),
+    [internal MR 1970](https://gitlab.khronos.org/openxr/openxr/merge_requests/1970))
+  - Reserve extension number 143 to 148 for MSFT extensions.
+    ([internal MR 1969](https://gitlab.khronos.org/openxr/openxr/merge_requests/1969))
+  - Update Magic Leap ID and contact information.
+    ([internal MR 1967](https://gitlab.khronos.org/openxr/openxr/merge_requests/1967))
+- SDK
+  - Add `./` to the start of the library name in API layer manifests on Windows, so
+    they are treated as a relative path.
+    ([internal MR 1975](https://gitlab.khronos.org/openxr/openxr/merge_requests/1975))
+  - Fix searching for prerequisites in generated CMake config files.
+    ([internal MR 1963](https://gitlab.khronos.org/openxr/openxr/merge_requests/1963))
+  - Start shipping the OpenXR API layers with the release artifacts.
+    ([internal MR 1975](https://gitlab.khronos.org/openxr/openxr/merge_requests/1975))
+  - cmake: Debug library uses d suffix on Windows. CMake `OPENXR_DEBUG_POSTFIX`
+    variable can be set to something else to change it.
+    ([OpenXR-SDK-Source/#229](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/229))
+  - hello_xr: Remove redundant call to `xrInitializeLoaderKHR`.
+    ([internal MR 1933](https://gitlab.khronos.org/openxr/openxr/merge_requests/1933))
+  - hello_xr: Return supported sample count as 1 for GLES, GL and D3D11.
+    ([internal MR 1962](https://gitlab.khronos.org/openxr/openxr/merge_requests/1962))
+  - hello_xr: Use `android.app.NativeActivity` correctly in place of NativeActivity
+    subclass.
+    ([internal MR 1976](https://gitlab.khronos.org/openxr/openxr/merge_requests/1976))
+  - hello_xr: On Vulkan, explicitly add surface extensions for mirror window.
+    ([OpenXR-SDK-Source/#230](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/230),
+    [internal MR 1934](https://gitlab.khronos.org/openxr/openxr/merge_requests/1934))
+  - loader: Relicense all files that become part of the loader, so the loader may
+    be "Apache-2.0 OR MIT" for downstream license compatibility.
+    ([internal MR 1937](https://gitlab.khronos.org/openxr/openxr/merge_requests/1937),
+    [internal issue 1449](https://gitlab.khronos.org/openxr/openxr/issues/1449),
+    [OpenXR-SDK-Source/#205](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/205))
+  - loader: Protect against the application overriding loader symbols.
+    ([internal MR 1961](https://gitlab.khronos.org/openxr/openxr/merge_requests/1961))
+  - loader: Handle JSON files in the search path that are not objects.
+    ([internal MR 1979](https://gitlab.khronos.org/openxr/openxr/merge_requests/1979))
 
 ## OpenXR SDK 1.0.13 (2020-11-24)
 

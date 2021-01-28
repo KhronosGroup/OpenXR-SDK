@@ -130,6 +130,12 @@ option(
     ON
 )
 
+if(WIN32)
+    set(OPENXR_DEBUG_POSTFIX d CACHE STRING "OpenXR loader debug postfix.")
+else()
+    set(OPENXR_DEBUG_POSTFIX "" CACHE STRING "OpenXR loader debug postfix.")
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     option(DYNAMIC_LOADER "Build the loader as a .dll library" OFF)
 else()
@@ -242,20 +248,18 @@ else()
     set(BUILD_CONFORMANCE_CLI OFF)
 endif()
 
-add_library(openxr-all-supported INTERFACE)
+set(OPENXR_ALL_SUPPORTED_DEFINES)
 if(BUILD_WITH_XLIB_HEADERS)
-    target_compile_definitions(openxr-all-supported INTERFACE XR_USE_PLATFORM_XLIB)
+    list(APPEND OPENXR_ALL_SUPPORTED_DEFINES XR_USE_PLATFORM_XLIB)
 endif()
 
 if(BUILD_WITH_XCB_HEADERS)
-    target_compile_definitions(openxr-all-supported INTERFACE XR_USE_PLATFORM_XCB)
+    list(APPEND OPENXR_ALL_SUPPORTED_DEFINES XR_USE_PLATFORM_XCB)
 endif()
 
 if(BUILD_WITH_WAYLAND_HEADERS)
-    target_compile_definitions(openxr-all-supported INTERFACE XR_USE_PLATFORM_WAYLAND)
+    list(APPEND OPENXR_ALL_SUPPORTED_DEFINES XR_USE_PLATFORM_WAYLAND)
 endif()
-# openxr-all-supported is a dependency of openxr_loader so it should be added to the export set
-install(TARGETS openxr-all-supported EXPORT openxr_loader_export)
 
 # Find glslc shader compiler.
 # On Android, the NDK includes the binary, so no external dependency.

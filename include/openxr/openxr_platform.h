@@ -2,7 +2,7 @@
 #define OPENXR_PLATFORM_H_ 1
 
 /*
-** Copyright (c) 2017-2020 The Khronos Group Inc.
+** Copyright (c) 2017-2021, The Khronos Group Inc.
 **
 ** SPDX-License-Identifier: Apache-2.0 OR MIT
 */
@@ -509,6 +509,27 @@ typedef struct XrHolographicWindowAttachmentMSFT {
 #endif // XR_USE_PLATFORM_WIN32
 
 #endif /* XR_USE_PLATFORM_WIN32 */
+
+#ifdef XR_USE_PLATFORM_ANDROID
+
+#define XR_FB_android_surface_swapchain_create 1
+#define XR_FB_android_surface_swapchain_create_SPEC_VERSION 1
+#define XR_FB_ANDROID_SURFACE_SWAPCHAIN_CREATE_EXTENSION_NAME "XR_FB_android_surface_swapchain_create"
+typedef XrFlags64 XrAndroidSurfaceSwapchainFlagsFB;
+
+// Flag bits for XrAndroidSurfaceSwapchainFlagsFB
+static const XrAndroidSurfaceSwapchainFlagsFB XR_ANDROID_SURFACE_SWAPCHAIN_SYNCHRONOUS_BIT_FB = 0x00000001;
+static const XrAndroidSurfaceSwapchainFlagsFB XR_ANDROID_SURFACE_SWAPCHAIN_USE_TIMESTAMPS_BIT_FB = 0x00000002;
+
+#ifdef XR_USE_PLATFORM_ANDROID
+typedef struct XrAndroidSurfaceSwapchainCreateInfoFB {
+    XrStructureType                     type;
+    const void* XR_MAY_ALIAS            next;
+    XrAndroidSurfaceSwapchainFlagsFB    createFlags;
+} XrAndroidSurfaceSwapchainCreateInfoFB;
+#endif // XR_USE_PLATFORM_ANDROID
+
+#endif /* XR_USE_PLATFORM_ANDROID */
 
 #ifdef __cplusplus
 }

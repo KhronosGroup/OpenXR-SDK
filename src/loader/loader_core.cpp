@@ -1,23 +1,10 @@
-// Copyright (c) 2017-2020 The Khronos Group Inc.
+// Copyright (c) 2017-2021, The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR MIT
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// Author: Mark Young <marky@lunarg.com>
-// Author: Dave Houlton <daveh@lunarg.com>
+// Initial Authors: Mark Young <marky@lunarg.com>, Dave Houlton <daveh@lunarg.com>
 //
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
@@ -85,17 +72,15 @@ inline bool IsMissingNullTerminator(const char (&str)[max_length]) {
 
 // ---- Core 1.0 manual loader trampoline functions
 #ifdef XR_KHR_LOADER_INIT_SUPPORT  // platforms that support XR_KHR_loader_init.
-LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *loaderInitInfo)
-    XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *loaderInitInfo) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrInitializeLoaderKHR", "Entering loader trampoline");
     return InitializeLoader(loaderInitInfo);
 }
 XRLOADER_ABI_CATCH_FALLBACK
 #endif
 
-LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
-                                                                           uint32_t *propertyCountOutput,
-                                                                           XrApiLayerProperties *properties) XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrEnumerateApiLayerProperties(uint32_t propertyCapacityInput, uint32_t *propertyCountOutput,
+                                                                   XrApiLayerProperties *properties) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrEnumerateApiLayerProperties", "Entering loader trampoline");
 
     // Make sure only one thread is attempting to read the JSON files at a time.
@@ -111,9 +96,9 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint3
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL
-xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyCapacityInput, uint32_t *propertyCountOutput,
-                                       XrExtensionProperties *properties) XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyCapacityInput,
+                                                                            uint32_t *propertyCountOutput,
+                                                                            XrExtensionProperties *properties) XRLOADER_ABI_TRY {
     bool just_layer_properties = false;
     LoaderLogger::LogVerboseMessage("xrEnumerateInstanceExtensionProperties", "Entering loader trampoline");
 
@@ -221,8 +206,7 @@ xrEnumerateInstanceExtensionProperties(const char *layerName, uint32_t propertyC
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCreateInfo *info,
-                                                              XrInstance *instance) XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrCreateInstance", "Entering loader trampoline");
     if (nullptr == info) {
         LoaderLogger::LogValidationErrorMessage("VUID-xrCreateInstance-info-parameter", "xrCreateInstance", "must be non-NULL");
@@ -326,7 +310,7 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCr
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instance) XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrDestroyInstance(XrInstance instance) XRLOADER_ABI_TRY {
     LoaderLogger::LogVerboseMessage("xrDestroyInstance", "Entering loader trampoline");
     // Runtimes may detect XR_NULL_HANDLE provided as a required handle parameter and return XR_ERROR_HANDLE_INVALID. - 2.9
     if (XR_NULL_HANDLE == instance) {
@@ -720,8 +704,8 @@ LoaderXrTermSetDebugUtilsObjectNameEXT(XrInstance instance, const XrDebugUtilsOb
 }
 XRLOADER_ABI_CATCH_FALLBACK
 
-LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance instance, const char *name,
-                                                                   PFN_xrVoidFunction *function) XRLOADER_ABI_TRY {
+XRAPI_ATTR XrResult XRAPI_CALL LoaderXrGetInstanceProcAddr(XrInstance instance, const char *name,
+                                                           PFN_xrVoidFunction *function) XRLOADER_ABI_TRY {
     // Initialize the function to nullptr in case it does not get caught in a known case
     *function = nullptr;
 
@@ -753,26 +737,26 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance in
 
     // These functions must always go through the loader's implementation (trampoline).
     if (strcmp(name, "xrGetInstanceProcAddr") == 0) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(xrGetInstanceProcAddr);
+        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrGetInstanceProcAddr);
         return XR_SUCCESS;
     } else if (strcmp(name, "xrInitializeLoaderKHR") == 0) {
 #ifdef XR_KHR_LOADER_INIT_SUPPORT
-        *function = reinterpret_cast<PFN_xrVoidFunction>(xrInitializeLoaderKHR);
+        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrInitializeLoaderKHR);
         return XR_SUCCESS;
 #else
         return XR_ERROR_FUNCTION_UNSUPPORTED;
 #endif
     } else if (strcmp(name, "xrEnumerateApiLayerProperties") == 0) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(xrEnumerateApiLayerProperties);
+        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrEnumerateApiLayerProperties);
         return XR_SUCCESS;
     } else if (strcmp(name, "xrEnumerateInstanceExtensionProperties") == 0) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(xrEnumerateInstanceExtensionProperties);
+        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrEnumerateInstanceExtensionProperties);
         return XR_SUCCESS;
     } else if (strcmp(name, "xrCreateInstance") == 0) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(xrCreateInstance);
+        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrCreateInstance);
         return XR_SUCCESS;
     } else if (strcmp(name, "xrDestroyInstance") == 0) {
-        *function = reinterpret_cast<PFN_xrVoidFunction>(xrDestroyInstance);
+        *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrDestroyInstance);
         return XR_SUCCESS;
     }
 
@@ -818,3 +802,38 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance in
     return loader_instance->GetInstanceProcAddr(name, function);
 }
 XRLOADER_ABI_CATCH_FALLBACK
+
+// Exported loader functions
+//
+// The application might override these by exporting the same symbols and so we can't use these
+// symbols anywhere in the loader code, and instead the internal non exported functions that these
+// stubs call should be used internally.
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
+                                                                           uint32_t *propertyCountOutput,
+                                                                           XrApiLayerProperties *properties) {
+    return LoaderXrEnumerateApiLayerProperties(propertyCapacityInput, propertyCountOutput, properties);
+}
+
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateInstanceExtensionProperties(const char *layerName,
+                                                                                    uint32_t propertyCapacityInput,
+                                                                                    uint32_t *propertyCountOutput,
+                                                                                    XrExtensionProperties *properties) {
+    return LoaderXrEnumerateInstanceExtensionProperties(layerName, propertyCapacityInput, propertyCountOutput, properties);
+}
+
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrCreateInstance(const XrInstanceCreateInfo *info, XrInstance *instance) {
+    return LoaderXrCreateInstance(info, instance);
+}
+
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instance) { return LoaderXrDestroyInstance(instance); }
+
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance instance, const char *name,
+                                                                   PFN_xrVoidFunction *function) {
+    return LoaderXrGetInstanceProcAddr(instance, name, function);
+}
+
+#ifdef XR_KHR_LOADER_INIT_SUPPORT
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *loaderInitInfo) {
+    return LoaderXrInitializeLoaderKHR(loaderInitInfo);
+}
+#endif

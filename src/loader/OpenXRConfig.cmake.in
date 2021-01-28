@@ -1,15 +1,15 @@
-# Copyright (c) 2017-2020 The Khronos Group Inc.
+# Copyright (c) 2017-2021, The Khronos Group Inc.
 #
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 
 @PACKAGE_INIT@
 
-# The header openxr.h is not added to the export target so we add the include directory here
-include("${CMAKE_CURRENT_LIST_DIR}/OpenXRTargets.cmake")
-set_and_check(OpenXR_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
-target_include_directories(OpenXR::openxr_loader INTERFACE ${OpenXR_INCLUDE_DIR})
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
 
-add_library(OpenXR::headers INTERFACE IMPORTED)
-target_include_directories(OpenXR::headers SYSTEM INTERFACE ${OpenXR_INCLUDE_DIR})
+include("${CMAKE_CURRENT_LIST_DIR}/OpenXRTargets.cmake")
+
+# Provide this variable as a convenience.
+set_and_check(OpenXR_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
 
 check_required_components(OpenXR)

@@ -1,8 +1,12 @@
+// Copyright (c) 2017-2021, The Khronos Group Inc.
+// Copyright (c) 2017-2019 Valve Corporation
+// Copyright (c) 2017-2019 LunarG, Inc.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
 // *********** THIS FILE IS GENERATED - DO NOT EDIT ***********
 //     See loader_source_generator.py for modifications
 // ************************************************************
 
-// Copyright (c) 2017-2020 The Khronos Group Inc.
+// Copyright (c) 2017-2021, The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
