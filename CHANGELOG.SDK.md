@@ -19,6 +19,92 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.15 (2021-04-13)
+
+The main SDK change in this release is that the OpenXR headers **no longer
+expose extension function prototypes** because extension functions are not
+exported by the loader. This should prevent some confusion during development
+without affecting code that correctly compiles and links with older SDKs. Code
+that was compiled but not linked (for instance, the automated tests of example
+source in the specification) and that would not have successfully linked may
+have their defects highlighted by this change, however. If you need those
+prototypes still available, there is a preprocessor define that can re-enable
+them. The function pointer definitions are always available.
+
+In addition to that header change, this release contains three new vendor
+extensions plus an assortment of SDK fixes.
+
+- Registry
+  - Add `XR_VARJO_foveated_rendering` vendor extension.
+    ([internal MR 1981](https://gitlab.khronos.org/openxr/openxr/merge_requests/1981))
+  - Add `XR_VARJO_composition_layer_depth_test` vendor extension.
+    ([internal MR 1998](https://gitlab.khronos.org/openxr/openxr/merge_requests/1998))
+  - Add `XR_VARJO_environment_depth_estimation` vendor extension.
+    ([internal MR 1998](https://gitlab.khronos.org/openxr/openxr/merge_requests/1998))
+  - Add `uint16_t` to `openxr_platform_defines` (and associated scripts) so it may
+    be used easily by extensions.
+    ([internal MR 2017](https://gitlab.khronos.org/openxr/openxr/merge_requests/2017))
+  - Reserve extension 149 for working group use.
+    ([internal MR 1999](https://gitlab.khronos.org/openxr/openxr/merge_requests/1999))
+  - Reserve extension numbers 150 to 155 for ULTRALEAP extensions
+    ([internal MR 2006](https://gitlab.khronos.org/openxr/openxr/merge_requests/2006))
+  - Reserve extension numbers 156-165 for Facebook.
+    ([internal MR 2018](https://gitlab.khronos.org/openxr/openxr/merge_requests/2018))
+- SDK
+  - Hide prototypes for extension functions unless explicitly requested by defining
+    `XR_EXTENSION_PROTOTYPES`. These functions are not exported from the loader, so
+    having their prototypes available is confusing and leads to link errors, etc.
+    ([OpenXR-SDK-Source/#251](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/251),
+    [OpenXR-SDK-Source/#174](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/174),
+    [internal issue 1554](https://gitlab.khronos.org/openxr/openxr/issues/1554),
+    [internal issue 1338](https://gitlab.khronos.org/openxr/openxr/issues/1338))
+  - Also list API layers in list tool.
+    ([internal MR 1991](https://gitlab.khronos.org/openxr/openxr/merge_requests/1991))
+  - Ensure we expose the OpenXR headers in the build-time interface of the loader,
+    as well as the install-time interface, for use with FetchContent.cmake.
+    ([OpenXR-SDK-Source/#242](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/242),
+    [OpenXR-SDK-Source/#195](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/195),
+    [internal issue 1409](https://gitlab.khronos.org/openxr/openxr/issues/1409))
+  - Improve `BUILDING.md`, including adding details on how to specify architecture
+    for VS2019.
+    ([OpenXR-SDK-Source/#245](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/245),
+    [OpenXR-SDK-Source/#253](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/253))
+  - Loader: Fix loader failing to load on Windows 7 due to `pathcch` dependency.
+    ([OpenXR-SDK-Source/#239](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/239),
+    [OpenXR-SDK-Source/#214](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/214),
+    [internal issue 1471](https://gitlab.khronos.org/openxr/openxr/issues/1471),
+    [OpenXR-SDK-Source/#236](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/236),
+    [internal issue 1519](https://gitlab.khronos.org/openxr/openxr/issues/1519))
+  - Loader: Fix conflicting filename in `openxr_loader.def` causing a linker warning
+    when building debug for Windows.
+    ([OpenXR-SDK-Source/#246](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/246))
+  - Update `cgenerator.py` to generate header comments in `openxr.h` to show when a
+    struct extends another struct
+    ([internal MR 2005](https://gitlab.khronos.org/openxr/openxr/merge_requests/2005))
+  - hello_xr: Check for `shaderStorageImageMultisample` feature in Vulkan plugin
+    before using it.
+    ([OpenXR-SDK-Source/#234](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/234),
+    [OpenXR-SDK-Source/#233](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/233),
+    [internal issue 1518](https://gitlab.khronos.org/openxr/openxr/issues/1518))
+  - hello_xr: Make sure `common.h` includes the reflection header that it uses.
+    ([OpenXR-SDK-Source/#247](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/247))
+  - layers: Revise documentation, re-formatting and updating to refer to real
+    functions and URLs.
+    ([internal MR 2012](https://gitlab.khronos.org/openxr/openxr/merge_requests/2012))
+  - loader: Check the instance handle passed to `xrGetInstanceProcAddr`.
+    ([internal MR 1980](https://gitlab.khronos.org/openxr/openxr/merge_requests/1980))
+  - loader: Fix building OpenXR-SDK with CMake's multi-config Ninja generator.
+    ([OpenXR-SDK-Source/#249](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/249),
+    [OpenXR-SDK-Source/#231](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/231))
+  - `openxr_reflection.h`: Make reproducible/deterministic by sorting protection
+    defines in the script.
+    ([internal MR 1993](https://gitlab.khronos.org/openxr/openxr/merge_requests/1993),
+    [internal issue 1424](https://gitlab.khronos.org/openxr/openxr/issues/1424))
+  - xr_dependencies (shared utility): Include `unknwn.h` on Windows, even without
+    D3D enabled.
+    ([OpenXR-SDK-Source/#250](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/250),
+    [OpenXR-SDK-Source/#237](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/237))
+
 ## OpenXR SDK 1.0.14 (2021-01-27)
 
 This release contains a collection of fixes and improvements, including one new

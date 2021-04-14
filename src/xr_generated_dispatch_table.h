@@ -237,6 +237,9 @@ struct XrGeneratedDispatchTable {
     // ---- XR_FB_color_space extension commands
     PFN_xrEnumerateColorSpacesFB EnumerateColorSpacesFB;
     PFN_xrSetColorSpaceFB SetColorSpaceFB;
+
+    // ---- XR_VARJO_environment_depth_estimation extension commands
+    PFN_xrSetEnvironmentDepthEstimationVARJO SetEnvironmentDepthEstimationVARJO;
 };
 
 

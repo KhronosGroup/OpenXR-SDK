@@ -7,7 +7,7 @@
 ;
 ;;;;  End Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-LIBRARY openxr_loader.dll
+LIBRARY
 EXPORTS
     xrCreateInstance
     xrDestroyInstance

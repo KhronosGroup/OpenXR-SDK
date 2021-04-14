@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 14)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 15)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -316,6 +316,10 @@ typedef enum XrStructureType {
     XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB = 1000101000,
     XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB = 1000108000,
     XR_TYPE_BINDING_MODIFICATIONS_KHR = 1000120000,
+    XR_TYPE_VIEW_LOCATE_FOVEATED_RENDERING_VARJO = 1000121000,
+    XR_TYPE_FOVEATED_VIEW_CONFIGURATION_VIEW_VARJO = 1000121001,
+    XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO = 1000121002,
+    XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO = 1000122000,
     XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR = XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR,
     XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR = XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR,
     XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR,
@@ -348,6 +352,7 @@ typedef enum XrReferenceSpaceType {
     XR_REFERENCE_SPACE_TYPE_LOCAL = 2,
     XR_REFERENCE_SPACE_TYPE_STAGE = 3,
     XR_REFERENCE_SPACE_TYPE_UNBOUNDED_MSFT = 1000038000,
+    XR_REFERENCE_SPACE_TYPE_COMBINED_EYE_VARJO = 1000121000,
     XR_REFERENCE_SPACE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrReferenceSpaceType;
 
@@ -544,6 +549,7 @@ typedef struct XrVector3f {
     float    z;
 } XrVector3f;
 
+// XrSpaceVelocity extends XrSpaceLocation
 typedef struct XrSpaceVelocity {
     XrStructureType         type;
     void* XR_MAY_ALIAS      next;
@@ -1296,7 +1302,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrApplyHapticFeedback(
 XRAPI_ATTR XrResult XRAPI_CALL xrStopHapticFeedback(
     XrSession                                   session,
     const XrHapticActionInfo*                   hapticActionInfo);
-#endif
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_KHR_composition_layer_cube 1
@@ -1318,6 +1324,7 @@ typedef struct XrCompositionLayerCubeKHR {
 #define XR_KHR_composition_layer_depth 1
 #define XR_KHR_composition_layer_depth_SPEC_VERSION 5
 #define XR_KHR_COMPOSITION_LAYER_DEPTH_EXTENSION_NAME "XR_KHR_composition_layer_depth"
+// XrCompositionLayerDepthInfoKHR extends XrCompositionLayerProjectionView
 typedef struct XrCompositionLayerDepthInfoKHR {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
@@ -1398,18 +1405,21 @@ typedef struct XrEventDataVisibilityMaskChangedKHR {
 typedef XrResult (XRAPI_PTR *PFN_xrGetVisibilityMaskKHR)(XrSession session, XrViewConfigurationType viewConfigurationType, uint32_t viewIndex, XrVisibilityMaskTypeKHR visibilityMaskType, XrVisibilityMaskKHR* visibilityMask);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrGetVisibilityMaskKHR(
     XrSession                                   session,
     XrViewConfigurationType                     viewConfigurationType,
     uint32_t                                    viewIndex,
     XrVisibilityMaskTypeKHR                     visibilityMaskType,
     XrVisibilityMaskKHR*                        visibilityMask);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_KHR_composition_layer_color_scale_bias 1
 #define XR_KHR_composition_layer_color_scale_bias_SPEC_VERSION 5
 #define XR_KHR_COMPOSITION_LAYER_COLOR_SCALE_BIAS_EXTENSION_NAME "XR_KHR_composition_layer_color_scale_bias"
+// XrCompositionLayerColorScaleBiasKHR extends XrCompositionLayerBaseHeader
 typedef struct XrCompositionLayerColorScaleBiasKHR {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
@@ -1430,9 +1440,11 @@ typedef struct XR_MAY_ALIAS XrLoaderInitInfoBaseHeaderKHR {
 typedef XrResult (XRAPI_PTR *PFN_xrInitializeLoaderKHR)(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrInitializeLoaderKHR(
     const XrLoaderInitInfoBaseHeaderKHR*        loaderInitInfo);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_KHR_composition_layer_equirect2 1
@@ -1462,6 +1474,7 @@ typedef struct XrBindingModificationBaseHeaderKHR {
     const void* XR_MAY_ALIAS    next;
 } XrBindingModificationBaseHeaderKHR;
 
+// XrBindingModificationsKHR extends XrInteractionProfileSuggestedBinding
 typedef struct XrBindingModificationsKHR {
     XrStructureType                                     type;
     const void* XR_MAY_ALIAS                            next;
@@ -1472,7 +1485,7 @@ typedef struct XrBindingModificationsKHR {
 
 
 #define XR_EXT_performance_settings 1
-#define XR_EXT_performance_settings_SPEC_VERSION 1
+#define XR_EXT_performance_settings_SPEC_VERSION 2
 #define XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME "XR_EXT_performance_settings"
 
 typedef enum XrPerfSettingsDomainEXT {
@@ -1514,11 +1527,13 @@ typedef struct XrEventDataPerfSettingsEXT {
 typedef XrResult (XRAPI_PTR *PFN_xrPerfSettingsSetPerformanceLevelEXT)(XrSession session, XrPerfSettingsDomainEXT domain, XrPerfSettingsLevelEXT level);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrPerfSettingsSetPerformanceLevelEXT(
     XrSession                                   session,
     XrPerfSettingsDomainEXT                     domain,
     XrPerfSettingsLevelEXT                      level);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_EXT_thermal_query 1
@@ -1527,13 +1542,15 @@ XRAPI_ATTR XrResult XRAPI_CALL xrPerfSettingsSetPerformanceLevelEXT(
 typedef XrResult (XRAPI_PTR *PFN_xrThermalGetTemperatureTrendEXT)(XrSession session, XrPerfSettingsDomainEXT domain, XrPerfSettingsNotificationLevelEXT* notificationLevel, float* tempHeadroom, float* tempSlope);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrThermalGetTemperatureTrendEXT(
     XrSession                                   session,
     XrPerfSettingsDomainEXT                     domain,
     XrPerfSettingsNotificationLevelEXT*         notificationLevel,
     float*                                      tempHeadroom,
     float*                                      tempSlope);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_EXT_debug_utils 1
@@ -1589,6 +1606,7 @@ typedef XrBool32 (XRAPI_PTR *PFN_xrDebugUtilsMessengerCallbackEXT)(
             void*                                            userData);
         
 
+// XrDebugUtilsMessengerCreateInfoEXT extends XrInstanceCreateInfo
 typedef struct XrDebugUtilsMessengerCreateInfoEXT {
     XrStructureType                         type;
     const void* XR_MAY_ALIAS                next;
@@ -1607,6 +1625,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrSessionEndDebugUtilsLabelRegionEXT)(XrSession
 typedef XrResult (XRAPI_PTR *PFN_xrSessionInsertDebugUtilsLabelEXT)(XrSession session, const XrDebugUtilsLabelEXT* labelInfo);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrSetDebugUtilsObjectNameEXT(
     XrInstance                                  instance,
     const XrDebugUtilsObjectNameInfoEXT*        nameInfo);
@@ -1635,18 +1654,21 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSessionEndDebugUtilsLabelRegionEXT(
 XRAPI_ATTR XrResult XRAPI_CALL xrSessionInsertDebugUtilsLabelEXT(
     XrSession                                   session,
     const XrDebugUtilsLabelEXT*                 labelInfo);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_EXT_eye_gaze_interaction 1
 #define XR_EXT_eye_gaze_interaction_SPEC_VERSION 1
 #define XR_EXT_EYE_GAZE_INTERACTION_EXTENSION_NAME "XR_EXT_eye_gaze_interaction"
+// XrSystemEyeGazeInteractionPropertiesEXT extends XrSystemProperties
 typedef struct XrSystemEyeGazeInteractionPropertiesEXT {
     XrStructureType       type;
     void* XR_MAY_ALIAS    next;
     XrBool32              supportsEyeGazeInteraction;
 } XrSystemEyeGazeInteractionPropertiesEXT;
 
+// XrEyeGazeSampleTimeEXT extends XrSpaceLocation
 typedef struct XrEyeGazeSampleTimeEXT {
     XrStructureType       type;
     void* XR_MAY_ALIAS    next;
@@ -1656,18 +1678,18 @@ typedef struct XrEyeGazeSampleTimeEXT {
 
 
 #define XR_EXTX_overlay 1
-#define XR_EXTX_overlay_SPEC_VERSION      4
+#define XR_EXTX_overlay_SPEC_VERSION      5
 #define XR_EXTX_OVERLAY_EXTENSION_NAME    "XR_EXTX_overlay"
 typedef XrFlags64 XrOverlaySessionCreateFlagsEXTX;
 
 // Flag bits for XrOverlaySessionCreateFlagsEXTX
-static const XrOverlaySessionCreateFlagsEXTX XR_OVERLAY_SESSION_CREATE_RELAXED_DISPLAY_TIME_BIT_EXTX = 0x00000001;
 
 typedef XrFlags64 XrOverlayMainSessionFlagsEXTX;
 
 // Flag bits for XrOverlayMainSessionFlagsEXTX
 static const XrOverlayMainSessionFlagsEXTX XR_OVERLAY_MAIN_SESSION_ENABLED_COMPOSITION_LAYER_INFO_DEPTH_BIT_EXTX = 0x00000001;
 
+// XrSessionCreateInfoOverlayEXTX extends XrSessionCreateInfo
 typedef struct XrSessionCreateInfoOverlayEXTX {
     XrStructureType                    type;
     const void* XR_MAY_ALIAS           next;
@@ -1718,6 +1740,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorSpaceMSFT)(XrSession sessi
 typedef XrResult (XRAPI_PTR *PFN_xrDestroySpatialAnchorMSFT)(XrSpatialAnchorMSFT anchor);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorMSFT(
     XrSession                                   session,
     const XrSpatialAnchorCreateInfoMSFT*        createInfo,
@@ -1730,7 +1753,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorSpaceMSFT(
 
 XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
     XrSpatialAnchorMSFT                         anchor);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_MND_headless 1
@@ -1746,6 +1770,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
 #define XR_EXT_view_configuration_depth_range 1
 #define XR_EXT_view_configuration_depth_range_SPEC_VERSION 1
 #define XR_EXT_VIEW_CONFIGURATION_DEPTH_RANGE_EXTENSION_NAME "XR_EXT_view_configuration_depth_range"
+// XrViewConfigurationDepthRangeEXT extends XrViewConfigurationView
 typedef struct XrViewConfigurationDepthRangeEXT {
     XrStructureType       type;
     void* XR_MAY_ALIAS    next;
@@ -1758,7 +1783,7 @@ typedef struct XrViewConfigurationDepthRangeEXT {
 
 
 #define XR_EXT_conformance_automation 1
-#define XR_EXT_conformance_automation_SPEC_VERSION 1
+#define XR_EXT_conformance_automation_SPEC_VERSION 2
 #define XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME "XR_EXT_conformance_automation"
 typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceActiveEXT)(XrSession session, XrPath interactionProfile, XrPath topLevelPath, XrBool32 isActive);
 typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceStateBoolEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, XrBool32 state);
@@ -1767,6 +1792,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceStateVector2fEXT)(XrSession ses
 typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceLocationEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, XrSpace space, XrPosef pose);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceActiveEXT(
     XrSession                                   session,
     XrPath                                      interactionProfile,
@@ -1797,7 +1823,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceLocationEXT(
     XrPath                                      inputSourcePath,
     XrSpace                                     space,
     XrPosef                                     pose);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_MSFT_spatial_graph_bridge 1
@@ -1820,11 +1847,13 @@ typedef struct XrSpatialGraphNodeSpaceCreateInfoMSFT {
 typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialGraphNodeSpaceMSFT)(XrSession session, const XrSpatialGraphNodeSpaceCreateInfoMSFT* createInfo, XrSpace* space);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialGraphNodeSpaceMSFT(
     XrSession                                   session,
     const XrSpatialGraphNodeSpaceCreateInfoMSFT* createInfo,
     XrSpace*                                    space);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_MSFT_hand_interaction 1
@@ -1837,7 +1866,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialGraphNodeSpaceMSFT(
 #define XR_HAND_JOINT_COUNT_EXT 26
 
 XR_DEFINE_HANDLE(XrHandTrackerEXT)
-#define XR_EXT_hand_tracking_SPEC_VERSION 2
+#define XR_EXT_hand_tracking_SPEC_VERSION 3
 #define XR_EXT_HAND_TRACKING_EXTENSION_NAME "XR_EXT_hand_tracking"
 
 typedef enum XrHandEXT {
@@ -1880,6 +1909,7 @@ typedef enum XrHandJointSetEXT {
     XR_HAND_JOINT_SET_DEFAULT_EXT = 0,
     XR_HAND_JOINT_SET_MAX_ENUM_EXT = 0x7FFFFFFF
 } XrHandJointSetEXT;
+// XrSystemHandTrackingPropertiesEXT extends XrSystemProperties
 typedef struct XrSystemHandTrackingPropertiesEXT {
     XrStructureType       type;
     void* XR_MAY_ALIAS    next;
@@ -1920,6 +1950,7 @@ typedef struct XrHandJointLocationsEXT {
     XrHandJointLocationEXT*    jointLocations;
 } XrHandJointLocationsEXT;
 
+// XrHandJointVelocitiesEXT extends XrHandJointLocationsEXT
 typedef struct XrHandJointVelocitiesEXT {
     XrStructureType            type;
     void* XR_MAY_ALIAS         next;
@@ -1932,6 +1963,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrDestroyHandTrackerEXT)(XrHandTrackerEXT handT
 typedef XrResult (XRAPI_PTR *PFN_xrLocateHandJointsEXT)(XrHandTrackerEXT handTracker, const XrHandJointsLocateInfoEXT* locateInfo, XrHandJointLocationsEXT* locations);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrCreateHandTrackerEXT(
     XrSession                                   session,
     const XrHandTrackerCreateInfoEXT*           createInfo,
@@ -1944,11 +1976,12 @@ XRAPI_ATTR XrResult XRAPI_CALL xrLocateHandJointsEXT(
     XrHandTrackerEXT                            handTracker,
     const XrHandJointsLocateInfoEXT*            locateInfo,
     XrHandJointLocationsEXT*                    locations);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_MSFT_hand_tracking_mesh 1
-#define XR_MSFT_hand_tracking_mesh_SPEC_VERSION 2
+#define XR_MSFT_hand_tracking_mesh_SPEC_VERSION 3
 #define XR_MSFT_HAND_TRACKING_MESH_EXTENSION_NAME "XR_MSFT_hand_tracking_mesh"
 
 typedef enum XrHandPoseTypeMSFT {
@@ -1956,6 +1989,7 @@ typedef enum XrHandPoseTypeMSFT {
     XR_HAND_POSE_TYPE_REFERENCE_OPEN_PALM_MSFT = 1,
     XR_HAND_POSE_TYPE_MAX_ENUM_MSFT = 0x7FFFFFFF
 } XrHandPoseTypeMSFT;
+// XrSystemHandTrackingMeshPropertiesMSFT extends XrSystemProperties
 typedef struct XrSystemHandTrackingMeshPropertiesMSFT {
     XrStructureType       type;
     void* XR_MAY_ALIAS    next;
@@ -2007,6 +2041,7 @@ typedef struct XrHandMeshMSFT {
     XrHandMeshVertexBufferMSFT    vertexBuffer;
 } XrHandMeshMSFT;
 
+// XrHandPoseTypeInfoMSFT extends XrHandTrackerCreateInfoEXT
 typedef struct XrHandPoseTypeInfoMSFT {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
@@ -2017,6 +2052,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrCreateHandMeshSpaceMSFT)(XrHandTrackerEXT han
 typedef XrResult (XRAPI_PTR *PFN_xrUpdateHandMeshMSFT)(XrHandTrackerEXT handTracker, const XrHandMeshUpdateInfoMSFT* updateInfo, XrHandMeshMSFT* handMesh);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrCreateHandMeshSpaceMSFT(
     XrHandTrackerEXT                            handTracker,
     const XrHandMeshSpaceCreateInfoMSFT*        createInfo,
@@ -2026,12 +2062,14 @@ XRAPI_ATTR XrResult XRAPI_CALL xrUpdateHandMeshMSFT(
     XrHandTrackerEXT                            handTracker,
     const XrHandMeshUpdateInfoMSFT*             updateInfo,
     XrHandMeshMSFT*                             handMesh);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_MSFT_secondary_view_configuration 1
 #define XR_MSFT_secondary_view_configuration_SPEC_VERSION 1
 #define XR_MSFT_SECONDARY_VIEW_CONFIGURATION_EXTENSION_NAME "XR_MSFT_secondary_view_configuration"
+// XrSecondaryViewConfigurationSessionBeginInfoMSFT extends XrSessionBeginInfo
 typedef struct XrSecondaryViewConfigurationSessionBeginInfoMSFT {
     XrStructureType                   type;
     const void* XR_MAY_ALIAS          next;
@@ -2046,6 +2084,7 @@ typedef struct XrSecondaryViewConfigurationStateMSFT {
     XrBool32                   active;
 } XrSecondaryViewConfigurationStateMSFT;
 
+// XrSecondaryViewConfigurationFrameStateMSFT extends XrFrameState
 typedef struct XrSecondaryViewConfigurationFrameStateMSFT {
     XrStructureType                           type;
     void* XR_MAY_ALIAS                        next;
@@ -2062,6 +2101,7 @@ typedef struct XrSecondaryViewConfigurationLayerInfoMSFT {
     const XrCompositionLayerBaseHeader* const*    layers;
 } XrSecondaryViewConfigurationLayerInfoMSFT;
 
+// XrSecondaryViewConfigurationFrameEndInfoMSFT extends XrFrameEndInfo
 typedef struct XrSecondaryViewConfigurationFrameEndInfoMSFT {
     XrStructureType                                     type;
     const void* XR_MAY_ALIAS                            next;
@@ -2069,6 +2109,7 @@ typedef struct XrSecondaryViewConfigurationFrameEndInfoMSFT {
     const XrSecondaryViewConfigurationLayerInfoMSFT*    viewConfigurationLayersInfo;
 } XrSecondaryViewConfigurationFrameEndInfoMSFT;
 
+// XrSecondaryViewConfigurationSwapchainCreateInfoMSFT extends XrSwapchainCreateInfo
 typedef struct XrSecondaryViewConfigurationSwapchainCreateInfoMSFT {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
@@ -2131,6 +2172,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrGetControllerModelPropertiesMSFT)(XrSession s
 typedef XrResult (XRAPI_PTR *PFN_xrGetControllerModelStateMSFT)(XrSession session, XrControllerModelKeyMSFT modelKey, XrControllerModelStateMSFT* state);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrGetControllerModelKeyMSFT(
     XrSession                                   session,
     XrPath                                      topLevelUserPath,
@@ -2152,7 +2194,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetControllerModelStateMSFT(
     XrSession                                   session,
     XrControllerModelKeyMSFT                    modelKey,
     XrControllerModelStateMSFT*                 state);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_EXT_win32_appcontainer_compatible 1
@@ -2163,6 +2206,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetControllerModelStateMSFT(
 #define XR_EPIC_view_configuration_fov 1
 #define XR_EPIC_view_configuration_fov_SPEC_VERSION 2
 #define XR_EPIC_VIEW_CONFIGURATION_FOV_EXTENSION_NAME "XR_EPIC_view_configuration_fov"
+// XrViewConfigurationViewFovEPIC extends XrViewConfigurationView
 typedef struct XrViewConfigurationViewFovEPIC {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
@@ -2180,6 +2224,7 @@ typedef struct XrViewConfigurationViewFovEPIC {
 #define XR_VALVE_analog_threshold 1
 #define XR_VALVE_analog_threshold_SPEC_VERSION 1
 #define XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME "XR_VALVE_analog_threshold"
+// XrInteractionProfileAnalogThresholdVALVE extends XrInteractionProfileSuggestedBinding
 typedef struct XrInteractionProfileAnalogThresholdVALVE {
     XrStructureType              type;
     const void* XR_MAY_ALIAS     next;
@@ -2223,6 +2268,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrGetDisplayRefreshRateFB)(XrSession session, f
 typedef XrResult (XRAPI_PTR *PFN_xrRequestDisplayRefreshRateFB)(XrSession session, float displayRefreshRate);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateDisplayRefreshRatesFB(
     XrSession                                   session,
     uint32_t                                    displayRefreshRateCapacityInput,
@@ -2236,7 +2282,8 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetDisplayRefreshRateFB(
 XRAPI_ATTR XrResult XRAPI_CALL xrRequestDisplayRefreshRateFB(
     XrSession                                   session,
     float                                       displayRefreshRate);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_HTC_vive_cosmos_controller_interaction 1
@@ -2269,6 +2316,7 @@ typedef XrResult (XRAPI_PTR *PFN_xrEnumerateColorSpacesFB)(XrSession session, ui
 typedef XrResult (XRAPI_PTR *PFN_xrSetColorSpaceFB)(XrSession session, const XrColorSpaceFB colorspace);
 
 #ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
 XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateColorSpacesFB(
     XrSession                                   session,
     uint32_t                                    colorSpaceCapacityInput,
@@ -2278,7 +2326,61 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateColorSpacesFB(
 XRAPI_ATTR XrResult XRAPI_CALL xrSetColorSpaceFB(
     XrSession                                   session,
     const XrColorSpaceFB                        colorspace);
-#endif
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_VARJO_foveated_rendering 1
+#define XR_VARJO_foveated_rendering_SPEC_VERSION 1
+#define XR_VARJO_FOVEATED_RENDERING_EXTENSION_NAME "XR_VARJO_foveated_rendering"
+// XrViewLocateFoveatedRenderingVARJO extends XrViewLocateInfo
+typedef struct XrViewLocateFoveatedRenderingVARJO {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrBool32                    foveatedRenderingActive;
+} XrViewLocateFoveatedRenderingVARJO;
+
+// XrFoveatedViewConfigurationViewVARJO extends XrViewConfigurationView
+typedef struct XrFoveatedViewConfigurationViewVARJO {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              foveatedRenderingActive;
+} XrFoveatedViewConfigurationViewVARJO;
+
+// XrSystemFoveatedRenderingPropertiesVARJO extends XrSystemProperties
+typedef struct XrSystemFoveatedRenderingPropertiesVARJO {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsFoveatedRendering;
+} XrSystemFoveatedRenderingPropertiesVARJO;
+
+
+
+#define XR_VARJO_composition_layer_depth_test 1
+#define XR_VARJO_composition_layer_depth_test_SPEC_VERSION 1
+#define XR_VARJO_COMPOSITION_LAYER_DEPTH_TEST_EXTENSION_NAME "XR_VARJO_composition_layer_depth_test"
+// XrCompositionLayerDepthTestVARJO extends XrCompositionLayerProjection
+typedef struct XrCompositionLayerDepthTestVARJO {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    float                       depthTestRangeNearZ;
+    float                       depthTestRangeFarZ;
+} XrCompositionLayerDepthTestVARJO;
+
+
+
+#define XR_VARJO_environment_depth_estimation 1
+#define XR_VARJO_environment_depth_estimation_SPEC_VERSION 1
+#define XR_VARJO_ENVIRONMENT_DEPTH_ESTIMATION_EXTENSION_NAME "XR_VARJO_environment_depth_estimation"
+typedef XrResult (XRAPI_PTR *PFN_xrSetEnvironmentDepthEstimationVARJO)(XrSession session, XrBool32 enabled);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrSetEnvironmentDepthEstimationVARJO(
+    XrSession                                   session,
+    XrBool32                                    enabled);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 #ifdef __cplusplus
 }

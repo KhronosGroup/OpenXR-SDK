@@ -234,6 +234,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     // ---- XR_FB_color_space extension commands
     (get_inst_proc_addr(instance, "xrEnumerateColorSpacesFB", (PFN_xrVoidFunction*)&table->EnumerateColorSpacesFB));
     (get_inst_proc_addr(instance, "xrSetColorSpaceFB", (PFN_xrVoidFunction*)&table->SetColorSpaceFB));
+
+    // ---- XR_VARJO_environment_depth_estimation extension commands
+    (get_inst_proc_addr(instance, "xrSetEnvironmentDepthEstimationVARJO", (PFN_xrVoidFunction*)&table->SetEnvironmentDepthEstimationVARJO));
 }
 
 

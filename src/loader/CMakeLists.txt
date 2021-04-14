@@ -31,6 +31,7 @@ endif()
 # List of all files externally generated outside of the loader that the loader
 # needs to build with.
 set(LOADER_EXTERNAL_GEN_FILES ${COMMON_GENERATED_OUTPUT})
+set(LOADER_EXTERNAL_GEN_DEPENDS ${COMMON_GENERATED_DEPENDS})
 run_xr_xml_generate(loader_source_generator.py xr_generated_loader.hpp)
 run_xr_xml_generate(loader_source_generator.py xr_generated_loader.cpp)
 
@@ -86,15 +87,17 @@ else()
 endif()
 set_target_properties(openxr_loader PROPERTIES FOLDER ${LOADER_FOLDER})
 
-set_source_files_properties(${LOADER_EXTERNAL_GEN_FILES} PROPERTIES GENERATED TRUE)
+if(LOADER_EXTERNAL_GEN_DEPENDS)
+    set_source_files_properties(${LOADER_EXTERNAL_GEN_DEPENDS} PROPERTIES GENERATED TRUE)
+endif()
 add_dependencies(openxr_loader generate_openxr_header xr_global_generated_files)
 target_include_directories(
     openxr_loader
-    PRIVATE ${PROJECT_SOURCE_DIR}/src/common
+    # for OpenXR headers
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+           $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
 
-            # for OpenXR headers
-            ${PROJECT_SOURCE_DIR}/include
-            ${PROJECT_BINARY_DIR}/include
+    PRIVATE ${PROJECT_SOURCE_DIR}/src/common
 
             # for generated dispatch table, common_config.h
             ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -193,7 +196,7 @@ elseif(WIN32)
         target_compile_options(openxr_loader PRIVATE /wd6386)
     endif()
 
-    target_link_libraries(openxr_loader PUBLIC advapi32 pathcch)
+    target_link_libraries(openxr_loader PUBLIC advapi32)
 
     # Need to copy DLL to client directories so clients can easily load it.
     if(DYNAMIC_LOADER AND (CMAKE_GENERATOR MATCHES "^Visual Studio.*"))
