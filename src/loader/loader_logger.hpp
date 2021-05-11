@@ -17,6 +17,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <shared_mutex>
 
 #include <openxr/openxr.h>
 
@@ -172,6 +173,8 @@ class LoaderLogger {
 
    private:
     LoaderLogger();
+
+    std::shared_timed_mutex _mutex;
 
     // List of *all* available recorder objects (including created specifically for an Instance)
     std::vector<std::unique_ptr<LoaderLogRecorder>> _recorders;

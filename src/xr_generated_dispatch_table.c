@@ -226,6 +226,11 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrTryGetPerceptionAnchorFromSpatialAnchorMSFT", (PFN_xrVoidFunction*)&table->TryGetPerceptionAnchorFromSpatialAnchorMSFT));
 #endif // defined(XR_USE_PLATFORM_WIN32)
 
+    // ---- XR_FB_swapchain_update_state extension commands
+#if defined(XR_USE_PLATFORM_ANDROID)
+    (get_inst_proc_addr(instance, "xrUpdateSwapchainFB", (PFN_xrVoidFunction*)&table->UpdateSwapchainFB));
+#endif // defined(XR_USE_PLATFORM_ANDROID)
+
     // ---- XR_FB_display_refresh_rate extension commands
     (get_inst_proc_addr(instance, "xrEnumerateDisplayRefreshRatesFB", (PFN_xrVoidFunction*)&table->EnumerateDisplayRefreshRatesFB));
     (get_inst_proc_addr(instance, "xrGetDisplayRefreshRateFB", (PFN_xrVoidFunction*)&table->GetDisplayRefreshRateFB));

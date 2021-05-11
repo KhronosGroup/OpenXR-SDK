@@ -1,0 +1,30 @@
+# Copyright (c) 2019-2021 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+parameters:
+  - name: buildType
+    type: string
+    default: "RelWithDebInfo"
+  - name: cmakeArgs
+    type: string
+    default: ""
+  - name: sourceDir
+    type: string
+    default: "$(System.DefaultWorkingDirectory)"
+  - name: buildDir
+    type: string
+    default: build
+
+steps:
+  - script: |
+      rm -rf ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+      mkdir -p ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+    displayName: "Clean up and create new build directory"
+
+  - script: cmake -G Ninja .. -DCMAKE_BUILD_TYPE=${{ parameters.buildType }} ${{ parameters.cmakeArgs }}
+    workingDirectory: ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+    displayName: "Generate build system"
+
+  - script: ninja
+    workingDirectory: ${{ parameters.sourceDir }}/${{ parameters.buildDir }}
+    displayName: "Compile"

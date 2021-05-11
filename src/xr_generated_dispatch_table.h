@@ -229,6 +229,11 @@ struct XrGeneratedDispatchTable {
     PFN_xrTryGetPerceptionAnchorFromSpatialAnchorMSFT TryGetPerceptionAnchorFromSpatialAnchorMSFT;
 #endif // defined(XR_USE_PLATFORM_WIN32)
 
+    // ---- XR_FB_swapchain_update_state extension commands
+#if defined(XR_USE_PLATFORM_ANDROID)
+    PFN_xrUpdateSwapchainFB UpdateSwapchainFB;
+#endif // defined(XR_USE_PLATFORM_ANDROID)
+
     // ---- XR_FB_display_refresh_rate extension commands
     PFN_xrEnumerateDisplayRefreshRatesFB EnumerateDisplayRefreshRatesFB;
     PFN_xrGetDisplayRefreshRateFB GetDisplayRefreshRateFB;

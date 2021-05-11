@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 15)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 16)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -181,6 +181,7 @@ typedef enum XrResult {
     XR_ERROR_LOCALIZED_NAME_DUPLICATED = -48,
     XR_ERROR_LOCALIZED_NAME_INVALID = -49,
     XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING = -50,
+    XR_ERROR_RUNTIME_UNAVAILABLE = -51,
     XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR = -1000003000,
     XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR = -1000003001,
     XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT = -1000039001,
@@ -307,7 +308,10 @@ typedef enum XrStructureType {
     XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC = 1000059000,
     XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT = 1000063000,
     XR_TYPE_ANDROID_SURFACE_SWAPCHAIN_CREATE_INFO_FB = 1000070000,
+    XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB = 1000071000,
+    XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB = 1000071001,
     XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE = 1000079000,
+    XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT = 1000080000,
     XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR = 1000089000,
     XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR = 1000090000,
     XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR = 1000090001,
@@ -1485,7 +1489,7 @@ typedef struct XrBindingModificationsKHR {
 
 
 #define XR_EXT_performance_settings 1
-#define XR_EXT_performance_settings_SPEC_VERSION 2
+#define XR_EXT_performance_settings_SPEC_VERSION 3
 #define XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME "XR_EXT_performance_settings"
 
 typedef enum XrPerfSettingsDomainEXT {
@@ -1537,7 +1541,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrPerfSettingsSetPerformanceLevelEXT(
 
 
 #define XR_EXT_thermal_query 1
-#define XR_EXT_thermal_query_SPEC_VERSION 1
+#define XR_EXT_thermal_query_SPEC_VERSION 2
 #define XR_EXT_THERMAL_QUERY_EXTENSION_NAME "XR_EXT_thermal_query"
 typedef XrResult (XRAPI_PTR *PFN_xrThermalGetTemperatureTrendEXT)(XrSession session, XrPerfSettingsDomainEXT domain, XrPerfSettingsNotificationLevelEXT* notificationLevel, float* tempHeadroom, float* tempSlope);
 
@@ -1555,7 +1559,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrThermalGetTemperatureTrendEXT(
 
 #define XR_EXT_debug_utils 1
 XR_DEFINE_HANDLE(XrDebugUtilsMessengerEXT)
-#define XR_EXT_debug_utils_SPEC_VERSION   3
+#define XR_EXT_debug_utils_SPEC_VERSION   4
 #define XR_EXT_DEBUG_UTILS_EXTENSION_NAME "XR_EXT_debug_utils"
 typedef XrFlags64 XrDebugUtilsMessageSeverityFlagsEXT;
 
@@ -1783,7 +1787,7 @@ typedef struct XrViewConfigurationDepthRangeEXT {
 
 
 #define XR_EXT_conformance_automation 1
-#define XR_EXT_conformance_automation_SPEC_VERSION 2
+#define XR_EXT_conformance_automation_SPEC_VERSION 3
 #define XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME "XR_EXT_conformance_automation"
 typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceActiveEXT)(XrSession session, XrPath interactionProfile, XrPath topLevelPath, XrBool32 isActive);
 typedef XrResult (XRAPI_PTR *PFN_xrSetInputDeviceStateBoolEXT)(XrSession session, XrPath topLevelPath, XrPath inputSourcePath, XrBool32 state);
@@ -1866,7 +1870,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialGraphNodeSpaceMSFT(
 #define XR_HAND_JOINT_COUNT_EXT 26
 
 XR_DEFINE_HANDLE(XrHandTrackerEXT)
-#define XR_EXT_hand_tracking_SPEC_VERSION 3
+#define XR_EXT_hand_tracking_SPEC_VERSION 4
 #define XR_EXT_HAND_TRACKING_EXTENSION_NAME "XR_EXT_hand_tracking"
 
 typedef enum XrHandEXT {
@@ -2235,6 +2239,24 @@ typedef struct XrInteractionProfileAnalogThresholdVALVE {
     const XrHapticBaseHeader*    onHaptic;
     const XrHapticBaseHeader*    offHaptic;
 } XrInteractionProfileAnalogThresholdVALVE;
+
+
+
+#define XR_EXT_hand_joints_motion_range 1
+#define XR_EXT_hand_joints_motion_range_SPEC_VERSION 1
+#define XR_EXT_HAND_JOINTS_MOTION_RANGE_EXTENSION_NAME "XR_EXT_hand_joints_motion_range"
+
+typedef enum XrHandJointsMotionRangeEXT {
+    XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT = 1,
+    XR_HAND_JOINTS_MOTION_RANGE_CONFORMING_TO_CONTROLLER_EXT = 2,
+    XR_HAND_JOINTS_MOTION_RANGE_MAX_ENUM_EXT = 0x7FFFFFFF
+} XrHandJointsMotionRangeEXT;
+// XrHandJointsMotionRangeInfoEXT extends XrHandJointsLocateInfoEXT
+typedef struct XrHandJointsMotionRangeInfoEXT {
+    XrStructureType               type;
+    const void* XR_MAY_ALIAS      next;
+    XrHandJointsMotionRangeEXT    handJointsMotionRange;
+} XrHandJointsMotionRangeInfoEXT;
 
 
 

@@ -565,6 +565,51 @@ typedef struct XrAndroidSurfaceSwapchainCreateInfoFB {
 
 #endif /* XR_USE_PLATFORM_ANDROID */
 
+#ifdef XR_USE_PLATFORM_ANDROID
+
+#define XR_FB_swapchain_update_state 1
+#define XR_FB_swapchain_update_state_SPEC_VERSION 1
+#define XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME "XR_FB_swapchain_update_state"
+typedef struct XR_MAY_ALIAS XrSwapchainStateBaseHeaderFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+} XrSwapchainStateBaseHeaderFB;
+
+typedef struct XrSwapchainStateAndroidSurfaceDimensionsFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    width;
+    uint32_t                    height;
+} XrSwapchainStateAndroidSurfaceDimensionsFB;
+
+#ifdef XR_USE_GRAPHICS_API_OPENGL_ES
+typedef struct XrSwapchainStateSamplerOpenGLESFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    EGLenum                     minFilter;
+    EGLenum                     magFilter;
+    EGLenum                     wrapModeS;
+    EGLenum                     wrapModeT;
+    EGLenum                     swizzleRed;
+    EGLenum                     swizzleGreen;
+    EGLenum                     swizzleBlue;
+    EGLenum                     swizzleAlpha;
+    float                       maxAnisotropy;
+    XrColor4f                   borderColor;
+} XrSwapchainStateSamplerOpenGLESFB;
+#endif // XR_USE_GRAPHICS_API_OPENGL_ES
+
+typedef XrResult (XRAPI_PTR *PFN_xrUpdateSwapchainFB)(XrSwapchain swapchain, const XrSwapchainStateBaseHeaderFB* state);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrUpdateSwapchainFB(
+    XrSwapchain                                 swapchain,
+    const XrSwapchainStateBaseHeaderFB*         state);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+#endif /* XR_USE_PLATFORM_ANDROID */
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,12 @@
+# Copyright (c) 2019-2021 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+jobs:
+  - job: check_codespell
+    displayName: "codespell"
+    pool:
+      vmImage: "ubuntu-latest"
+    container: khronosgroup/docker-images:openxr-sdk.202102
+    steps:
+      - script: ./checkCodespell
+        displayName: Run Codespell script

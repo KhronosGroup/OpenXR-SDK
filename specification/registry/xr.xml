@@ -68,6 +68,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type requires="EGL/egl.h" name="EGLDisplay"/>
         <type requires="EGL/egl.h" name="EGLConfig"/>
         <type requires="EGL/egl.h" name="EGLContext"/>
+        <type requires="EGL/egl.h" name="EGLenum"/>
         <type requires="EGL/egl.h" name="PFNEGLGETPROCADDRESSPROC"/>
         <type requires="GL/glxext.h" name="GLXFBConfig"/>
         <type requires="GL/glxext.h" name="GLXDrawable"/>
@@ -111,7 +112,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 15)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 16)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1194,6 +1195,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member len="jointCount"><type>XrHandJointVelocityEXT</type>* <name>jointVelocities</name></member>
         </type>
 
+        <!-- XR_EXT_controller_hand_joints_motion_range -->
+        <type name="XrHandJointsMotionRangeEXT" category="enum"/>
+        <type category="struct" name="XrHandJointsMotionRangeInfoEXT" structextends="XrHandJointsLocateInfoEXT">
+            <member values="XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrHandJointsMotionRangeEXT</type> <name>handJointsMotionRange</name></member>
+        </type>
+
         <!-- XR_MSFT_hand_tracking_mesh -->
         <type name="XrHandPoseTypeMSFT" category="enum"/>
         <type category="struct" name="XrHandMeshSpaceCreateInfoMSFT">
@@ -1298,6 +1307,32 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
           <member values="XR_TYPE_ANDROID_SURFACE_SWAPCHAIN_CREATE_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
           <member>const <type>void</type>* <name>next</name></member>
           <member><type>XrAndroidSurfaceSwapchainFlagsFB</type> <name>createFlags</name></member>
+        </type>
+
+        <!-- XR_FB_swapchain_update_state structs -->
+        <type category="struct" name="XrSwapchainStateBaseHeaderFB">
+          <member><type>XrStructureType</type> <name>type</name></member>
+          <member><type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrSwapchainStateAndroidSurfaceDimensionsFB" parentstruct="XrSwapchainStateBaseHeaderFB">
+          <member values="XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB"><type>XrStructureType</type> <name>type</name></member>
+          <member>const <type>void</type>* <name>next</name></member>
+          <member><type>uint32_t</type> <name>width</name></member>
+          <member><type>uint32_t</type> <name>height</name></member>
+        </type>
+        <type category="struct" name="XrSwapchainStateSamplerOpenGLESFB" parentstruct="XrSwapchainStateBaseHeaderFB" protect="XR_USE_GRAPHICS_API_OPENGL_ES">
+          <member values="XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB"><type>XrStructureType</type> <name>type</name></member>
+          <member>const <type>void</type>* <name>next</name></member>
+          <member><type>EGLenum</type> <name>minFilter</name></member>
+          <member><type>EGLenum</type> <name>magFilter</name></member>
+          <member><type>EGLenum</type> <name>wrapModeS</name></member>
+          <member><type>EGLenum</type> <name>wrapModeT</name></member>
+          <member><type>EGLenum</type> <name>swizzleRed</name></member>
+          <member><type>EGLenum</type> <name>swizzleGreen</name></member>
+          <member><type>EGLenum</type> <name>swizzleBlue</name></member>
+          <member><type>EGLenum</type> <name>swizzleAlpha</name></member>
+          <member><type>float</type> <name>maxAnisotropy</name></member>
+          <member><type>XrColor4f</type> <name>borderColor</name></member>
         </type>
 
         <!-- XR_KHR_loader_init -->
@@ -1546,6 +1581,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="-48"   name="XR_ERROR_LOCALIZED_NAME_DUPLICATED" comment="The localized name provided was a duplicate of an already-existing resource."/>
         <enum value="-49"   name="XR_ERROR_LOCALIZED_NAME_INVALID" comment="The localized name provided was invalid."/>
         <enum value="-50"   name="XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING" comment="The fname:xrGetGraphicsRequirements* call was not made before calling fname:xrCreateSession."/>
+        <enum value="-51"   name="XR_ERROR_RUNTIME_UNAVAILABLE" comment="The loader was unable to find or load a runtime."/>
         <unused start="-100"/>
     </enums>
     <enums name="XrObjectType" type="enum" comment="Enums to track objects of various types">
@@ -1690,6 +1726,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="0" name="XR_HAND_JOINT_SET_DEFAULT_EXT"/>
     </enums>
 
+    <!-- XR_EXT_hand_joints_motion_range -->
+    <enums name="XrHandJointsMotionRangeEXT" type="enum">
+        <enum value="1" name="XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT"/>
+        <enum value="2" name="XR_HAND_JOINTS_MOTION_RANGE_CONFORMING_TO_CONTROLLER_EXT"/>
+    </enums>
+
     <!-- XR_MSFT_hand_tracking_mesh -->
     <enums name="XrHandPoseTypeMSFT" type="enum">
         <enum value="0" name="XR_HAND_POSE_TYPE_TRACKED_MSFT"/>
@@ -1722,7 +1764,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <enums name="XrSwapchainUsageFlagBits" type="bitmask">
         <enum bitpos="0"    name="XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT"               comment="Specifies that the image can: be a color rendering target."/>
         <enum bitpos="1"    name="XR_SWAPCHAIN_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT"       comment="Specifies that the image can: be a depth/stencil rendering target."/>
-        <enum bitpos="2"    name="XR_SWAPCHAIN_USAGE_UNORDERED_ACCESS_BIT"               comment="Specifies that the image can: be used as data/compute."/>
+        <enum bitpos="2"    name="XR_SWAPCHAIN_USAGE_UNORDERED_ACCESS_BIT"               comment="Specifies that the image can: be accessed out of order and that access can: be via atomic operations."/>
         <enum bitpos="3"    name="XR_SWAPCHAIN_USAGE_TRANSFER_SRC_BIT"                   comment="Specifies that the image can: be used as the source of a transfer command."/>
         <enum bitpos="4"    name="XR_SWAPCHAIN_USAGE_TRANSFER_DST_BIT"                   comment="Specifies that the image can: be used as the destination of a transfer command."/>
         <enum bitpos="5"    name="XR_SWAPCHAIN_USAGE_SAMPLED_BIT"                        comment="Specifies that the image can: be sampled by a shader."/>
@@ -1812,14 +1854,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>uint32_t</type>* <name>propertyCountOutput</name></param>
             <param optional="true" len="propertyCapacityInput"><type>XrApiLayerProperties</type>* <name>properties</name></param>
         </command>
-        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_OUT_OF_MEMORY,XR_ERROR_API_LAYER_NOT_PRESENT,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_SIZE_INSUFFICIENT">
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_OUT_OF_MEMORY,XR_ERROR_API_LAYER_NOT_PRESENT,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_RUNTIME_UNAVAILABLE">
             <proto><type>XrResult</type> <name>xrEnumerateInstanceExtensionProperties</name></proto>
             <param optional="true" len="null-terminated">const <type>char</type>* <name>layerName</name></param>
             <param optional="true"><type>uint32_t</type> <name>propertyCapacityInput</name></param>
             <param><type>uint32_t</type>* <name>propertyCountOutput</name></param>
             <param optional="true" len="propertyCapacityInput"><type>XrExtensionProperties</type>* <name>properties</name></param>
         </command>
-        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_INITIALIZATION_FAILED,XR_ERROR_API_VERSION_UNSUPPORTED,XR_ERROR_API_LAYER_NOT_PRESENT,XR_ERROR_EXTENSION_NOT_PRESENT,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_NAME_INVALID">
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_INITIALIZATION_FAILED,XR_ERROR_API_VERSION_UNSUPPORTED,XR_ERROR_API_LAYER_NOT_PRESENT,XR_ERROR_EXTENSION_NOT_PRESENT,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_NAME_INVALID,XR_ERROR_RUNTIME_UNAVAILABLE">
             <proto><type>XrResult</type> <name>xrCreateInstance</name></proto>
             <param>const <type>XrInstanceCreateInfo</type>* <name>createInfo</name></param>
             <param><type>XrInstance</type>* <name>instance</name></param>
@@ -2194,13 +2236,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrSystemId</type> <name>systemId</name></param>
             <param><type>XrGraphicsRequirementsD3D12KHR</type>* <name>graphicsRequirements</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrPerfSettingsSetPerformanceLevelEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPerfSettingsDomainEXT</type> <name>domain</name></param>
             <param><type>XrPerfSettingsLevelEXT</type> <name>level</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrThermalGetTemperatureTrendEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPerfSettingsDomainEXT</type> <name>domain</name></param>
@@ -2233,16 +2275,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrDebugUtilsMessageTypeFlagsEXT</type>             <name>messageTypes</name></param>
             <param>const <type>XrDebugUtilsMessengerCallbackDataEXT</type>* <name>callbackData</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSessionBeginDebugUtilsLabelRegionEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrDebugUtilsLabelEXT</type>* <name>labelInfo</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSessionEndDebugUtilsLabelRegionEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_HANDLE_INVALID,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_FUNCTION_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSessionInsertDebugUtilsLabelEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrDebugUtilsLabelEXT</type>* <name>labelInfo</name></param>
@@ -2329,7 +2371,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- commands for XR_EXT_conformance_automation -->
         <command successcodes="XR_SUCCESS"
-            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSetInputDeviceActiveEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPath</type> <name>interactionProfile</name></param>
@@ -2337,7 +2379,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrBool32</type> <name>isActive</name></param>
         </command>
         <command successcodes="XR_SUCCESS"
-            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSetInputDeviceStateBoolEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPath</type> <name>topLevelPath</name></param>
@@ -2345,7 +2387,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrBool32</type> <name>state</name></param>
         </command>
         <command successcodes="XR_SUCCESS"
-            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSetInputDeviceStateFloatEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPath</type> <name>topLevelPath</name></param>
@@ -2353,7 +2395,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>float</type> <name>state</name></param>
         </command>
         <command successcodes="XR_SUCCESS"
-            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSetInputDeviceStateVector2fEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPath</type> <name>topLevelPath</name></param>
@@ -2361,7 +2403,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrVector2f</type> <name>state</name></param>
         </command>
         <command successcodes="XR_SUCCESS"
-            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_POSE_INVALID">
+            errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_SESSION_LOSS_PENDING,XR_ERROR_PATH_INVALID,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_POSE_INVALID">
             <proto><type>XrResult</type> <name>xrSetInputDeviceLocationEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrPath</type> <name>topLevelPath</name></param>
@@ -2479,6 +2521,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
           <param><type>XrSession</type> <name>session</name></param>
           <param><type>XrSpatialAnchorMSFT</type> <name>anchor</name></param>
           <param><type>IUnknown</type>** <name>perceptionAnchor</name></param>
+      </command>
+
+      <!-- XR_FB_swapchain_update_state -->
+      <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE">
+        <proto><type>XrResult</type> <name>xrUpdateSwapchainFB</name></proto>
+        <param><type>XrSwapchain</type> <name>swapchain</name></param>
+        <param>const <type>XrSwapchainStateBaseHeaderFB</type>* <name>state</name></param>
       </command>
 
       <!-- XR_FB_color_space -->
@@ -2745,7 +2794,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Performance Settings extension -->
     <extension name="XR_EXT_performance_settings" number="16" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_EXT_performance_settings_SPEC_VERSION"/>
+            <enum value="3" name="XR_EXT_performance_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_performance_settings&quot;" name="XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT"/>
             <type name="XrPerfSettingsDomainEXT"/>
@@ -2760,7 +2809,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Thermal Query extension -->
     <extension name="XR_EXT_thermal_query" number="17" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_EXT_thermal_query_SPEC_VERSION"/>
+            <enum value="2" name="XR_EXT_thermal_query_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_thermal_query&quot;" name="XR_EXT_THERMAL_QUERY_EXTENSION_NAME"/>
             <type name="XrPerfSettingsDomainEXT"/>
             <type name="XrPerfSettingsNotificationLevelEXT"/>
@@ -2791,7 +2840,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Debug Utilities extension -->
     <extension name="XR_EXT_debug_utils" number="20" type="instance" supported="openxr">
         <require>
-            <enum value="3"                                name="XR_EXT_debug_utils_SPEC_VERSION"/>
+            <enum value="4"                                name="XR_EXT_debug_utils_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_debug_utils&quot;"   name="XR_EXT_DEBUG_UTILS_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"     name="XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT"/>
             <enum offset="1" extends="XrStructureType"     name="XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"/>
@@ -3089,7 +3138,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_EXT_conformance_automation" number="48" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_EXT_conformance_automation_SPEC_VERSION"/>
+            <enum value="3" name="XR_EXT_conformance_automation_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_conformance_automation&quot;" name="XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME"/>
             <command name="xrSetInputDeviceActiveEXT"/>
             <command name="xrSetInputDeviceStateBoolEXT"/>
@@ -3128,7 +3177,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_EXT_hand_tracking" number="52" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_EXT_hand_tracking_SPEC_VERSION"/>
+            <enum value="4" name="XR_EXT_hand_tracking_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_tracking&quot;" name="XR_EXT_HAND_TRACKING_EXTENSION_NAME"/>
 
             <command name="xrCreateHandTrackerEXT"/>
@@ -3346,10 +3395,17 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_72" number="72" type="instance" supported="disabled">
+    <extension name="XR_FB_swapchain_update_state" number="72" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
         <require>
-            <enum value="1" name="XR_FB_extension_72_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_72&quot;" name="XR_FB_extension_72_EXTENSION_NAME"/>
+            <enum value="1" name="XR_FB_swapchain_update_state_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_swapchain_update_state&quot;" name="XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME"/>
+
+            <type name="XrSwapchainStateBaseHeaderFB" />
+            <type name="XrSwapchainStateAndroidSurfaceDimensionsFB" />
+            <type name="XrSwapchainStateSamplerOpenGLESFB" />
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB"/>
+            <command name="xrUpdateSwapchainFB"/>
         </require>
     </extension>
 
@@ -3411,10 +3467,15 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_VALVE_extension_81" number="81" type="instance" supported="disabled">
+    <extension name="XR_EXT_hand_joints_motion_range" number="81" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="1" name="XR_VALVE_extension_81_SPEC_VERSION"/>
-            <enum value="&quot;XR_VALVE_extension_81&quot;" name="XR_VALVE_extension_81_EXTENSION_NAME"/>
+            <enum value="1" name="XR_EXT_hand_joints_motion_range_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_hand_joints_motion_range&quot;" name="XR_EXT_HAND_JOINTS_MOTION_RANGE_EXTENSION_NAME"/>
+
+            <type name="XrHandJointsMotionRangeEXT"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT"/>
+            <type name="XrHandJointsMotionRangeInfoEXT"/>
         </require>
     </extension>
 
@@ -3549,6 +3610,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="2" name="XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_swapchain_usage_input_attachment_bit&quot;" name="XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME"/>
+            <!-- NOTE: This was added before the working group established a process. Future vendor extensions MUST NOT extend core bitmasks. -->
             <enum bitpos="7" extends="XrSwapchainUsageFlagBits" name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND" comment="Specifies that the image can: be used as a input attachment."/>
         </require>
     </extension>
@@ -4058,6 +4120,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_FB_extension_165_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_165&quot;" name="XR_FB_extension_165_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_166" number="166" type="instance" supported="disabled">
+        <require>
+            <enum value="1" name="XR_KHR_extension_166_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_166&quot;" name="XR_KHR_extension_166_EXTENSION_NAME"/>
         </require>
     </extension>
 

@@ -19,6 +19,53 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.16 (2021-05-11)
+
+This release contains an update to define a new error code,
+`XR_ERROR_RUNTIME_UNAVAILABLE`, now returned by the loader at `xrCreateInstance`
+and `xrEnumerateInstanceProperties` when it cannot find or load a runtime for
+some reason. This should be more clear for developers when encountering it, as
+well as helpful when troubleshooting errors hit by users. (The
+previously-returned error was typically `XR_ERROR_INSTANCE_LOST`, which is
+confusing when returned when trying to create an instance.) This release also
+includes a new multi-vendor extension, a new vendor extension, and improved
+concurrency handling in the loader, among smaller fixes.
+
+- Registry
+  - Add new `XR_ERROR_RUNTIME_UNAVAILABLE` error code, add
+    `XR_ERROR_RUNTIME_UNAVAILABLE` as a supported error code to `xrCreateInstance`
+    and `xrEnumerateInstanceProperties`, and remove `XR_ERROR_INSTANCE_LOST` as a
+    supported error code from `xrCreateInstance`.
+    ([internal MR 2024](https://gitlab.khronos.org/openxr/openxr/merge_requests/2024),
+    [internal issue 1552](https://gitlab.khronos.org/openxr/openxr/issues/1552),
+    [OpenXR-SDK-Source/#177](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/177))
+  - Add `XR_EXT_hand_joint_motion_range` multi-vendor extension.
+    ([internal MR 1995](https://gitlab.khronos.org/openxr/openxr/merge_requests/1995))
+  - Add `XR_FB_swapchain_update_state` vendor extension.
+    ([internal MR 1997](https://gitlab.khronos.org/openxr/openxr/merge_requests/1997))
+  - Fix missing `XR_ERROR_INSTANCE_LOST` return codes for extension functions in
+    `XR_EXT_performance_settings`, `XR_EXT_debug_utils`,
+    `XR_EXT_conformance_automation`, and `XR_EXT_thermal_query`.
+    ([internal MR 2023](https://gitlab.khronos.org/openxr/openxr/merge_requests/2023),
+    [OpenXR-Docs/#10](https://github.com/KhronosGroup/OpenXR-Docs/issues/10),
+    [internal issue 1256](https://gitlab.khronos.org/openxr/openxr/issues/1256))
+  - Reserve extension 166 for working group use.
+    ([internal MR 2025](https://gitlab.khronos.org/openxr/openxr/merge_requests/2025))
+- SDK
+  - Loader: Change runtime part to return `XR_ERROR_RUNTIME_UNAVAILABLE` when
+    there is an error loading a runtime.
+    ([internal MR 2024](https://gitlab.khronos.org/openxr/openxr/merge_requests/2024),
+    [internal issue 1552](https://gitlab.khronos.org/openxr/openxr/issues/1552),
+    [OpenXR-SDK-Source/#177](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/177))
+  - Loader: Simplify in areas where code paths were dead.
+    ([internal MR 2024](https://gitlab.khronos.org/openxr/openxr/merge_requests/2024))
+  - Loader: Improved locking around a few areas of the loader that aren't robust
+    against usual concurrent calls.
+    ([OpenXR-SDK-Source/#252](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/252))
+  - validation layer: Fix generated code when a protected extension contains a base
+    header type.
+    ([internal MR 1997](https://gitlab.khronos.org/openxr/openxr/merge_requests/1997))
+
 ## OpenXR SDK 1.0.15 (2021-04-13)
 
 The main SDK change in this release is that the OpenXR headers **no longer

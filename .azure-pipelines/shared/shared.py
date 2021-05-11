@@ -1,23 +1,20 @@
 # Copyright (c) 2019 The Khronos Group Inc.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import sys
 
-VS_VERSIONS = {
-    2019: 'Visual Studio 16 2019',
-    # 2017: 'Visual Studio 15 2017',
-}
+VS_VERSION = 'Visual Studio 16 2019'
 
-BITS = (32, 64)
+PLATFORMS = ('Win32', 'x64', 'ARM', 'ARM64')
 
 TRUE_FALSE = (True, False)
 
 
-def make_win_artifact_name(vsver, dynamic, bits):
-    return 'loader_win{}_msvs{}_{}'.format(
-        bits,
-        vsver,
-        'dynamic' if dynamic else 'static'
+def make_win_artifact_name(platform, uwp):
+    return 'loader_{}{}'.format(
+        platform.lower(),
+        '_uwp' if uwp else '',
     )
 
 

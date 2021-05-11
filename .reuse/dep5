@@ -23,17 +23,24 @@ Files: external/python/markupsafe/*
 Copyright: 2010 Pallets
 License: BSD-3-Clause
 
-Files: specification/sources/chapters/extensions/epic/*
+Files: specification/sources/chapters/extensions/epic/epic_view_configuration_fov.adoc
 Copyright: 2020, Epic Games, Inc.
 License: CC-BY-4.0
 Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1422
 
-Files: specification/sources/chapters/extensions/fb/*
+Files: specification/sources/chapters/extensions/fb/fb_android_surface_swapchain_create.adoc
+  specification/sources/chapters/extensions/fb/fb_color_space.adoc
+  specification/sources/chapters/extensions/fb/fb_display_refresh_rate.adoc
 Copyright: 2020, Facebook, Inc.
+License: CC-BY-4.0
+Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1562
+
+Files: specification/sources/chapters/extensions/oculus/oculus_android_session_state_enable.adoc
+Copyright: 2019, Oculus VR, LLC.
 License: CC-BY-4.0
 Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1418
 
-Files: specification/sources/chapters/extensions/valve/*
+Files: specification/sources/chapters/extensions/valve/valve_analog_threshold.adoc
 Copyright: 2020, Valve
 License: CC-BY-4.0
 Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1421

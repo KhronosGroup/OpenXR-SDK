@@ -136,14 +136,19 @@ LoaderLogger::LoaderLogger() {
     }
 }
 
-void LoaderLogger::AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder) { _recorders.push_back(std::move(recorder)); }
+void LoaderLogger::AddLogRecorder(std::unique_ptr<LoaderLogRecorder>&& recorder) {
+    std::unique_lock<std::shared_timed_mutex> lock(_mutex);
+    _recorders.push_back(std::move(recorder));
+}
 
 void LoaderLogger::AddLogRecorderForXrInstance(XrInstance instance, std::unique_ptr<LoaderLogRecorder>&& recorder) {
+    std::unique_lock<std::shared_timed_mutex> lock(_mutex);
     _recordersByInstance[instance].insert(recorder->UniqueId());
     _recorders.emplace_back(std::move(recorder));
 }
 
 void LoaderLogger::RemoveLogRecorder(uint64_t unique_id) {
+    std::unique_lock<std::shared_timed_mutex> lock(_mutex);
     vector_remove_if_and_erase(
         _recorders, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) { return recorder->UniqueId() == unique_id; });
     for (auto& recorders : _recordersByInstance) {
@@ -155,6 +160,7 @@ void LoaderLogger::RemoveLogRecorder(uint64_t unique_id) {
 }
 
 void LoaderLogger::RemoveLogRecordersForXrInstance(XrInstance instance) {
+    std::unique_lock<std::shared_timed_mutex> lock(_mutex);
     if (_recordersByInstance.find(instance) != _recordersByInstance.end()) {
         auto recorders = _recordersByInstance[instance];
         vector_remove_if_and_erase(_recorders, [=](std::unique_ptr<LoaderLogRecorder> const& recorder) {
@@ -179,6 +185,7 @@ bool LoaderLogger::LogMessage(XrLoaderLogMessageSeverityFlagBits message_severit
     callback_data.session_labels = names_and_labels.labels.empty() ? nullptr : names_and_labels.labels.data();
     callback_data.session_labels_count = static_cast<uint8_t>(names_and_labels.labels.size());
 
+    std::shared_lock<std::shared_timed_mutex> lock(_mutex);
     bool exit_app = false;
     for (std::unique_ptr<LoaderLogRecorder>& recorder : _recorders) {
         if ((recorder->MessageSeverities() & message_severity) == message_severity &&
@@ -201,6 +208,7 @@ bool LoaderLogger::LogDebugUtilsMessage(XrDebugUtilsMessageSeverityFlagsEXT mess
     data_.WrapCallbackData(&augmented_data, callback_data);
 
     // Loop through the recorders
+    std::shared_lock<std::shared_timed_mutex> lock(_mutex);
     for (std::unique_ptr<LoaderLogRecorder>& recorder : _recorders) {
         // Only send the message if it's a debug utils recorder and of the type the recorder cares about.
         if (recorder->Type() != XR_LOADER_LOG_DEBUG_UTILS ||

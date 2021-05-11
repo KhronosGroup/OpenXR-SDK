@@ -105,14 +105,10 @@ XrResult InitializeLoader(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo) {
 
 #endif  // XR_KHR_LOADER_INIT_SUPPORT
 
-void RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command,
-                                               std::unique_ptr<RuntimeManifestFile>& manifest_file, bool& any_loaded,
-                                               XrResult& last_error) {
+XrResult RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command,
+                                                   std::unique_ptr<RuntimeManifestFile>& manifest_file) {
     LoaderPlatformLibraryHandle runtime_library = LoaderPlatformLibraryOpen(manifest_file->LibraryPath());
     if (nullptr == runtime_library) {
-        if (!any_loaded) {
-            last_error = XR_ERROR_INSTANCE_LOST;
-        }
         std::string library_message = LoaderPlatformLibraryOpenError(manifest_file->LibraryPath());
         std::string warning_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
         warning_message += manifest_file->Filename();
@@ -120,7 +116,7 @@ void RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command
         warning_message += library_message;
         warning_message += "\"";
         LoaderLogger::LogErrorMessage(openxr_command, warning_message);
-        return;
+        return XR_ERROR_FILE_ACCESS_ERROR;
     }
 #ifdef XR_KHR_LOADER_INIT_SUPPORT
     {
@@ -137,10 +133,8 @@ void RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command
                 LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntime skipping manifest file " +
                                                                   manifest_file->Filename() +
                                                                   ", forwarded call to xrInitializeLoaderKHR failed.");
-                last_error = res;
-
                 LoaderPlatformLibraryClose(runtime_library);
-                return;
+                return res;
             }
         }
     }
@@ -200,16 +194,13 @@ void RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command
         }
     }
     if (XR_FAILED(res)) {
-        if (!any_loaded) {
-            last_error = res;
-        }
         std::string warning_message = "RuntimeInterface::LoadRuntime skipping manifest file ";
         warning_message += manifest_file->Filename();
         warning_message += ", negotiation failed with error ";
         warning_message += std::to_string(res);
         LoaderLogger::LogErrorMessage(openxr_command, warning_message);
         LoaderPlatformLibraryClose(runtime_library);
-        return;
+        return res;
     }
 
     std::string info_message = "RuntimeInterface::LoadRuntime succeeded loading runtime defined in manifest file ";
@@ -236,9 +227,7 @@ void RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command
     }
     GetInstance()->SetSupportedExtensions(supported_extensions);
 
-    // If we load one, clear all errors.
-    any_loaded = true;
-    last_error = XR_SUCCESS;
+    return XR_SUCCESS;
 }
 
 XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
@@ -256,26 +245,25 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
 #endif  // XR_KHR_LOADER_INIT_SUPPORT
 
     std::vector<std::unique_ptr<RuntimeManifestFile>> runtime_manifest_files = {};
-    bool any_loaded = false;
 
     // Find the available runtimes which we may need to report information for.
-    XrResult last_error = RuntimeManifestFile::FindManifestFiles(MANIFEST_TYPE_RUNTIME, runtime_manifest_files);
+    XrResult last_error = RuntimeManifestFile::FindManifestFiles(runtime_manifest_files);
     if (XR_FAILED(last_error)) {
         LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - unknown error");
-        last_error = XR_ERROR_FILE_ACCESS_ERROR;
     } else {
+        last_error = XR_ERROR_RUNTIME_UNAVAILABLE;
         for (std::unique_ptr<RuntimeManifestFile>& manifest_file : runtime_manifest_files) {
-            RuntimeInterface::TryLoadingSingleRuntime(openxr_command, manifest_file, any_loaded, last_error);
+            last_error = RuntimeInterface::TryLoadingSingleRuntime(openxr_command, manifest_file);
+            if (XR_SUCCEEDED(last_error)) {
+                break;
+            }
         }
     }
 
-    // Always clear the manifest file list.  Either we use them or we don't.
-    runtime_manifest_files.clear();
-
-    // We found no valid runtimes, throw the initialization failed message
-    if (!any_loaded) {
-        LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - failed to find a valid runtime");
-        last_error = XR_ERROR_INSTANCE_LOST;
+    // Unsuccessful in loading any runtime, throw the runtime unavailable message.
+    if (XR_FAILED(last_error)) {
+        LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntimes - failed to load a runtime");
+        last_error = XR_ERROR_RUNTIME_UNAVAILABLE;
     }
 
     return last_error;

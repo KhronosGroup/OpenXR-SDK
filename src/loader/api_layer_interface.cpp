@@ -185,61 +185,75 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
                                           const char* const* enabled_api_layer_names,
                                           std::vector<std::unique_ptr<ApiLayerInterface>>& api_layer_interfaces) {
     XrResult last_error = XR_SUCCESS;
+    std::unordered_set<std::string> layers_already_found;
+
     bool any_loaded = false;
-    std::vector<bool> layer_found;
-    std::vector<std::unique_ptr<ApiLayerManifestFile>> layer_manifest_files = {};
+    std::vector<std::unique_ptr<ApiLayerManifestFile>> enabled_layer_manifest_files_in_init_order = {};
 
-    // Find any implicit layers which we may need to report information for.
-    XrResult result = ApiLayerManifestFile::FindManifestFiles(MANIFEST_TYPE_IMPLICIT_API_LAYER, layer_manifest_files);
+    // Find any implicit layers.
+    XrResult result =
+        ApiLayerManifestFile::FindManifestFiles(MANIFEST_TYPE_IMPLICIT_API_LAYER, enabled_layer_manifest_files_in_init_order);
+
+    for (const auto& enabled_layer_manifest_file : enabled_layer_manifest_files_in_init_order) {
+        layers_already_found.insert(enabled_layer_manifest_file->LayerName());
+    }
+
+    // Find any explicit layers.
+    std::vector<std::unique_ptr<ApiLayerManifestFile>> explicit_layer_manifest_files = {};
+
     if (XR_SUCCEEDED(result)) {
-        // Find any explicit layers which we may need to report information for.
-        result = ApiLayerManifestFile::FindManifestFiles(MANIFEST_TYPE_EXPLICIT_API_LAYER, layer_manifest_files);
+        result = ApiLayerManifestFile::FindManifestFiles(MANIFEST_TYPE_EXPLICIT_API_LAYER, explicit_layer_manifest_files);
     }
 
-    // Put all the enabled layers into a string vector
-    std::vector<std::string> enabled_api_layers = {};
-    AddEnvironmentApiLayers(enabled_api_layers);
-    if (enabled_api_layer_count > 0) {
-        if (nullptr == enabled_api_layer_names) {
-            LoaderLogger::LogErrorMessage(
-                "xrCreateInstance",
-                "VUID-XrInstanceCreateInfo-enabledApiLayerNames-parameter: enabledApiLayerCount is non-0 but array is NULL");
-            LoaderLogger::LogErrorMessage(
-                "xrCreateInstance", "VUID-xrCreateInstance-info-parameter: something wrong with XrInstanceCreateInfo contents");
-            return XR_ERROR_VALIDATION_FAILURE;
+    bool found_all_layers = true;
+
+    if (XR_SUCCEEDED(result)) {
+        // Put all explicit and then xrCreateInstance enabled layers into a string vector
+
+        std::vector<std::string> enabled_explicit_api_layer_names = {};
+
+        AddEnvironmentApiLayers(enabled_explicit_api_layer_names);
+
+        if (enabled_api_layer_count > 0) {
+            if (nullptr == enabled_api_layer_names) {
+                LoaderLogger::LogErrorMessage(
+                    "xrCreateInstance",
+                    "VUID-XrInstanceCreateInfo-enabledApiLayerNames-parameter: enabledApiLayerCount is non-0 but array is NULL");
+                LoaderLogger::LogErrorMessage(
+                    "xrCreateInstance", "VUID-xrCreateInstance-info-parameter: something wrong with XrInstanceCreateInfo contents");
+                return XR_ERROR_VALIDATION_FAILURE;
+            }
+
+            std::copy(enabled_api_layer_names, enabled_api_layer_names + enabled_api_layer_count,
+                      std::back_inserter(enabled_explicit_api_layer_names));
         }
-        auto num_env_api_layers = static_cast<uint32_t>(enabled_api_layers.size());
-        uint32_t total_api_layers = num_env_api_layers + enabled_api_layer_count;
-        enabled_api_layers.resize(total_api_layers);
-        for (uint32_t layer = 0; layer < enabled_api_layer_count; ++layer) {
-            enabled_api_layers[num_env_api_layers + layer] = enabled_api_layer_names[layer];
-        }
-    }
 
-    // Initialize the layer found vector to false
-    layer_found.resize(enabled_api_layers.size());
-    for (auto&& layer : layer_found) {
-        layer = false;
-    }
+        // add explicit layers to list of layers to enable
+        for (const auto& layer_name : enabled_explicit_api_layer_names) {
+            bool found_this_layer = false;
 
-    for (std::unique_ptr<ApiLayerManifestFile>& manifest_file : layer_manifest_files) {
-        // Always add implicit layers.  They would only be in this list if they were enabled
-        // (i.e. the disable environment variable is not set).
-        bool enabled = (manifest_file->Type() == MANIFEST_TYPE_IMPLICIT_API_LAYER);
+            for (auto it = explicit_layer_manifest_files.begin(); it < explicit_layer_manifest_files.end(); it++) {
+                if (layers_already_found.count(layer_name) > 0) {
+                    found_this_layer = true;
+                } else if (layer_name == (*it)->LayerName()) {
+                    found_this_layer = true;
+                    layers_already_found.insert(layer_name);
+                    enabled_layer_manifest_files_in_init_order.push_back(std::move(*it));
+                    it = explicit_layer_manifest_files.erase(it);
+                }
+            }
 
-        // Check if this layer is explicitly enabled.
-        for (uint32_t layer = 0; layer < enabled_api_layers.size(); ++layer) {
-            if (enabled_api_layers[layer] == manifest_file->LayerName()) {
-                layer_found[layer] = true;
-                enabled = true;
+            // If even one of the layers wasn't found, we want to return an error
+            if (!found_this_layer) {
+                found_all_layers = false;
+                std::string error_message = "ApiLayerInterface::LoadApiLayers - failed to find layer ";
+                error_message += layer_name;
+                LoaderLogger::LogErrorMessage(openxr_command, error_message);
             }
         }
+    }
 
-        // If this layer isn't enabled, skip it.
-        if (!enabled) {
-            continue;
-        }
-
+    for (std::unique_ptr<ApiLayerManifestFile>& manifest_file : enabled_layer_manifest_files_in_init_order) {
         LoaderPlatformLibraryHandle layer_library = LoaderPlatformLibraryOpen(manifest_file->LibraryPath());
         if (nullptr == layer_library) {
             if (!any_loaded) {
@@ -326,7 +340,7 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
             supported_extensions.emplace_back(ext_prop.extensionName);
         }
 
-        // Add this runtime to the vector
+        // Add this API layer to the vector
         api_layer_interfaces.emplace_back(new ApiLayerInterface(manifest_file->LayerName(), layer_library, supported_extensions,
                                                                 api_layer_info.getInstanceProcAddr,
                                                                 api_layer_info.createApiLayerInstance));
@@ -336,18 +350,10 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
         last_error = XR_SUCCESS;
     }
 
-    // If even one of the layers wasn't found, we want to return an error
-    for (uint32_t layer = 0; layer < layer_found.size(); ++layer) {
-        if (!layer_found[layer]) {
-            std::string error_message = "ApiLayerInterface::LoadApiLayers - failed to find layer ";
-            error_message += enabled_api_layers[layer];
-            LoaderLogger::LogErrorMessage(openxr_command, error_message);
-            last_error = XR_ERROR_API_LAYER_NOT_PRESENT;
-        }
+    // Set error here to preserve prior error behavior
+    if (!found_all_layers) {
+        last_error = XR_ERROR_API_LAYER_NOT_PRESENT;
     }
-
-    // Always clear the manifest file list.  Either we use them or we don't.
-    layer_manifest_files.clear();
 
     // If we failed catastrophically for some reason, clean up everything.
     if (XR_FAILED(last_error)) {

@@ -41,15 +41,17 @@ CppProperties.json
 local.properties
 
 # Don't ignore these things
-!.azure-pipelines/
-!.clang-format
-!.gitattributes
-!.gitignore
-!.proclamation.json
-!.clang-tidy
-!.editorconfig
-!.cmake-format.json
-!.gitlab-ci.yml
-!.reuse
 !.*.license
+!.azure-pipelines/
 !.azure-pipelines/nuget/NugetTemplate/build
+!.clang-format
+!.clang-tidy
+!.cmake-format.json
+!.editorconfig
+!.gitattributes
+!.github
+!.gitignore
+!.gitlab-ci.yml
+!.markdownlint.yaml
+!.proclamation.json
+!.reuse

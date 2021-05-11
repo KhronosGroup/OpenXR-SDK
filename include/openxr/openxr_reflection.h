@@ -85,6 +85,7 @@ XR_ENUM_STR(XrResult);
     _(XR_ERROR_LOCALIZED_NAME_DUPLICATED, -48) \
     _(XR_ERROR_LOCALIZED_NAME_INVALID, -49) \
     _(XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING, -50) \
+    _(XR_ERROR_RUNTIME_UNAVAILABLE, -51) \
     _(XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR, -1000003000) \
     _(XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR, -1000003001) \
     _(XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT, -1000039001) \
@@ -210,7 +211,10 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC, 1000059000) \
     _(XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT, 1000063000) \
     _(XR_TYPE_ANDROID_SURFACE_SWAPCHAIN_CREATE_INFO_FB, 1000070000) \
+    _(XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB, 1000071000) \
+    _(XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB, 1000071001) \
     _(XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE, 1000079000) \
+    _(XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT, 1000080000) \
     _(XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR, 1000089000) \
     _(XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR, 1000090000) \
     _(XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR, 1000090001) \
@@ -374,6 +378,11 @@ XR_ENUM_STR(XrResult);
     _(XR_HAND_POSE_TYPE_TRACKED_MSFT, 0) \
     _(XR_HAND_POSE_TYPE_REFERENCE_OPEN_PALM_MSFT, 1) \
     _(XR_HAND_POSE_TYPE_MAX_ENUM_MSFT, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrHandJointsMotionRangeEXT(_) \
+    _(XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT, 1) \
+    _(XR_HAND_JOINTS_MOTION_RANGE_CONFORMING_TO_CONTROLLER_EXT, 2) \
+    _(XR_HAND_JOINTS_MOTION_RANGE_MAX_ENUM_EXT, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrColorSpaceFB(_) \
     _(XR_COLOR_SPACE_UNMANAGED_FB, 0) \
@@ -1413,6 +1422,30 @@ XR_ENUM_STR(XrResult);
     _(next) \
     _(createFlags) \
 
+#define XR_LIST_STRUCT_XrSwapchainStateBaseHeaderFB(_) \
+    _(type) \
+    _(next) \
+
+#define XR_LIST_STRUCT_XrSwapchainStateAndroidSurfaceDimensionsFB(_) \
+    _(type) \
+    _(next) \
+    _(width) \
+    _(height) \
+
+#define XR_LIST_STRUCT_XrSwapchainStateSamplerOpenGLESFB(_) \
+    _(type) \
+    _(next) \
+    _(minFilter) \
+    _(magFilter) \
+    _(wrapModeS) \
+    _(wrapModeT) \
+    _(swizzleRed) \
+    _(swizzleGreen) \
+    _(swizzleBlue) \
+    _(swizzleAlpha) \
+    _(maxAnisotropy) \
+    _(borderColor) \
+
 #define XR_LIST_STRUCT_XrInteractionProfileAnalogThresholdVALVE(_) \
     _(type) \
     _(next) \
@@ -1422,6 +1455,11 @@ XR_ENUM_STR(XrResult);
     _(offThreshold) \
     _(onHaptic) \
     _(offHaptic) \
+
+#define XR_LIST_STRUCT_XrHandJointsMotionRangeInfoEXT(_) \
+    _(type) \
+    _(next) \
+    _(handJointsMotionRange) \
 
 #define XR_LIST_STRUCT_XrEventDataDisplayRefreshRateChangedFB(_) \
     _(type) \
@@ -1552,6 +1590,7 @@ XR_ENUM_STR(XrResult);
     _(XrControllerModelStateMSFT, XR_TYPE_CONTROLLER_MODEL_STATE_MSFT) \
     _(XrViewConfigurationViewFovEPIC, XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC) \
     _(XrInteractionProfileAnalogThresholdVALVE, XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE) \
+    _(XrHandJointsMotionRangeInfoEXT, XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT) \
     _(XrEventDataDisplayRefreshRateChangedFB, XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB) \
     _(XrSystemColorSpacePropertiesFB, XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB) \
     _(XrViewLocateFoveatedRenderingVARJO, XR_TYPE_VIEW_LOCATE_FOVEATED_RENDERING_VARJO) \
@@ -1643,6 +1682,7 @@ XR_ENUM_STR(XrResult);
 #if defined(XR_USE_GRAPHICS_API_OPENGL_ES) && defined(XR_USE_PLATFORM_ANDROID)
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_ES_XR_USE_PLATFORM_ANDROID(_) \
     _(XrGraphicsBindingOpenGLESAndroidKHR, XR_TYPE_GRAPHICS_BINDING_OPENGL_ES_ANDROID_KHR) \
+    _(XrSwapchainStateSamplerOpenGLESFB, XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB) \
 
 
 #else
@@ -1669,6 +1709,7 @@ XR_ENUM_STR(XrResult);
     _(XrInstanceCreateInfoAndroidKHR, XR_TYPE_INSTANCE_CREATE_INFO_ANDROID_KHR) \
     _(XrLoaderInitInfoAndroidKHR, XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR) \
     _(XrAndroidSurfaceSwapchainCreateInfoFB, XR_TYPE_ANDROID_SURFACE_SWAPCHAIN_CREATE_INFO_FB) \
+    _(XrSwapchainStateAndroidSurfaceDimensionsFB, XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB) \
 
 
 #else
@@ -1754,7 +1795,9 @@ XR_ENUM_STR(XrResult);
     _(XR_MSFT_holographic_window_attachment, 64) \
     _(XR_HUAWEI_controller_interaction, 70) \
     _(XR_FB_android_surface_swapchain_create, 71) \
+    _(XR_FB_swapchain_update_state, 72) \
     _(XR_VALVE_analog_threshold, 80) \
+    _(XR_EXT_hand_joints_motion_range, 81) \
     _(XR_KHR_loader_init, 89) \
     _(XR_KHR_loader_init_android, 90) \
     _(XR_KHR_vulkan_enable2, 91) \
