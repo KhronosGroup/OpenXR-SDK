@@ -229,10 +229,28 @@ struct XrGeneratedDispatchTable {
     PFN_xrTryGetPerceptionAnchorFromSpatialAnchorMSFT TryGetPerceptionAnchorFromSpatialAnchorMSFT;
 #endif // defined(XR_USE_PLATFORM_WIN32)
 
+    // ---- XR_MSFT_composition_layer_reprojection extension commands
+    PFN_xrEnumerateReprojectionModesMSFT EnumerateReprojectionModesMSFT;
+
     // ---- XR_FB_swapchain_update_state extension commands
-#if defined(XR_USE_PLATFORM_ANDROID)
     PFN_xrUpdateSwapchainFB UpdateSwapchainFB;
-#endif // defined(XR_USE_PLATFORM_ANDROID)
+    PFN_xrGetSwapchainStateFB GetSwapchainStateFB;
+
+    // ---- XR_MSFT_scene_understanding extension commands
+    PFN_xrEnumerateSceneComputeFeaturesMSFT EnumerateSceneComputeFeaturesMSFT;
+    PFN_xrCreateSceneObserverMSFT CreateSceneObserverMSFT;
+    PFN_xrDestroySceneObserverMSFT DestroySceneObserverMSFT;
+    PFN_xrCreateSceneMSFT CreateSceneMSFT;
+    PFN_xrDestroySceneMSFT DestroySceneMSFT;
+    PFN_xrComputeNewSceneMSFT ComputeNewSceneMSFT;
+    PFN_xrGetSceneComputeStateMSFT GetSceneComputeStateMSFT;
+    PFN_xrGetSceneComponentsMSFT GetSceneComponentsMSFT;
+    PFN_xrLocateSceneComponentsMSFT LocateSceneComponentsMSFT;
+    PFN_xrGetSceneMeshBuffersMSFT GetSceneMeshBuffersMSFT;
+
+    // ---- XR_MSFT_scene_understanding_serialization extension commands
+    PFN_xrDeserializeSceneMSFT DeserializeSceneMSFT;
+    PFN_xrGetSerializedSceneFragmentDataMSFT GetSerializedSceneFragmentDataMSFT;
 
     // ---- XR_FB_display_refresh_rate extension commands
     PFN_xrEnumerateDisplayRefreshRatesFB EnumerateDisplayRefreshRatesFB;
@@ -245,6 +263,14 @@ struct XrGeneratedDispatchTable {
 
     // ---- XR_VARJO_environment_depth_estimation extension commands
     PFN_xrSetEnvironmentDepthEstimationVARJO SetEnvironmentDepthEstimationVARJO;
+
+    // ---- XR_OCULUS_audio_device_guid extension commands
+#if defined(XR_USE_PLATFORM_WIN32)
+    PFN_xrGetAudioOutputDeviceGuidOculus GetAudioOutputDeviceGuidOculus;
+#endif // defined(XR_USE_PLATFORM_WIN32)
+#if defined(XR_USE_PLATFORM_WIN32)
+    PFN_xrGetAudioInputDeviceGuidOculus GetAudioInputDeviceGuidOculus;
+#endif // defined(XR_USE_PLATFORM_WIN32)
 };
 
 

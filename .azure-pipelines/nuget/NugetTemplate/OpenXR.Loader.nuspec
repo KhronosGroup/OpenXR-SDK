@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <!--
-  Copyright (c) 2020 The Khronos Group Inc.
+  Copyright (c) 2020-2021 The Khronos Group Inc.
   SPDX-License-Identifier: CC-BY-4.0
   -->
   <metadata>
@@ -11,7 +11,6 @@
     <owners>Khronos Group</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">Apache-2.0 OR MIT</license>
-    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
     <projectUrl>https://github.com/KhronosGroup/OpenXR-SDK</projectUrl>
     <description>Khronos OpenXR loader and headers required to build a Win32 or UWP OpenXR application</description>
     <tags>native khronos openxr loader</tags>

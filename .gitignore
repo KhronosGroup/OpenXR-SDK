@@ -48,10 +48,13 @@ local.properties
 !.clang-tidy
 !.cmake-format.json
 !.editorconfig
+!.git-blame-ignore-revs
+!.git-keep
 !.gitattributes
 !.github
 !.gitignore
 !.gitlab-ci.yml
+!.mailmap
 !.markdownlint.yaml
 !.proclamation.json
 !.reuse

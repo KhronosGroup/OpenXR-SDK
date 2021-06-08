@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 16)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 17)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -187,6 +187,13 @@ typedef enum XrResult {
     XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT = -1000039001,
     XR_ERROR_SECONDARY_VIEW_CONFIGURATION_TYPE_NOT_ENABLED_MSFT = -1000053000,
     XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT = -1000055000,
+    XR_ERROR_REPROJECTION_MODE_UNSUPPORTED_MSFT = -1000066000,
+    XR_ERROR_COMPUTE_NEW_SCENE_NOT_COMPLETED_MSFT = -1000097000,
+    XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT = -1000097001,
+    XR_ERROR_SCENE_COMPONENT_TYPE_MISMATCH_MSFT = -1000097002,
+    XR_ERROR_SCENE_MESH_BUFFER_ID_INVALID_MSFT = -1000097003,
+    XR_ERROR_SCENE_COMPUTE_FEATURE_INCOMPATIBLE_MSFT = -1000097004,
+    XR_ERROR_SCENE_COMPUTE_CONSISTENCY_MISMATCH_MSFT = -1000097005,
     XR_ERROR_DISPLAY_REFRESH_RATE_UNSUPPORTED_FB = -1000101000,
     XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB = -1000108000,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
@@ -307,9 +314,9 @@ typedef enum XrStructureType {
     XR_TYPE_CONTROLLER_MODEL_STATE_MSFT = 1000055004,
     XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC = 1000059000,
     XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT = 1000063000,
+    XR_TYPE_COMPOSITION_LAYER_REPROJECTION_INFO_MSFT = 1000066000,
+    XR_TYPE_COMPOSITION_LAYER_REPROJECTION_PLANE_OVERRIDE_MSFT = 1000066001,
     XR_TYPE_ANDROID_SURFACE_SWAPCHAIN_CREATE_INFO_FB = 1000070000,
-    XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB = 1000071000,
-    XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB = 1000071001,
     XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE = 1000079000,
     XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT = 1000080000,
     XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR = 1000089000,
@@ -317,6 +324,27 @@ typedef enum XrStructureType {
     XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR = 1000090001,
     XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR = 1000090003,
     XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR = 1000091000,
+    XR_TYPE_SCENE_OBSERVER_CREATE_INFO_MSFT = 1000097000,
+    XR_TYPE_SCENE_CREATE_INFO_MSFT = 1000097001,
+    XR_TYPE_NEW_SCENE_COMPUTE_INFO_MSFT = 1000097002,
+    XR_TYPE_VISUAL_MESH_COMPUTE_LOD_INFO_MSFT = 1000097003,
+    XR_TYPE_SCENE_COMPONENTS_MSFT = 1000097004,
+    XR_TYPE_SCENE_COMPONENTS_GET_INFO_MSFT = 1000097005,
+    XR_TYPE_SCENE_COMPONENT_LOCATIONS_MSFT = 1000097006,
+    XR_TYPE_SCENE_COMPONENTS_LOCATE_INFO_MSFT = 1000097007,
+    XR_TYPE_SCENE_OBJECTS_MSFT = 1000097008,
+    XR_TYPE_SCENE_COMPONENT_PARENT_FILTER_INFO_MSFT = 1000097009,
+    XR_TYPE_SCENE_OBJECT_TYPES_FILTER_INFO_MSFT = 1000097010,
+    XR_TYPE_SCENE_PLANES_MSFT = 1000097011,
+    XR_TYPE_SCENE_PLANE_ALIGNMENT_FILTER_INFO_MSFT = 1000097012,
+    XR_TYPE_SCENE_MESHES_MSFT = 1000097013,
+    XR_TYPE_SCENE_MESH_BUFFERS_GET_INFO_MSFT = 1000097014,
+    XR_TYPE_SCENE_MESH_BUFFERS_MSFT = 1000097015,
+    XR_TYPE_SCENE_MESH_VERTEX_BUFFER_MSFT = 1000097016,
+    XR_TYPE_SCENE_MESH_INDICES_UINT32_MSFT = 1000097017,
+    XR_TYPE_SCENE_MESH_INDICES_UINT16_MSFT = 1000097018,
+    XR_TYPE_SERIALIZED_SCENE_FRAGMENT_DATA_GET_INFO_MSFT = 1000098000,
+    XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT = 1000098001,
     XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB = 1000101000,
     XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB = 1000108000,
     XR_TYPE_BINDING_MODIFICATIONS_KHR = 1000120000,
@@ -324,6 +352,9 @@ typedef enum XrStructureType {
     XR_TYPE_FOVEATED_VIEW_CONFIGURATION_VIEW_VARJO = 1000121001,
     XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO = 1000121002,
     XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO = 1000122000,
+    XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB = 1000161000,
+    XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB = 1000162000,
+    XR_TYPE_SWAPCHAIN_STATE_SAMPLER_VULKAN_FB = 1000163000,
     XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR = XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR,
     XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR = XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR,
     XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR,
@@ -400,6 +431,8 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT = 1000019000,
     XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT = 1000039000,
     XR_OBJECT_TYPE_HAND_TRACKER_EXT = 1000051000,
+    XR_OBJECT_TYPE_SCENE_OBSERVER_MSFT = 1000097000,
+    XR_OBJECT_TYPE_SCENE_MSFT = 1000097001,
     XR_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrObjectType;
 typedef XrFlags64 XrInstanceCreateFlags;
@@ -2220,9 +2253,75 @@ typedef struct XrViewConfigurationViewFovEPIC {
 
 
 
+#define XR_MSFT_composition_layer_reprojection 1
+#define XR_MSFT_composition_layer_reprojection_SPEC_VERSION 1
+#define XR_MSFT_COMPOSITION_LAYER_REPROJECTION_EXTENSION_NAME "XR_MSFT_composition_layer_reprojection"
+
+typedef enum XrReprojectionModeMSFT {
+    XR_REPROJECTION_MODE_DEPTH_MSFT = 1,
+    XR_REPROJECTION_MODE_PLANAR_FROM_DEPTH_MSFT = 2,
+    XR_REPROJECTION_MODE_PLANAR_MANUAL_MSFT = 3,
+    XR_REPROJECTION_MODE_ORIENTATION_ONLY_MSFT = 4,
+    XR_REPROJECTION_MODE_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrReprojectionModeMSFT;
+// XrCompositionLayerReprojectionInfoMSFT extends XrCompositionLayerProjection
+typedef struct XrCompositionLayerReprojectionInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrReprojectionModeMSFT      reprojectionMode;
+} XrCompositionLayerReprojectionInfoMSFT;
+
+// XrCompositionLayerReprojectionPlaneOverrideMSFT extends XrCompositionLayerProjection
+typedef struct XrCompositionLayerReprojectionPlaneOverrideMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrVector3f                  position;
+    XrVector3f                  normal;
+    XrVector3f                  velocity;
+} XrCompositionLayerReprojectionPlaneOverrideMSFT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrEnumerateReprojectionModesMSFT)(XrInstance instance, XrSystemId systemId, XrViewConfigurationType viewConfigurationType, uint32_t modeCapacityInput, uint32_t* modeCountOutput, XrReprojectionModeMSFT* modes);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateReprojectionModesMSFT(
+    XrInstance                                  instance,
+    XrSystemId                                  systemId,
+    XrViewConfigurationType                     viewConfigurationType,
+    uint32_t                                    modeCapacityInput,
+    uint32_t*                                   modeCountOutput,
+    XrReprojectionModeMSFT*                     modes);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 #define XR_HUAWEI_controller_interaction 1
 #define XR_HUAWEI_controller_interaction_SPEC_VERSION 1
 #define XR_HUAWEI_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_HUAWEI_controller_interaction"
+
+
+#define XR_FB_swapchain_update_state 1
+#define XR_FB_swapchain_update_state_SPEC_VERSION 3
+#define XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME "XR_FB_swapchain_update_state"
+typedef struct XR_MAY_ALIAS XrSwapchainStateBaseHeaderFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+} XrSwapchainStateBaseHeaderFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrUpdateSwapchainFB)(XrSwapchain swapchain, const XrSwapchainStateBaseHeaderFB* state);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSwapchainStateFB)(XrSwapchain swapchain, XrSwapchainStateBaseHeaderFB* state);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrUpdateSwapchainFB(
+    XrSwapchain                                 swapchain,
+    const XrSwapchainStateBaseHeaderFB*         state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSwapchainStateFB(
+    XrSwapchain                                 swapchain,
+    XrSwapchainStateBaseHeaderFB*               state);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_VALVE_analog_threshold 1
@@ -2273,6 +2372,374 @@ typedef struct XrHandJointsMotionRangeInfoEXT {
 #define XR_MND_swapchain_usage_input_attachment_bit 1
 #define XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION 2
 #define XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME "XR_MND_swapchain_usage_input_attachment_bit"
+
+
+#define XR_MSFT_scene_understanding 1
+
+            XR_DEFINE_HANDLE(XrSceneObserverMSFT)
+
+
+            XR_DEFINE_HANDLE(XrSceneMSFT)
+
+#define XR_MSFT_scene_understanding_SPEC_VERSION 1
+#define XR_MSFT_SCENE_UNDERSTANDING_EXTENSION_NAME "XR_MSFT_scene_understanding"
+
+typedef enum XrSceneComputeFeatureMSFT {
+    XR_SCENE_COMPUTE_FEATURE_PLANE_MSFT = 1,
+    XR_SCENE_COMPUTE_FEATURE_PLANE_MESH_MSFT = 2,
+    XR_SCENE_COMPUTE_FEATURE_VISUAL_MESH_MSFT = 3,
+    XR_SCENE_COMPUTE_FEATURE_COLLIDER_MESH_MSFT = 4,
+    XR_SCENE_COMPUTE_FEATURE_SERIALIZE_SCENE_MSFT = 1000098000,
+    XR_SCENE_COMPUTE_FEATURE_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrSceneComputeFeatureMSFT;
+
+typedef enum XrSceneComputeConsistencyMSFT {
+    XR_SCENE_COMPUTE_CONSISTENCY_SNAPSHOT_COMPLETE_MSFT = 1,
+    XR_SCENE_COMPUTE_CONSISTENCY_SNAPSHOT_INCOMPLETE_FAST_MSFT = 2,
+    XR_SCENE_COMPUTE_CONSISTENCY_OCCLUSION_OPTIMIZED_MSFT = 3,
+    XR_SCENE_COMPUTE_CONSISTENCY_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrSceneComputeConsistencyMSFT;
+
+typedef enum XrMeshComputeLodMSFT {
+    XR_MESH_COMPUTE_LOD_COARSE_MSFT = 1,
+    XR_MESH_COMPUTE_LOD_MEDIUM_MSFT = 2,
+    XR_MESH_COMPUTE_LOD_FINE_MSFT = 3,
+    XR_MESH_COMPUTE_LOD_UNLIMITED_MSFT = 4,
+    XR_MESH_COMPUTE_LOD_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrMeshComputeLodMSFT;
+
+typedef enum XrSceneComponentTypeMSFT {
+    XR_SCENE_COMPONENT_TYPE_INVALID_MSFT = -1,
+    XR_SCENE_COMPONENT_TYPE_OBJECT_MSFT = 1,
+    XR_SCENE_COMPONENT_TYPE_PLANE_MSFT = 2,
+    XR_SCENE_COMPONENT_TYPE_VISUAL_MESH_MSFT = 3,
+    XR_SCENE_COMPONENT_TYPE_COLLIDER_MESH_MSFT = 4,
+    XR_SCENE_COMPONENT_TYPE_SERIALIZED_SCENE_FRAGMENT_MSFT = 1000098000,
+    XR_SCENE_COMPONENT_TYPE_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrSceneComponentTypeMSFT;
+
+typedef enum XrSceneObjectTypeMSFT {
+    XR_SCENE_OBJECT_TYPE_UNCATEGORIZED_MSFT = -1,
+    XR_SCENE_OBJECT_TYPE_BACKGROUND_MSFT = 1,
+    XR_SCENE_OBJECT_TYPE_WALL_MSFT = 2,
+    XR_SCENE_OBJECT_TYPE_FLOOR_MSFT = 3,
+    XR_SCENE_OBJECT_TYPE_CEILING_MSFT = 4,
+    XR_SCENE_OBJECT_TYPE_PLATFORM_MSFT = 5,
+    XR_SCENE_OBJECT_TYPE_INFERRED_MSFT = 6,
+    XR_SCENE_OBJECT_TYPE_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrSceneObjectTypeMSFT;
+
+typedef enum XrScenePlaneAlignmentTypeMSFT {
+    XR_SCENE_PLANE_ALIGNMENT_TYPE_NON_ORTHOGONAL_MSFT = 0,
+    XR_SCENE_PLANE_ALIGNMENT_TYPE_HORIZONTAL_MSFT = 1,
+    XR_SCENE_PLANE_ALIGNMENT_TYPE_VERTICAL_MSFT = 2,
+    XR_SCENE_PLANE_ALIGNMENT_TYPE_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrScenePlaneAlignmentTypeMSFT;
+
+typedef enum XrSceneComputeStateMSFT {
+    XR_SCENE_COMPUTE_STATE_NONE_MSFT = 0,
+    XR_SCENE_COMPUTE_STATE_UPDATING_MSFT = 1,
+    XR_SCENE_COMPUTE_STATE_COMPLETED_MSFT = 2,
+    XR_SCENE_COMPUTE_STATE_COMPLETED_WITH_ERROR_MSFT = 3,
+    XR_SCENE_COMPUTE_STATE_MAX_ENUM_MSFT = 0x7FFFFFFF
+} XrSceneComputeStateMSFT;
+typedef struct XrUuidMSFT {
+    uint8_t    bytes[16];
+} XrUuidMSFT;
+
+typedef struct XrSceneObserverCreateInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrSceneObserverCreateInfoMSFT;
+
+typedef struct XrSceneCreateInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrSceneCreateInfoMSFT;
+
+typedef struct XrSceneSphereBoundMSFT {
+    XrVector3f    center;
+    float         radius;
+} XrSceneSphereBoundMSFT;
+
+typedef struct XrSceneOrientedBoxBoundMSFT {
+    XrPosef       pose;
+    XrVector3f    extents;
+} XrSceneOrientedBoxBoundMSFT;
+
+typedef struct XrSceneFrustumBoundMSFT {
+    XrPosef    pose;
+    XrFovf     fov;
+    float      farDistance;
+} XrSceneFrustumBoundMSFT;
+
+typedef struct XrSceneBoundsMSFT {
+    XrSpace                               space;
+    XrTime                                time;
+    uint32_t                              sphereCount;
+    const XrSceneSphereBoundMSFT*         spheres;
+    uint32_t                              boxCount;
+    const XrSceneOrientedBoxBoundMSFT*    boxes;
+    uint32_t                              frustumCount;
+    const XrSceneFrustumBoundMSFT*        frustums;
+} XrSceneBoundsMSFT;
+
+typedef struct XrNewSceneComputeInfoMSFT {
+    XrStructureType                     type;
+    const void* XR_MAY_ALIAS            next;
+    uint32_t                            requestedFeatureCount;
+    const XrSceneComputeFeatureMSFT*    requestedFeatures;
+    XrSceneComputeConsistencyMSFT       consistency;
+    XrSceneBoundsMSFT                   bounds;
+} XrNewSceneComputeInfoMSFT;
+
+// XrVisualMeshComputeLodInfoMSFT extends XrNewSceneComputeInfoMSFT
+typedef struct XrVisualMeshComputeLodInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrMeshComputeLodMSFT        lod;
+} XrVisualMeshComputeLodInfoMSFT;
+
+typedef struct XrSceneComponentMSFT {
+    XrSceneComponentTypeMSFT    componentType;
+    XrUuidMSFT                  id;
+    XrUuidMSFT                  parentId;
+    XrTime                      updateTime;
+} XrSceneComponentMSFT;
+
+typedef struct XrSceneComponentsMSFT {
+    XrStructureType          type;
+    void* XR_MAY_ALIAS       next;
+    uint32_t                 componentCapacityInput;
+    uint32_t                 componentCountOutput;
+    XrSceneComponentMSFT*    components;
+} XrSceneComponentsMSFT;
+
+typedef struct XrSceneComponentsGetInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSceneComponentTypeMSFT    componentType;
+} XrSceneComponentsGetInfoMSFT;
+
+typedef struct XrSceneComponentLocationMSFT {
+    XrSpaceLocationFlags    flags;
+    XrPosef                 pose;
+} XrSceneComponentLocationMSFT;
+
+typedef struct XrSceneComponentLocationsMSFT {
+    XrStructureType                  type;
+    void* XR_MAY_ALIAS               next;
+    uint32_t                         locationCount;
+    XrSceneComponentLocationMSFT*    locations;
+} XrSceneComponentLocationsMSFT;
+
+typedef struct XrSceneComponentsLocateInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpace                     baseSpace;
+    XrTime                      time;
+    uint32_t                    componentIdCount;
+    const XrUuidMSFT*           componentIds;
+} XrSceneComponentsLocateInfoMSFT;
+
+typedef struct XrSceneObjectMSFT {
+    XrSceneObjectTypeMSFT    objectType;
+} XrSceneObjectMSFT;
+
+// XrSceneObjectsMSFT extends XrSceneComponentsMSFT
+typedef struct XrSceneObjectsMSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              sceneObjectCount;
+    XrSceneObjectMSFT*    sceneObjects;
+} XrSceneObjectsMSFT;
+
+// XrSceneComponentParentFilterInfoMSFT extends XrSceneComponentsGetInfoMSFT
+typedef struct XrSceneComponentParentFilterInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrUuidMSFT                  parentId;
+} XrSceneComponentParentFilterInfoMSFT;
+
+// XrSceneObjectTypesFilterInfoMSFT extends XrSceneComponentsGetInfoMSFT
+typedef struct XrSceneObjectTypesFilterInfoMSFT {
+    XrStructureType                 type;
+    const void* XR_MAY_ALIAS        next;
+    uint32_t                        objectTypeCount;
+    const XrSceneObjectTypeMSFT*    objectTypes;
+} XrSceneObjectTypesFilterInfoMSFT;
+
+typedef struct XrScenePlaneMSFT {
+    XrScenePlaneAlignmentTypeMSFT    alignment;
+    XrExtent2Df                      size;
+    uint64_t                         meshBufferId;
+    XrBool32                         supportsIndicesUint16;
+} XrScenePlaneMSFT;
+
+// XrScenePlanesMSFT extends XrSceneComponentsMSFT
+typedef struct XrScenePlanesMSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              scenePlaneCount;
+    XrScenePlaneMSFT*     scenePlanes;
+} XrScenePlanesMSFT;
+
+// XrScenePlaneAlignmentFilterInfoMSFT extends XrSceneComponentsGetInfoMSFT
+typedef struct XrScenePlaneAlignmentFilterInfoMSFT {
+    XrStructureType                         type;
+    const void* XR_MAY_ALIAS                next;
+    uint32_t                                alignmentCount;
+    const XrScenePlaneAlignmentTypeMSFT*    alignments;
+} XrScenePlaneAlignmentFilterInfoMSFT;
+
+typedef struct XrSceneMeshMSFT {
+    uint64_t    meshBufferId;
+    XrBool32    supportsIndicesUint16;
+} XrSceneMeshMSFT;
+
+// XrSceneMeshesMSFT extends XrSceneComponentsMSFT
+typedef struct XrSceneMeshesMSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              sceneMeshCount;
+    XrSceneMeshMSFT*      sceneMeshes;
+} XrSceneMeshesMSFT;
+
+typedef struct XrSceneMeshBuffersGetInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint64_t                    meshBufferId;
+} XrSceneMeshBuffersGetInfoMSFT;
+
+typedef struct XrSceneMeshBuffersMSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+} XrSceneMeshBuffersMSFT;
+
+typedef struct XrSceneMeshVertexBufferMSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              vertexCapacityInput;
+    uint32_t              vertexCountOutput;
+    XrVector3f*           vertices;
+} XrSceneMeshVertexBufferMSFT;
+
+typedef struct XrSceneMeshIndicesUint32MSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              indexCapacityInput;
+    uint32_t              indexCountOutput;
+    uint32_t*             indices;
+} XrSceneMeshIndicesUint32MSFT;
+
+typedef struct XrSceneMeshIndicesUint16MSFT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              indexCapacityInput;
+    uint32_t              indexCountOutput;
+    uint16_t*             indices;
+} XrSceneMeshIndicesUint16MSFT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrEnumerateSceneComputeFeaturesMSFT)(XrInstance instance, XrSystemId systemId, uint32_t featureCapacityInput, uint32_t* featureCountOutput, XrSceneComputeFeatureMSFT* features);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSceneObserverMSFT)(XrSession session, const XrSceneObserverCreateInfoMSFT* createInfo, XrSceneObserverMSFT* sceneObserver);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroySceneObserverMSFT)(XrSceneObserverMSFT sceneObserver);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSceneMSFT)(XrSceneObserverMSFT sceneObserver, const XrSceneCreateInfoMSFT* createInfo, XrSceneMSFT* scene);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroySceneMSFT)(XrSceneMSFT scene);
+typedef XrResult (XRAPI_PTR *PFN_xrComputeNewSceneMSFT)(XrSceneObserverMSFT sceneObserver, const XrNewSceneComputeInfoMSFT* computeInfo);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSceneComputeStateMSFT)(XrSceneObserverMSFT sceneObserver, XrSceneComputeStateMSFT* state);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSceneComponentsMSFT)(XrSceneMSFT scene, const XrSceneComponentsGetInfoMSFT* getInfo, XrSceneComponentsMSFT* components);
+typedef XrResult (XRAPI_PTR *PFN_xrLocateSceneComponentsMSFT)(XrSceneMSFT scene, const XrSceneComponentsLocateInfoMSFT* locateInfo, XrSceneComponentLocationsMSFT* locations);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSceneMeshBuffersMSFT)(XrSceneMSFT scene, const XrSceneMeshBuffersGetInfoMSFT* getInfo, XrSceneMeshBuffersMSFT* buffers);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateSceneComputeFeaturesMSFT(
+    XrInstance                                  instance,
+    XrSystemId                                  systemId,
+    uint32_t                                    featureCapacityInput,
+    uint32_t*                                   featureCountOutput,
+    XrSceneComputeFeatureMSFT*                  features);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSceneObserverMSFT(
+    XrSession                                   session,
+    const XrSceneObserverCreateInfoMSFT*        createInfo,
+    XrSceneObserverMSFT*                        sceneObserver);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySceneObserverMSFT(
+    XrSceneObserverMSFT                         sceneObserver);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSceneMSFT(
+    XrSceneObserverMSFT                         sceneObserver,
+    const XrSceneCreateInfoMSFT*                createInfo,
+    XrSceneMSFT*                                scene);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySceneMSFT(
+    XrSceneMSFT                                 scene);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrComputeNewSceneMSFT(
+    XrSceneObserverMSFT                         sceneObserver,
+    const XrNewSceneComputeInfoMSFT*            computeInfo);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSceneComputeStateMSFT(
+    XrSceneObserverMSFT                         sceneObserver,
+    XrSceneComputeStateMSFT*                    state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSceneComponentsMSFT(
+    XrSceneMSFT                                 scene,
+    const XrSceneComponentsGetInfoMSFT*         getInfo,
+    XrSceneComponentsMSFT*                      components);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrLocateSceneComponentsMSFT(
+    XrSceneMSFT                                 scene,
+    const XrSceneComponentsLocateInfoMSFT*      locateInfo,
+    XrSceneComponentLocationsMSFT*              locations);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSceneMeshBuffersMSFT(
+    XrSceneMSFT                                 scene,
+    const XrSceneMeshBuffersGetInfoMSFT*        getInfo,
+    XrSceneMeshBuffersMSFT*                     buffers);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_MSFT_scene_understanding_serialization 1
+#define XR_MSFT_scene_understanding_serialization_SPEC_VERSION 1
+#define XR_MSFT_SCENE_UNDERSTANDING_SERIALIZATION_EXTENSION_NAME "XR_MSFT_scene_understanding_serialization"
+typedef struct XrSerializedSceneFragmentDataGetInfoMSFT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrUuidMSFT                  sceneFragmentId;
+} XrSerializedSceneFragmentDataGetInfoMSFT;
+
+typedef struct XrDeserializeSceneFragmentMSFT {
+    uint32_t          bufferSize;
+    const uint8_t*    buffer;
+} XrDeserializeSceneFragmentMSFT;
+
+typedef struct XrSceneDeserializeInfoMSFT {
+    XrStructureType                          type;
+    const void* XR_MAY_ALIAS                 next;
+    uint32_t                                 fragmentCount;
+    const XrDeserializeSceneFragmentMSFT*    fragments;
+} XrSceneDeserializeInfoMSFT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrDeserializeSceneMSFT)(XrSceneObserverMSFT sceneObserver, const XrSceneDeserializeInfoMSFT* deserializeInfo);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSerializedSceneFragmentDataMSFT)(XrSceneMSFT scene, const XrSerializedSceneFragmentDataGetInfoMSFT* getInfo, uint32_t countInput, uint32_t* readOutput, uint8_t* buffer);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrDeserializeSceneMSFT(
+    XrSceneObserverMSFT                         sceneObserver,
+    const XrSceneDeserializeInfoMSFT*           deserializeInfo);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSerializedSceneFragmentDataMSFT(
+    XrSceneMSFT                                 scene,
+    const XrSerializedSceneFragmentDataGetInfoMSFT* getInfo,
+    uint32_t                                    countInput,
+    uint32_t*                                   readOutput,
+    uint8_t*                                    buffer);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_FB_display_refresh_rate 1

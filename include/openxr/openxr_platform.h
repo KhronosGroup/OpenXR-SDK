@@ -565,50 +565,92 @@ typedef struct XrAndroidSurfaceSwapchainCreateInfoFB {
 
 #endif /* XR_USE_PLATFORM_ANDROID */
 
-#ifdef XR_USE_PLATFORM_ANDROID
+#ifdef XR_USE_PLATFORM_WIN32
 
-#define XR_FB_swapchain_update_state 1
-#define XR_FB_swapchain_update_state_SPEC_VERSION 1
-#define XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME "XR_FB_swapchain_update_state"
-typedef struct XR_MAY_ALIAS XrSwapchainStateBaseHeaderFB {
-    XrStructureType       type;
-    void* XR_MAY_ALIAS    next;
-} XrSwapchainStateBaseHeaderFB;
-
-typedef struct XrSwapchainStateAndroidSurfaceDimensionsFB {
-    XrStructureType             type;
-    const void* XR_MAY_ALIAS    next;
-    uint32_t                    width;
-    uint32_t                    height;
-} XrSwapchainStateAndroidSurfaceDimensionsFB;
-
-#ifdef XR_USE_GRAPHICS_API_OPENGL_ES
-typedef struct XrSwapchainStateSamplerOpenGLESFB {
-    XrStructureType             type;
-    const void* XR_MAY_ALIAS    next;
-    EGLenum                     minFilter;
-    EGLenum                     magFilter;
-    EGLenum                     wrapModeS;
-    EGLenum                     wrapModeT;
-    EGLenum                     swizzleRed;
-    EGLenum                     swizzleGreen;
-    EGLenum                     swizzleBlue;
-    EGLenum                     swizzleAlpha;
-    float                       maxAnisotropy;
-    XrColor4f                   borderColor;
-} XrSwapchainStateSamplerOpenGLESFB;
-#endif // XR_USE_GRAPHICS_API_OPENGL_ES
-
-typedef XrResult (XRAPI_PTR *PFN_xrUpdateSwapchainFB)(XrSwapchain swapchain, const XrSwapchainStateBaseHeaderFB* state);
+#define XR_OCULUS_audio_device_guid 1
+#define XR_OCULUS_audio_device_guid_SPEC_VERSION 1
+#define XR_OCULUS_AUDIO_DEVICE_GUID_EXTENSION_NAME "XR_OCULUS_audio_device_guid"
+#define XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS 128
+typedef XrResult (XRAPI_PTR *PFN_xrGetAudioOutputDeviceGuidOculus)(XrInstance instance, wchar_t buffer[XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS]);
+typedef XrResult (XRAPI_PTR *PFN_xrGetAudioInputDeviceGuidOculus)(XrInstance instance, wchar_t buffer[XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS]);
 
 #ifndef XR_NO_PROTOTYPES
 #ifdef XR_EXTENSION_PROTOTYPES
-XRAPI_ATTR XrResult XRAPI_CALL xrUpdateSwapchainFB(
-    XrSwapchain                                 swapchain,
-    const XrSwapchainStateBaseHeaderFB*         state);
+XRAPI_ATTR XrResult XRAPI_CALL xrGetAudioOutputDeviceGuidOculus(
+    XrInstance                                  instance,
+    wchar_t                                     buffer[XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS]);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetAudioInputDeviceGuidOculus(
+    XrInstance                                  instance,
+    wchar_t                                     buffer[XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS]);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
+#endif /* XR_USE_PLATFORM_WIN32 */
+
+#ifdef XR_USE_PLATFORM_ANDROID
+
+#define XR_FB_swapchain_update_state_android_surface 1
+#define XR_FB_swapchain_update_state_android_surface_SPEC_VERSION 1
+#define XR_FB_SWAPCHAIN_UPDATE_STATE_ANDROID_SURFACE_EXTENSION_NAME "XR_FB_swapchain_update_state_android_surface"
+#ifdef XR_USE_PLATFORM_ANDROID
+typedef struct XrSwapchainStateAndroidSurfaceDimensionsFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              width;
+    uint32_t              height;
+} XrSwapchainStateAndroidSurfaceDimensionsFB;
+#endif // XR_USE_PLATFORM_ANDROID
+
 #endif /* XR_USE_PLATFORM_ANDROID */
+
+#ifdef XR_USE_GRAPHICS_API_OPENGL_ES
+
+#define XR_FB_swapchain_update_state_opengl_es 1
+#define XR_FB_swapchain_update_state_opengl_es_SPEC_VERSION 1
+#define XR_FB_SWAPCHAIN_UPDATE_STATE_OPENGL_ES_EXTENSION_NAME "XR_FB_swapchain_update_state_opengl_es"
+#ifdef XR_USE_GRAPHICS_API_OPENGL_ES
+typedef struct XrSwapchainStateSamplerOpenGLESFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    EGLenum               minFilter;
+    EGLenum               magFilter;
+    EGLenum               wrapModeS;
+    EGLenum               wrapModeT;
+    EGLenum               swizzleRed;
+    EGLenum               swizzleGreen;
+    EGLenum               swizzleBlue;
+    EGLenum               swizzleAlpha;
+    float                 maxAnisotropy;
+    XrColor4f             borderColor;
+} XrSwapchainStateSamplerOpenGLESFB;
+#endif // XR_USE_GRAPHICS_API_OPENGL_ES
+
+#endif /* XR_USE_GRAPHICS_API_OPENGL_ES */
+
+#ifdef XR_USE_GRAPHICS_API_VULKAN
+
+#define XR_FB_swapchain_update_state_vulkan 1
+#define XR_FB_swapchain_update_state_vulkan_SPEC_VERSION 1
+#define XR_FB_SWAPCHAIN_UPDATE_STATE_VULKAN_EXTENSION_NAME "XR_FB_swapchain_update_state_vulkan"
+#ifdef XR_USE_GRAPHICS_API_VULKAN
+typedef struct XrSwapchainStateSamplerVulkanFB {
+    XrStructureType         type;
+    void* XR_MAY_ALIAS      next;
+    VkFilter                minFilter;
+    VkFilter                magFilter;
+    VkSamplerMipmapMode     mipmapMode;
+    VkSamplerAddressMode    wrapModeS;
+    VkSamplerAddressMode    wrapModeT;
+    VkComponentSwizzle      swizzleRed;
+    VkComponentSwizzle      swizzleGreen;
+    VkComponentSwizzle      swizzleBlue;
+    VkComponentSwizzle      swizzleAlpha;
+    float                   maxAnisotropy;
+    XrColor4f               borderColor;
+} XrSwapchainStateSamplerVulkanFB;
+#endif // XR_USE_GRAPHICS_API_VULKAN
+
+#endif /* XR_USE_GRAPHICS_API_VULKAN */
 
 #ifdef __cplusplus
 }

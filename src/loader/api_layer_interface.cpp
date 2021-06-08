@@ -232,7 +232,9 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
         for (const auto& layer_name : enabled_explicit_api_layer_names) {
             bool found_this_layer = false;
 
-            for (auto it = explicit_layer_manifest_files.begin(); it < explicit_layer_manifest_files.end(); it++) {
+            for (auto it = explicit_layer_manifest_files.begin(); it != explicit_layer_manifest_files.end();) {
+                bool erased_layer_manifest_file = false;
+
                 if (layers_already_found.count(layer_name) > 0) {
                     found_this_layer = true;
                 } else if (layer_name == (*it)->LayerName()) {
@@ -240,6 +242,11 @@ XrResult ApiLayerInterface::LoadApiLayers(const std::string& openxr_command, uin
                     layers_already_found.insert(layer_name);
                     enabled_layer_manifest_files_in_init_order.push_back(std::move(*it));
                     it = explicit_layer_manifest_files.erase(it);
+                    erased_layer_manifest_file = true;
+                }
+
+                if (!erased_layer_manifest_file) {
+                    it++;
                 }
             }
 

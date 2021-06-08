@@ -15,7 +15,7 @@ trim_trailing_whitespace = true
 
 [*.xml]
 indent_style = space
-indent_size = 2
+indent_size = 4
 
 [*.cmake,CMakeLists.txt]
 indent_style = space
