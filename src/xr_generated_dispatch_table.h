@@ -261,8 +261,21 @@ struct XrGeneratedDispatchTable {
     PFN_xrEnumerateColorSpacesFB EnumerateColorSpacesFB;
     PFN_xrSetColorSpaceFB SetColorSpaceFB;
 
+    // ---- XR_FB_foveation extension commands
+    PFN_xrCreateFoveationProfileFB CreateFoveationProfileFB;
+    PFN_xrDestroyFoveationProfileFB DestroyFoveationProfileFB;
+
     // ---- XR_VARJO_environment_depth_estimation extension commands
     PFN_xrSetEnvironmentDepthEstimationVARJO SetEnvironmentDepthEstimationVARJO;
+
+    // ---- XR_MSFT_spatial_anchor_persistence extension commands
+    PFN_xrCreateSpatialAnchorStoreConnectionMSFT CreateSpatialAnchorStoreConnectionMSFT;
+    PFN_xrDestroySpatialAnchorStoreConnectionMSFT DestroySpatialAnchorStoreConnectionMSFT;
+    PFN_xrPersistSpatialAnchorMSFT PersistSpatialAnchorMSFT;
+    PFN_xrEnumeratePersistedSpatialAnchorNamesMSFT EnumeratePersistedSpatialAnchorNamesMSFT;
+    PFN_xrCreateSpatialAnchorFromPersistedNameMSFT CreateSpatialAnchorFromPersistedNameMSFT;
+    PFN_xrUnpersistSpatialAnchorMSFT UnpersistSpatialAnchorMSFT;
+    PFN_xrClearSpatialAnchorStoreMSFT ClearSpatialAnchorStoreMSFT;
 
     // ---- XR_OCULUS_audio_device_guid extension commands
 #if defined(XR_USE_PLATFORM_WIN32)

@@ -19,6 +19,59 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.18 (2021-07-30)
+
+This release mostly adds new extensions. It also includes some fixes to the
+included layers, as well as text in the loader documentation describing how
+runtimes can register themselves for manual selection. This is not used by the
+loader itself and does not require any changes to the loader, but it may be
+useful to developer-focused supporting software.
+
+- Registry
+  - Add ratified `XR_KHR_swapchain_usage_input_attachment_bit` Khronos extension.
+    (Promotion of `XR_MND_swapchain_usage_input_attachment_bit`, which is now
+    deprecated.)
+    ([internal MR 2045](https://gitlab.khronos.org/openxr/openxr/merge_requests/2045))
+  - Add new `XR_FB_foveation`, `XR_FB_foveation_configuration`, and
+    `XR_FB_foveation_vulkan` vendor extensions.
+    ([internal MR 2050](https://gitlab.khronos.org/openxr/openxr/merge_requests/2050))
+  - Add additional extension dependencies to `XR_FB_swapchain_update_state`.
+    ([internal MR 2072](https://gitlab.khronos.org/openxr/openxr/merge_requests/2072),
+    [internal issue 1572](https://gitlab.khronos.org/openxr/openxr/issues/1572))
+  - Add new `XR_FB_composition_layer_secure_content` vendor extension.
+    ([internal MR 2075](https://gitlab.khronos.org/openxr/openxr/merge_requests/2075))
+  - Add new `XR_FB_composition_layer_alpha_blend` vendor extension.
+    ([internal MR 2078](https://gitlab.khronos.org/openxr/openxr/merge_requests/2078))
+  - Add new `XR_FB_composition_layer_image_layout` vendor extension.
+    ([internal MR 2090](https://gitlab.khronos.org/openxr/openxr/merge_requests/2090))
+  - Add new `XR_MSFT_spatial_anchor_persistence` vendor extension.
+    ([internal MR 2093](https://gitlab.khronos.org/openxr/openxr/merge_requests/2093))
+  - Add some simple [Schematron](https://schematron.com) rules and a script to
+    check the XML registry against them.
+    ([internal MR 2103](https://gitlab.khronos.org/openxr/openxr/merge_requests/2103))
+  - Register author ID and Reserve vendor extensions for Unity.
+    ([internal MR 2105](https://gitlab.khronos.org/openxr/openxr/merge_requests/2105))
+  - Reserve extension ID range 187-196 for LIV Inc.
+    ([internal MR 2102](https://gitlab.khronos.org/openxr/openxr/merge_requests/2102))
+- SDK
+  - Describe how runtimes may register themselves at installation time for manual
+    selection.
+    ([internal MR 2081](https://gitlab.khronos.org/openxr/openxr/merge_requests/2081),
+    [internal MR 2109](https://gitlab.khronos.org/openxr/openxr/merge_requests/2109),
+    [internal issue 1574](https://gitlab.khronos.org/openxr/openxr/issues/1574))
+  - Include sRGB in list of supported swapchain texture formats for the HelloXR
+    OpenGLES plugin.
+    ([internal MR 2066](https://gitlab.khronos.org/openxr/openxr/merge_requests/2066))
+  - layers: Refactor generated `xrGetInstanceProcAddr` implementations to avoid
+    deeply-nested `if ... else` blocks. (Some compilers have limits we were nearing
+    or hitting.)
+    ([internal MR 2050](https://gitlab.khronos.org/openxr/openxr/merge_requests/2050))
+  - validation layer: Set default logging mode to stdout ("text") instead of none.
+    ([OpenXR-SDK-Source PR 262](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/262))
+  - validation layer: Fix invalid struct type error message to show the expected
+    type instead of the actual type.
+    ([OpenXR-SDK-Source PR 263](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/263))
+
 ## OpenXR SDK 1.0.17 (2021-06-08)
 
 This release features an important fix to the loader for an invalid-iterator bug

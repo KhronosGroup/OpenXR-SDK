@@ -167,7 +167,7 @@ else()
     set(BUILD_CONFORMANCE_CLI OFF)
 endif()
 
-# Several files use these compile-time OS switches
+# Several files use these compile time OS switches
 if(WIN32)
     add_definitions(-DXR_OS_WINDOWS)
     add_definitions(-DNOMINMAX)
@@ -223,7 +223,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     include(presentation)
 endif()
 
-# Several files use these compile-time platform switches
+# Several files use these compile time platform switches
 if(WIN32)
     add_definitions(-DXR_USE_PLATFORM_WIN32)
 elseif(ANDROID)

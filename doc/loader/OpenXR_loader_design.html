@@ -445,9 +445,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>OpenXR<sup>&#174;</sup>  Loader - Design and Operation [DRAFT] (with all published extensions)</h1>
 <div class="details">
 <span id="author" class="author">Copyright (c) 2017-2021, The Khronos Group Inc.</span><br>
-<span id="revnumber">version 1.0.17,</span>
-<span id="revdate">Tue, 08 Jun 2021 21:03:43 +0000</span>
-<br><span id="revremark">from git ref release-1.0.17 commit: 02bdab75bb56b006a92eeb191de0441a79a6ef9c</span>
+<span id="revnumber">version 1.0.18,</span>
+<span id="revdate">Sat, 31 Jul 2021 17:51:09 +0000</span>
+<br><span id="revremark">from git ref release-1.0.18 commit: 864bd08fafb489e37b495c22f3f90277a647928e</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -513,9 +513,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#runtime-discovery">5.1. Runtime Discovery</a>
 <ul class="sectlevel3">
 <li><a href="#active-runtime-information">5.1.1. Active Runtime Information</a></li>
-<li><a href="#runtime-manifest-file-format">5.1.2. Runtime Manifest File Format</a></li>
-<li><a href="#loader-distribution">5.1.3. Loader Distribution</a></li>
-<li><a href="#overriding-the-default-runtime-usage">5.1.4. Overriding the Default Runtime Usage</a></li>
+<li><a href="#runtime-enumeration">5.1.2. Runtime Enumeration</a></li>
+<li><a href="#runtime-manifest-file-format">5.1.3. Runtime Manifest File Format</a></li>
+<li><a href="#loader-distribution">5.1.4. Loader Distribution</a></li>
+<li><a href="#overriding-the-default-runtime-usage">5.1.5. Overriding the Default Runtime Usage</a></li>
 </ul>
 </li>
 <li><a href="#loader-runtime-interface-negotiation">5.2. Loader/Runtime Interface Negotiation</a>
@@ -2816,7 +2817,7 @@ contents to the list of extensions.</p>
 </li>
 <li>
 <p>For any OpenXR command the API layer intercepts, <code>xrGetInstanceProcAddr</code>
-<strong class="purple">must</strong> return a pointer to a local entry-point.</p>
+<strong class="purple">must</strong> return a pointer to a local entry point.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -3220,7 +3221,120 @@ file.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="runtime-manifest-file-format">5.1.2. Runtime Manifest File Format</h4>
+<h4 id="runtime-enumeration">5.1.2. Runtime Enumeration</h4>
+<div class="paragraph">
+<p>When multiple runtimes are installed on a system, the OpenXR loader will
+find the currently active runtime using the mechanism described before.</p>
+</div>
+<div class="paragraph">
+<p>At that point, the loader will act as if this runtime is currently the only
+installed one.</p>
+</div>
+<div class="paragraph">
+<p>To be able to allow additional tooling to discover other runtimes that are
+installed, but currently are not the active runtime on the system, each
+runtime should register the path to their manifest in a platform-dependant
+way in a list of "available runtimes".</p>
+</div>
+<div class="paragraph">
+<p>Runtime manifest files may optionally contain a <code>"name"</code> field.
+Tools that allow users to configure what runtime is currently active should
+display this user-friendly name if present when referring to the runtime in
+question.</p>
+</div>
+<div class="sect4">
+<h5 id="_windows_installed_runtimes_enumeration">Windows Installed Runtimes Enumeration</h5>
+<div class="paragraph">
+<p>On Windows, the available runtimes' information is located in the Windows
+Registry.</p>
+</div>
+<div class="paragraph">
+<p>It can be found under the key:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\OpenXR\&lt;major_api_version&gt;\AvailableRuntimes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each installed runtime should add a <code>DWORD</code> value under that key.
+The `DWORD&#8217;s name is the full path to the runtime&#8217;s manifest</p>
+</div>
+<div class="paragraph">
+<p>Similarly to how Implicit API layers can control their activation state in
+the registry, as described in <a href="#windows-manifest-registry-usage">Windows Manifest Registry Usage</a>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A value of <code>0</code> indicates that the runtime can be discovered by tools that
+want to enumerate all installed runtimes.</p>
+</li>
+<li>
+<p>A non-zero value may be used if the runtime wants to disable itself from
+enumeration (for example, if hardware configuration, or first time setup
+hasn&#8217;t been run by the user yet).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For instance, the OpenXR 1.x runtime used as an example in section <a href="#Windows
+Active Runtime Location">[Windows
+Active Runtime Location]</a> would add a <code>DWORD</code> value in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\OpenXR\1\AvailableRuntimes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the name:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>C:\Windows\system32\my_system_runtime.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And set it to <code>0</code>.</p>
+</div>
+<div class="paragraph">
+<p>All considerations for 32 bit platforms mentioned in section <a href="#Windows
+Active Runtime Location">[Windows
+Active Runtime Location]</a> still apply.</p>
+</div>
+<div class="paragraph">
+<p>Tools that want to change the currently <code>ActiveRuntime</code> should not modify
+the list of <code>AvailableRuntimes</code>, and just copy the path to the correct
+location.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_linux_installed_runtimes_enumeration">Linux Installed Runtimes Enumeration</h5>
+<div class="paragraph">
+<p>As previously defined, the OpenXR configuration on Linux is either stored in
+a standard XDG configuration directory, or the system-wide configuration
+directory.</p>
+</div>
+<div class="paragraph">
+<p>Aside from the currently active runtime, installed runtimes that make
+themselves available for enumeration should install their runtime manifest
+into this directory, using any name suitable.</p>
+</div>
+<div class="paragraph">
+<p>Rules about precedence in different directories for runtime enumeration
+follow the same rules as in section <a href="#_linux_active_runtime_location">Linux Active Runtime Location</a> for
+selecting the folder containing an <code>active_runtime.json</code>.</p>
+</div>
+<div class="paragraph">
+<p>Tools that want to change the current <code>active_runtime.json</code> should only
+update the symlink to the active runtime, and not move, copy or delete any
+other files.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="runtime-manifest-file-format">5.1.3. Runtime Manifest File Format</h4>
 <div class="paragraph">
 <p>As mentioned before, the OpenXR loader on Windows and Linux uses manifest
 files to discover the active runtime.
@@ -3241,6 +3355,7 @@ requirement of using the ".json" extension.</p>
 <pre class="highlight"><code class="language-json" data-lang="json">{
    "file_format_version": "1.0.0",
    "runtime": {
+      "name": "openxr_sample_runtime",
       "library_path": "./dbuild/src/impl/libopenxr_sample_impl.so"
    }
 }</code></pre>
@@ -3296,8 +3411,19 @@ requirement of using the ".json" extension.</p>
         "functions" node is required if the runtime is using an alternative name
         for <code>xrNegotiateLoaderRuntimeInterface</code>.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"name"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An optional user-facing name that can be used by tooling to refer to
+        this specific runtime.</p></td>
+</tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>Vendors may add non-standard fields to their runtime manifest files.
+These vendor specific fields must be prefixed with their vendor id (e.g:
+<code>VENDOR_name_of_field</code>).</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -3341,12 +3467,25 @@ The fields of the 1.0.0 file format include:</p>
 <li>
 <p>"library_path"</p>
 </li>
+<li>
+<p>"name"</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This is an optional field, added before the OpenXR 1.0.18 release.
+As it is not used by the loader nor does it introduce incompatibility, it
+was added to the format described here without incrementing the manifest
+file format version number.</p>
+</li>
+</ul>
+</div>
+</li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="loader-distribution">5.1.3. Loader Distribution</h4>
+<h4 id="loader-distribution">5.1.4. Loader Distribution</h4>
 <div class="paragraph">
 <p>Any application using the OpenXR API is responsible with making sure it can
 properly execute on a user&#8217;s system.
@@ -3362,7 +3501,7 @@ If an engine or platform provides an OpenXR loader for applications, it
 </div>
 </div>
 <div class="sect3">
-<h4 id="overriding-the-default-runtime-usage">5.1.4. Overriding the Default Runtime Usage</h4>
+<h4 id="overriding-the-default-runtime-usage">5.1.5. Overriding the Default Runtime Usage</h4>
 <div class="paragraph">
 <p>There may be times that a developer wishes to ignore the standard runtime
 discovery process and force the loader to use a specific runtime.
@@ -3418,7 +3557,7 @@ environment variable.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>export XR_RUNTIME_JSON=/home/user/.local/share/openxr/runtime.d/steam_runtime.json</pre>
+<pre>export XR_RUNTIME_JSON=/home/user/.config/openxr/1/steamxr.json</pre>
 </div>
 </div>
 </div>
@@ -3681,7 +3820,7 @@ remaining OpenXR commands supported by the runtime.</p>
 <p>The <a href="#xrNegotiateLoaderRuntimeInterface">xrNegotiateLoaderRuntimeInterface</a> should be directly exported by a
 runtime so that using "GetProcAddress" on Windows or "dlsym" on Linux,
 should return a valid function pointer to it.
-However, <strong>all other OpenXR entry-points</strong> <strong class="purple">must</strong> either:</p>
+However, <strong>all other OpenXR entry points</strong> <strong class="purple">must</strong> either:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3702,7 +3841,7 @@ prior to when the OpenXR loader library is loaded by the application.</p>
 <p>Beware of interposing by dynamic OS library loaders if the official OpenXR
 names are used.
 On Linux, if official names are used, the runtime library must be linked
-with -Bsymbolic.</p>
+with <code>-Bsymbolic</code>.</p>
 </div>
 </div>
 <div class="sect3">
@@ -5296,7 +5435,7 @@ To determine what might have happened, the loader will call the
 <ul>
 <li>
 <p><code>path</code> <strong class="purple">must</strong> be a constant string containing the name of the
-entry-point that was attempted to be queried during the previous
+entry point that was attempted to be queried during the previous
 <a href="#LoaderPlatformLibraryGetProcAddr">LoaderPlatformLibraryGetProcAddr</a> call.</p>
 </li>
 </ul>
@@ -5708,8 +5847,8 @@ discovery.</p>
 </div>
 <div id="footer" style="max-width: 100;">
 <div id="footer-text">
-Version 1.0.17<br>
-Last updated 2021-06-08 21:01:05 UTC
+Version 1.0.18<br>
+Last updated 2021-07-31 17:46:03 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

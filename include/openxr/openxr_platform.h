@@ -587,6 +587,22 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetAudioInputDeviceGuidOculus(
 #endif /* !XR_NO_PROTOTYPES */
 #endif /* XR_USE_PLATFORM_WIN32 */
 
+#ifdef XR_USE_GRAPHICS_API_VULKAN
+
+#define XR_FB_foveation_vulkan 1
+#define XR_FB_foveation_vulkan_SPEC_VERSION 1
+#define XR_FB_FOVEATION_VULKAN_EXTENSION_NAME "XR_FB_foveation_vulkan"
+// XrSwapchainImageFoveationVulkanFB extends XrSwapchainImageVulkanKHR
+typedef struct XrSwapchainImageFoveationVulkanFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    VkImage               image;
+    uint32_t              width;
+    uint32_t              height;
+} XrSwapchainImageFoveationVulkanFB;
+
+#endif /* XR_USE_GRAPHICS_API_VULKAN */
+
 #ifdef XR_USE_PLATFORM_ANDROID
 
 #define XR_FB_swapchain_update_state_android_surface 1

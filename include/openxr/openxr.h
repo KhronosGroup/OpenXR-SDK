@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 17)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 18)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -196,6 +196,8 @@ typedef enum XrResult {
     XR_ERROR_SCENE_COMPUTE_CONSISTENCY_MISMATCH_MSFT = -1000097005,
     XR_ERROR_DISPLAY_REFRESH_RATE_UNSUPPORTED_FB = -1000101000,
     XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB = -1000108000,
+    XR_ERROR_SPATIAL_ANCHOR_NAME_NOT_FOUND_MSFT = -1000142001,
+    XR_ERROR_SPATIAL_ANCHOR_NAME_INVALID_MSFT = -1000142002,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
 } XrResult;
 
@@ -288,6 +290,8 @@ typedef enum XrStructureType {
     XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR = 1000034000,
     XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT = 1000039000,
     XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT = 1000039001,
+    XR_TYPE_COMPOSITION_LAYER_IMAGE_LAYOUT_FB = 1000040000,
+    XR_TYPE_COMPOSITION_LAYER_ALPHA_BLEND_FB = 1000041001,
     XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT = 1000046000,
     XR_TYPE_GRAPHICS_BINDING_EGL_MNDX = 1000048004,
     XR_TYPE_SPATIAL_GRAPH_NODE_SPACE_CREATE_INFO_MSFT = 1000049000,
@@ -317,6 +321,7 @@ typedef enum XrStructureType {
     XR_TYPE_COMPOSITION_LAYER_REPROJECTION_INFO_MSFT = 1000066000,
     XR_TYPE_COMPOSITION_LAYER_REPROJECTION_PLANE_OVERRIDE_MSFT = 1000066001,
     XR_TYPE_ANDROID_SURFACE_SWAPCHAIN_CREATE_INFO_FB = 1000070000,
+    XR_TYPE_COMPOSITION_LAYER_SECURE_CONTENT_FB = 1000072000,
     XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE = 1000079000,
     XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT = 1000080000,
     XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR = 1000089000,
@@ -347,11 +352,18 @@ typedef enum XrStructureType {
     XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT = 1000098001,
     XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB = 1000101000,
     XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB = 1000108000,
+    XR_TYPE_FOVEATION_PROFILE_CREATE_INFO_FB = 1000114000,
+    XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB = 1000114001,
+    XR_TYPE_SWAPCHAIN_STATE_FOVEATION_FB = 1000114002,
+    XR_TYPE_FOVEATION_LEVEL_PROFILE_CREATE_INFO_FB = 1000115000,
     XR_TYPE_BINDING_MODIFICATIONS_KHR = 1000120000,
     XR_TYPE_VIEW_LOCATE_FOVEATED_RENDERING_VARJO = 1000121000,
     XR_TYPE_FOVEATED_VIEW_CONFIGURATION_VIEW_VARJO = 1000121001,
     XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO = 1000121002,
     XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO = 1000122000,
+    XR_TYPE_SPATIAL_ANCHOR_PERSISTENCE_INFO_MSFT = 1000142000,
+    XR_TYPE_SPATIAL_ANCHOR_FROM_PERSISTED_ANCHOR_CREATE_INFO_MSFT = 1000142001,
+    XR_TYPE_SWAPCHAIN_IMAGE_FOVEATION_VULKAN_FB = 1000160000,
     XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB = 1000161000,
     XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB = 1000162000,
     XR_TYPE_SWAPCHAIN_STATE_SAMPLER_VULKAN_FB = 1000163000,
@@ -433,6 +445,8 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_HAND_TRACKER_EXT = 1000051000,
     XR_OBJECT_TYPE_SCENE_OBSERVER_MSFT = 1000097000,
     XR_OBJECT_TYPE_SCENE_MSFT = 1000097001,
+    XR_OBJECT_TYPE_FOVEATION_PROFILE_FB = 1000114000,
+    XR_OBJECT_TYPE_SPATIAL_ANCHOR_STORE_CONNECTION_MSFT = 1000142000,
     XR_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrObjectType;
 typedef XrFlags64 XrInstanceCreateFlags;
@@ -474,6 +488,7 @@ static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_TRANSFER_DST_BIT = 0x00000
 static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_SAMPLED_BIT = 0x00000020;
 static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_MUTABLE_FORMAT_BIT = 0x00000040;
 static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND = 0x00000080;
+static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_KHR = 0x00000080;  // alias of XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND
 
 typedef XrFlags64 XrCompositionLayerFlags;
 
@@ -1521,6 +1536,11 @@ typedef struct XrBindingModificationsKHR {
 
 
 
+#define XR_KHR_swapchain_usage_input_attachment_bit 1
+#define XR_KHR_swapchain_usage_input_attachment_bit_SPEC_VERSION 3
+#define XR_KHR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME "XR_KHR_swapchain_usage_input_attachment_bit"
+
+
 #define XR_EXT_performance_settings 1
 #define XR_EXT_performance_settings_SPEC_VERSION 3
 #define XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME "XR_EXT_performance_settings"
@@ -1755,7 +1775,7 @@ typedef struct XrEventDataMainSessionVisibilityChangedEXTX {
 
 #define XR_MSFT_spatial_anchor 1
 XR_DEFINE_HANDLE(XrSpatialAnchorMSFT)
-#define XR_MSFT_spatial_anchor_SPEC_VERSION 1
+#define XR_MSFT_spatial_anchor_SPEC_VERSION 2
 #define XR_MSFT_SPATIAL_ANCHOR_EXTENSION_NAME "XR_MSFT_spatial_anchor"
 typedef struct XrSpatialAnchorCreateInfoMSFT {
     XrStructureType             type;
@@ -1792,6 +1812,48 @@ XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorMSFT(
     XrSpatialAnchorMSFT                         anchor);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_FB_composition_layer_image_layout 1
+#define XR_FB_composition_layer_image_layout_SPEC_VERSION 1
+#define XR_FB_COMPOSITION_LAYER_IMAGE_LAYOUT_EXTENSION_NAME "XR_FB_composition_layer_image_layout"
+typedef XrFlags64 XrCompositionLayerImageLayoutFlagsFB;
+
+// Flag bits for XrCompositionLayerImageLayoutFlagsFB
+static const XrCompositionLayerImageLayoutFlagsFB XR_COMPOSITION_LAYER_IMAGE_LAYOUT_VERTICAL_FLIP_BIT_FB = 0x00000001;
+
+// XrCompositionLayerImageLayoutFB extends XrCompositionLayerBaseHeader
+typedef struct XrCompositionLayerImageLayoutFB {
+    XrStructureType                         type;
+    void* XR_MAY_ALIAS                      next;
+    XrCompositionLayerImageLayoutFlagsFB    flags;
+} XrCompositionLayerImageLayoutFB;
+
+
+
+#define XR_FB_composition_layer_alpha_blend 1
+#define XR_FB_composition_layer_alpha_blend_SPEC_VERSION 2
+#define XR_FB_COMPOSITION_LAYER_ALPHA_BLEND_EXTENSION_NAME "XR_FB_composition_layer_alpha_blend"
+
+typedef enum XrBlendFactorFB {
+    XR_BLEND_FACTOR_ZERO_FB = 0,
+    XR_BLEND_FACTOR_ONE_FB = 1,
+    XR_BLEND_FACTOR_SRC_ALPHA_FB = 2,
+    XR_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA_FB = 3,
+    XR_BLEND_FACTOR_DST_ALPHA_FB = 4,
+    XR_BLEND_FACTOR_ONE_MINUS_DST_ALPHA_FB = 5,
+    XR_BLEND_FACTOR_MAX_ENUM_FB = 0x7FFFFFFF
+} XrBlendFactorFB;
+// XrCompositionLayerAlphaBlendFB extends XrCompositionLayerBaseHeader
+typedef struct XrCompositionLayerAlphaBlendFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBlendFactorFB       srcFactorColor;
+    XrBlendFactorFB       dstFactorColor;
+    XrBlendFactorFB       srcFactorAlpha;
+    XrBlendFactorFB       dstFactorAlpha;
+} XrCompositionLayerAlphaBlendFB;
+
 
 
 #define XR_MND_headless 1
@@ -2324,6 +2386,24 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetSwapchainStateFB(
 #endif /* !XR_NO_PROTOTYPES */
 
 
+#define XR_FB_composition_layer_secure_content 1
+#define XR_FB_composition_layer_secure_content_SPEC_VERSION 1
+#define XR_FB_COMPOSITION_LAYER_SECURE_CONTENT_EXTENSION_NAME "XR_FB_composition_layer_secure_content"
+typedef XrFlags64 XrCompositionLayerSecureContentFlagsFB;
+
+// Flag bits for XrCompositionLayerSecureContentFlagsFB
+static const XrCompositionLayerSecureContentFlagsFB XR_COMPOSITION_LAYER_SECURE_CONTENT_EXCLUDE_LAYER_BIT_FB = 0x00000001;
+static const XrCompositionLayerSecureContentFlagsFB XR_COMPOSITION_LAYER_SECURE_CONTENT_REPLACE_LAYER_BIT_FB = 0x00000002;
+
+// XrCompositionLayerSecureContentFB extends XrCompositionLayerBaseHeader
+typedef struct XrCompositionLayerSecureContentFB {
+    XrStructureType                           type;
+    const void* XR_MAY_ALIAS                  next;
+    XrCompositionLayerSecureContentFlagsFB    flags;
+} XrCompositionLayerSecureContentFB;
+
+
+
 #define XR_VALVE_analog_threshold 1
 #define XR_VALVE_analog_threshold_SPEC_VERSION 1
 #define XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME "XR_VALVE_analog_threshold"
@@ -2819,8 +2899,85 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetColorSpaceFB(
 #endif /* !XR_NO_PROTOTYPES */
 
 
+#define XR_FB_foveation 1
+XR_DEFINE_HANDLE(XrFoveationProfileFB)
+#define XR_FB_foveation_SPEC_VERSION      1
+#define XR_FB_FOVEATION_EXTENSION_NAME    "XR_FB_foveation"
+typedef XrFlags64 XrSwapchainCreateFoveationFlagsFB;
+
+// Flag bits for XrSwapchainCreateFoveationFlagsFB
+static const XrSwapchainCreateFoveationFlagsFB XR_SWAPCHAIN_CREATE_FOVEATION_SCALED_BIN_BIT_FB = 0x00000001;
+static const XrSwapchainCreateFoveationFlagsFB XR_SWAPCHAIN_CREATE_FOVEATION_FRAGMENT_DENSITY_MAP_BIT_FB = 0x00000002;
+
+typedef XrFlags64 XrSwapchainStateFoveationFlagsFB;
+
+// Flag bits for XrSwapchainStateFoveationFlagsFB
+
+typedef struct XrFoveationProfileCreateInfoFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+} XrFoveationProfileCreateInfoFB;
+
+// XrSwapchainCreateInfoFoveationFB extends XrSwapchainCreateInfo
+typedef struct XrSwapchainCreateInfoFoveationFB {
+    XrStructureType                      type;
+    void* XR_MAY_ALIAS                   next;
+    XrSwapchainCreateFoveationFlagsFB    flags;
+} XrSwapchainCreateInfoFoveationFB;
+
+typedef struct XrSwapchainStateFoveationFB {
+    XrStructureType                     type;
+    void* XR_MAY_ALIAS                  next;
+    XrSwapchainStateFoveationFlagsFB    flags;
+    XrFoveationProfileFB                profile;
+} XrSwapchainStateFoveationFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateFoveationProfileFB)(XrSession session, const XrFoveationProfileCreateInfoFB* createInfo, XrFoveationProfileFB* profile);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyFoveationProfileFB)(XrFoveationProfileFB profile);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateFoveationProfileFB(
+    XrSession                                   session,
+    const XrFoveationProfileCreateInfoFB*       createInfo,
+    XrFoveationProfileFB*                       profile);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyFoveationProfileFB(
+    XrFoveationProfileFB                        profile);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_FB_foveation_configuration 1
+#define XR_FB_foveation_configuration_SPEC_VERSION 1
+#define XR_FB_FOVEATION_CONFIGURATION_EXTENSION_NAME "XR_FB_foveation_configuration"
+
+typedef enum XrFoveationLevelFB {
+    XR_FOVEATION_LEVEL_NONE_FB = 0,
+    XR_FOVEATION_LEVEL_LOW_FB = 1,
+    XR_FOVEATION_LEVEL_MEDIUM_FB = 2,
+    XR_FOVEATION_LEVEL_HIGH_FB = 3,
+    XR_FOVEATION_LEVEL_MAX_ENUM_FB = 0x7FFFFFFF
+} XrFoveationLevelFB;
+
+typedef enum XrFoveationDynamicFB {
+    XR_FOVEATION_DYNAMIC_DISABLED_FB = 0,
+    XR_FOVEATION_DYNAMIC_LEVEL_ENABLED_FB = 1,
+    XR_FOVEATION_DYNAMIC_MAX_ENUM_FB = 0x7FFFFFFF
+} XrFoveationDynamicFB;
+// XrFoveationLevelProfileCreateInfoFB extends XrFoveationProfileCreateInfoFB
+typedef struct XrFoveationLevelProfileCreateInfoFB {
+    XrStructureType         type;
+    void* XR_MAY_ALIAS      next;
+    XrFoveationLevelFB      level;
+    float                   verticalOffset;
+    XrFoveationDynamicFB    dynamic;
+} XrFoveationLevelProfileCreateInfoFB;
+
+
+
 #define XR_VARJO_foveated_rendering 1
-#define XR_VARJO_foveated_rendering_SPEC_VERSION 1
+#define XR_VARJO_foveated_rendering_SPEC_VERSION 2
 #define XR_VARJO_FOVEATED_RENDERING_EXTENSION_NAME "XR_VARJO_foveated_rendering"
 // XrViewLocateFoveatedRenderingVARJO extends XrViewLocateInfo
 typedef struct XrViewLocateFoveatedRenderingVARJO {
@@ -2846,7 +3003,7 @@ typedef struct XrSystemFoveatedRenderingPropertiesVARJO {
 
 
 #define XR_VARJO_composition_layer_depth_test 1
-#define XR_VARJO_composition_layer_depth_test_SPEC_VERSION 1
+#define XR_VARJO_composition_layer_depth_test_SPEC_VERSION 2
 #define XR_VARJO_COMPOSITION_LAYER_DEPTH_TEST_EXTENSION_NAME "XR_VARJO_composition_layer_depth_test"
 // XrCompositionLayerDepthTestVARJO extends XrCompositionLayerProjection
 typedef struct XrCompositionLayerDepthTestVARJO {
@@ -2868,6 +3025,71 @@ typedef XrResult (XRAPI_PTR *PFN_xrSetEnvironmentDepthEstimationVARJO)(XrSession
 XRAPI_ATTR XrResult XRAPI_CALL xrSetEnvironmentDepthEstimationVARJO(
     XrSession                                   session,
     XrBool32                                    enabled);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_MSFT_spatial_anchor_persistence 1
+XR_DEFINE_HANDLE(XrSpatialAnchorStoreConnectionMSFT)
+#define XR_MAX_SPATIAL_ANCHOR_NAME_SIZE_MSFT 256
+#define XR_MSFT_spatial_anchor_persistence_SPEC_VERSION 2
+#define XR_MSFT_SPATIAL_ANCHOR_PERSISTENCE_EXTENSION_NAME "XR_MSFT_spatial_anchor_persistence"
+typedef struct XrSpatialAnchorPersistenceNameMSFT {
+    char    name[XR_MAX_SPATIAL_ANCHOR_NAME_SIZE_MSFT];
+} XrSpatialAnchorPersistenceNameMSFT;
+
+typedef struct XrSpatialAnchorPersistenceInfoMSFT {
+    XrStructureType                       type;
+    const void* XR_MAY_ALIAS              next;
+    XrSpatialAnchorPersistenceNameMSFT    spatialAnchorPersistenceName;
+    XrSpatialAnchorMSFT                   spatialAnchor;
+} XrSpatialAnchorPersistenceInfoMSFT;
+
+typedef struct XrSpatialAnchorFromPersistedAnchorCreateInfoMSFT {
+    XrStructureType                       type;
+    const void* XR_MAY_ALIAS              next;
+    XrSpatialAnchorStoreConnectionMSFT    spatialAnchorStore;
+    XrSpatialAnchorPersistenceNameMSFT    spatialAnchorPersistenceName;
+} XrSpatialAnchorFromPersistedAnchorCreateInfoMSFT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorStoreConnectionMSFT)(XrSession session, XrSpatialAnchorStoreConnectionMSFT* spatialAnchorStore);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroySpatialAnchorStoreConnectionMSFT)(XrSpatialAnchorStoreConnectionMSFT spatialAnchorStore);
+typedef XrResult (XRAPI_PTR *PFN_xrPersistSpatialAnchorMSFT)(XrSpatialAnchorStoreConnectionMSFT spatialAnchorStore, const XrSpatialAnchorPersistenceInfoMSFT* spatialAnchorPersistenceInfo);
+typedef XrResult (XRAPI_PTR *PFN_xrEnumeratePersistedSpatialAnchorNamesMSFT)(XrSpatialAnchorStoreConnectionMSFT spatialAnchorStore, uint32_t spatialAnchorNamesCapacityInput, uint32_t* spatialAnchorNamesCountOutput, XrSpatialAnchorPersistenceNameMSFT* persistedAnchorNames);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorFromPersistedNameMSFT)(XrSession session, const XrSpatialAnchorFromPersistedAnchorCreateInfoMSFT* spatialAnchorCreateInfo, XrSpatialAnchorMSFT* spatialAnchor);
+typedef XrResult (XRAPI_PTR *PFN_xrUnpersistSpatialAnchorMSFT)(XrSpatialAnchorStoreConnectionMSFT        spatialAnchorStore, const XrSpatialAnchorPersistenceNameMSFT* spatialAnchorPersistenceName);
+typedef XrResult (XRAPI_PTR *PFN_xrClearSpatialAnchorStoreMSFT)(XrSpatialAnchorStoreConnectionMSFT spatialAnchorStore);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorStoreConnectionMSFT(
+    XrSession                                   session,
+    XrSpatialAnchorStoreConnectionMSFT*         spatialAnchorStore);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySpatialAnchorStoreConnectionMSFT(
+    XrSpatialAnchorStoreConnectionMSFT          spatialAnchorStore);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPersistSpatialAnchorMSFT(
+    XrSpatialAnchorStoreConnectionMSFT          spatialAnchorStore,
+    const XrSpatialAnchorPersistenceInfoMSFT*   spatialAnchorPersistenceInfo);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumeratePersistedSpatialAnchorNamesMSFT(
+    XrSpatialAnchorStoreConnectionMSFT          spatialAnchorStore,
+    uint32_t                                    spatialAnchorNamesCapacityInput,
+    uint32_t*                                   spatialAnchorNamesCountOutput,
+    XrSpatialAnchorPersistenceNameMSFT*         persistedAnchorNames);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorFromPersistedNameMSFT(
+    XrSession                                   session,
+    const XrSpatialAnchorFromPersistedAnchorCreateInfoMSFT* spatialAnchorCreateInfo,
+    XrSpatialAnchorMSFT*                        spatialAnchor);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrUnpersistSpatialAnchorMSFT(
+    XrSpatialAnchorStoreConnectionMSFT          spatialAnchorStore,
+    const XrSpatialAnchorPersistenceNameMSFT*   spatialAnchorPersistenceName);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrClearSpatialAnchorStoreMSFT(
+    XrSpatialAnchorStoreConnectionMSFT          spatialAnchorStore);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
 
