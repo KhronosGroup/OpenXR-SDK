@@ -7,6 +7,8 @@ trigger:
   branches:
     include:
       - "*"
+variables:
+  VULKAN_SDK_VERSION: "1.1.114.0"
 
 stages:
   - stage: Build
