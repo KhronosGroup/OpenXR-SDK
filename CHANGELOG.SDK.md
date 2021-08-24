@@ -19,6 +19,36 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.19 (2021-08-24)
+
+This release features a number of new or updated vendor extensions, as well as
+some minor cleanups and bug fixes in the SDK.
+
+- Registry
+  - Add `XR_SESSION_NOT_FOCUSED` as a possible success return code to
+    `xrApplyHapticFeedback` and `xrStopHapticFeedback`.
+    ([internal MR 2106](https://gitlab.khronos.org/openxr/openxr/merge_requests/2106),
+    [internal issue 1270](https://gitlab.khronos.org/openxr/openxr/issues/1270))
+  - Add new `XR_FB_hand_tracking_mesh` vendor extension.
+    ([internal MR 2089](https://gitlab.khronos.org/openxr/openxr/merge_requests/2089))
+  - Add new `XR_FB_hand_tracking_capsules` vendor extension.
+    ([internal MR 2089](https://gitlab.khronos.org/openxr/openxr/merge_requests/2089))
+  - Add new `XR_FB_hand_tracking_aim` vendor extension.
+    ([internal MR 2089](https://gitlab.khronos.org/openxr/openxr/merge_requests/2089))
+  - Add version 1 of new `XR_FB_space_warp` vendor extension.
+    ([internal MR 2115](https://gitlab.khronos.org/openxr/openxr/merge_requests/2115))
+  - Register new Author ID for Almalence.
+    ([OpenXR-Docs PR 92](https://github.com/KhronosGroup/OpenXR-Docs/pull/92),
+    [OpenXR-Docs PR 93](https://github.com/KhronosGroup/OpenXR-Docs/pull/93))
+  - Update to version 2 of `XR_VALVE_analog_threshold`.
+    ([internal MR 2113](https://gitlab.khronos.org/openxr/openxr/merge_requests/2113))
+- SDK
+  - scripts: Some typing annotations and type-related cleanup found by using type-
+    aware Python editors.
+    ([internal MR 2100](https://gitlab.khronos.org/openxr/openxr/merge_requests/2100))
+  - `xr_linear.h`: Fix bug in `XrVector3f_Cross`
+    ([internal MR 2111](https://gitlab.khronos.org/openxr/openxr/merge_requests/2111))
+
 ## OpenXR SDK 1.0.18 (2021-07-30)
 
 This release mostly adds new extensions. It also includes some fixes to the

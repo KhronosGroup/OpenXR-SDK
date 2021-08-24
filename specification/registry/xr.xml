@@ -27,6 +27,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- SECTION: OpenXR vendor/author tags for extensions and layers -->
     <tags>
         <!--  Sorted alphabetically by tag name -->
+        <tag name="ALMALENCE"  author="Almalence"                   contact="Ivan Chupakhin @ivan.chupakhin, Dmitry Shmunk @dmitry.shmunk"/>
         <tag name="ARM"        author="Arm Limited"                 contact="Andreas Loeve Selvik @selvik, Sam Martin @sammartin"/>
         <tag name="COLLABORA"  author="Collabora"                   contact="Ryan Pavlik @rpavlik"/>
         <tag name="EPIC"       author="Epic"                        contact="Nick Whiting @whitingn"/>
@@ -120,7 +121,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 18)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 19)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -221,6 +222,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type requires="openxr_platform_defines" name="float"/>
         <type requires="openxr_platform_defines" name="int8_t"/>
         <type requires="openxr_platform_defines" name="uint8_t"/>
+        <type requires="openxr_platform_defines" name="int16_t"/>
         <type requires="openxr_platform_defines" name="uint16_t"/>
         <type requires="openxr_platform_defines" name="int32_t"/>
         <type requires="openxr_platform_defines" name="uint32_t"/>
@@ -264,6 +266,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_FB_foveation -->
         <type bitvalues="XrSwapchainCreateFoveationFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrSwapchainCreateFoveationFlagsFB</name>;</type>
         <type bitvalues="XrSwapchainStateFoveationFlagBitsFB"  category="bitmask">typedef <type>XrFlags64</type> <name>XrSwapchainStateFoveationFlagsFB</name>;</type>
+
+        <!-- Bitmask types for XR_FB_hand_tracking_aim -->
+        <type bitvalues="XrHandTrackingAimFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrHandTrackingAimFlagsFB</name>;</type>
+
+        <!-- Bitmask types for XR_FB_space_warp -->
+        <type bitvalues="XrCompositionLayerSpaceWarpInfoFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrCompositionLayerSpaceWarpInfoFlagsFB</name>;</type>
 
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
@@ -341,6 +349,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enums and flag bits for XR_FB_foveation -->
         <type name="XrSwapchainCreateFoveationFlagBitsFB" category="enum"/>
         <type name="XrSwapchainStateFoveationFlagBitsFB" category="enum"/>
+
+        <!-- enums and flag bits for XR_FB_space_warp -->
+        <type name="XrCompositionLayerSpaceWarpInfoFlagBitsFB" category="enum"/>
+
+        <!-- enums and flag bits for XR_FB_hand_tracking_aim -->
+        <type name="XrHandTrackingAimFlagBitsFB" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -1103,7 +1117,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
 
         <!-- struct types for XR_VALVE_analog_threshold -->
-        <type category="struct" name="XrInteractionProfileAnalogThresholdVALVE" structextends="XrInteractionProfileSuggestedBinding">
+        <type category="struct" name="XrInteractionProfileAnalogThresholdVALVE" parentstruct="XrBindingModificationBaseHeaderKHR">
             <member values="XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrAction</type>              <name>action</name></member>
@@ -1721,6 +1735,65 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrFoveationDynamicFB</type> <name>dynamic</name></member>
         </type>
 
+        <!-- XR_FB_hand_tracking_mesh structs -->
+        <type category="struct" name="XrVector4sFB">
+            <member><type>int16_t</type>          <name>x</name></member>
+            <member><type>int16_t</type>          <name>y</name></member>
+            <member><type>int16_t</type>          <name>z</name></member>
+            <member><type>int16_t</type>          <name>w</name></member>
+        </type>
+        <type category="struct" name="XrHandTrackingMeshFB">
+            <member values="XR_TYPE_HAND_TRACKING_MESH_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                    <name>next</name></member>
+            <member><type>uint32_t</type>                                 <name>jointCapacityInput</name></member>
+            <member><type>uint32_t</type>                                 <name>jointCountOutput</name></member>
+            <member len="jointCapacityInput"><type>XrPosef</type>*        <name>jointBindPoses</name></member>
+            <member len="jointCapacityInput"><type>float</type>*          <name>jointRadii</name></member>
+            <member len="jointCapacityInput"><type>XrHandJointEXT</type>* <name>jointParents</name></member>
+            <member><type>uint32_t</type>                                 <name>vertexCapacityInput</name></member>
+            <member><type>uint32_t</type>                                 <name>vertexCountOutput</name></member>
+            <member len="vertexCapacityInput"><type>XrVector3f</type>*    <name>vertexPositions</name></member>
+            <member len="vertexCapacityInput"><type>XrVector3f</type>*    <name>vertexNormals</name></member>
+            <member len="vertexCapacityInput"><type>XrVector2f</type>*    <name>vertexUVs</name></member>
+            <member len="vertexCapacityInput"><type>XrVector4sFB</type>*  <name>vertexBlendIndices</name></member>
+            <member len="vertexCapacityInput"><type>XrVector4f</type>*    <name>vertexBlendWeights</name></member>
+            <member><type>uint32_t</type>                                 <name>indexCapacityInput</name></member>
+            <member><type>uint32_t</type>                                 <name>indexCountOutput</name></member>
+            <member len="indexCapacityInput"><type>int16_t</type>*        <name>indices</name></member>
+        </type>
+        <type category="struct" name="XrHandTrackingScaleFB" structextends="XrHandJointsLocateInfoEXT">
+            <member values="XR_TYPE_HAND_TRACKING_SCALE_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>float</type> <name>sensorOutput</name></member>
+            <member><type>float</type> <name>currentOutput</name></member>
+            <member><type>XrBool32</type> <name>overrideHandScale</name></member>
+            <member optional="true"><type>float</type> <name>overrideValueInput</name></member>
+        </type>
+
+        <!-- XR_FB_hand_tracking_aim structs -->
+        <type category="struct" name="XrHandTrackingAimStateFB" returnedonly="true" structextends="XrHandJointsLocateInfoEXT">
+            <member values="XR_TYPE_HAND_TRACKING_AIM_STATE_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrHandTrackingAimFlagsFB</type> <name>status</name></member>
+            <member><type>XrPosef</type> <name>aimPose</name></member>
+            <member><type>float</type> <name>pinchStrengthIndex</name></member>
+            <member><type>float</type> <name>pinchStrengthMiddle</name></member>
+            <member><type>float</type> <name>pinchStrengthRing</name></member>
+            <member><type>float</type> <name>pinchStrengthLittle</name></member>
+        </type>
+
+        <!-- XR_FB_hand_tracking_capsules structs -->
+        <type category="struct" name="XrHandCapsuleFB" returnedonly="true">
+            <member><type>XrVector3f</type> <name>points</name>[<enum>XR_FB_HAND_TRACKING_CAPSULE_POINT_COUNT</enum>]</member>
+            <member><type>float</type> <name>radius</name></member>
+            <member><type>XrHandJointEXT</type> <name>joint</name></member>
+        </type>
+        <type category="struct" name="XrHandTrackingCapsulesStateFB" returnedonly="true" structextends="XrHandJointsLocateInfoEXT">
+            <member values="XR_TYPE_HAND_TRACKING_CAPSULES_STATE_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrHandCapsuleFB</type> <name>capsules</name>[<enum>XR_FB_HAND_TRACKING_CAPSULE_COUNT</enum>]</member>
+        </type>
+
         <!-- XR_VARJO_composition_layer_depth_test -->
         <type category="struct" name="XrCompositionLayerDepthTestVARJO" structextends="XrCompositionLayerProjection">
             <member values="XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO"><type>XrStructureType</type> <name>type</name></member>
@@ -1780,6 +1853,26 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*                            <name>next</name></member>
             <member><type>XrSpatialAnchorStoreConnectionMSFT</type>     <name>spatialAnchorStore</name></member>
             <member><type>XrSpatialAnchorPersistenceNameMSFT</type>     <name>spatialAnchorPersistenceName</name></member>
+        </type>
+
+        <!-- XR_FB_space_warp -->
+        <type category="struct" name="XrCompositionLayerSpaceWarpInfoFB" structextends="XrCompositionLayerProjectionView">
+            <member values="XR_TYPE_COMPOSITION_LAYER_SPACE_WARP_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                            <name>next</name></member>
+            <member><type>XrCompositionLayerSpaceWarpInfoFlagsFB</type> <name>layerFlags</name></member>
+            <member><type>XrSwapchainSubImage</type>                    <name>motionVectorSubImage</name></member>
+            <member><type>XrPosef</type>                                <name>appSpaceDeltaPose</name></member>
+            <member><type>XrSwapchainSubImage</type>                    <name>depthSubImage</name></member>
+            <member><type>float</type>                                  <name>minDepth</name></member>
+            <member><type>float</type>                                  <name>maxDepth</name></member>
+            <member><type>float</type>                                  <name>nearZ</name></member>
+            <member><type>float</type>                                  <name>farZ</name></member>
+        </type>
+        <type category="struct" name="XrSystemSpaceWarpPropertiesFB" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_SPACE_WARP_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>uint32_t</type> <name>recommendedMotionVectorImageRectWidth</name></member>
+            <member><type>uint32_t</type> <name>recommendedMotionVectorImageRectHeight</name></member>
         </type>
 
     </types>
@@ -2279,6 +2372,24 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="1"   name="XR_FOVEATION_DYNAMIC_LEVEL_ENABLED_FB" comment="Dynamic changing foveation based on performance headroom available up to the maximum desired level"/>
     </enums>
 
+    <!-- flags for XR_FB_hand_tracking_aim -->
+    <enums name="XrHandTrackingAimFlagBitsFB" type="bitmask">
+        <enum bitpos="0" name="XR_HAND_TRACKING_AIM_COMPUTED_BIT_FB"        comment="Aiming data is computed from additional sources beyond the hand data in the base structure"/>
+        <enum bitpos="1" name="XR_HAND_TRACKING_AIM_VALID_BIT_FB"           comment="Aiming data is valid"/>
+        <enum bitpos="2" name="XR_HAND_TRACKING_AIM_INDEX_PINCHING_BIT_FB"  comment="Index finger pinch discrete signal"/>
+        <enum bitpos="3" name="XR_HAND_TRACKING_AIM_MIDDLE_PINCHING_BIT_FB" comment="Middle finger pinch discrete signal"/>
+        <enum bitpos="4" name="XR_HAND_TRACKING_AIM_RING_PINCHING_BIT_FB"   comment="Ring finger pinch discrete signal"/>
+        <enum bitpos="5" name="XR_HAND_TRACKING_AIM_LITTLE_PINCHING_BIT_FB" comment="Little finger pinch discrete signal"/>
+        <enum bitpos="6" name="XR_HAND_TRACKING_AIM_SYSTEM_GESTURE_BIT_FB"  comment="System gesture is active"/>
+        <enum bitpos="7" name="XR_HAND_TRACKING_AIM_DOMINANT_HAND_BIT_FB"   comment="Hand is currently marked as dominant for the system"/>
+        <enum bitpos="8" name="XR_HAND_TRACKING_AIM_MENU_PRESSED_BIT_FB"    comment="System menu gesture is active"/>
+    </enums>
+
+    <!-- flags for XR_FB_space_warp -->
+    <enums name="XrCompositionLayerSpaceWarpInfoFlagBitsFB" type="bitmask">
+        <!-- This is currently empty, awaiting future flags. -->
+    </enums>
+
     <!-- SECTION: OpenXR command definitions -->
     <commands>
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_OUT_OF_MEMORY">
@@ -2492,13 +2603,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
                 <param>the pname:session parameter by any other flink:xrWaitFrame call</param>
             </implicitexternsyncparams>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_PATH_INVALID,XR_ERROR_ACTION_TYPE_MISMATCH,XR_ERROR_ACTIONSET_NOT_ATTACHED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SESSION_NOT_FOCUSED" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_PATH_INVALID,XR_ERROR_ACTION_TYPE_MISMATCH,XR_ERROR_ACTIONSET_NOT_ATTACHED">
             <proto><type>XrResult</type> <name>xrApplyHapticFeedback</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrHapticActionInfo</type>* <name>hapticActionInfo</name></param>
             <param>const <type>XrHapticBaseHeader</type>* <name>hapticFeedback</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_PATH_INVALID,XR_ERROR_ACTION_TYPE_MISMATCH,XR_ERROR_ACTIONSET_NOT_ATTACHED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SESSION_NOT_FOCUSED" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_PATH_INVALID,XR_ERROR_ACTION_TYPE_MISMATCH,XR_ERROR_ACTIONSET_NOT_ATTACHED">
             <proto><type>XrResult</type> <name>xrStopHapticFeedback</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrHapticActionInfo</type>* <name>hapticActionInfo</name></param>
@@ -3063,6 +3174,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
             <proto><type>XrResult</type> <name>xrDestroyFoveationProfileFB</name></proto>
             <param externsync="true_with_children"><type>XrFoveationProfileFB</type> <name>profile</name></param>
+        </command>
+
+        <!-- XR_FB_hand_tracking_mesh -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetHandMeshFB</name></proto>
+            <param><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
+            <param><type>XrHandTrackingMeshFB</type>* <name>mesh</name></param>
         </command>
 
         <!-- commands for XR_VARJO_environment_depth_estimation -->
@@ -4060,7 +4178,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VALVE_analog_threshold" number="80" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_VALVE_analog_threshold_SPEC_VERSION"/>
+            <enum value="2" name="XR_VALVE_analog_threshold_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_analog_threshold&quot;" name="XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE"/>
             <type name="XrInteractionProfileAnalogThresholdVALVE"/>
@@ -4406,24 +4524,45 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_111" number="111" type="instance" supported="disabled">
+    <extension name="XR_FB_hand_tracking_mesh" number="111" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="1" name="XR_FB_extension_111_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_111&quot;" name="XR_FB_extension_111_EXTENSION_NAME"/>
+            <enum value="1"                                    name="XR_FB_hand_tracking_mesh_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_hand_tracking_mesh&quot;" name="XR_FB_HAND_TRACKING_MESH_EXTENSION_NAME"/>
+
+            <type name="XrVector4sFB"/>
+            <type name="XrHandTrackingMeshFB"/>
+            <type name="XrHandTrackingScaleFB"/>
+
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_HAND_TRACKING_MESH_FB"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_HAND_TRACKING_SCALE_FB"/>
+
+            <command name="xrGetHandMeshFB"/>
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_112" number="112" type="instance" supported="disabled">
+    <extension name="XR_FB_hand_tracking_aim" number="112" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="1" name="XR_FB_extension_112_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_112&quot;" name="XR_FB_extension_112_EXTENSION_NAME"/>
+            <enum value="1"                                   name="XR_FB_hand_tracking_aim_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_hand_tracking_aim&quot;" name="XR_FB_HAND_TRACKING_AIM_EXTENSION_NAME"/>
+
+            <type name="XrHandTrackingAimStateFB"/>
+
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_HAND_TRACKING_AIM_STATE_FB"/>
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_113" number="113" type="instance" supported="disabled">
+    <extension name="XR_FB_hand_tracking_capsules" number="113" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="1" name="XR_FB_extension_113_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_113&quot;" name="XR_FB_extension_113_EXTENSION_NAME"/>
+            <enum value="1"                                        name="XR_FB_hand_tracking_capsules_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_hand_tracking_capsules&quot;" name="XR_FB_HAND_TRACKING_CAPSULES_EXTENSION_NAME"/>
+
+            <type name="XrHandCapsuleFB"/>
+            <type name="XrHandTrackingCapsulesStateFB"/>
+
+            <enum value="2"                            name="XR_FB_HAND_TRACKING_CAPSULE_POINT_COUNT"/>
+            <enum value="19"                           name="XR_FB_HAND_TRACKING_CAPSULE_COUNT"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_HAND_TRACKING_CAPSULES_STATE_FB"/>
         </require>
     </extension>
 
@@ -4903,10 +5042,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_172" number="172" type="instance" supported="disabled">
+    <extension name="XR_FB_space_warp" number="172" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_FB_extension_172_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_172&quot;" name="XR_FB_extension_172_EXTENSION_NAME"/>
+            <enum value="1"                            name="XR_FB_space_warp_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_space_warp&quot;" name="XR_FB_SPACE_WARP_EXTENSION_NAME"/>
+            <type name="XrCompositionLayerSpaceWarpInfoFB"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_SPACE_WARP_INFO_FB"/>
+            <type name="XrSystemSpaceWarpPropertiesFB"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SYSTEM_SPACE_WARP_PROPERTIES_FB"/>
         </require>
     </extension>
 

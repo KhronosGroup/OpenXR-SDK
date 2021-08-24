@@ -255,6 +255,10 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT, 1000098001) \
     _(XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB, 1000101000) \
     _(XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB, 1000108000) \
+    _(XR_TYPE_HAND_TRACKING_MESH_FB, 1000110001) \
+    _(XR_TYPE_HAND_TRACKING_SCALE_FB, 1000110003) \
+    _(XR_TYPE_HAND_TRACKING_AIM_STATE_FB, 1000111001) \
+    _(XR_TYPE_HAND_TRACKING_CAPSULES_STATE_FB, 1000112000) \
     _(XR_TYPE_FOVEATION_PROFILE_CREATE_INFO_FB, 1000114000) \
     _(XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB, 1000114001) \
     _(XR_TYPE_SWAPCHAIN_STATE_FOVEATION_FB, 1000114002) \
@@ -270,6 +274,8 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB, 1000161000) \
     _(XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB, 1000162000) \
     _(XR_TYPE_SWAPCHAIN_STATE_SAMPLER_VULKAN_FB, 1000163000) \
+    _(XR_TYPE_COMPOSITION_LAYER_SPACE_WARP_INFO_FB, 1000171000) \
+    _(XR_TYPE_SYSTEM_SPACE_WARP_PROPERTIES_FB, 1000171001) \
     _(XR_STRUCTURE_TYPE_MAX_ENUM, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrFormFactor(_) \
@@ -600,11 +606,24 @@ XR_ENUM_STR(XrResult);
     _(XR_COMPOSITION_LAYER_SECURE_CONTENT_EXCLUDE_LAYER_BIT_FB, 0x00000001) \
     _(XR_COMPOSITION_LAYER_SECURE_CONTENT_REPLACE_LAYER_BIT_FB, 0x00000002) \
 
+#define XR_LIST_BITS_XrHandTrackingAimFlagsFB(_) \
+    _(XR_HAND_TRACKING_AIM_COMPUTED_BIT_FB, 0x00000001) \
+    _(XR_HAND_TRACKING_AIM_VALID_BIT_FB, 0x00000002) \
+    _(XR_HAND_TRACKING_AIM_INDEX_PINCHING_BIT_FB, 0x00000004) \
+    _(XR_HAND_TRACKING_AIM_MIDDLE_PINCHING_BIT_FB, 0x00000008) \
+    _(XR_HAND_TRACKING_AIM_RING_PINCHING_BIT_FB, 0x00000010) \
+    _(XR_HAND_TRACKING_AIM_LITTLE_PINCHING_BIT_FB, 0x00000020) \
+    _(XR_HAND_TRACKING_AIM_SYSTEM_GESTURE_BIT_FB, 0x00000040) \
+    _(XR_HAND_TRACKING_AIM_DOMINANT_HAND_BIT_FB, 0x00000080) \
+    _(XR_HAND_TRACKING_AIM_MENU_PRESSED_BIT_FB, 0x00000100) \
+
 #define XR_LIST_BITS_XrSwapchainCreateFoveationFlagsFB(_) \
     _(XR_SWAPCHAIN_CREATE_FOVEATION_SCALED_BIN_BIT_FB, 0x00000001) \
     _(XR_SWAPCHAIN_CREATE_FOVEATION_FRAGMENT_DENSITY_MAP_BIT_FB, 0x00000002) \
 
 #define XR_LIST_BITS_XrSwapchainStateFoveationFlagsFB(_)
+
+#define XR_LIST_BITS_XrCompositionLayerSpaceWarpInfoFlagsFB(_)
 
 #define XR_LIST_STRUCT_XrApiLayerProperties(_) \
     _(type) \
@@ -1800,6 +1819,59 @@ XR_ENUM_STR(XrResult);
     _(next) \
     _(colorSpace) \
 
+#define XR_LIST_STRUCT_XrVector4sFB(_) \
+    _(x) \
+    _(y) \
+    _(z) \
+    _(w) \
+
+#define XR_LIST_STRUCT_XrHandTrackingMeshFB(_) \
+    _(type) \
+    _(next) \
+    _(jointCapacityInput) \
+    _(jointCountOutput) \
+    _(jointBindPoses) \
+    _(jointRadii) \
+    _(jointParents) \
+    _(vertexCapacityInput) \
+    _(vertexCountOutput) \
+    _(vertexPositions) \
+    _(vertexNormals) \
+    _(vertexUVs) \
+    _(vertexBlendIndices) \
+    _(vertexBlendWeights) \
+    _(indexCapacityInput) \
+    _(indexCountOutput) \
+    _(indices) \
+
+#define XR_LIST_STRUCT_XrHandTrackingScaleFB(_) \
+    _(type) \
+    _(next) \
+    _(sensorOutput) \
+    _(currentOutput) \
+    _(overrideHandScale) \
+    _(overrideValueInput) \
+
+#define XR_LIST_STRUCT_XrHandTrackingAimStateFB(_) \
+    _(type) \
+    _(next) \
+    _(status) \
+    _(aimPose) \
+    _(pinchStrengthIndex) \
+    _(pinchStrengthMiddle) \
+    _(pinchStrengthRing) \
+    _(pinchStrengthLittle) \
+
+#define XR_LIST_STRUCT_XrHandCapsuleFB(_) \
+    _(points) \
+    _(radius) \
+    _(joint) \
+
+#define XR_LIST_STRUCT_XrHandTrackingCapsulesStateFB(_) \
+    _(type) \
+    _(next) \
+    _(capsules) \
+
 #define XR_LIST_STRUCT_XrFoveationProfileCreateInfoFB(_) \
     _(type) \
     _(next) \
@@ -1899,6 +1971,24 @@ XR_ENUM_STR(XrResult);
     _(swizzleAlpha) \
     _(maxAnisotropy) \
     _(borderColor) \
+
+#define XR_LIST_STRUCT_XrCompositionLayerSpaceWarpInfoFB(_) \
+    _(type) \
+    _(next) \
+    _(layerFlags) \
+    _(motionVectorSubImage) \
+    _(appSpaceDeltaPose) \
+    _(depthSubImage) \
+    _(minDepth) \
+    _(maxDepth) \
+    _(nearZ) \
+    _(farZ) \
+
+#define XR_LIST_STRUCT_XrSystemSpaceWarpPropertiesFB(_) \
+    _(type) \
+    _(next) \
+    _(recommendedMotionVectorImageRectWidth) \
+    _(recommendedMotionVectorImageRectHeight) \
 
 
 
@@ -2026,6 +2116,10 @@ XR_ENUM_STR(XrResult);
     _(XrSceneDeserializeInfoMSFT, XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT) \
     _(XrEventDataDisplayRefreshRateChangedFB, XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB) \
     _(XrSystemColorSpacePropertiesFB, XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB) \
+    _(XrHandTrackingMeshFB, XR_TYPE_HAND_TRACKING_MESH_FB) \
+    _(XrHandTrackingScaleFB, XR_TYPE_HAND_TRACKING_SCALE_FB) \
+    _(XrHandTrackingAimStateFB, XR_TYPE_HAND_TRACKING_AIM_STATE_FB) \
+    _(XrHandTrackingCapsulesStateFB, XR_TYPE_HAND_TRACKING_CAPSULES_STATE_FB) \
     _(XrFoveationProfileCreateInfoFB, XR_TYPE_FOVEATION_PROFILE_CREATE_INFO_FB) \
     _(XrSwapchainCreateInfoFoveationFB, XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB) \
     _(XrSwapchainStateFoveationFB, XR_TYPE_SWAPCHAIN_STATE_FOVEATION_FB) \
@@ -2036,6 +2130,8 @@ XR_ENUM_STR(XrResult);
     _(XrCompositionLayerDepthTestVARJO, XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO) \
     _(XrSpatialAnchorPersistenceInfoMSFT, XR_TYPE_SPATIAL_ANCHOR_PERSISTENCE_INFO_MSFT) \
     _(XrSpatialAnchorFromPersistedAnchorCreateInfoMSFT, XR_TYPE_SPATIAL_ANCHOR_FROM_PERSISTED_ANCHOR_CREATE_INFO_MSFT) \
+    _(XrCompositionLayerSpaceWarpInfoFB, XR_TYPE_COMPOSITION_LAYER_SPACE_WARP_INFO_FB) \
+    _(XrSystemSpaceWarpPropertiesFB, XR_TYPE_SYSTEM_SPACE_WARP_PROPERTIES_FB) \
 
 
 
@@ -2255,6 +2351,9 @@ XR_ENUM_STR(XrResult);
     _(XR_FB_display_refresh_rate, 102) \
     _(XR_HTC_vive_cosmos_controller_interaction, 103) \
     _(XR_FB_color_space, 109) \
+    _(XR_FB_hand_tracking_mesh, 111) \
+    _(XR_FB_hand_tracking_aim, 112) \
+    _(XR_FB_hand_tracking_capsules, 113) \
     _(XR_FB_foveation, 115) \
     _(XR_FB_foveation_configuration, 116) \
     _(XR_KHR_binding_modification, 121) \
@@ -2268,6 +2367,7 @@ XR_ENUM_STR(XrResult);
     _(XR_FB_swapchain_update_state_opengl_es, 163) \
     _(XR_FB_swapchain_update_state_vulkan, 164) \
     _(XR_KHR_swapchain_usage_input_attachment_bit, 166) \
+    _(XR_FB_space_warp, 172) \
 
 
 #endif

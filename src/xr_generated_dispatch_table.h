@@ -261,6 +261,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrEnumerateColorSpacesFB EnumerateColorSpacesFB;
     PFN_xrSetColorSpaceFB SetColorSpaceFB;
 
+    // ---- XR_FB_hand_tracking_mesh extension commands
+    PFN_xrGetHandMeshFB GetHandMeshFB;
+
     // ---- XR_FB_foveation extension commands
     PFN_xrCreateFoveationProfileFB CreateFoveationProfileFB;
     PFN_xrDestroyFoveationProfileFB DestroyFoveationProfileFB;

@@ -195,7 +195,7 @@ inline static float XrVector3f_Dot(const XrVector3f* a, const XrVector3f* b) { r
 inline static void XrVector3f_Cross(XrVector3f* result, const XrVector3f* a, const XrVector3f* b) {
     result->x = a->y * b->z - a->z * b->y;
     result->y = a->z * b->x - a->x * b->z;
-    result->x = a->x * b->y - a->y * b->x;
+    result->z = a->x * b->y - a->y * b->x;
 }
 
 inline static void XrVector3f_Normalize(XrVector3f* v) {

@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 18)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 19)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -352,6 +352,10 @@ typedef enum XrStructureType {
     XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT = 1000098001,
     XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB = 1000101000,
     XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB = 1000108000,
+    XR_TYPE_HAND_TRACKING_MESH_FB = 1000110001,
+    XR_TYPE_HAND_TRACKING_SCALE_FB = 1000110003,
+    XR_TYPE_HAND_TRACKING_AIM_STATE_FB = 1000111001,
+    XR_TYPE_HAND_TRACKING_CAPSULES_STATE_FB = 1000112000,
     XR_TYPE_FOVEATION_PROFILE_CREATE_INFO_FB = 1000114000,
     XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB = 1000114001,
     XR_TYPE_SWAPCHAIN_STATE_FOVEATION_FB = 1000114002,
@@ -367,6 +371,8 @@ typedef enum XrStructureType {
     XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB = 1000161000,
     XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB = 1000162000,
     XR_TYPE_SWAPCHAIN_STATE_SAMPLER_VULKAN_FB = 1000163000,
+    XR_TYPE_COMPOSITION_LAYER_SPACE_WARP_INFO_FB = 1000171000,
+    XR_TYPE_SYSTEM_SPACE_WARP_PROPERTIES_FB = 1000171001,
     XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR = XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR,
     XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR = XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR,
     XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR,
@@ -1521,7 +1527,7 @@ typedef struct XrCompositionLayerEquirect2KHR {
 #define XR_KHR_binding_modification 1
 #define XR_KHR_binding_modification_SPEC_VERSION 1
 #define XR_KHR_BINDING_MODIFICATION_EXTENSION_NAME "XR_KHR_binding_modification"
-typedef struct XrBindingModificationBaseHeaderKHR {
+typedef struct XR_MAY_ALIAS XrBindingModificationBaseHeaderKHR {
     XrStructureType             type;
     const void* XR_MAY_ALIAS    next;
 } XrBindingModificationBaseHeaderKHR;
@@ -2405,9 +2411,8 @@ typedef struct XrCompositionLayerSecureContentFB {
 
 
 #define XR_VALVE_analog_threshold 1
-#define XR_VALVE_analog_threshold_SPEC_VERSION 1
+#define XR_VALVE_analog_threshold_SPEC_VERSION 2
 #define XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME "XR_VALVE_analog_threshold"
-// XrInteractionProfileAnalogThresholdVALVE extends XrInteractionProfileSuggestedBinding
 typedef struct XrInteractionProfileAnalogThresholdVALVE {
     XrStructureType              type;
     const void* XR_MAY_ALIAS     next;
@@ -2899,6 +2904,107 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetColorSpaceFB(
 #endif /* !XR_NO_PROTOTYPES */
 
 
+#define XR_FB_hand_tracking_mesh 1
+#define XR_FB_hand_tracking_mesh_SPEC_VERSION 1
+#define XR_FB_HAND_TRACKING_MESH_EXTENSION_NAME "XR_FB_hand_tracking_mesh"
+typedef struct XrVector4sFB {
+    int16_t    x;
+    int16_t    y;
+    int16_t    z;
+    int16_t    w;
+} XrVector4sFB;
+
+typedef struct XrHandTrackingMeshFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              jointCapacityInput;
+    uint32_t              jointCountOutput;
+    XrPosef*              jointBindPoses;
+    float*                jointRadii;
+    XrHandJointEXT*       jointParents;
+    uint32_t              vertexCapacityInput;
+    uint32_t              vertexCountOutput;
+    XrVector3f*           vertexPositions;
+    XrVector3f*           vertexNormals;
+    XrVector2f*           vertexUVs;
+    XrVector4sFB*         vertexBlendIndices;
+    XrVector4f*           vertexBlendWeights;
+    uint32_t              indexCapacityInput;
+    uint32_t              indexCountOutput;
+    int16_t*              indices;
+} XrHandTrackingMeshFB;
+
+// XrHandTrackingScaleFB extends XrHandJointsLocateInfoEXT
+typedef struct XrHandTrackingScaleFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    float                 sensorOutput;
+    float                 currentOutput;
+    XrBool32              overrideHandScale;
+    float                 overrideValueInput;
+} XrHandTrackingScaleFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrGetHandMeshFB)(XrHandTrackerEXT handTracker, XrHandTrackingMeshFB* mesh);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrGetHandMeshFB(
+    XrHandTrackerEXT                            handTracker,
+    XrHandTrackingMeshFB*                       mesh);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_FB_hand_tracking_aim 1
+#define XR_FB_hand_tracking_aim_SPEC_VERSION 1
+#define XR_FB_HAND_TRACKING_AIM_EXTENSION_NAME "XR_FB_hand_tracking_aim"
+typedef XrFlags64 XrHandTrackingAimFlagsFB;
+
+// Flag bits for XrHandTrackingAimFlagsFB
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_COMPUTED_BIT_FB = 0x00000001;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_VALID_BIT_FB = 0x00000002;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_INDEX_PINCHING_BIT_FB = 0x00000004;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_MIDDLE_PINCHING_BIT_FB = 0x00000008;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_RING_PINCHING_BIT_FB = 0x00000010;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_LITTLE_PINCHING_BIT_FB = 0x00000020;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_SYSTEM_GESTURE_BIT_FB = 0x00000040;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_DOMINANT_HAND_BIT_FB = 0x00000080;
+static const XrHandTrackingAimFlagsFB XR_HAND_TRACKING_AIM_MENU_PRESSED_BIT_FB = 0x00000100;
+
+// XrHandTrackingAimStateFB extends XrHandJointsLocateInfoEXT
+typedef struct XrHandTrackingAimStateFB {
+    XrStructureType             type;
+    void* XR_MAY_ALIAS          next;
+    XrHandTrackingAimFlagsFB    status;
+    XrPosef                     aimPose;
+    float                       pinchStrengthIndex;
+    float                       pinchStrengthMiddle;
+    float                       pinchStrengthRing;
+    float                       pinchStrengthLittle;
+} XrHandTrackingAimStateFB;
+
+
+
+#define XR_FB_hand_tracking_capsules 1
+#define XR_FB_HAND_TRACKING_CAPSULE_POINT_COUNT 2
+#define XR_FB_HAND_TRACKING_CAPSULE_COUNT 19
+#define XR_FB_hand_tracking_capsules_SPEC_VERSION 1
+#define XR_FB_HAND_TRACKING_CAPSULES_EXTENSION_NAME "XR_FB_hand_tracking_capsules"
+typedef struct XrHandCapsuleFB {
+    XrVector3f        points[XR_FB_HAND_TRACKING_CAPSULE_POINT_COUNT];
+    float             radius;
+    XrHandJointEXT    joint;
+} XrHandCapsuleFB;
+
+// XrHandTrackingCapsulesStateFB extends XrHandJointsLocateInfoEXT
+typedef struct XrHandTrackingCapsulesStateFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrHandCapsuleFB       capsules[XR_FB_HAND_TRACKING_CAPSULE_COUNT];
+} XrHandTrackingCapsulesStateFB;
+
+
+
 #define XR_FB_foveation 1
 XR_DEFINE_HANDLE(XrFoveationProfileFB)
 #define XR_FB_foveation_SPEC_VERSION      1
@@ -3092,6 +3198,37 @@ XRAPI_ATTR XrResult XRAPI_CALL xrClearSpatialAnchorStoreMSFT(
     XrSpatialAnchorStoreConnectionMSFT          spatialAnchorStore);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_FB_space_warp 1
+#define XR_FB_space_warp_SPEC_VERSION     1
+#define XR_FB_SPACE_WARP_EXTENSION_NAME   "XR_FB_space_warp"
+typedef XrFlags64 XrCompositionLayerSpaceWarpInfoFlagsFB;
+
+// Flag bits for XrCompositionLayerSpaceWarpInfoFlagsFB
+
+// XrCompositionLayerSpaceWarpInfoFB extends XrCompositionLayerProjectionView
+typedef struct XrCompositionLayerSpaceWarpInfoFB {
+    XrStructureType                           type;
+    const void* XR_MAY_ALIAS                  next;
+    XrCompositionLayerSpaceWarpInfoFlagsFB    layerFlags;
+    XrSwapchainSubImage                       motionVectorSubImage;
+    XrPosef                                   appSpaceDeltaPose;
+    XrSwapchainSubImage                       depthSubImage;
+    float                                     minDepth;
+    float                                     maxDepth;
+    float                                     nearZ;
+    float                                     farZ;
+} XrCompositionLayerSpaceWarpInfoFB;
+
+// XrSystemSpaceWarpPropertiesFB extends XrSystemProperties
+typedef struct XrSystemSpaceWarpPropertiesFB {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              recommendedMotionVectorImageRectWidth;
+    uint32_t              recommendedMotionVectorImageRectHeight;
+} XrSystemSpaceWarpPropertiesFB;
+
 
 #ifdef __cplusplus
 }
