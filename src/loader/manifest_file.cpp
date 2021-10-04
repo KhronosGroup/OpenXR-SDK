@@ -57,6 +57,8 @@
 #endif  // JSON_USE_EXCEPTIONS
 #endif  // !XRLOADER_DISABLE_EXCEPTION_HANDLING
 
+#include "runtime_interface.hpp"
+
 // Utility functions for finding files in the appropriate paths
 
 static inline bool StringEndsWith(const std::string &value, const std::string &ending) {
@@ -529,6 +531,12 @@ void RuntimeManifestFile::CreateIfValid(std::string const &filename,
         return;
     }
 
+    CreateIfValid(root_node, filename, manifest_files);
+}
+
+void RuntimeManifestFile::CreateIfValid(const Json::Value &root_node, const std::string &filename,
+                                        std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files) {
+    std::ostringstream error_ss("RuntimeManifestFile::CreateIfValid ");
     JsonVersion file_version = {};
     if (!ManifestFile::IsValidJson(root_node, file_version)) {
         error_ss << "isValidJson indicates " << filename << " is not a valid manifest file.";
@@ -536,8 +544,8 @@ void RuntimeManifestFile::CreateIfValid(std::string const &filename,
         return;
     }
     const Json::Value &runtime_root_node = root_node["runtime"];
-    // The Runtime manifest file needs the "runtime" root as well as sub-nodes for "api_version" and
-    // "library_path".  If any of those aren't there, fail.
+    // The Runtime manifest file needs the "runtime" root as well as a sub-node for "library_path".  If any of those aren't there,
+    // fail.
     if (runtime_root_node.isNull() || runtime_root_node["library_path"].isNull() || !runtime_root_node["library_path"].isString()) {
         error_ss << filename << " is missing required fields.  Verify all proper fields exist.";
         LoaderLogger::LogErrorMessage("", error_ss.str());
@@ -616,15 +624,25 @@ XrResult RuntimeManifestFile::FindManifestFiles(std::vector<std::unique_ptr<Runt
             return XR_ERROR_RUNTIME_UNAVAILABLE;
         }
 #else
+
+#if defined(XR_KHR_LOADER_INIT_SUPPORT)
+        Json::Value virtualManifest;
+        result = GetPlatformRuntimeVirtualManifest(virtualManifest);
+        if (XR_SUCCESS == result) {
+            RuntimeManifestFile::CreateIfValid(virtualManifest, "", manifest_files);
+            return result;
+        }
+#endif  // defined(XR_KHR_LOADER_INIT_SUPPORT)
         if (!PlatformGetGlobalRuntimeFileName(XR_VERSION_MAJOR(XR_CURRENT_API_VERSION), filename)) {
             LoaderLogger::LogErrorMessage(
                 "", "RuntimeManifestFile::FindManifestFiles - failed to determine active runtime file path for this environment");
             return XR_ERROR_RUNTIME_UNAVAILABLE;
         }
-#endif
         LoaderLogger::LogInfoMessage("", "RuntimeManifestFile::FindManifestFiles - using global runtime file " + filename);
+#endif
     }
     RuntimeManifestFile::CreateIfValid(filename, manifest_files);
+
     return result;
 }
 

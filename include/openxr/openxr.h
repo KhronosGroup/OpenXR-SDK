@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 19)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 20)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -196,6 +196,14 @@ typedef enum XrResult {
     XR_ERROR_SCENE_COMPUTE_CONSISTENCY_MISMATCH_MSFT = -1000097005,
     XR_ERROR_DISPLAY_REFRESH_RATE_UNSUPPORTED_FB = -1000101000,
     XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB = -1000108000,
+    XR_ERROR_UNEXPECTED_STATE_PASSTHROUGH_FB = -1000118000,
+    XR_ERROR_FEATURE_ALREADY_CREATED_PASSTHROUGH_FB = -1000118001,
+    XR_ERROR_FEATURE_REQUIRED_PASSTHROUGH_FB = -1000118002,
+    XR_ERROR_NOT_PERMITTED_PASSTHROUGH_FB = -1000118003,
+    XR_ERROR_INSUFFICIENT_RESOURCES_PASSTHROUGH_FB = -1000118004,
+    XR_ERROR_UNKNOWN_PASSTHROUGH_FB = -1000118050,
+    XR_ERROR_MARKER_NOT_TRACKED_VARJO = -1000124000,
+    XR_ERROR_MARKER_ID_INVALID_VARJO = -1000124001,
     XR_ERROR_SPATIAL_ANCHOR_NAME_NOT_FOUND_MSFT = -1000142001,
     XR_ERROR_SPATIAL_ANCHOR_NAME_INVALID_MSFT = -1000142002,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
@@ -351,6 +359,8 @@ typedef enum XrStructureType {
     XR_TYPE_SERIALIZED_SCENE_FRAGMENT_DATA_GET_INFO_MSFT = 1000098000,
     XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT = 1000098001,
     XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB = 1000101000,
+    XR_TYPE_VIVE_TRACKER_PATHS_HTCX = 1000103000,
+    XR_TYPE_EVENT_DATA_VIVE_TRACKER_CONNECTED_HTCX = 1000103001,
     XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB = 1000108000,
     XR_TYPE_HAND_TRACKING_MESH_FB = 1000110001,
     XR_TYPE_HAND_TRACKING_SCALE_FB = 1000110003,
@@ -360,11 +370,25 @@ typedef enum XrStructureType {
     XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB = 1000114001,
     XR_TYPE_SWAPCHAIN_STATE_FOVEATION_FB = 1000114002,
     XR_TYPE_FOVEATION_LEVEL_PROFILE_CREATE_INFO_FB = 1000115000,
+    XR_TYPE_TRIANGLE_MESH_CREATE_INFO_FB = 1000117001,
+    XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES_FB = 1000118000,
+    XR_TYPE_PASSTHROUGH_CREATE_INFO_FB = 1000118001,
+    XR_TYPE_PASSTHROUGH_LAYER_CREATE_INFO_FB = 1000118002,
+    XR_TYPE_COMPOSITION_LAYER_PASSTHROUGH_FB = 1000118003,
+    XR_TYPE_GEOMETRY_INSTANCE_CREATE_INFO_FB = 1000118004,
+    XR_TYPE_GEOMETRY_INSTANCE_TRANSFORM_FB = 1000118005,
+    XR_TYPE_PASSTHROUGH_STYLE_FB = 1000118020,
+    XR_TYPE_PASSTHROUGH_COLOR_MAP_MONO_TO_RGBA_FB = 1000118021,
+    XR_TYPE_PASSTHROUGH_COLOR_MAP_MONO_TO_MONO_FB = 1000118022,
+    XR_TYPE_EVENT_DATA_PASSTHROUGH_STATE_CHANGED_FB = 1000118030,
     XR_TYPE_BINDING_MODIFICATIONS_KHR = 1000120000,
     XR_TYPE_VIEW_LOCATE_FOVEATED_RENDERING_VARJO = 1000121000,
     XR_TYPE_FOVEATED_VIEW_CONFIGURATION_VIEW_VARJO = 1000121001,
     XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO = 1000121002,
     XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO = 1000122000,
+    XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_VARJO = 1000124000,
+    XR_TYPE_EVENT_DATA_MARKER_TRACKING_UPDATE_VARJO = 1000124001,
+    XR_TYPE_MARKER_SPACE_CREATE_INFO_VARJO = 1000124002,
     XR_TYPE_SPATIAL_ANCHOR_PERSISTENCE_INFO_MSFT = 1000142000,
     XR_TYPE_SPATIAL_ANCHOR_FROM_PERSISTED_ANCHOR_CREATE_INFO_MSFT = 1000142001,
     XR_TYPE_SWAPCHAIN_IMAGE_FOVEATION_VULKAN_FB = 1000160000,
@@ -452,6 +476,10 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_SCENE_OBSERVER_MSFT = 1000097000,
     XR_OBJECT_TYPE_SCENE_MSFT = 1000097001,
     XR_OBJECT_TYPE_FOVEATION_PROFILE_FB = 1000114000,
+    XR_OBJECT_TYPE_TRIANGLE_MESH_FB = 1000117000,
+    XR_OBJECT_TYPE_PASSTHROUGH_FB = 1000118000,
+    XR_OBJECT_TYPE_PASSTHROUGH_LAYER_FB = 1000118002,
+    XR_OBJECT_TYPE_GEOMETRY_INSTANCE_FB = 1000118004,
     XR_OBJECT_TYPE_SPATIAL_ANCHOR_STORE_CONNECTION_MSFT = 1000142000,
     XR_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrObjectType;
@@ -2865,8 +2893,37 @@ XRAPI_ATTR XrResult XRAPI_CALL xrRequestDisplayRefreshRateFB(
 #define XR_HTC_VIVE_COSMOS_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_HTC_vive_cosmos_controller_interaction"
 
 
+#define XR_HTCX_vive_tracker_interaction 1
+#define XR_HTCX_vive_tracker_interaction_SPEC_VERSION 1
+#define XR_HTCX_VIVE_TRACKER_INTERACTION_EXTENSION_NAME "XR_HTCX_vive_tracker_interaction"
+typedef struct XrViveTrackerPathsHTCX {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrPath                persistentPath;
+    XrPath                rolePath;
+} XrViveTrackerPathsHTCX;
+
+typedef struct XrEventDataViveTrackerConnectedHTCX {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrViveTrackerPathsHTCX*     paths;
+} XrEventDataViveTrackerConnectedHTCX;
+
+typedef XrResult (XRAPI_PTR *PFN_xrEnumerateViveTrackerPathsHTCX)(XrInstance instance, uint32_t pathCapacityInput, uint32_t* pathCountOutput, XrViveTrackerPathsHTCX* paths);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateViveTrackerPathsHTCX(
+    XrInstance                                  instance,
+    uint32_t                                    pathCapacityInput,
+    uint32_t*                                   pathCountOutput,
+    XrViveTrackerPathsHTCX*                     paths);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 #define XR_FB_color_space 1
-#define XR_FB_color_space_SPEC_VERSION    1
+#define XR_FB_color_space_SPEC_VERSION    2
 #define XR_FB_COLOR_SPACE_EXTENSION_NAME  "XR_FB_color_space"
 
 typedef enum XrColorSpaceFB {
@@ -2880,6 +2937,7 @@ typedef enum XrColorSpaceFB {
     XR_COLOR_SPACE_ADOBE_RGB_FB = 7,
     XR_COLOR_SPACE_MAX_ENUM_FB = 0x7FFFFFFF
 } XrColorSpaceFB;
+// XrSystemColorSpacePropertiesFB extends XrSystemProperties
 typedef struct XrSystemColorSpacePropertiesFB {
     XrStructureType       type;
     void* XR_MAY_ALIAS    next;
@@ -3082,6 +3140,240 @@ typedef struct XrFoveationLevelProfileCreateInfoFB {
 
 
 
+#define XR_FB_triangle_mesh 1
+XR_DEFINE_HANDLE(XrTriangleMeshFB)
+#define XR_FB_triangle_mesh_SPEC_VERSION  1
+#define XR_FB_TRIANGLE_MESH_EXTENSION_NAME "XR_FB_triangle_mesh"
+
+typedef enum XrWindingOrderFB {
+    XR_WINDING_ORDER_UNKNOWN_FB = 0,
+    XR_WINDING_ORDER_CW_FB = 1,
+    XR_WINDING_ORDER_CCW_FB = 2,
+    XR_WINDING_ORDER_MAX_ENUM_FB = 0x7FFFFFFF
+} XrWindingOrderFB;
+typedef XrFlags64 XrTriangleMeshFlagsFB;
+
+// Flag bits for XrTriangleMeshFlagsFB
+static const XrTriangleMeshFlagsFB XR_TRIANGLE_MESH_MUTABLE_BIT_FB = 0x00000001;
+
+typedef struct XrTriangleMeshCreateInfoFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrTriangleMeshFlagsFB       flags;
+    XrWindingOrderFB            windingOrder;
+    uint32_t                    vertexCount;
+    const XrVector3f*           vertexBuffer;
+    uint32_t                    triangleCount;
+    const uint32_t*             indexBuffer;
+} XrTriangleMeshCreateInfoFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateTriangleMeshFB)(XrSession session, const XrTriangleMeshCreateInfoFB* createInfo, XrTriangleMeshFB* outTriangleMesh);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyTriangleMeshFB)(XrTriangleMeshFB mesh);
+typedef XrResult (XRAPI_PTR *PFN_xrTriangleMeshGetVertexBufferFB)(XrTriangleMeshFB mesh, XrVector3f** outVertexBuffer);
+typedef XrResult (XRAPI_PTR *PFN_xrTriangleMeshGetIndexBufferFB)(XrTriangleMeshFB mesh, uint32_t** outIndexBuffer);
+typedef XrResult (XRAPI_PTR *PFN_xrTriangleMeshBeginUpdateFB)(XrTriangleMeshFB mesh);
+typedef XrResult (XRAPI_PTR *PFN_xrTriangleMeshEndUpdateFB)(XrTriangleMeshFB mesh, uint32_t vertexCount, uint32_t triangleCount);
+typedef XrResult (XRAPI_PTR *PFN_xrTriangleMeshBeginVertexBufferUpdateFB)(XrTriangleMeshFB mesh, uint32_t* outVertexCount);
+typedef XrResult (XRAPI_PTR *PFN_xrTriangleMeshEndVertexBufferUpdateFB)(XrTriangleMeshFB mesh);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateTriangleMeshFB(
+    XrSession                                   session,
+    const XrTriangleMeshCreateInfoFB*           createInfo,
+    XrTriangleMeshFB*                           outTriangleMesh);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyTriangleMeshFB(
+    XrTriangleMeshFB                            mesh);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshGetVertexBufferFB(
+    XrTriangleMeshFB                            mesh,
+    XrVector3f**                                outVertexBuffer);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshGetIndexBufferFB(
+    XrTriangleMeshFB                            mesh,
+    uint32_t**                                  outIndexBuffer);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshBeginUpdateFB(
+    XrTriangleMeshFB                            mesh);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshEndUpdateFB(
+    XrTriangleMeshFB                            mesh,
+    uint32_t                                    vertexCount,
+    uint32_t                                    triangleCount);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshBeginVertexBufferUpdateFB(
+    XrTriangleMeshFB                            mesh,
+    uint32_t*                                   outVertexCount);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshEndVertexBufferUpdateFB(
+    XrTriangleMeshFB                            mesh);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_FB_passthrough 1
+XR_DEFINE_HANDLE(XrPassthroughFB)
+XR_DEFINE_HANDLE(XrPassthroughLayerFB)
+XR_DEFINE_HANDLE(XrGeometryInstanceFB)
+#define XR_FB_passthrough_SPEC_VERSION    1
+#define XR_FB_PASSTHROUGH_EXTENSION_NAME  "XR_FB_passthrough"
+#define XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB 256
+
+typedef enum XrPassthroughLayerPurposeFB {
+    XR_PASSTHROUGH_LAYER_PURPOSE_RECONSTRUCTION_FB = 0,
+    XR_PASSTHROUGH_LAYER_PURPOSE_PROJECTED_FB = 1,
+    XR_PASSTHROUGH_LAYER_PURPOSE_MAX_ENUM_FB = 0x7FFFFFFF
+} XrPassthroughLayerPurposeFB;
+typedef XrFlags64 XrPassthroughFlagsFB;
+
+// Flag bits for XrPassthroughFlagsFB
+static const XrPassthroughFlagsFB XR_PASSTHROUGH_IS_RUNNING_AT_CREATION_BIT_FB = 0x00000001;
+
+typedef XrFlags64 XrPassthroughStateChangedFlagsFB;
+
+// Flag bits for XrPassthroughStateChangedFlagsFB
+static const XrPassthroughStateChangedFlagsFB XR_PASSTHROUGH_STATE_CHANGED_REINIT_REQUIRED_BIT_FB = 0x00000001;
+static const XrPassthroughStateChangedFlagsFB XR_PASSTHROUGH_STATE_CHANGED_NON_RECOVERABLE_ERROR_BIT_FB = 0x00000002;
+static const XrPassthroughStateChangedFlagsFB XR_PASSTHROUGH_STATE_CHANGED_RECOVERABLE_ERROR_BIT_FB = 0x00000004;
+static const XrPassthroughStateChangedFlagsFB XR_PASSTHROUGH_STATE_CHANGED_RESTORED_ERROR_BIT_FB = 0x00000008;
+
+// XrSystemPassthroughPropertiesFB extends XrSystemProperties
+typedef struct XrSystemPassthroughPropertiesFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrBool32                    supportsPassthrough;
+} XrSystemPassthroughPropertiesFB;
+
+typedef struct XrPassthroughCreateInfoFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrPassthroughFlagsFB        flags;
+} XrPassthroughCreateInfoFB;
+
+typedef struct XrPassthroughLayerCreateInfoFB {
+    XrStructureType                type;
+    const void* XR_MAY_ALIAS       next;
+    XrPassthroughFB                passthrough;
+    XrPassthroughFlagsFB           flags;
+    XrPassthroughLayerPurposeFB    purpose;
+} XrPassthroughLayerCreateInfoFB;
+
+// XrCompositionLayerPassthroughFB extends XrCompositionLayerBaseHeader
+typedef struct XrCompositionLayerPassthroughFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrCompositionLayerFlags     flags;
+    XrSpace                     space;
+    XrPassthroughLayerFB        layerHandle;
+} XrCompositionLayerPassthroughFB;
+
+typedef struct XrGeometryInstanceCreateInfoFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrPassthroughLayerFB        layer;
+    XrTriangleMeshFB            mesh;
+    XrSpace                     baseSpace;
+    XrPosef                     pose;
+    XrVector3f                  scale;
+} XrGeometryInstanceCreateInfoFB;
+
+typedef struct XrGeometryInstanceTransformFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpace                     baseSpace;
+    XrTime                      time;
+    XrPosef                     pose;
+    XrVector3f                  scale;
+} XrGeometryInstanceTransformFB;
+
+typedef struct XrPassthroughStyleFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    float                       textureOpacityFactor;
+    XrColor4f                   edgeColor;
+} XrPassthroughStyleFB;
+
+typedef struct XrPassthroughColorMapMonoToRgbaFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrColor4f                   textureColorMap[XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB];
+} XrPassthroughColorMapMonoToRgbaFB;
+
+typedef struct XrPassthroughColorMapMonoToMonoFB {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint8_t                     textureColorMap[XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB];
+} XrPassthroughColorMapMonoToMonoFB;
+
+typedef struct XrEventDataPassthroughStateChangedFB {
+    XrStructureType                     type;
+    const void* XR_MAY_ALIAS            next;
+    XrPassthroughStateChangedFlagsFB    flags;
+} XrEventDataPassthroughStateChangedFB;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreatePassthroughFB)(XrSession session, const XrPassthroughCreateInfoFB* createInfo, XrPassthroughFB* outPassthrough);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyPassthroughFB)(XrPassthroughFB passthrough);
+typedef XrResult (XRAPI_PTR *PFN_xrPassthroughStartFB)(XrPassthroughFB passthrough);
+typedef XrResult (XRAPI_PTR *PFN_xrPassthroughPauseFB)(XrPassthroughFB passthrough);
+typedef XrResult (XRAPI_PTR *PFN_xrCreatePassthroughLayerFB)(XrSession session, const XrPassthroughLayerCreateInfoFB* createInfo, XrPassthroughLayerFB* outLayer);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyPassthroughLayerFB)(XrPassthroughLayerFB layer);
+typedef XrResult (XRAPI_PTR *PFN_xrPassthroughLayerPauseFB)(XrPassthroughLayerFB layer);
+typedef XrResult (XRAPI_PTR *PFN_xrPassthroughLayerResumeFB)(XrPassthroughLayerFB layer);
+typedef XrResult (XRAPI_PTR *PFN_xrPassthroughLayerSetStyleFB)(XrPassthroughLayerFB layer, const XrPassthroughStyleFB* style);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateGeometryInstanceFB)(XrSession session, const XrGeometryInstanceCreateInfoFB* createInfo, XrGeometryInstanceFB* outGeometryInstance);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyGeometryInstanceFB)(XrGeometryInstanceFB instance);
+typedef XrResult (XRAPI_PTR *PFN_xrGeometryInstanceSetTransformFB)(XrGeometryInstanceFB instance, const XrGeometryInstanceTransformFB* transformation);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreatePassthroughFB(
+    XrSession                                   session,
+    const XrPassthroughCreateInfoFB*            createInfo,
+    XrPassthroughFB*                            outPassthrough);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyPassthroughFB(
+    XrPassthroughFB                             passthrough);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPassthroughStartFB(
+    XrPassthroughFB                             passthrough);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPassthroughPauseFB(
+    XrPassthroughFB                             passthrough);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreatePassthroughLayerFB(
+    XrSession                                   session,
+    const XrPassthroughLayerCreateInfoFB*       createInfo,
+    XrPassthroughLayerFB*                       outLayer);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyPassthroughLayerFB(
+    XrPassthroughLayerFB                        layer);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPassthroughLayerPauseFB(
+    XrPassthroughLayerFB                        layer);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPassthroughLayerResumeFB(
+    XrPassthroughLayerFB                        layer);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPassthroughLayerSetStyleFB(
+    XrPassthroughLayerFB                        layer,
+    const XrPassthroughStyleFB*                 style);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateGeometryInstanceFB(
+    XrSession                                   session,
+    const XrGeometryInstanceCreateInfoFB*       createInfo,
+    XrGeometryInstanceFB*                       outGeometryInstance);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyGeometryInstanceFB(
+    XrGeometryInstanceFB                        instance);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGeometryInstanceSetTransformFB(
+    XrGeometryInstanceFB                        instance,
+    const XrGeometryInstanceTransformFB*        transformation);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 #define XR_VARJO_foveated_rendering 1
 #define XR_VARJO_foveated_rendering_SPEC_VERSION 2
 #define XR_VARJO_FOVEATED_RENDERING_EXTENSION_NAME "XR_VARJO_foveated_rendering"
@@ -3131,6 +3423,67 @@ typedef XrResult (XRAPI_PTR *PFN_xrSetEnvironmentDepthEstimationVARJO)(XrSession
 XRAPI_ATTR XrResult XRAPI_CALL xrSetEnvironmentDepthEstimationVARJO(
     XrSession                                   session,
     XrBool32                                    enabled);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_VARJO_marker_tracking 1
+#define XR_VARJO_marker_tracking_SPEC_VERSION 1
+#define XR_VARJO_MARKER_TRACKING_EXTENSION_NAME "XR_VARJO_marker_tracking"
+// XrSystemMarkerTrackingPropertiesVARJO extends XrSystemProperties
+typedef struct XrSystemMarkerTrackingPropertiesVARJO {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsMarkerTracking;
+} XrSystemMarkerTrackingPropertiesVARJO;
+
+typedef struct XrEventDataMarkerTrackingUpdateVARJO {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint64_t                    markerId;
+    XrBool32                    isActive;
+    XrBool32                    isPredicted;
+    XrTime                      time;
+} XrEventDataMarkerTrackingUpdateVARJO;
+
+typedef struct XrMarkerSpaceCreateInfoVARJO {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint64_t                    markerId;
+    XrPosef                     poseInMarkerSpace;
+} XrMarkerSpaceCreateInfoVARJO;
+
+typedef XrResult  (XRAPI_PTR *PFN_xrSetMarkerTrackingVARJO)(XrSession session, XrBool32  enabled);
+typedef XrResult (XRAPI_PTR *PFN_xrSetMarkerTrackingTimeoutVARJO)(XrSession session, uint64_t markerId, XrDuration timeout);
+typedef XrResult (XRAPI_PTR *PFN_xrSetMarkerTrackingPredictionVARJO)(XrSession session, uint64_t markerId, XrBool32 enabled);
+typedef XrResult (XRAPI_PTR *PFN_xrGetMarkerSizeVARJO)(XrSession session, uint64_t markerId, XrExtent2Df* size);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateMarkerSpaceVARJO)(XrSession session, const XrMarkerSpaceCreateInfoVARJO* createInfo, XrSpace* space);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult  XRAPI_CALL xrSetMarkerTrackingVARJO(
+    XrSession                                   session,
+    XrBool32                                    enabled);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetMarkerTrackingTimeoutVARJO(
+    XrSession                                   session,
+    uint64_t                                    markerId,
+    XrDuration                                  timeout);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetMarkerTrackingPredictionVARJO(
+    XrSession                                   session,
+    uint64_t                                    markerId,
+    XrBool32                                    enabled);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetMarkerSizeVARJO(
+    XrSession                                   session,
+    uint64_t                                    markerId,
+    XrExtent2Df*                                size);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateMarkerSpaceVARJO(
+    XrSession                                   session,
+    const XrMarkerSpaceCreateInfoVARJO*         createInfo,
+    XrSpace*                                    space);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
 

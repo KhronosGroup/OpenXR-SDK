@@ -26,37 +26,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include(GNUInstallDirs)
 include(StdFilesystemFlags)
-
-string(TOUPPER "${CMAKE_GENERATOR_PLATFORM}" CMAKE_GENERATOR_PLATFORM_UPPER)
-
-# Artifact organization
-if(WIN32)
-    option(INSTALL_TO_ARCHITECTURE_PREFIXES "Install platform-specific files to architecture-specific directories." OFF)
-    if(INSTALL_TO_ARCHITECTURE_PREFIXES)
-        unset(_UWP_SUFFIX)
-        if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-            set(_UWP_SUFFIX _uwp)
-        endif()
-        if(CMAKE_GENERATOR_PLATFORM_UPPER MATCHES "ARM.*")
-            if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-                set(_PLATFORM ARM64)
-            else()
-                set(_PLATFORM ARM)
-            endif()
-        else()
-            if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-                set(_PLATFORM x64)
-            else()
-                set(_PLATFORM Win32)
-            endif()
-        endif()
-
-        set(CMAKE_INSTALL_BINDIR ${_PLATFORM}${_UWP_SUFFIX}/${CMAKE_INSTALL_BINDIR})
-        set(CMAKE_INSTALL_LIBDIR ${_PLATFORM}${_UWP_SUFFIX}/${CMAKE_INSTALL_LIBDIR})
-    endif()
-endif()
 
 ### Dependencies
 
@@ -161,12 +131,6 @@ cmake_dependent_option(
     OFF
 )
 
-if(BUILD_CONFORMANCE_TESTS AND NOT ANDROID)
-    set(BUILD_CONFORMANCE_CLI ON)
-else()
-    set(BUILD_CONFORMANCE_CLI OFF)
-endif()
-
 # Several files use these compile time OS switches
 if(WIN32)
     add_definitions(-DXR_OS_WINDOWS)
@@ -228,6 +192,7 @@ if(WIN32)
     add_definitions(-DXR_USE_PLATFORM_WIN32)
 elseif(ANDROID)
     add_definitions(-DXR_USE_PLATFORM_ANDROID)
+    set(OPENXR_ANDROID_VERSION_SUFFIX "" CACHE STRING "Suffix for generated Android artifacts.")
 elseif(PRESENTATION_BACKEND MATCHES "xlib")
     add_definitions(-DXR_USE_PLATFORM_XLIB)
 elseif(PRESENTATION_BACKEND MATCHES "xcb")

@@ -23,13 +23,18 @@
 #define XR_KHR_LOADER_INIT_SUPPORT
 #endif
 
-class RuntimeManifestFile;
-struct XrGeneratedDispatchTable;
+namespace Json {
+class Value;
+}
 
 #ifdef XR_KHR_LOADER_INIT_SUPPORT
 //! Initialize loader, where required.
 XrResult InitializeLoader(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo);
+XrResult GetPlatformRuntimeVirtualManifest(Json::Value& out_manifest);
 #endif
+
+class RuntimeManifestFile;
+struct XrGeneratedDispatchTable;
 
 class RuntimeInterface {
    public:

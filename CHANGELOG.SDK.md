@@ -19,6 +19,39 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.20 (2021-10-04)
+
+This release includes a proposed cross-vendor OpenXR loader for Android, Android
+build system for hello_xr, and a number of new vendor extensions.
+
+- Registry
+  - Add new `XR_HTCX_vive_tracker_interaction` provisional vendor extension.
+    ([internal MR 1983](https://gitlab.khronos.org/openxr/openxr/merge_requests/1983))
+  - Add new `XR_VARJO_marker_tracking` vendor extension.
+    ([internal MR 2129](https://gitlab.khronos.org/openxr/openxr/merge_requests/2129))
+  - Add new `XR_FB_triangle_mesh` vendor extension.
+    ([internal MR 2130](https://gitlab.khronos.org/openxr/openxr/merge_requests/2130))
+  - Add new `XR_FB_passthrough` vendor extension.
+    ([internal MR 2130](https://gitlab.khronos.org/openxr/openxr/merge_requests/2130))
+  - Reserve vendor extensions for Facebook.
+    ([internal MR 2131](https://gitlab.khronos.org/openxr/openxr/merge_requests/2131))
+  - Reserve a vendor extension for Almalence.
+    ([OpenXR-Docs PR 99](https://github.com/KhronosGroup/OpenXR-Docs/pull/99))
+  - XR_FB_color_space: Fix XML markup to indicate that
+    `XrSystemColorSpacePropertiesFB` is chained to `XrSystemProperties`.
+    ([internal MR 2143](https://gitlab.khronos.org/openxr/openxr/merge_requests/2143))
+- SDK
+  - Loader specification: Describe a cross-vendor loader for use on Android.
+    ([internal MR 1949](https://gitlab.khronos.org/openxr/openxr/merge_requests/1949),
+    [internal issue 1425](https://gitlab.khronos.org/openxr/openxr/issues/1425))
+  - hello_xr: Add Android build system, using new cross-vendor loader, and make
+    some improvements/fixes.
+    ([internal MR 1949](https://gitlab.khronos.org/openxr/openxr/merge_requests/1949),
+    [internal issue 1425](https://gitlab.khronos.org/openxr/openxr/issues/1425))
+  - loader: Implement cross-vendor loader for Android, with AAR Prefab packaging.
+    ([internal MR 1949](https://gitlab.khronos.org/openxr/openxr/merge_requests/1949),
+    [internal issue 1425](https://gitlab.khronos.org/openxr/openxr/issues/1425))
+
 ## OpenXR SDK 1.0.19 (2021-08-24)
 
 This release features a number of new or updated vendor extensions, as well as

@@ -58,3 +58,7 @@ local.properties
 !.markdownlint.yaml
 !.proclamation.json
 !.reuse
+
+# Output artifact
+*.aar
+*.pom

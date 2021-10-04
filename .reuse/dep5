@@ -7,10 +7,33 @@ Files: changes/*
 Copyright: 2019-2021, The Khronos Group Inc.
 License: CC-BY-4.0
 
+Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/vulkan/mipmap-mdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/vulkan/mipmap-xhdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/vulkan/mipmap-hdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/vulkan/mipmap-xxxhdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/opengles/mipmap-xxhdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/opengles/mipmap-mdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/opengles/mipmap-xhdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/opengles/mipmap-hdpi/ic_helloxr_launcher.png
+       src/tests/hello_xr/android_resources/opengles/mipmap-xxxhdpi/ic_helloxr_launcher.png
+Copyright: Copyright (c) 2020-2021 The Khronos Group Inc.
+  Copyright (c) 2020, Google
+License: Apache-2.0
+Comment: Based on a Material Icons asset ("emoji-people") with added text
+  in "Miriam Libre" Bold, converted to path, and manually simplified.
+  Rasterized with Android Studio.
+
 Files: src/external/jsoncpp/*
 Copyright: 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
 License: MIT OR LicenseRef-jsoncpp-public-domain
 Comment: Unmodified, vendored copy of jsoncpp 1.8.4
+
+Files: src/external/jnipp/*
+Copyright: 2016-2020, Mitchell Dowd
+  2020, Collabora, Ltd.
+License: MIT
+Comment: Ryan Pavlik at Collabora's fork
 
 Files: external/python/jinja2/*
   external/python/Jinja2-2.10.3.dist-info/*
@@ -43,3 +66,14 @@ Files: specification/sources/chapters/extensions/ext/ext_performance_settings.ad
 Copyright: 2017-2020, The Khronos Group Inc.
 License: CC-BY-4.0
 Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1419
+
+Files: src/conformance/platform_specific/android_resources/mipmap-hdpi/*
+  src/conformance/platform_specific/android_resources/mipmap-mdpi/*
+  src/conformance/platform_specific/android_resources/mipmap-xhdpi/*
+  src/conformance/platform_specific/android_resources/mipmap-xxhdpi/*
+  src/conformance/platform_specific/android_resources/mipmap-xxxhdpi/*
+Copyright: 2020, The Khronos Group Inc.
+  2020, Google
+License: Apache-2.0
+Comment: Generated .png versions of an icon, created in Android Studio
+  based on a Material Icons asset.

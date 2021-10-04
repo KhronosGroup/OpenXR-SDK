@@ -257,6 +257,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrGetDisplayRefreshRateFB GetDisplayRefreshRateFB;
     PFN_xrRequestDisplayRefreshRateFB RequestDisplayRefreshRateFB;
 
+    // ---- XR_HTCX_vive_tracker_interaction extension commands
+    PFN_xrEnumerateViveTrackerPathsHTCX EnumerateViveTrackerPathsHTCX;
+
     // ---- XR_FB_color_space extension commands
     PFN_xrEnumerateColorSpacesFB EnumerateColorSpacesFB;
     PFN_xrSetColorSpaceFB SetColorSpaceFB;
@@ -268,8 +271,39 @@ struct XrGeneratedDispatchTable {
     PFN_xrCreateFoveationProfileFB CreateFoveationProfileFB;
     PFN_xrDestroyFoveationProfileFB DestroyFoveationProfileFB;
 
+    // ---- XR_FB_triangle_mesh extension commands
+    PFN_xrCreateTriangleMeshFB CreateTriangleMeshFB;
+    PFN_xrDestroyTriangleMeshFB DestroyTriangleMeshFB;
+    PFN_xrTriangleMeshGetVertexBufferFB TriangleMeshGetVertexBufferFB;
+    PFN_xrTriangleMeshGetIndexBufferFB TriangleMeshGetIndexBufferFB;
+    PFN_xrTriangleMeshBeginUpdateFB TriangleMeshBeginUpdateFB;
+    PFN_xrTriangleMeshEndUpdateFB TriangleMeshEndUpdateFB;
+    PFN_xrTriangleMeshBeginVertexBufferUpdateFB TriangleMeshBeginVertexBufferUpdateFB;
+    PFN_xrTriangleMeshEndVertexBufferUpdateFB TriangleMeshEndVertexBufferUpdateFB;
+
+    // ---- XR_FB_passthrough extension commands
+    PFN_xrCreatePassthroughFB CreatePassthroughFB;
+    PFN_xrDestroyPassthroughFB DestroyPassthroughFB;
+    PFN_xrPassthroughStartFB PassthroughStartFB;
+    PFN_xrPassthroughPauseFB PassthroughPauseFB;
+    PFN_xrCreatePassthroughLayerFB CreatePassthroughLayerFB;
+    PFN_xrDestroyPassthroughLayerFB DestroyPassthroughLayerFB;
+    PFN_xrPassthroughLayerPauseFB PassthroughLayerPauseFB;
+    PFN_xrPassthroughLayerResumeFB PassthroughLayerResumeFB;
+    PFN_xrPassthroughLayerSetStyleFB PassthroughLayerSetStyleFB;
+    PFN_xrCreateGeometryInstanceFB CreateGeometryInstanceFB;
+    PFN_xrDestroyGeometryInstanceFB DestroyGeometryInstanceFB;
+    PFN_xrGeometryInstanceSetTransformFB GeometryInstanceSetTransformFB;
+
     // ---- XR_VARJO_environment_depth_estimation extension commands
     PFN_xrSetEnvironmentDepthEstimationVARJO SetEnvironmentDepthEstimationVARJO;
+
+    // ---- XR_VARJO_marker_tracking extension commands
+    PFN_xrSetMarkerTrackingVARJO SetMarkerTrackingVARJO;
+    PFN_xrSetMarkerTrackingTimeoutVARJO SetMarkerTrackingTimeoutVARJO;
+    PFN_xrSetMarkerTrackingPredictionVARJO SetMarkerTrackingPredictionVARJO;
+    PFN_xrGetMarkerSizeVARJO GetMarkerSizeVARJO;
+    PFN_xrCreateMarkerSpaceVARJO CreateMarkerSpaceVARJO;
 
     // ---- XR_MSFT_spatial_anchor_persistence extension commands
     PFN_xrCreateSpatialAnchorStoreConnectionMSFT CreateSpatialAnchorStoreConnectionMSFT;

@@ -75,6 +75,8 @@ class RuntimeManifestFile : public ManifestFile {
    private:
     RuntimeManifestFile(const std::string &filename, const std::string &library_path);
     static void CreateIfValid(const std::string &filename, std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
+    static void CreateIfValid(const Json::Value &root_node, const std::string &filename,
+                              std::vector<std::unique_ptr<RuntimeManifestFile>> &manifest_files);
 };
 
 // ApiLayerManifestFile class -

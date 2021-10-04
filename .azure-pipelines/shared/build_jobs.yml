@@ -5,7 +5,7 @@ parameters:
   - name: sourceDir
     type: string
     default: "$(System.DefaultWorkingDirectory)"
-  - name: isSdk
+  - name: isSdkSourceRepo
     type: boolean
     default: true
 
@@ -96,7 +96,7 @@ jobs:
 
   - job: combine_artifacts
     dependsOn: windows_build
-    condition: ${{ eq(parameters.isSdk, true) }}
+    condition: ${{ eq(parameters.isSdkSourceRepo, true) }}
     displayName: "Organize artifacts"
     pool:
       vmImage: "windows-latest"
