@@ -1,7 +1,7 @@
 # OpenXR™ Software Development Kit (SDK) Project
 
 <!--
-Copyright (c) 2017-2021, The Khronos Group Inc.
+Copyright (c) 2017-2022, The Khronos Group Inc.
 
 SPDX-License-Identifier: CC-BY-4.0
 -->

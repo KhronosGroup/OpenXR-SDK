@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021, The Khronos Group Inc.
+// Copyright (c) 2020-2022, The Khronos Group Inc.
 // Copyright (c) 2020-2021, Collabora, Ltd.
 //
 // SPDX-License-Identifier:  Apache-2.0 OR MIT
@@ -6,6 +6,7 @@
 // Initial Author: Ryan Pavlik <ryan.pavlik@collabora.com>
 
 #pragma once
+#ifdef __ANDROID__
 
 #include "wrap/android.content.h"
 
@@ -27,3 +28,5 @@ using wrap::android::content::Context;
  */
 int getActiveRuntimeVirtualManifest(wrap::android::content::Context const &context, Json::Value &virtualManifest);
 }  // namespace openxr_android
+
+#endif  // __ANDROID__

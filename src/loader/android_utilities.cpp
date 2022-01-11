@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021, The Khronos Group Inc.
+// Copyright (c) 2020-2022, The Khronos Group Inc.
 // Copyright (c) 2020-2021, Collabora, Ltd.
 //
 // SPDX-License-Identifier:  Apache-2.0 OR MIT
@@ -7,6 +7,7 @@
 
 #include "android_utilities.h"
 
+#ifdef __ANDROID__
 #include <wrap/android.net.h>
 #include <wrap/android.content.h>
 #include <wrap/android.database.h>
@@ -314,3 +315,5 @@ int getActiveRuntimeVirtualManifest(wrap::android::content::Context const &conte
     return 0;
 }
 }  // namespace openxr_android
+
+#endif  // __ANDROID__

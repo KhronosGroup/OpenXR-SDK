@@ -249,6 +249,15 @@ TEST(Object_moveAssignmentOperator)
     ASSERT(b.isNull());
 }
 
+TEST(Object_nullary_construct_from_signature)
+{
+    jni::Class String("java/lang/String");
+    jni::method_t init = String.getMethod("<init>", "()V");
+    jni::Object i = String.newInstance(init);
+    ASSERT(!i.isNull());
+    jni::internal::ArgArray<> a;
+}
+
 TEST(Object_call)
 {
     jni::Class Integer("java/lang/Integer");
@@ -575,6 +584,7 @@ int main()
 
         // jni::Object Tests
         RUN_TEST(Object_defaultConstructor_isNull);
+        RUN_TEST(Object_nullary_construct_from_signature);
         RUN_TEST(Object_copyConstructorIsSameObject);
         RUN_TEST(Object_moveConstructor);
         RUN_TEST(Object_copyAssignmentOperator);
@@ -612,8 +622,6 @@ int main()
         RUN_TEST(Arg_ObjectPtr);
     }
 
-    std::cout << "Press a key to continue..." << std::endl;
-    std::cin.get();
     return 0;
 }
 

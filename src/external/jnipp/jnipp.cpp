@@ -6,6 +6,8 @@
 #else
   // UNIX Dependencies
 # include <dlfcn.h>
+# include <unistd.h>
+# include <tuple>
 #endif
 
 // External Dependencies
@@ -24,6 +26,14 @@ namespace jni
     static std::atomic_bool isVm(false);
     static JavaVM* javaVm = nullptr;
 
+    static bool getEnv(JavaVM *vm, JNIEnv **env) {
+        return vm->GetEnv((void **)env, JNI_VERSION_1_2) == JNI_OK;
+    }
+
+    static bool isAttached(JavaVM *vm) {
+        JNIEnv *env = nullptr;
+        return getEnv(vm, &env);
+    }
     /**
         Maintains the lifecycle of a JNIEnv.
      */
@@ -57,7 +67,7 @@ namespace jni
         if (vm == nullptr)
             throw InitializationException("JNI not initialized");
 
-        if (vm->GetEnv((void**)&_env, JNI_VERSION_1_2) != JNI_OK)
+        if (!getEnv(vm, &_env))
         {
 #ifdef __ANDROID__
             if (vm->AttachCurrentThread(&_env, nullptr) != 0)
@@ -150,8 +160,17 @@ namespace jni
     {
         static thread_local ScopedEnv env;
 
+        if (env.get() != nullptr && !isAttached(javaVm))
+        {
+            // we got detached, so clear it.
+            // will be re-populated from static javaVm below.
+            env = ScopedEnv{};
+        }
+
         if (env.get() == nullptr)
+        {
             env.init(javaVm);
+        }
 
         return env.get();
     }
@@ -353,20 +372,20 @@ namespace jni
         return _handle == nullptr || env()->IsSameObject(_handle, nullptr);
     }
 
-    template <> void Object::callMethod(method_t method, internal::value_t* args) const
+    void Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<void> const&) const
     {
         env()->CallVoidMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
     }
 
-    template <> bool Object::callMethod(method_t method, internal::value_t* args) const
+    bool Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<bool> const&) const
     {
         auto result = env()->CallBooleanMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result != 0;
     }
 
-    template <> bool Object::get(field_t field) const
+    bool Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<bool> const&) const
     {
         return env()->GetBooleanField(_handle, field) != 0;
     }
@@ -376,122 +395,122 @@ namespace jni
         env()->SetBooleanField(_handle, field, value);
     }
 
-    template <> byte_t Object::callMethod(method_t method, internal::value_t* args) const
+    byte_t Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<byte_t> const&) const
     {
         auto result = env()->CallByteMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> wchar_t Object::callMethod(method_t method, internal::value_t* args) const
+    wchar_t Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<wchar_t> const&) const
     {
         auto result = env()->CallCharMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> short Object::callMethod(method_t method, internal::value_t* args) const
+    short Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<short> const&) const
     {
         auto result = env()->CallShortMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> int Object::callMethod(method_t method, internal::value_t* args) const
+    int Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<int> const&) const
     {
         auto result = env()->CallIntMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> long long Object::callMethod(method_t method, internal::value_t* args) const
+    long long Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<long long> const&) const
     {
         auto result = env()->CallLongMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> float Object::callMethod(method_t method, internal::value_t* args) const
+    float Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<float> const&) const
     {
         auto result = env()->CallFloatMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> double Object::callMethod(method_t method, internal::value_t* args) const
+    double Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<double> const&) const
     {
         auto result = env()->CallDoubleMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return result;
     }
 
-    template <> std::string Object::callMethod(method_t method, internal::value_t* args) const
+    std::string Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<std::string> const&) const
     {
         auto result = env()->CallObjectMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return toString(result);
     }
 
-    template <> std::wstring Object::callMethod(method_t method, internal::value_t* args) const
+    std::wstring Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<std::wstring> const&) const
     {
         auto result = env()->CallObjectMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return toWString(result);
     }
 
-    template <> jni::Object Object::callMethod(method_t method, internal::value_t* args) const
+    jni::Object Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<jni::Object> const&) const
     {
         auto result = env()->CallObjectMethodA(_handle, method, (jvalue*) args);
         handleJavaExceptions();
         return Object(result, DeleteLocalInput);
     }
 
-    template <> byte_t Object::get(field_t field) const
+    byte_t Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<byte_t> const&) const
     {
         return env()->GetByteField(_handle, field);
     }
 
-    template <> wchar_t Object::get(field_t field) const
+    wchar_t Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<wchar_t> const&) const
     {
         return env()->GetCharField(_handle, field);
     }
 
-    template <> short Object::get(field_t field) const
+    short Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<short> const&) const
     {
         return env()->GetShortField(_handle, field);
     }
 
-    template <> int Object::get(field_t field) const
+    int Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<int> const&) const
     {
         return env()->GetIntField(_handle, field);
     }
 
-    template <> long long Object::get(field_t field) const
+    long long Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<long long> const&) const
     {
         return env()->GetLongField(_handle, field);
     }
 
-    template <> float Object::get(field_t field) const
+    float Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<float> const&) const
     {
         return env()->GetFloatField(_handle, field);
     }
 
-    template <> double Object::get(field_t field) const
+    double Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<double> const&) const
     {
         return env()->GetDoubleField(_handle, field);
     }
 
-    template <> std::string Object::get(field_t field) const
+    std::string Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<std::string> const&) const
     {
         return toString(env()->GetObjectField(_handle, field));
     }
 
-    template <> std::wstring Object::get(field_t field) const
+    std::wstring Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<std::wstring> const&) const
     {
         return toWString(env()->GetObjectField(_handle, field));
     }
 
-    template <> Object Object::get(field_t field) const
+    Object Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<Object> const&) const
     {
         return Object(env()->GetObjectField(_handle, field), DeleteLocalInput);
     }
@@ -1270,7 +1289,57 @@ namespace jni
 
     typedef jint (JNICALL *CreateVm_t)(JavaVM**, void**, void*);
 
+#ifndef _WIN32
+    static bool fileExists(const std::string& filePath)
+    {
+        return access(filePath.c_str(), F_OK) != -1;
+    }
 
+    template <size_t N>
+    static ssize_t readlink_safe(const char *pathname, char (&output)[N]) {
+        auto len = readlink(pathname, output, N - 1);
+        if (len > 0) {
+            output[len] = '\0';
+        }
+        return len;
+    }
+
+    static std::pair<ssize_t, std::string>
+    readlink_as_string(const char *pathname) {
+        char buf[2048] = {};
+        auto len = readlink_safe(pathname, buf);
+        if (len <= 0) {
+            return {len, {}};
+        }
+        return {len, std::string{buf, static_cast<size_t>(len)}};
+    }
+    static std::string readlink_deep(const char *pathname) {
+        std::string prev{pathname};
+        ssize_t len = 0;
+        std::string next;
+        while (true) {
+            std::tie(len, next) = readlink_as_string(prev.c_str());
+            if (!next.empty()) {
+                prev = next;
+            } else {
+                return prev;
+            }
+        }
+    }
+
+    static std::string drop_path_components(const std::string & path, size_t num_components) {
+        size_t pos = std::string::npos;
+        size_t slash_pos = std::string::npos;
+        for (size_t i = 0; i < num_components; ++i) {
+            slash_pos = path.find_last_of('/', pos);
+            if (slash_pos == std::string::npos || slash_pos == 0) {
+                return {};
+            }
+            pos = slash_pos - 1;
+        }
+        return std::string{path.c_str(), slash_pos};
+    }
+#endif
     static std::string detectJvmPath()
     {
         std::string result;
@@ -1321,7 +1390,7 @@ namespace jni
                     javaHome + "\\bin\\server\\jvm.dll"
                 };
 
-                for (auto i : options)
+                for (auto const& i : options)
                     if (fileExists(i))
                         return i;
             }
@@ -1338,6 +1407,28 @@ namespace jni
             #endif
             result = libJvmPath;
         } else {
+            std::string path = readlink_deep("/usr/bin/java");
+            if (!path.empty()) {
+                // drop bin and java
+                auto javaHome = drop_path_components(path, 2);
+                if (!javaHome.empty()) {
+                    std::string options[] = {
+                        javaHome + "/jre/lib/amd64/server/libjvm.so",
+                        javaHome + "/jre/lib/amd64/client/libjvm.so",
+                        javaHome + "/jre/lib/server/libjvm.so",
+                        javaHome + "/jre/lib/client/libjvm.so",
+                        javaHome + "/lib/server/libjvm.so",
+                        javaHome + "/lib/client/libjvm.so",
+                    };
+
+                    for (auto const &i : options) {
+                        fprintf(stderr, "trying %s\n", i.c_str());
+                        if (fileExists(i)) {
+                            return i;
+                        }
+                    }
+                }
+            }
             // Best guess so far.
             result = "/usr/lib/jvm/default-java/jre/lib/amd64/server/libjvm.so";
         }

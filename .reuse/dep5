@@ -4,7 +4,7 @@ Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
 Source: https://khronos.org/registry/OpenXR/
 
 Files: changes/*
-Copyright: 2019-2021, The Khronos Group Inc.
+Copyright: 2019-2022, The Khronos Group Inc.
 License: CC-BY-4.0
 
 Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_launcher.png
@@ -17,7 +17,7 @@ Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_laun
        src/tests/hello_xr/android_resources/opengles/mipmap-xhdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/opengles/mipmap-hdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/opengles/mipmap-xxxhdpi/ic_helloxr_launcher.png
-Copyright: Copyright (c) 2020-2021 The Khronos Group Inc.
+Copyright: Copyright (c) 2020-2022, The Khronos Group Inc.
   Copyright (c) 2020, Google
 License: Apache-2.0
 Comment: Based on a Material Icons asset ("emoji-people") with added text
@@ -27,7 +27,7 @@ Comment: Based on a Material Icons asset ("emoji-people") with added text
 Files: src/external/jsoncpp/*
 Copyright: 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
 License: MIT OR LicenseRef-jsoncpp-public-domain
-Comment: Unmodified, vendored copy of jsoncpp 1.8.4
+Comment: Unmodified, vendored copy of jsoncpp 1.9.5
 
 Files: src/external/jnipp/*
 Copyright: 2016-2020, Mitchell Dowd

@@ -46,6 +46,8 @@ else() # build static lib
 endif()
 
 add_library(openxr_loader ${LIBRARY_TYPE}
+    android_utilities.cpp
+    android_utilities.h
     api_layer_interface.cpp
     api_layer_interface.hpp
     loader_core.cpp

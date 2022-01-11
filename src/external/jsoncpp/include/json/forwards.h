@@ -25,11 +25,11 @@ class Reader;
 class CharReader;
 class CharReaderBuilder;
 
-// features.h
+// json_features.h
 class Features;
 
 // value.h
-typedef unsigned int ArrayIndex;
+using ArrayIndex = unsigned int;
 class StaticString;
 class Path;
 class PathArgument;

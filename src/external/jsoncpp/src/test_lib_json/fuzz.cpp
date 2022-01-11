@@ -9,7 +9,6 @@
 #include <json/config.h>
 #include <json/json.h>
 #include <memory>
-#include <stdint.h>
 #include <string>
 
 namespace Json {
@@ -23,8 +22,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  uint32_t hash_settings = *(const uint32_t*)data;
+  const uint32_t hash_settings = static_cast<uint32_t>(data[0]) |
+                                 (static_cast<uint32_t>(data[1]) << 8) |
+                                 (static_cast<uint32_t>(data[2]) << 16) |
+                                 (static_cast<uint32_t>(data[3]) << 24);
   data += sizeof(uint32_t);
+  size -= sizeof(uint32_t);
 
   builder.settings_["failIfExtra"] = hash_settings & (1 << 0);
   builder.settings_["allowComments_"] = hash_settings & (1 << 1);
@@ -35,11 +38,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   builder.settings_["failIfExtra_"] = hash_settings & (1 << 6);
   builder.settings_["rejectDupKeys_"] = hash_settings & (1 << 7);
   builder.settings_["allowSpecialFloats_"] = hash_settings & (1 << 8);
+  builder.settings_["collectComments"] = hash_settings & (1 << 9);
+  builder.settings_["allowTrailingCommas_"] = hash_settings & (1 << 10);
 
   std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
   Json::Value root;
-  const char* data_str = reinterpret_cast<const char*>(data);
+  const auto data_str = reinterpret_cast<const char*>(data);
   try {
     reader->parse(data_str, data_str + size, &root, nullptr);
   } catch (Json::Exception const&) {

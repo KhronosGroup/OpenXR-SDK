@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, The Khronos Group Inc.
+// Copyright (c) 2017-2022, The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
@@ -6,7 +6,7 @@
 //     See utility_source_generator.py for modifications
 // ************************************************************
 
-// Copyright (c) 2017-2021, The Khronos Group Inc.
+// Copyright (c) 2017-2022, The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
@@ -260,6 +260,11 @@ struct XrGeneratedDispatchTable {
     // ---- XR_HTCX_vive_tracker_interaction extension commands
     PFN_xrEnumerateViveTrackerPathsHTCX EnumerateViveTrackerPathsHTCX;
 
+    // ---- XR_HTC_facial_tracking extension commands
+    PFN_xrCreateFacialTrackerHTC CreateFacialTrackerHTC;
+    PFN_xrDestroyFacialTrackerHTC DestroyFacialTrackerHTC;
+    PFN_xrGetFacialExpressionsHTC GetFacialExpressionsHTC;
+
     // ---- XR_FB_color_space extension commands
     PFN_xrEnumerateColorSpacesFB EnumerateColorSpacesFB;
     PFN_xrSetColorSpaceFB SetColorSpaceFB;
@@ -270,6 +275,10 @@ struct XrGeneratedDispatchTable {
     // ---- XR_FB_foveation extension commands
     PFN_xrCreateFoveationProfileFB CreateFoveationProfileFB;
     PFN_xrDestroyFoveationProfileFB DestroyFoveationProfileFB;
+
+    // ---- XR_FB_keyboard_tracking extension commands
+    PFN_xrQuerySystemTrackedKeyboardFB QuerySystemTrackedKeyboardFB;
+    PFN_xrCreateKeyboardSpaceFB CreateKeyboardSpaceFB;
 
     // ---- XR_FB_triangle_mesh extension commands
     PFN_xrCreateTriangleMeshFB CreateTriangleMeshFB;
@@ -294,6 +303,11 @@ struct XrGeneratedDispatchTable {
     PFN_xrCreateGeometryInstanceFB CreateGeometryInstanceFB;
     PFN_xrDestroyGeometryInstanceFB DestroyGeometryInstanceFB;
     PFN_xrGeometryInstanceSetTransformFB GeometryInstanceSetTransformFB;
+
+    // ---- XR_FB_render_model extension commands
+    PFN_xrEnumerateRenderModelPathsFB EnumerateRenderModelPathsFB;
+    PFN_xrGetRenderModelPropertiesFB GetRenderModelPropertiesFB;
+    PFN_xrLoadRenderModelFB LoadRenderModelFB;
 
     // ---- XR_VARJO_environment_depth_estimation extension commands
     PFN_xrSetEnvironmentDepthEstimationVARJO SetEnvironmentDepthEstimationVARJO;
@@ -321,6 +335,12 @@ struct XrGeneratedDispatchTable {
 #if defined(XR_USE_PLATFORM_WIN32)
     PFN_xrGetAudioInputDeviceGuidOculus GetAudioInputDeviceGuidOculus;
 #endif // defined(XR_USE_PLATFORM_WIN32)
+
+    // ---- XR_ALMALENCE_digital_lens_control extension commands
+    PFN_xrSetDigitalLensControlALMALENCE SetDigitalLensControlALMALENCE;
+
+    // ---- XR_FB_passthrough_keyboard_hands extension commands
+    PFN_xrPassthroughLayerSetKeyboardHandsIntensityFB PassthroughLayerSetKeyboardHandsIntensityFB;
 };
 
 

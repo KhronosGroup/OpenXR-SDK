@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="org.khronos.openxr.openxr_loader_for_android">
   <!--
-  Copyright (c) 2020-2021 The Khronos Group Inc.
+  Copyright (c) 2020-2022, The Khronos Group Inc.
   SPDX-License-Identifier: Apache-2.0
   -->
 

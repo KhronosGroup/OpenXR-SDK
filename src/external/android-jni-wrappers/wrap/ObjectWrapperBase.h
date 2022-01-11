@@ -1,8 +1,9 @@
-// Copyright 2020, Collabora, Ltd.
+// Copyright 2020-2021, Collabora, Ltd.
 // SPDX-License-Identifier: BSL-1.0
 // Author: Ryan Pavlik <ryan.pavlik@collabora.com>
 
 #pragma once
+#include <assert.h>
 #include <jni.h>
 #include <jnipp.h>
 

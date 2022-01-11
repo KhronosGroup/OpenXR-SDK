@@ -15,7 +15,7 @@ endif
 
 JAVA_HOME ?= /usr/lib/jvm/default-java
 
-CXXFLAGS=-I. -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/$(OS_NAME) -ldl -std=c++11
+CXXFLAGS=-I. -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/$(OS_NAME) -ldl -std=c++11 -Wall -g
 
 SRC=jnipp.o main.o
 VPATH=tests

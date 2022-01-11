@@ -4,7 +4,7 @@
 <?xml-model href="registry.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <registry>
     <comment>
-Copyright (c) 2017-2021, The Khronos Group Inc.
+Copyright (c) 2017-2022, The Khronos Group Inc.
 
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -122,7 +122,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 20)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 21)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -203,6 +203,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="define">
 #define <name>XR_NULL_CONTROLLER_MODEL_KEY_MSFT</name> 0</type>
 
+        <!-- XR_FB_render_model -->
+        <type category="define">
+#define <name>XR_NULL_RENDER_MODEL_KEY_FB</name> 0</type>
+
+        <!-- XR_HTC_facial_tracking -->
+        <type category="define">
+#define <name>XR_FACIAL_EXPRESSION_EYE_COUNT_HTC</name> 14</type>
+        <type category="define">
+#define <name>XR_FACIAL_EXPRESSION_LIP_COUNT_HTC</name> 37</type>
+
         <!-- Value types -->
         <type category="basetype">typedef <type>uint32_t</type> <name>XrBool32</name>;</type>
         <type category="basetype">typedef <type>uint64_t</type> <name>XrFlags64</name>;</type>
@@ -215,6 +225,8 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrSystemId</name>)</type>
         <!-- XR_MSFT_controller_model -->
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrControllerModelKeyMSFT</name>)</type>
+        <!-- XR_FB_render_model -->
+        <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrRenderModelKeyFB</name>)</type>
 
         <!-- Basic C types, pulled in via openxr_platform_defines.h -->
         <type requires="openxr_platform_defines" name="void"/>
@@ -278,8 +290,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_FB_hand_tracking_aim -->
         <type bitvalues="XrHandTrackingAimFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrHandTrackingAimFlagsFB</name>;</type>
 
+        <!-- Bitmask types for XR_FB_keyboard_tracking -->
+        <type bitvalues="XrKeyboardTrackingFlagBitsFB"      category="bitmask">typedef <type>XrFlags64</type> <name>XrKeyboardTrackingFlagsFB</name>;</type>
+        <type bitvalues="XrKeyboardTrackingQueryFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrKeyboardTrackingQueryFlagsFB</name>;</type>
+
         <!-- Bitmask types for XR_FB_space_warp -->
         <type bitvalues="XrCompositionLayerSpaceWarpInfoFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrCompositionLayerSpaceWarpInfoFlagsFB</name>;</type>
+
+        <!-- Bitmask types for XR_FB_render_model -->
+        <type bitvalues="XrRenderModelFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrRenderModelFlagsFB</name>;</type>
+
+        <!-- Bitmask types for XR_ALMALENCE_digital_lens_control -->
+        <type bitvalues="XrDigitalLensControlFlagBitsALMALENCE" category="bitmask">typedef <type>XrFlags64</type> <name>XrDigitalLensControlFlagsALMALENCE</name>;</type>
 
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
@@ -332,15 +354,15 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrPerfSettingsLevelEXT" category="enum"/>
         <type name="XrPerfSettingsNotificationLevelEXT" category="enum"/>
 
-        <!-- enums and flag bits for XR_KHR_vulkan_enable2 -->
+        <!-- flag bits for XR_KHR_vulkan_enable2 -->
         <type name="XrVulkanInstanceCreateFlagBitsKHR" category="enum"/>
         <type name="XrVulkanDeviceCreateFlagBitsKHR" category="enum"/>
 
-        <!-- enums and flag bits for XR_EXT_debug_utils -->
+        <!-- flag bits for XR_EXT_debug_utils -->
         <type name="XrDebugUtilsMessageSeverityFlagBitsEXT" category="enum"/>
         <type name="XrDebugUtilsMessageTypeFlagBitsEXT" category="enum"/>
 
-        <!-- enums and flag bits for XR_EXTX_overlay -->
+        <!-- flag bits for XR_EXTX_overlay -->
         <type name="XrOverlayMainSessionFlagBitsEXTX" category="enum"/>
         <type name="XrOverlaySessionCreateFlagBitsEXTX" category="enum"/>
 
@@ -350,19 +372,19 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enums for XR_MSFT_spatial_graph_bridge -->
         <type name="XrSpatialGraphNodeTypeMSFT" category="enum"/>
 
-        <!-- enums for XR_FB_android_surface_swapchain_create -->
+        <!-- flag bits for XR_FB_android_surface_swapchain_create -->
         <type name="XrAndroidSurfaceSwapchainFlagBitsFB" category="enum"/>
 
-        <!-- enums for XR_FB_composition_layer_image_layout -->
+        <!-- flag bits for XR_FB_composition_layer_image_layout -->
         <type name="XrCompositionLayerImageLayoutFlagBitsFB" category="enum"/>
 
         <!-- enums for XR_FB_composition_layer_alpha_blend -->
         <type name="XrBlendFactorFB" category="enum"/>
 
-        <!-- enums for XR_FB_composition_layer_secure_content -->
+        <!-- flag bits for XR_FB_composition_layer_secure_content -->
         <type name="XrCompositionLayerSecureContentFlagBitsFB" category="enum"/>
 
-        <!-- enums and flag bits for XR_FB_foveation -->
+        <!-- flag bits for XR_FB_foveation -->
         <type name="XrSwapchainCreateFoveationFlagBitsFB" category="enum"/>
         <type name="XrSwapchainStateFoveationFlagBitsFB" category="enum"/>
 
@@ -375,11 +397,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrPassthroughLayerPurposeFB" category="enum"/>
         <type name="XrPassthroughStateChangedFlagBitsFB" category="enum"/>
 
-        <!-- enums and flag bits for XR_FB_space_warp -->
+        <!-- flag bits for XR_FB_space_warp -->
         <type name="XrCompositionLayerSpaceWarpInfoFlagBitsFB" category="enum"/>
 
-        <!-- enums and flag bits for XR_FB_hand_tracking_aim -->
+        <!-- flag bits for XR_FB_render_model -->
+        <type name="XrRenderModelFlagBitsFB" category="enum"/>
+
+        <!-- flag bits for XR_FB_hand_tracking_aim -->
         <type name="XrHandTrackingAimFlagBitsFB" category="enum"/>
+
+        <!-- flag bits for XR_FB_keyboard_tracking -->
+        <type name="XrKeyboardTrackingFlagBitsFB" category="enum"/>
+        <type name="XrKeyboardTrackingQueryFlagBitsFB" category="enum"/>
+
+        <!-- flag bits for XR_ALMALENCE_digital_lens_control -->
+        <type name="XrDigitalLensControlFlagBitsALMALENCE" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -1819,6 +1851,62 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrHandCapsuleFB</type> <name>capsules</name>[<enum>XR_FB_HAND_TRACKING_CAPSULE_COUNT</enum>]</member>
         </type>
 
+        <!-- XR_FB_render_model structs -->
+        <type category="struct" name="XrRenderModelPathInfoFB">
+            <member values="XR_TYPE_RENDER_MODEL_PATH_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                      <name>next</name></member>
+            <member><type>XrPath</type>                                                     <name>path</name></member>
+        </type>
+        <type category="struct" name="XrRenderModelPropertiesFB">
+            <member values="XR_TYPE_RENDER_MODEL_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                       <name>next</name></member>
+            <member><type>uint32_t</type>                                                    <name>vendorId</name></member>
+            <member><type>char</type>                                                        <name>modelName</name>[XR_MAX_RENDER_MODEL_NAME_SIZE_FB]</member>
+            <member><type>XrRenderModelKeyFB</type>                                          <name>modelKey</name></member>
+            <member><type>uint32_t</type>                                                    <name>modelVersion</name></member>
+            <member><type>XrRenderModelFlagsFB</type>                                        <name>flags</name></member>
+        </type>
+        <type category="struct" name="XrRenderModelBufferFB">
+            <member values="XR_TYPE_RENDER_MODEL_BUFFER_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                   <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                <name>bufferCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                <name>bufferCountOutput</name></member>
+            <member optional="true" len="bufferCapacityInput"><type>uint8_t</type>*      <name>buffer</name></member>
+        </type>
+        <type category="struct" name="XrRenderModelLoadInfoFB">
+            <member values="XR_TYPE_RENDER_MODEL_LOAD_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                      <name>next</name></member>
+            <member><type>XrRenderModelKeyFB</type>                                         <name>modelKey</name></member>
+        </type>
+        <type category="struct" name="XrSystemRenderModelPropertiesFB" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_RENDER_MODEL_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                         <name>next</name></member>
+            <member><type>XrBool32</type>                                                      <name>supportsRenderModelLoading</name></member>
+        </type>
+
+        <!-- XR_FB_keyboard_tracking structs -->
+        <type category="struct" name="XrSystemKeyboardTrackingPropertiesFB" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_KEYBOARD_TRACKING_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsKeyboardTracking</name></member>
+        </type>
+        <type category="struct" name="XrKeyboardTrackingDescriptionFB" returnedonly="true">
+            <member><type>uint64_t</type> <name>trackedKeyboardId</name></member>
+            <member><type>XrVector3f</type> <name>size</name></member>
+            <member><type>XrKeyboardTrackingFlagsFB</type> <name>flags</name></member>
+            <member><type>char</type> <name>name</name>[XR_MAX_KEYBOARD_TRACKING_NAME_SIZE_FB]</member>
+        </type>
+        <type category="struct" name="XrKeyboardSpaceCreateInfoFB">
+            <member values="XR_TYPE_KEYBOARD_SPACE_CREATE_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>uint64_t</type> <name>trackedKeyboardId</name></member>
+        </type>
+        <type category="struct" name="XrKeyboardTrackingQueryFB">
+            <member values="XR_TYPE_KEYBOARD_TRACKING_QUERY_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>* <name>next</name></member>
+            <member><type>XrKeyboardTrackingQueryFlagsFB</type>   <name>flags</name></member>
+        </type>
+
         <!-- XR_VARJO_composition_layer_depth_test -->
         <type category="struct" name="XrCompositionLayerDepthTestVARJO" structextends="XrCompositionLayerProjection">
             <member values="XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO"><type>XrStructureType</type> <name>type</name></member>
@@ -1937,6 +2025,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrPassthroughStateChangedFlagsFB</type> <name>flags</name></member>
         </type>
 
+        <!-- XR_FB_passthrough_keyboard_hands -->
+        <type category="struct" name="XrPassthroughKeyboardHandsIntensityFB">
+            <member values="XR_TYPE_PASSTHROUGH_KEYBOARD_HANDS_INTENSITY_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>float</type>       <name>leftHandIntensity</name></member>
+            <member><type>float</type>       <name>rightHandIntensity</name></member>
+        </type>
+
         <!-- XR_MSFT_spatial_anchor_persistence -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSpatialAnchorStoreConnectionMSFT</name>)</type>
 
@@ -1954,6 +2050,33 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*                            <name>next</name></member>
             <member><type>XrSpatialAnchorStoreConnectionMSFT</type>     <name>spatialAnchorStore</name></member>
             <member><type>XrSpatialAnchorPersistenceNameMSFT</type>     <name>spatialAnchorPersistenceName</name></member>
+        </type>
+
+        <!-- XR_HTC_facial_tracking -->
+        <type category="handle" parent="XrInstance"><type>XR_DEFINE_HANDLE</type>(<name>XrFacialTrackerHTC</name>)</type>
+
+        <type name="XrFacialTrackingTypeHTC" category="enum"/>
+        <type name="XrEyeExpressionHTC" category="enum"/>
+        <type name="XrLipExpressionHTC" category="enum"/>
+
+        <type category="struct" name="XrFacialTrackerCreateInfoHTC">
+            <member values="XR_TYPE_FACIAL_TRACKER_CREATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*         <name>next</name></member>
+            <member><type>XrFacialTrackingTypeHTC</type> <name>facialTrackingType</name></member>
+        </type>
+        <type category="struct" name="XrSystemFacialTrackingPropertiesHTC" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_FACIAL_TRACKING_PROPERTIES_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportEyeFacialTracking</name></member>
+            <member><type>XrBool32</type> <name>supportLipFacialTracking</name></member>
+        </type>
+        <type category="struct" name="XrFacialExpressionsHTC">
+            <member values="XR_TYPE_FACIAL_EXPRESSIONS_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type>    <name>isActive</name></member>
+            <member><type>XrTime</type>      <name>sampleTime</name></member>
+            <member><type>uint32_t</type>    <name>expressionCount</name></member>
+            <member><type>float</type>*      <name>expressionWeightings</name></member>
         </type>
 
         <!-- XR_HTCX_vive_tracker_interaction structs -->
@@ -1990,6 +2113,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>uint32_t</type> <name>recommendedMotionVectorImageRectHeight</name></member>
         </type>
 
+
         <!-- XR_VARJO_marker_tracking -->
         <type category="struct" name="XrSystemMarkerTrackingPropertiesVARJO" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_VARJO"><type>XrStructureType</type> <name>type</name></member>
@@ -2012,6 +2136,19 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>uint64_t</type>                   <name>markerId</name></member>
             <member><type>XrPosef</type>                    <name>poseInMarkerSpace</name></member>
         </type>
+
+        <!-- XR_EXT_uuid -->
+        <type category="struct" name="XrUuidEXT">
+            <member><type>uint8_t</type> <name>data</name>[XR_UUID_SIZE_EXT]</member>
+        </type>
+
+        <!-- XR_ALMALENCE_digital_lens_control -->
+        <type category="struct" name="XrDigitalLensControlALMALENCE">
+            <member values="XR_TYPE_DIGITAL_LENS_CONTROL_ALMALENCE"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                        <name>next</name></member>
+            <member><type>XrDigitalLensControlFlagsALMALENCE</type> <name>flags</name></member>
+        </type>
+
     </types>
 
     <!-- SECTION: OpenXR enumerant (token) definitions. -->
@@ -2547,9 +2684,96 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum bitpos="8" name="XR_HAND_TRACKING_AIM_MENU_PRESSED_BIT_FB"    comment="System menu gesture is active"/>
     </enums>
 
+    <!-- flags for XR_FB_keyboard_tracking query state -->
+    <enums name="XrKeyboardTrackingFlagBitsFB" type="bitmask">
+        <enum bitpos="0" name="XR_KEYBOARD_TRACKING_EXISTS_BIT_FB"    comment="indicates that the system has a physically tracked keyboard to report.  If not set then no other bits should be considered to be valid or meaningful.  If set either XR_KEYBOARD_TRACKING_LOCAL_BIT_FB or XR_KEYBOARD_TRACKING_REMOTE_BIT_FB must also be set."/>
+        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_LOCAL_BIT_FB"     comment="indicates that the physically tracked keyboard is intended to be used in a local pairing with the system.  Mutally exclusive with XR_KEYBOARD_TRACKING_REMOTE_BIT_FB."/>
+        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_REMOTE_BIT_FB"    comment="indicates that the physically tracked keyboard is intended to be used while paired to a separate remote computing device. Mutally exclusive with XR_KEYBOARD_TRACKING_LOCAL_BIT_FB."/>
+        <enum bitpos="3" name="XR_KEYBOARD_TRACKING_CONNECTED_BIT_FB" comment="indicates that the physically tracked keyboard is actively connected to the headset and capable of sending key data"/>
+    </enums>
+
+    <!-- flags for XR_FB_keyboard_tracking query -->
+    <enums name="XrKeyboardTrackingQueryFlagBitsFB" type="bitmask">
+        <enum bitpos="0" name="XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB"  comment="indicates the query is for the physically tracked keyboard that is intended to be used in a local pairing with the System. Mutally exclusive with XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB."/>
+        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB" comment="indicates the query is for the physically tracked keyboard that may be connected to a separate remote computing device. Mutally exclusive with XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB."/>
+    </enums>
+
     <!-- flags for XR_FB_space_warp -->
     <enums name="XrCompositionLayerSpaceWarpInfoFlagBitsFB" type="bitmask">
         <!-- This is currently empty, awaiting future flags. -->
+    </enums>
+
+    <!-- flags for XR_FB_render_model -->
+    <enums name="XrRenderModelFlagBitsFB" type="bitmask">
+        <!-- This is currently empty, awaiting future flags. -->
+    </enums>
+
+    <!-- enums for XR_HTC_facial_tracking -->
+    <enums name="XrFacialTrackingTypeHTC" type="enum">
+        <enum value="1"   name="XR_FACIAL_TRACKING_TYPE_EYE_DEFAULT_HTC" comment="Specifies this handle will observe eye expressions, with values indexed by elink:XrEyeExpressionHTC whose count is dlink:XR_FACIAL_EXPRESSION_EYE_COUNT_HTC."/>
+        <enum value="2"   name="XR_FACIAL_TRACKING_TYPE_LIP_DEFAULT_HTC" comment="Specifies this handle will observe lip expressions, with values indexed by elink:XrLipExpressionHTC whose count is dlink:XR_FACIAL_EXPRESSION_LIP_COUNT_HTC."/>
+    </enums>
+
+    <enums name="XrEyeExpressionHTC" type="enum">
+        <enum value="0"    name="XR_EYE_EXPRESSION_LEFT_BLINK_HTC"/>
+        <enum value="1"    name="XR_EYE_EXPRESSION_LEFT_WIDE_HTC"/>
+        <enum value="2"    name="XR_EYE_EXPRESSION_RIGHT_BLINK_HTC"/>
+        <enum value="3"    name="XR_EYE_EXPRESSION_RIGHT_WIDE_HTC"/>
+        <enum value="4"    name="XR_EYE_EXPRESSION_LEFT_SQUEEZE_HTC"/>
+        <enum value="5"    name="XR_EYE_EXPRESSION_RIGHT_SQUEEZE_HTC"/>
+        <enum value="6"    name="XR_EYE_EXPRESSION_LEFT_DOWN_HTC"/>
+        <enum value="7"    name="XR_EYE_EXPRESSION_RIGHT_DOWN_HTC"/>
+        <enum value="8"    name="XR_EYE_EXPRESSION_LEFT_OUT_HTC"/>
+        <enum value="9"    name="XR_EYE_EXPRESSION_RIGHT_IN_HTC"/>
+        <enum value="10"   name="XR_EYE_EXPRESSION_LEFT_IN_HTC"/>
+        <enum value="11"   name="XR_EYE_EXPRESSION_RIGHT_OUT_HTC"/>
+        <enum value="12"   name="XR_EYE_EXPRESSION_LEFT_UP_HTC"/>
+        <enum value="13"   name="XR_EYE_EXPRESSION_RIGHT_UP_HTC"/>
+    </enums>
+
+    <enums name="XrLipExpressionHTC" type="enum">
+        <enum value="0"    name="XR_LIP_EXPRESSION_JAW_RIGHT_HTC"/>
+        <enum value="1"    name="XR_LIP_EXPRESSION_JAW_LEFT_HTC"/>
+        <enum value="2"    name="XR_LIP_EXPRESSION_JAW_FORWARD_HTC"/>
+        <enum value="3"    name="XR_LIP_EXPRESSION_JAW_OPEN_HTC"/>
+        <enum value="4"    name="XR_LIP_EXPRESSION_MOUTH_APE_SHAPE_HTC"/>
+        <enum value="5"    name="XR_LIP_EXPRESSION_MOUTH_UPPER_RIGHT_HTC"/>
+        <enum value="6"    name="XR_LIP_EXPRESSION_MOUTH_UPPER_LEFT_HTC"/>
+        <enum value="7"    name="XR_LIP_EXPRESSION_MOUTH_LOWER_RIGHT_HTC"/>
+        <enum value="8"    name="XR_LIP_EXPRESSION_MOUTH_LOWER_LEFT_HTC"/>
+        <enum value="9"    name="XR_LIP_EXPRESSION_MOUTH_UPPER_OVERTURN_HTC"/>
+        <enum value="10"   name="XR_LIP_EXPRESSION_MOUTH_LOWER_OVERTURN_HTC"/>
+        <enum value="11"   name="XR_LIP_EXPRESSION_MOUTH_POUT_HTC"/>
+        <enum value="12"   name="XR_LIP_EXPRESSION_MOUTH_SMILE_RIGHT_HTC"/>
+        <enum value="13"   name="XR_LIP_EXPRESSION_MOUTH_SMILE_LEFT_HTC"/>
+        <enum value="14"   name="XR_LIP_EXPRESSION_MOUTH_SAD_RIGHT_HTC"/>
+        <enum value="15"   name="XR_LIP_EXPRESSION_MOUTH_SAD_LEFT_HTC"/>
+        <enum value="16"   name="XR_LIP_EXPRESSION_CHEEK_PUFF_RIGHT_HTC"/>
+        <enum value="17"   name="XR_LIP_EXPRESSION_CHEEK_PUFF_LEFT_HTC"/>
+        <enum value="18"   name="XR_LIP_EXPRESSION_CHEEK_SUCK_HTC"/>
+        <enum value="19"   name="XR_LIP_EXPRESSION_MOUTH_UPPER_UPRIGHT_HTC"/>
+        <enum value="20"   name="XR_LIP_EXPRESSION_MOUTH_UPPER_UPLEFT_HTC"/>
+        <enum value="21"   name="XR_LIP_EXPRESSION_MOUTH_LOWER_DOWNRIGHT_HTC"/>
+        <enum value="22"   name="XR_LIP_EXPRESSION_MOUTH_LOWER_DOWNLEFT_HTC"/>
+        <enum value="23"   name="XR_LIP_EXPRESSION_MOUTH_UPPER_INSIDE_HTC"/>
+        <enum value="24"   name="XR_LIP_EXPRESSION_MOUTH_LOWER_INSIDE_HTC"/>
+        <enum value="25"   name="XR_LIP_EXPRESSION_MOUTH_LOWER_OVERLAY_HTC"/>
+        <enum value="26"   name="XR_LIP_EXPRESSION_TONGUE_LONGSTEP1_HTC"/>
+        <enum value="27"   name="XR_LIP_EXPRESSION_TONGUE_LEFT_HTC"/>
+        <enum value="28"   name="XR_LIP_EXPRESSION_TONGUE_RIGHT_HTC"/>
+        <enum value="29"   name="XR_LIP_EXPRESSION_TONGUE_UP_HTC"/>
+        <enum value="30"   name="XR_LIP_EXPRESSION_TONGUE_DOWN_HTC"/>
+        <enum value="31"   name="XR_LIP_EXPRESSION_TONGUE_ROLL_HTC"/>
+        <enum value="32"   name="XR_LIP_EXPRESSION_TONGUE_LONGSTEP2_HTC"/>
+        <enum value="33"   name="XR_LIP_EXPRESSION_TONGUE_UPRIGHT_MORPH_HTC"/>
+        <enum value="34"   name="XR_LIP_EXPRESSION_TONGUE_UPLEFT_MORPH_HTC"/>
+        <enum value="35"   name="XR_LIP_EXPRESSION_TONGUE_DOWNRIGHT_MORPH_HTC"/>
+        <enum value="36"   name="XR_LIP_EXPRESSION_TONGUE_DOWNLEFT_MORPH_HTC"/>
+    </enums>
+
+    <!-- flags for XR_ALMALENCE_digital_lens_control -->
+    <enums name="XrDigitalLensControlFlagBitsALMALENCE" type="bitmask">
+        <enum bitpos="0" name="XR_DIGITAL_LENS_CONTROL_PROCESSING_DISABLE_BIT_ALMALENCE" comment="disables Digital Lens processing of render textures"/>
     </enums>
 
     <!-- SECTION: OpenXR command definitions -->
@@ -3345,6 +3569,41 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrHandTrackingMeshFB</type>* <name>mesh</name></param>
         </command>
 
+        <!-- XR_FB_render_model -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
+            <proto><type>XrResult</type> <name>xrEnumerateRenderModelPathsFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param optional="true"><type>uint32_t</type> <name>pathCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>pathCountOutput</name></param>
+            <param optional="true" len="pathCapacityInput"><type>XrRenderModelPathInfoFB</type>* <name>paths</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_RENDER_MODEL_UNAVAILABLE_FB" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_PATH_UNSUPPORTED,XR_ERROR_PATH_INVALID,XR_ERROR_CALL_ORDER_INVALID">
+            <proto><type>XrResult</type> <name>xrGetRenderModelPropertiesFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPath</type> <name>path</name></param>
+            <param><type>XrRenderModelPropertiesFB</type>* <name>properties</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_RENDER_MODEL_UNAVAILABLE_FB" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_RENDER_MODEL_KEY_INVALID_FB">
+            <proto><type>XrResult</type> <name>xrLoadRenderModelFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrRenderModelLoadInfoFB</type>* <name>info</name></param>
+            <param><type>XrRenderModelBufferFB</type>* <name>buffer</name></param>
+        </command>
+
+        <!-- XR_FB_keyboard_tracking -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrQuerySystemTrackedKeyboardFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrKeyboardTrackingQueryFB</type>* <name>queryInfo</name></param>
+            <param><type>XrKeyboardTrackingDescriptionFB</type>* <name>keyboard</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateKeyboardSpaceFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrKeyboardSpaceCreateInfoFB</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>keyboardSpace</name></param>
+        </command>
+
         <!-- commands for XR_VARJO_environment_depth_estimation -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrSetEnvironmentDepthEstimationVARJO</name></proto>
@@ -3478,6 +3737,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param>const <type>XrGeometryInstanceTransformFB</type>* <name>transformation</name></param>
         </command>
 
+        <!-- XR_FB_passthrough_keyboard_hands -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrPassthroughLayerSetKeyboardHandsIntensityFB</name></proto>
+            <param><type>XrPassthroughLayerFB</type> <name>layer</name></param>
+            <param>const <type>XrPassthroughKeyboardHandsIntensityFB</type>* <name>intensity</name></param>
+        </command>
+
         <!-- XR_MSFT_spatial_anchor_persistence -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
             <proto><type>XrResult</type> <name>xrCreateSpatialAnchorStoreConnectionMSFT</name></proto>
@@ -3514,6 +3780,23 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
             <proto><type>XrResult</type> <name>xrClearSpatialAnchorStoreMSFT</name></proto>
             <param><type>XrSpatialAnchorStoreConnectionMSFT</type> <name>spatialAnchorStore</name></param>
+        </command>
+
+        <!-- XR_HTC_facial_tracking -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateFacialTrackerHTC</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrFacialTrackerCreateInfoHTC</type>* <name>createInfo</name></param>
+            <param><type>XrFacialTrackerHTC</type>* <name>facialTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyFacialTrackerHTC</name></proto>
+            <param externsync="true_with_children"><type>XrFacialTrackerHTC</type> <name>facialTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_TIME_INVALID">
+            <proto><type>XrResult</type> <name>xrGetFacialExpressionsHTC</name></proto>
+            <param><type>XrFacialTrackerHTC</type> <name>facialTracker</name></param>
+            <param><type>XrFacialExpressionsHTC</type>* <name>facialExpressions</name></param>
         </command>
 
         <!-- XR_HTCX_vive_tracker_interaction -->
@@ -3559,6 +3842,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param>const <type>XrMarkerSpaceCreateInfoVARJO</type>* <name>createInfo</name></param>
             <param><type>XrSpace</type>* <name>space</name></param>
         </command>
+
+        <!-- commands for XR_ALMALENCE_digital_lens_control -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrSetDigitalLensControlALMALENCE</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrDigitalLensControlALMALENCE</type>* <name>digitalLensControl</name></param>
+        </command>
+
     </commands>
 
     <!-- SECTION: OpenXR API interface definitions -->
@@ -4224,7 +4515,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <extension name="XR_MSFT_hand_tracking_mesh" number="53"
             requires="XR_EXT_hand_tracking" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_MSFT_hand_tracking_mesh_SPEC_VERSION"/>
+            <enum value="4" name="XR_MSFT_hand_tracking_mesh_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_hand_tracking_mesh&quot;" name="XR_MSFT_HAND_TRACKING_MESH_EXTENSION_NAME"/>
 
             <command name="xrCreateHandMeshSpaceMSFT"/>
@@ -4786,17 +5077,36 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_HTC_extension_105" number="105" type="instance" supported="disabled">
+    <extension name="XR_HTC_facial_tracking" number="105" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_HTC_extension_105_SPEC_VERSION"/>
-            <enum value="&quot;XR_HTC_extension_105&quot;" name="XR_HTC_extension_105_EXTENSION_NAME"/>
+            <enum value="1"                                  name="XR_HTC_facial_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_facial_tracking&quot;" name="XR_HTC_FACIAL_TRACKING_EXTENSION_NAME"/>
+
+            <type name="XrSystemFacialTrackingPropertiesHTC"/>
+            <type name="XrFacialExpressionsHTC"/>
+            <type name="XrEyeExpressionHTC"/>
+            <type name="XrLipExpressionHTC"/>
+            <type name="XrFacialTrackerCreateInfoHTC"/>
+            <type name="XrFacialTrackingTypeHTC"/>
+            <type name="XR_FACIAL_EXPRESSION_EYE_COUNT_HTC"/>
+            <type name="XR_FACIAL_EXPRESSION_LIP_COUNT_HTC"/>
+
+            <enum offset="0" extends="XrObjectType"    name="XR_OBJECT_TYPE_FACIAL_TRACKER_HTC"             comment="XrFacialTrackerHTC"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_FACIAL_TRACKING_PROPERTIES_HTC"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_FACIAL_TRACKER_CREATE_INFO_HTC"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_FACIAL_EXPRESSIONS_HTC"/>
+
+            <command name="xrCreateFacialTrackerHTC"/>
+            <command name="xrDestroyFacialTrackerHTC"/>
+            <command name="xrGetFacialExpressionsHTC"/>
         </require>
     </extension>
 
-    <extension name="XR_HTC_extension_106" number="106" type="instance" supported="disabled">
+    <extension name="XR_HTC_vive_focus3_controller_interaction" number="106" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_HTC_extension_106_SPEC_VERSION"/>
-            <enum value="&quot;XR_HTC_extension_106&quot;" name="XR_HTC_extension_106_EXTENSION_NAME"/>
+            <enum value="1"                                                     name="XR_HTC_vive_focus3_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_vive_focus3_controller_interaction&quot;" name="XR_HTC_VIVE_FOCUS3_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -4866,14 +5176,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_hand_tracking_capsules" number="113" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="1"                                        name="XR_FB_hand_tracking_capsules_SPEC_VERSION"/>
+            <enum value="2"                                        name="XR_FB_hand_tracking_capsules_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_hand_tracking_capsules&quot;" name="XR_FB_HAND_TRACKING_CAPSULES_EXTENSION_NAME"/>
 
             <type name="XrHandCapsuleFB"/>
             <type name="XrHandTrackingCapsulesStateFB"/>
 
-            <enum value="2"                            name="XR_FB_HAND_TRACKING_CAPSULE_POINT_COUNT"/>
-            <enum value="19"                           name="XR_FB_HAND_TRACKING_CAPSULE_COUNT"/>
+            <enum value="2"                            name="XR_HAND_TRACKING_CAPSULE_POINT_COUNT_FB"/>
+            <enum value="19"                           name="XR_HAND_TRACKING_CAPSULE_COUNT_FB"/>
+
+            <enum name="XR_FB_HAND_TRACKING_CAPSULE_POINT_COUNT" alias="XR_HAND_TRACKING_CAPSULE_POINT_COUNT_FB" comment="Backward-compatibility alias containing typo."/>
+
+            <enum name="XR_FB_HAND_TRACKING_CAPSULE_COUNT"       alias="XR_HAND_TRACKING_CAPSULE_COUNT_FB"       comment="Backward-compatibility alias containing typo."/>
 
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_HAND_TRACKING_CAPSULES_STATE_FB"/>
         </require>
@@ -4919,10 +5233,24 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_117" number="117" type="instance" supported="disabled">
+    <extension name="XR_FB_keyboard_tracking" number="117" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_FB_extension_117_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_117&quot;" name="XR_FB_extension_117_EXTENSION_NAME"/>
+            <enum value="1"                                   name="XR_FB_keyboard_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_keyboard_tracking&quot;" name="XR_FB_KEYBOARD_TRACKING_EXTENSION_NAME"/>
+
+            <type name="XrSystemKeyboardTrackingPropertiesFB"/>
+            <type name="XrKeyboardTrackingDescriptionFB"/>
+            <type name="XrKeyboardSpaceCreateInfoFB"/>
+            <type name="XrKeyboardTrackingQueryFB"/>
+
+            <enum value="128"                          name="XR_MAX_KEYBOARD_TRACKING_NAME_SIZE_FB"/>
+
+            <enum offset="9" extends="XrStructureType" name="XR_TYPE_KEYBOARD_SPACE_CREATE_INFO_FB"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_KEYBOARD_TRACKING_QUERY_FB"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_SYSTEM_KEYBOARD_TRACKING_PROPERTIES_FB"/>
+
+            <command name="xrQuerySystemTrackedKeyboardFB"/>
+            <command name="xrCreateKeyboardSpaceFB"/>
         </require>
     </extension>
 
@@ -5005,10 +5333,32 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_120" number="120" type="instance" supported="disabled">
+    <extension name="XR_FB_render_model" number="120" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_FB_extension_120_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_120&quot;" name="XR_FB_extension_120_EXTENSION_NAME"/>
+            <enum value="1"                              name="XR_FB_render_model_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_render_model&quot;" name="XR_FB_RENDER_MODEL_EXTENSION_NAME"/>
+
+            <type name="XrRenderModelPathInfoFB"/>
+            <type name="XrRenderModelPropertiesFB"/>
+            <type name="XrRenderModelBufferFB"/>
+            <type name="XrRenderModelLoadInfoFB"/>
+            <type name="XrRenderModelKeyFB"/>
+            <type name="XrSystemRenderModelPropertiesFB"/>
+            <type name="XR_NULL_RENDER_MODEL_KEY_FB"/>
+
+            <command name="xrEnumerateRenderModelPathsFB"/>
+            <command name="xrGetRenderModelPropertiesFB"/>
+            <command name="xrLoadRenderModelFB"/>
+
+            <enum value="64"                                    name="XR_MAX_RENDER_MODEL_NAME_SIZE_FB"/>
+
+            <enum offset="0"          extends="XrStructureType" name="XR_TYPE_RENDER_MODEL_PATH_INFO_FB"/>
+            <enum offset="1"          extends="XrStructureType" name="XR_TYPE_RENDER_MODEL_PROPERTIES_FB"/>
+            <enum offset="2"          extends="XrStructureType" name="XR_TYPE_RENDER_MODEL_BUFFER_FB"/>
+            <enum offset="3"          extends="XrStructureType" name="XR_TYPE_RENDER_MODEL_LOAD_INFO_FB"/>
+            <enum offset="4"          extends="XrStructureType" name="XR_TYPE_SYSTEM_RENDER_MODEL_PROPERTIES_FB"/>
+            <enum offset="0"  dir="-" extends="XrResult"        name="XR_ERROR_RENDER_MODEL_KEY_INVALID_FB"      comment="The model key is invalid."/>
+            <enum offset="20"         extends="XrResult"        name="XR_RENDER_MODEL_UNAVAILABLE_FB"            comment="The model is unavailable."/>
         </require>
     </extension>
 
@@ -5617,10 +5967,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_ALMALENCE_digital_lens_control" number="197" type="instance" supported="disabled">
+    <extension name="XR_ALMALENCE_digital_lens_control" number="197" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                              name="XR_ALMALENCE_digital_lens_control_SPEC_VERSION"/>
-            <enum value="&quot;XR_ALMALENCE_digital_lens_control&quot;"  name="XR_ALMALENCE_DIGITAL_LENS_CONTROL_EXTENSION_NAME"/>
+            <enum value="1"                                             name="XR_ALMALENCE_digital_lens_control_SPEC_VERSION"/>
+            <enum value="&quot;XR_ALMALENCE_digital_lens_control&quot;" name="XR_ALMALENCE_DIGITAL_LENS_CONTROL_EXTENSION_NAME"/>
+
+            <command name="xrSetDigitalLensControlALMALENCE"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_DIGITAL_LENS_CONTROL_ALMALENCE"/>
         </require>
     </extension>
 
@@ -5666,10 +6020,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_204" number="204" type="instance" supported="disabled">
+    <extension name="XR_FB_passthrough_keyboard_hands" number="204" type="instance" supported="openxr" requires="XR_FB_passthrough">
         <require>
-            <enum value="1" name="XR_FB_extension_204_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_204&quot;" name="XR_FB_EXTENSION_204_EXTENSION_NAME"/>
+            <enum value="1"                                            name="XR_FB_passthrough_keyboard_hands_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_passthrough_keyboard_hands&quot;" name="XR_FB_PASSTHROUGH_KEYBOARD_HANDS_EXTENSION_NAME"/>
+
+            <enum offset="1" extends="XrPassthroughLayerPurposeFB"     name="XR_PASSTHROUGH_LAYER_PURPOSE_TRACKED_KEYBOARD_HANDS_FB" comment="Passthrough layer purpose for keyboard hands presence."/>
+
+            <enum offset="2" extends="XrStructureType"                 name="XR_TYPE_PASSTHROUGH_KEYBOARD_HANDS_INTENSITY_FB"/>
+
+            <type name="XrPassthroughKeyboardHandsIntensityFB"/>
+
+            <command name="xrPassthroughLayerSetKeyboardHandsIntensityFB"/>
         </require>
     </extension>
 
@@ -5691,6 +6053,673 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1" name="XR_FB_extension_207_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_207&quot;" name="XR_FB_EXTENSION_207_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_208" number="208" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_208_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_208&quot;" name="XR_FB_EXTENSION_208_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_209" number="209" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_209_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_209&quot;" name="XR_FB_EXTENSION_209_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_210" number="210" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_210_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_210&quot;" name="XR_FB_EXTENSION_210_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_211" number="211" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_211_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_211&quot;" name="XR_FB_EXTENSION_211_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_212" number="212" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_212_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_212&quot;" name="XR_FB_EXTENSION_212_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_213" number="213" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_213_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_213&quot;" name="XR_FB_EXTENSION_213_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_214" number="214" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_214_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_214&quot;" name="XR_FB_EXTENSION_214_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_215" number="215" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_215_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_215&quot;" name="XR_FB_EXTENSION_215_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_216" number="216" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_216_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_216&quot;" name="XR_FB_EXTENSION_216_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_217" number="217" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_217_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_217&quot;" name="XR_FB_EXTENSION_217_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_218" number="218" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_218_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_218&quot;" name="XR_FB_EXTENSION_218_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_219" number="219" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_219_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_219&quot;" name="XR_FB_EXTENSION_219_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_220" number="220" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_220_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_220&quot;" name="XR_FB_EXTENSION_220_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_221" number="221" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_221_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_221&quot;" name="XR_FB_EXTENSION_221_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_222" number="222" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_222_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_222&quot;" name="XR_FB_EXTENSION_222_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_223" number="223" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_223_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_223&quot;" name="XR_FB_EXTENSION_223_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_224" number="224" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_224_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_224&quot;" name="XR_FB_EXTENSION_224_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_225" number="225" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_225_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_225&quot;" name="XR_FB_EXTENSION_225_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_226" number="226" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_226_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_226&quot;" name="XR_FB_EXTENSION_226_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_227" number="227" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_227_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_227&quot;" name="XR_FB_EXTENSION_227_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_228" number="228" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_228_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_228&quot;" name="XR_FB_EXTENSION_228_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_229" number="229" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_229_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_229&quot;" name="XR_FB_EXTENSION_229_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_230" number="230" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_230_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_230&quot;" name="XR_FB_EXTENSION_230_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_231" number="231" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_231_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_231&quot;" name="XR_FB_EXTENSION_231_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_232" number="232" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_232_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_232&quot;" name="XR_FB_EXTENSION_232_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_233" number="233" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_233_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_233&quot;" name="XR_FB_EXTENSION_233_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_234" number="234" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_234_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_234&quot;" name="XR_FB_EXTENSION_234_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_235" number="235" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_235_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_235&quot;" name="XR_FB_EXTENSION_235_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_236" number="236" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_236_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_236&quot;" name="XR_FB_EXTENSION_236_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_237" number="237" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_237_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_237&quot;" name="XR_FB_EXTENSION_237_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_238" number="238" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_238_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_238&quot;" name="XR_FB_EXTENSION_238_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_239" number="239" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_239_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_239&quot;" name="XR_FB_EXTENSION_239_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_240" number="240" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_240_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_240&quot;" name="XR_FB_EXTENSION_240_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_241" number="241" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_241_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_241&quot;" name="XR_FB_EXTENSION_241_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_242" number="242" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_242_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_242&quot;" name="XR_FB_EXTENSION_242_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_243" number="243" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_243_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_243&quot;" name="XR_FB_EXTENSION_243_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_244" number="244" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_244_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_244&quot;" name="XR_FB_EXTENSION_244_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_245" number="245" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_245_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_245&quot;" name="XR_FB_EXTENSION_245_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_246" number="246" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_246_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_246&quot;" name="XR_FB_EXTENSION_246_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_247" number="247" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_247_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_247&quot;" name="XR_FB_EXTENSION_247_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_248" number="248" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_248_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_248&quot;" name="XR_FB_EXTENSION_248_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_249" number="249" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_249_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_249&quot;" name="XR_FB_EXTENSION_249_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_250" number="250" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_250_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_250&quot;" name="XR_FB_EXTENSION_250_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_251" number="251" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_251_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_251&quot;" name="XR_FB_EXTENSION_251_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_252" number="252" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_252_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_252&quot;" name="XR_FB_EXTENSION_252_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_253" number="253" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_253_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_253&quot;" name="XR_FB_EXTENSION_253_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_254" number="254" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_254_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_254&quot;" name="XR_FB_EXTENSION_254_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_255" number="255" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_255_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_255&quot;" name="XR_FB_EXTENSION_255_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_256" number="256" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_256_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_256&quot;" name="XR_FB_EXTENSION_256_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_257" number="257" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_257_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_257&quot;" name="XR_FB_EXTENSION_257_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_258" number="258" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_258_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_258&quot;" name="XR_FB_EXTENSION_258_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_259" number="259" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_259_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_259&quot;" name="XR_FB_EXTENSION_259_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_260" number="260" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_260_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_260&quot;" name="XR_FB_EXTENSION_260_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_261" number="261" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_261_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_261&quot;" name="XR_FB_EXTENSION_261_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_262" number="262" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_262_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_262&quot;" name="XR_FB_EXTENSION_262_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_263" number="263" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_263_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_263&quot;" name="XR_FB_EXTENSION_263_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_264" number="264" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_264_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_264&quot;" name="XR_FB_EXTENSION_264_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_265" number="265" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_265_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_265&quot;" name="XR_FB_EXTENSION_265_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_266" number="266" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_266_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_266&quot;" name="XR_FB_EXTENSION_266_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_267" number="267" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_267_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_267&quot;" name="XR_FB_EXTENSION_267_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_268" number="268" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_268_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_268&quot;" name="XR_FB_EXTENSION_268_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_269" number="269" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_269_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_269&quot;" name="XR_FB_EXTENSION_269_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_270" number="270" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_270_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_270&quot;" name="XR_FB_EXTENSION_270_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_271" number="271" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_271_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_271&quot;" name="XR_FB_EXTENSION_271_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_272" number="272" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_272_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_272&quot;" name="XR_FB_EXTENSION_272_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_273" number="273" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_273_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_273&quot;" name="XR_FB_EXTENSION_273_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_274" number="274" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_274_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_274&quot;" name="XR_FB_EXTENSION_274_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_275" number="275" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_275_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_275&quot;" name="XR_FB_EXTENSION_275_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_276" number="276" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_276_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_276&quot;" name="XR_FB_EXTENSION_276_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_277" number="277" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_277_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_277&quot;" name="XR_FB_EXTENSION_277_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_278" number="278" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_278_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_278&quot;" name="XR_FB_EXTENSION_278_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_279" number="279" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_279_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_279&quot;" name="XR_FB_EXTENSION_279_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_280" number="280" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_280_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_280&quot;" name="XR_FB_EXTENSION_280_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_281" number="281" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_281_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_281&quot;" name="XR_FB_EXTENSION_281_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_282" number="282" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_282_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_282&quot;" name="XR_FB_EXTENSION_282_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_283" number="283" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_283_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_283&quot;" name="XR_FB_EXTENSION_283_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_284" number="284" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_284_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_284&quot;" name="XR_FB_EXTENSION_284_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_285" number="285" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_285_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_285&quot;" name="XR_FB_EXTENSION_285_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_286" number="286" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_286_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_286&quot;" name="XR_FB_EXTENSION_286_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_287" number="287" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_287_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_287&quot;" name="XR_FB_EXTENSION_287_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_288" number="288" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_288_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_288&quot;" name="XR_FB_EXTENSION_288_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_289" number="289" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_289_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_289&quot;" name="XR_FB_EXTENSION_289_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_290" number="290" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_290_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_290&quot;" name="XR_FB_EXTENSION_290_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_291" number="291" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_291_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_291&quot;" name="XR_FB_EXTENSION_291_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_292" number="292" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_292_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_292&quot;" name="XR_FB_EXTENSION_292_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_293" number="293" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_293_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_293&quot;" name="XR_FB_EXTENSION_293_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_294" number="294" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_294_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_294&quot;" name="XR_FB_EXTENSION_294_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_295" number="295" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_295_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_295&quot;" name="XR_FB_EXTENSION_295_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_296" number="296" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_296_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_296&quot;" name="XR_FB_EXTENSION_296_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_297" number="297" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_297_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_297&quot;" name="XR_FB_EXTENSION_297_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_298" number="298" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_298_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_298&quot;" name="XR_FB_EXTENSION_298_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_FB_extension_299" number="299" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_FB_extension_299_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_extension_299&quot;" name="XR_FB_EXTENSION_299_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_uuid" number="300" type="instance" supported="openxr">
+        <require>
+            <enum value="1"                       name="XR_EXT_uuid_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_uuid&quot;" name="XR_EXT_UUID_EXTENSION_NAME"/>
+            <type name="XrUuidEXT"/>
+            <enum value="16" name="XR_UUID_SIZE_EXT"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_render_model" number="301" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_EXT_render_model_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_render_model&quot;" name="XR_EXT_RENDER_MODEL_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_controller_model" number="302" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                   name="XR_EXT_controller_model_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_controller_model&quot;" name="XR_EXT_CONTROLLER_MODEL_EXTENSION_NAME"/>
         </require>
     </extension>
 

@@ -175,7 +175,32 @@ namespace jni
             value_t values[sizeof...(TArgs)];
         };
 
+        /* specialization for empty array - no args. Avoids "empty array" warning. */
+        template <>
+        class ArgArray<>
+        {
+        public:
+            ArgArray() {
+                std::memset(this, 0, sizeof(ArgArray<>));
+            }
+
+            ~ArgArray() {
+            }
+
+            value_t values[1];
+        };
         long getArrayLength(jarray array);
+
+        /**
+         * @brief Used as a tag type for dispatching internally based on return type.
+         *
+         * @tparam T The type to wrap.
+         */
+        template<typename T>
+        struct ReturnTypeWrapper
+        {
+            using type = T;
+        };
     }
 
     /**
@@ -282,7 +307,7 @@ namespace jni
             \return The method's return value.
          */
         template <class TReturn>
-        TReturn call(method_t method) const { return callMethod<TReturn>(method, nullptr); }
+        TReturn call(method_t method) const { return callMethod(method, nullptr, internal::ReturnTypeWrapper<TReturn>{}); }
 
         /**
             Calls the method on this Object with the given name, and no arguments.
@@ -312,7 +337,7 @@ namespace jni
         template <class TReturn, class... TArgs>
         TReturn call(method_t method, const TArgs&... args) const {
             internal::ArgArray<TArgs...> transform(args...);
-            return callMethod<TReturn>(method, transform.values);
+            return callMethod(method, transform.values, internal::ReturnTypeWrapper<TReturn>{});
         }
 
         /**
@@ -342,7 +367,11 @@ namespace jni
             \return The field's value.
          */
         template <class TType>
-        TType get(field_t field) const;
+        TType get(field_t field) const {
+            // If you get a compile error here, then you've asked for a type
+            // we don't know how to get from JNI directly.
+            return getFieldValue(field, internal::ReturnTypeWrapper<TType>{});
+        }
 
         /**
             Gets a field value from this Object. The field must belong to the
@@ -410,7 +439,33 @@ namespace jni
         method_t getMethod(const char* name, const char* signature) const;
         method_t getMethod(const char* nameAndSignature) const;
         field_t getField(const char* name, const char* signature) const;
-        template <class TType> TType callMethod(method_t method, internal::value_t* values) const;
+
+        void callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<void> const&) const;
+        bool callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<bool> const&) const;
+        byte_t callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<byte_t> const&) const;
+        wchar_t callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<wchar_t> const&) const;
+        short callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<short> const&) const;
+        int callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<int> const&) const;
+        long long callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<long long> const&) const;
+        float callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<float> const&) const;
+        double callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<double> const&) const;
+        std::string callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<std::string> const&) const;
+        std::wstring callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<std::wstring> const&) const;
+        jni::Object callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<jni::Object> const&) const;
+
+
+        void getFieldValue(field_t field, internal::ReturnTypeWrapper<void> const&) const;
+        bool getFieldValue(field_t field, internal::ReturnTypeWrapper<bool> const&) const;
+        byte_t getFieldValue(field_t field, internal::ReturnTypeWrapper<byte_t> const&) const;
+        wchar_t getFieldValue(field_t field, internal::ReturnTypeWrapper<wchar_t> const&) const;
+        short getFieldValue(field_t field, internal::ReturnTypeWrapper<short> const&) const;
+        int getFieldValue(field_t field, internal::ReturnTypeWrapper<int> const&) const;
+        long long getFieldValue(field_t field, internal::ReturnTypeWrapper<long long> const&) const;
+        float getFieldValue(field_t field, internal::ReturnTypeWrapper<float> const&) const;
+        double getFieldValue(field_t field, internal::ReturnTypeWrapper<double> const&) const;
+        std::string getFieldValue(field_t field, internal::ReturnTypeWrapper<std::string> const&) const;
+        std::wstring getFieldValue(field_t field, internal::ReturnTypeWrapper<std::wstring> const&) const;
+        jni::Object getFieldValue(field_t field, internal::ReturnTypeWrapper<jni::Object> const&) const;
 
         // Instance Variables
         jobject _handle;
