@@ -19,7 +19,7 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
-## OpenXR SDK 1.0.21 (2022-01-10)
+## OpenXR SDK 1.0.22 (2022-01-12)
 
 This release features a number of new extensions, as well as some software
 updates and fixes, especially for Android. If you are using the bundled jsoncpp,
@@ -95,6 +95,11 @@ incorporate security improvements from upstream.
   - scripts: Populate `ext_name` in `HandleData` too, for use by language wrapper
     generation scripts.
     ([internal MR 2184](https://gitlab.khronos.org/openxr/openxr/merge_requests/2184))
+
+## OpenXR SDK 1.0.21 (2022-01-10)
+
+This release was withdrawn due to a typo noticed after initial publication.
+All changes are now listed under 1.0.22.
 
 ## OpenXR SDK 1.0.20 (2021-10-04)
 

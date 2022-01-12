@@ -26,7 +26,7 @@ jobs:
           presentationBackend: wayland
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr-sdk.202102
+    container: khronosgroup/docker-images:openxr-sdk.202110
     steps:
       # First build as debug
       - template: build_linux.yml
@@ -44,6 +44,8 @@ jobs:
 
   # This job computes the product of the config dimensions
   - job: generator
+    pool:
+      vmImage: "ubuntu-latest"
     steps:
       - task: PythonScript@0
         name: winmatrix
@@ -51,6 +53,7 @@ jobs:
           scriptPath: $(System.DefaultWorkingDirectory)/.azure-pipelines/shared/generate_windows_matrix_build.py
           # argument sets the variable name defined by python script
           arguments: winbuild
+          pythonInterpreter: /usr/bin/python3
 
   # Build the loader, API layers, and samples on Windows
   - job: windows_build
@@ -95,7 +98,9 @@ jobs:
   #         useVulkan: 'true'
 
   - job: combine_artifacts
-    dependsOn: windows_build
+    dependsOn:
+      - generator
+      - windows_build
     condition: ${{ eq(parameters.isSdkSourceRepo, true) }}
     displayName: "Organize artifacts"
     pool:

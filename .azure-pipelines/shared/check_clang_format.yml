@@ -6,7 +6,7 @@ jobs:
     displayName: "clang-format"
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr-sdk.202102
+    container: khronosgroup/docker-images:openxr-sdk.202110
     steps:
       - script: ./runClangFormat.sh
         displayName: Run clang-format

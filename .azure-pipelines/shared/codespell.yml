@@ -6,7 +6,7 @@ jobs:
     displayName: "codespell"
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr-sdk.202102
+    container: khronosgroup/docker-images:openxr-sdk.202110
     steps:
       - script: ./checkCodespell
         displayName: Run Codespell script
