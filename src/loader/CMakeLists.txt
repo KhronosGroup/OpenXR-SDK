@@ -167,11 +167,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         COMMAND ${CMAKE_COMMAND} -E create_symlink libopenxr_loader.so.${MAJOR}.${MINOR}.${PATCH}
                 libopenxr_loader.so.${MAJOR}.${MINOR}
     )
-
-    set(XR_API_VERSION "${MAJOR}.${MINOR}")
-    set(EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
-    configure_file(openxr.pc.in openxr.pc @ONLY)
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openxr.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 elseif(WIN32)
     if(MSVC)
         # WindowsStore (UWP) apps must be compiled with dynamic CRT linkage (default)
@@ -243,6 +238,13 @@ elseif(ANDROID)
         ${JNIPP_ROOT}
         ${JNIWRAPPER_ROOT}
     )
+endif()
+
+if(NOT MSVC)
+    set(XR_API_VERSION "${MAJOR}.${MINOR}")
+    set(EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
+    configure_file(openxr.pc.in openxr.pc @ONLY)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openxr.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()
 
 # Copy loader to conformance_cli binary folder if built as dynamic

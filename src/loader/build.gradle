@@ -107,7 +107,7 @@ android {
         versionCode = project.versionOpenXR.getVersionCode()
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=c++_shared",
+                arguments "-DANDROID_STL=c++_static",
                         "-DBUILD_API_LAYERS=OFF",
                         "-DBUILD_TESTS=OFF",
                         "-DBUILD_LOADER=ON",

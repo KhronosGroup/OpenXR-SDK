@@ -7,7 +7,7 @@ parameters:
     default: "Debug"
   - name: generator
     type: string
-    default: "Visual Studio 16 2019"
+    default: "Visual Studio 17 2022"
   - name: cmakeArgs
     type: string
     default: ""

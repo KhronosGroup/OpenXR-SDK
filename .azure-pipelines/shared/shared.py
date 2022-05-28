@@ -4,7 +4,7 @@
 import json
 import sys
 
-VS_VERSION = 'Visual Studio 16 2019'
+VS_VERSION = 'Visual Studio 17 2022'
 
 PLATFORMS = ('Win32', 'x64', 'ARM', 'ARM64')
 
