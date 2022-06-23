@@ -125,7 +125,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 23)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 24)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -2105,8 +2105,47 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member values="XR_TYPE_SPACE_CONTAINER_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                                         <name>next</name></member>
             <member optional="true"><type>uint32_t</type>                            <name>uuidCapacityInput</name></member>
-            <member><type>uint32_t</type>*                                           <name>uuidCountOutput</name></member>
+            <member optional="true"><type>uint32_t</type>                            <name>uuidCountOutput</name></member>
             <member optional="true" len="uuidCapacityInput"><type>XrUuidEXT</type>*  <name>uuids</name></member>
+        </type>
+
+        <!-- XR_FB_scene structs -->
+        <type category="struct" name="XrExtent3DfFB">
+            <member><type>float</type> <name>width</name></member>
+            <member><type>float</type> <name>height</name></member>
+            <member><type>float</type> <name>depth</name></member>
+        </type>
+        <type category="struct" name="XrOffset3DfFB">
+            <member><type>float</type> <name>x</name></member>
+            <member><type>float</type> <name>y</name></member>
+            <member><type>float</type> <name>z</name></member>
+        </type>
+        <type category="struct" name="XrRect3DfFB">
+            <member><type>XrOffset3DfFB</type> <name>offset</name></member>
+            <member><type>XrExtent3DfFB</type> <name>extent</name></member>
+        </type>
+        <type category="struct" name="XrSemanticLabelsFB">
+            <member values="XR_TYPE_SEMANTIC_LABELS_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                     <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                        <name>bufferCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                        <name>bufferCountOutput</name></member>
+            <member optional="true" len="bufferCapacityInput"><type>char</type>* <name>buffer</name></member>
+        </type>
+        <type category="struct" name="XrRoomLayoutFB">
+            <member values="XR_TYPE_ROOM_LAYOUT_FB"><type>XrStructureType</type>        <name>type</name></member>
+            <member>const <type>void</type>*                                            <name>next</name></member>
+            <member><type>XrUuidEXT</type>                                              <name>floorUuid</name></member>
+            <member><type>XrUuidEXT</type>                                              <name>ceilingUuid</name></member>
+            <member optional="true"><type>uint32_t</type>                               <name>wallUuidCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                               <name>wallUuidCountOutput</name></member>
+            <member optional="true" len="wallUuidCapacityInput"><type>XrUuidEXT</type>* <name>wallUuids</name></member>
+        </type>
+        <type category="struct" name="XrBoundary2DFB">
+            <member values="XR_TYPE_BOUNDARY_2D_FB"><type>XrStructureType</type>       <name>type</name></member>
+            <member>const <type>void</type>*                                           <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                              <name>vertexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                              <name>vertexCountOutput</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector2f</type>* <name>vertices</name></member>
         </type>
 
         <!-- XR_FB_keyboard_tracking structs -->
@@ -2925,6 +2964,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <enums name="XrSpaceComponentTypeFB" type="enum">
         <enum value="0"   name="XR_SPACE_COMPONENT_TYPE_LOCATABLE_FB"       comment="Enables tracking the 6 DOF pose of the slink:XrSpace with flink:xrLocateSpace."/>
         <enum value="1"   name="XR_SPACE_COMPONENT_TYPE_STORABLE_FB"        comment="Enables persistence operations: save and erase."/>
+        <enum value="3"   name="XR_SPACE_COMPONENT_TYPE_BOUNDED_2D_FB"      comment="Bounded 2D component."/>
+        <enum value="4"   name="XR_SPACE_COMPONENT_TYPE_BOUNDED_3D_FB"      comment="Bounded 3D component."/>
+        <enum value="5"   name="XR_SPACE_COMPONENT_TYPE_SEMANTIC_LABELS_FB" comment="Semantic labels component."/>
+        <enum value="6"   name="XR_SPACE_COMPONENT_TYPE_ROOM_LAYOUT_FB"     comment="Room layout component."/>
         <enum value="7"   name="XR_SPACE_COMPONENT_TYPE_SPACE_CONTAINER_FB" comment="Space container component."/>
     </enums>
 
@@ -4158,6 +4201,38 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>XrSpace</type> <name>space</name></param>
             <param><type>XrSpaceContainerFB</type>* <name>spaceContainerOutput</name></param>
+        </command>
+
+        <!-- XR_FB_scene -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetSpaceBoundingBox2DFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrSpace</type> <name>space</name></param>
+            <param><type>XrRect2Df</type>* <name>boundingBox2DOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetSpaceBoundingBox3DFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrSpace</type> <name>space</name></param>
+            <param><type>XrRect3DfFB</type>* <name>boundingBox3DOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetSpaceSemanticLabelsFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrSpace</type> <name>space</name></param>
+            <param><type>XrSemanticLabelsFB</type>* <name>semanticLabelsOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetSpaceBoundary2DFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrSpace</type> <name>space</name></param>
+            <param><type>XrBoundary2DFB</type>* <name>boundary2DOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrGetSpaceRoomLayoutFB</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrSpace</type> <name>space</name></param>
+            <param><type>XrRoomLayoutFB</type>* <name>roomLayoutOutput</name></param>
         </command>
 
         <!-- XR_FB_passthrough_keyboard_hands -->
@@ -6372,17 +6447,35 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_176" number="176" type="instance" supported="disabled">
+    <extension name="XR_FB_scene" number="176" type="instance" requires="XR_FB_spatial_entity" supported="openxr">
         <require>
-            <enum value="1" name="XR_FB_extension_176_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_176&quot;" name="XR_FB_extension_176_EXTENSION_NAME"/>
+            <enum value="1"                            name="XR_FB_scene_SPEC_VERSION"/>
+            <enum value="&quot;XR_FB_scene&quot;"      name="XR_FB_SCENE_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SEMANTIC_LABELS_FB"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_ROOM_LAYOUT_FB"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_BOUNDARY_2D_FB"/>
+
+            <type name="XrExtent3DfFB"/>
+            <type name="XrOffset3DfFB"/>
+            <type name="XrRect3DfFB"/>
+            <type name="XrSemanticLabelsFB"/>
+            <type name="XrRoomLayoutFB"/>
+            <type name="XrBoundary2DFB"/>
+
+            <command name="xrGetSpaceBoundingBox2DFB"/>
+            <command name="xrGetSpaceBoundingBox3DFB"/>
+            <command name="xrGetSpaceSemanticLabelsFB"/>
+            <command name="xrGetSpaceBoundary2DFB"/>
+            <command name="xrGetSpaceRoomLayoutFB"/>
+
         </require>
     </extension>
 
-    <extension name="XR_UNITY_hand_model_pose" number="177" type="instance" supported="disabled">
+    <extension name="XR_EXT_palm_pose" number="177" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                    name="XR_UNITY_hand_model_pose_SPEC_VERSION"/>
-            <enum value="&quot;XR_UNITY_hand_model_pose&quot;" name="XR_UNITY_HAND_MODEL_POSE_EXTENSION_NAME"/>
+            <enum value="2"                            name="XR_EXT_palm_pose_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_palm_pose&quot;" name="XR_EXT_PALM_POSE_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -6546,7 +6639,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_spatial_entity_container" number="200" type="instance" requires="XR_FB_spatial_entity" supported="openxr">
         <require>
-            <enum value="1"                                          name="XR_FB_spatial_entity_container_SPEC_VERSION"/>
+            <enum value="2"                                          name="XR_FB_spatial_entity_container_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_spatial_entity_container&quot;" name="XR_FB_SPATIAL_ENTITY_CONTAINER_EXTENSION_NAME"/>
 
             <enum offset="0" extends="XrStructureType"               name="XR_TYPE_SPACE_CONTAINER_FB"/>

@@ -19,6 +19,35 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.24 (2022-06-23)
+
+- Registry
+  - Add new `XR_EXT_palm_pose` multi-vendor extension.
+    ([internal MR 2112](https://gitlab.khronos.org/openxr/openxr/merge_requests/2112))
+  - Add new `XR_FB_scene` vendor extension.
+    ([internal MR 2237](https://gitlab.khronos.org/openxr/openxr/merge_requests/2237))
+  - Fix structure definition in `XR_FB_spatial_entity_container`.
+    ([internal MR 2278](https://gitlab.khronos.org/openxr/openxr/merge_requests/2278))
+  - scripts: Teach xr_conventions that 2D, 3D, etc. are words for the purposes of
+    structure type enum generation.
+    ([internal MR 2237](https://gitlab.khronos.org/openxr/openxr/merge_requests/2237))
+- SDK
+  - Loader: Fix filename and native lib dir sequence for log
+    ([OpenXR-SDK-Source PR 311](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/311))
+  - Loader: Fix loader building with Gradle and add CI checking for loader building
+    with Gradle
+    ([OpenXR-SDK-Source PR 312](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/312))
+  - hello_xr: Pick background clear color based on the selected environment blend
+    mode.
+    ([internal MR 2275](https://gitlab.khronos.org/openxr/openxr/merge_requests/2275))
+  - hello_xr: Defer Vulkan CPU sync until the next frame begins.
+    ([OpenXR-SDK-Source PR 277](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/277))
+  - hello_xr: Fix shader compile on Mali driver
+    ([OpenXR-SDK-Source PR 310](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/310))
+  - scripts: Delegate generating structure types to the conventions object as done
+    elsewhere in the repo.
+    ([internal MR 2237](https://gitlab.khronos.org/openxr/openxr/merge_requests/2237))
+
 ## OpenXR SDK 1.0.23 (2022-05-27)
 
 This release primarily features a large number of new vendor and multi-vendor

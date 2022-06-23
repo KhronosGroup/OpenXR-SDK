@@ -45,6 +45,7 @@ local.properties
 
 # Don't ignore these things
 !.*.license
+!.appveyor.yml
 !.azure-pipelines/
 !.azure-pipelines/nuget/NugetTemplate/build
 !.clang-format

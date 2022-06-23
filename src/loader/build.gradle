@@ -40,6 +40,7 @@ def registry = "${project.repoRoot}/specification/registry/xr.xml"
 // Python is used to generate header files
 python {
     pip "jinja2:2.10.3"
+    pip "MarkupSafe:2.0.1"
     minPythonVersion = "3.4"
 
     environment = ["PYTHONPATH": scriptDir]
