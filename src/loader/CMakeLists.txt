@@ -128,7 +128,8 @@ if(ANDROID)
     target_link_libraries(
         openxr_loader
         PRIVATE
-        ${ANDROID_LOG_LIBRARY})
+        ${ANDROID_LOG_LIBRARY}
+        ${ANDROID_LIBRARY})
 endif()
 
 target_compile_definitions(openxr_loader PRIVATE API_NAME="OpenXR")

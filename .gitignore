@@ -57,6 +57,7 @@ local.properties
 !.gitattributes
 !.github
 !.gitignore
+!.gitlab
 !.gitlab-ci.yml
 !.mailmap
 !.markdownlint.yaml

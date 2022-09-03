@@ -19,6 +19,92 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.25 (2022-09-02)
+
+This release contains a few specification clarifications and consistency
+improvements, as well as some new vendor extensions. The OpenXR loader for
+Android now supports API layers packaged in the application APK, which is
+important for running the conformance tests, and which may also be used for
+running with the validation layer enabled during application development, for
+example. The loader design doc has been updated accordingly. The spec generation
+toolchain scripts have been synchronized with Vulkan. Hello_XR now models the
+recommended approach for selecting an environment blend mode, among other fixes.
+
+- Registry
+  - Add new `XR_ML_ml2_controller_interaction` vendor extension.
+    ([internal MR 2344](https://gitlab.khronos.org/openxr/openxr/merge_requests/2344))
+  - Clarification: Note that all specialized swapchain image structures are
+    "returnedonly", which removes some unneeded generated implicit valid usage.
+    ([internal MR 2303](https://gitlab.khronos.org/openxr/openxr/merge_requests/2303))
+  - Clarification: Note that all event structs are "returnedonly", which removes
+    some unneeded generated implicit valid usage.
+    ([internal MR 2305](https://gitlab.khronos.org/openxr/openxr/merge_requests/2305))
+  - Register author ID for Oppo.
+    ([OpenXR-Docs PR 129](https://github.com/KhronosGroup/OpenXR-Docs/pull/129))
+  - Register author ID for Fred Emmott.
+    ([OpenXR-Docs PR 131](https://github.com/KhronosGroup/OpenXR-Docs/pull/131))
+  - Register author ID for Acer.
+    ([OpenXR-Docs PR 132](https://github.com/KhronosGroup/OpenXR-Docs/pull/132))
+  - Reserve extension numbers for anticipated cross-vendor and Khronos extensions.
+    ([internal MR 2337](https://gitlab.khronos.org/openxr/openxr/merge_requests/2337),
+    [internal MR 2338](https://gitlab.khronos.org/openxr/openxr/merge_requests/2338),
+    [internal MR 2389](https://gitlab.khronos.org/openxr/openxr/merge_requests/2389))
+  - Reserve a vendor extension for Huawei.
+    ([internal MR 2356](https://gitlab.khronos.org/openxr/openxr/merge_requests/2356))
+  - Reserve vendor extensions for MNDX.
+    ([OpenXR-Docs PR 133](https://github.com/KhronosGroup/OpenXR-Docs/pull/133))
+  - Update `XR_MSFT_scene_understanding` and
+    `XR_MSFT_scene_understanding_serialization` vendor extensions to list error
+    codes that may be returned by functions.
+    ([internal MR 2316](https://gitlab.khronos.org/openxr/openxr/merge_requests/2316))
+  - `XR_FB_color_space`: Mark `XrSystemColorSpacePropertiesFB` as "returned-only"
+    for consistency and to correct the implicit valid usage.
+    ([internal MR 2304](https://gitlab.khronos.org/openxr/openxr/merge_requests/2304))
+  - `XR_FB_display_refresh_rate`: Mark `XrEventDataDisplayRefreshRateChangedFB` as
+    "returned only" for consistency.
+    ([internal MR 2308](https://gitlab.khronos.org/openxr/openxr/merge_requests/2308))
+  - `XR_FB_hand_tracking_mesh`: Fix two-call-idiom markup for
+    `XrHandTrackingMeshFB`, affecting implicit valid usage, and increment the
+    revision.
+    ([internal MR 2311](https://gitlab.khronos.org/openxr/openxr/merge_requests/2311))
+  - `XR_FB_passthrough`: Add `XrSystemPassthroughProperties2FB` and
+    `XR_PASSTHROUGH_LAYER_DEPTH_BIT_FB`, update spec version to 3.
+    ([internal MR 2333](https://gitlab.khronos.org/openxr/openxr/merge_requests/2333))
+  - `XR_FB_render_model`: Mark `XrRenderModelCapabilitiesRequestFB` as "returned-
+    only" for consistency and to correct the implicit valid usage.
+    ([internal MR 2309](https://gitlab.khronos.org/openxr/openxr/merge_requests/2309))
+- SDK
+  - Loader design doc: Correct a wrong description of extension implementation
+    chosen by the loader when duplicates.
+    ([internal MR 2324](https://gitlab.khronos.org/openxr/openxr/merge_requests/2324),
+    [internal issue 1731](https://gitlab.khronos.org/openxr/openxr/issues/1731))
+  - hello_xr: Model the recommended behavior of choosing first blend mode
+    enumerated by xrEnumerateEnvironmentBlendModes that is supported by the app.
+    ([internal MR 2352](https://gitlab.khronos.org/openxr/openxr/merge_requests/2352))
+  - hello_xr: Fix exit on Android.
+    ([internal MR 2403](https://gitlab.khronos.org/openxr/openxr/merge_requests/2403))
+  - loader: Add Android support for API Layers bundled in the application APK.
+    ([internal MR 2350](https://gitlab.khronos.org/openxr/openxr/merge_requests/2350))
+  - loader: Move validation checks before initialization to avoid potential nullptr
+    dereference
+    ([internal MR 2365](https://gitlab.khronos.org/openxr/openxr/merge_requests/2365))
+  - loader: On Android, make sure we always build with the same C++ standard
+    library (static) whether using shell script or gradle.
+    ([internal MR 2366](https://gitlab.khronos.org/openxr/openxr/merge_requests/2366))
+  - loader: add -DXR_OS_APPLE define on macOS (fixes compilation on macOS)
+    ([OpenXR-SDK-Source PR 323](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/323))
+  - scripts: Synchronize scripts with Vulkan, and move all generated files into a
+    single target directory.
+    ([internal MR 2335](https://gitlab.khronos.org/openxr/openxr/merge_requests/2335),
+    [internal issue 1693](https://gitlab.khronos.org/openxr/openxr/issues/1693),
+    [internal MR 2393](https://gitlab.khronos.org/openxr/openxr/merge_requests/2393),
+    [internal MR 2400](https://gitlab.khronos.org/openxr/openxr/merge_requests/2400))
+  - scripts: Remove spurious warning from codegen script.
+    ([internal MR 2341](https://gitlab.khronos.org/openxr/openxr/merge_requests/2341))
+  - validation layer: Fix output to `XR_EXT_debug_utils` when no labels/names have
+    been defined.
+    ([internal MR 2375](https://gitlab.khronos.org/openxr/openxr/merge_requests/2375))
+
 ## OpenXR SDK 1.0.24 (2022-06-23)
 
 - Registry

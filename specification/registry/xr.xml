@@ -27,6 +27,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- SECTION: OpenXR vendor/author tags for extensions and layers -->
     <tags>
         <!--  Sorted alphabetically by tag name -->
+        <tag name="ACER"       author="Acer"                        contact="OC Lin @aceroc"/>
         <tag name="ALMALENCE"  author="Almalence"                   contact="Ivan Chupakhin @ivan.chupakhin, Dmitry Shmunk @dmitry.shmunk"/>
         <tag name="ARM"        author="Arm Limited"                 contact="Andreas Loeve Selvik @selvik, Sam Martin @sammartin"/>
         <tag name="COLLABORA"  author="Collabora"                   contact="Ryan Pavlik @rpavlik"/>
@@ -34,10 +35,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="EXT"        author="Multivendor"                 contact="Ryan Pavlik @rpavlik"/>
         <tag name="EXTX"       author="Multivendor experimental"    contact="Brad Grantham @bradgrantham-lunarg"/>
         <tag name="FB"         author="Facebook"                    contact="Cass Everitt @casseveritt, Jonathan Wright @Nelno"/>
+        <tag name="FREDEMMOTT" author="Frederick Emmott"            contact="Frederick Emmott @fredemmott"/>
         <tag name="GOOGLE"     author="Google"                      contact="Kaye Mason @chaleur"/>
         <tag name="HTC"        author="HTC"                         contact="Chris Kuo @ggkuo, Kyle Chen @kylechen76"/>
         <tag name="HTCX"       author="HTC"                         contact="Chris Kuo @ggkuo, Kyle Chen @kylechen76"/>
-        <tag name="HUAWEI"     author="Huawei"                      contact="Yihong Huang @rachelhuang"/>
+        <tag name="HUAWEI"     author="Huawei"                      contact="Yihong Huang @rachelhuang, Li jingya @yzljy"/>
         <tag name="INTEL"      author="Intel"                       contact="Javier Martinez @javier"/>
         <tag name="KHR"        author="Khronos"                     contact="Brent Insko @insko"/>
         <tag name="LUNARG"     author="LunarG"                      contact="Brad Grantham @bradgrantham-lunarg"/>
@@ -49,6 +51,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="MSFT"       author="Microsoft"                   contact="Alex Turner @alexturn, Yin Li @yl_msft, Bryce Hutchings @brycehutchings, Lachlan Ford @laford_msft, Minmin Gong @gongminmin "/>
         <tag name="NV"         author="NVIDIA Corporation"          contact="Satish Salian @ssalian, Robert Menzel"/>
         <tag name="OCULUS"     author="Oculus"                      contact="Cass Everitt @casseveritt, Jonathan Wright @Nelno"/>
+        <tag name="OPPO"       author="OPPO"                        contact="Buyi Xu @fantastxu, Haomiao Jiang @hjiang36"/>
         <tag name="PLUTO"      author="Pluto VR"                    contact="Jared Cheshier @Jared, Sophia Baldonado @sophia"/>
         <tag name="QCOM"       author="Qualcomm Technologies"       contact="Armelle @alaine_qcom, Martin Renschler @martinr"/>
         <tag name="STARBREEZE" author="Starbreeze"                  contact="David Srour @dsrour"/>
@@ -125,7 +128,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 24)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 25)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -298,6 +301,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_FB_passthrough -->
         <type bitvalues="XrPassthroughFlagBitsFB"             category="bitmask">typedef <type>XrFlags64</type> <name>XrPassthroughFlagsFB</name>;</type>
         <type bitvalues="XrPassthroughStateChangedFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrPassthroughStateChangedFlagsFB</name>;</type>
+        <type bitvalues="XrPassthroughCapabilityFlagBitsFB"   category="bitmask">typedef <type>XrFlags64</type> <name>XrPassthroughCapabilityFlagsFB</name>;</type>
 
         <!-- Bitmask types for XR_FB_hand_tracking_aim -->
         <type bitvalues="XrHandTrackingAimFlagBitsFB" category="bitmask">typedef <type>XrFlags64</type> <name>XrHandTrackingAimFlagsFB</name>;</type>
@@ -417,6 +421,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrPassthroughFlagBitsFB" category="enum"/>
         <type name="XrPassthroughLayerPurposeFB" category="enum"/>
         <type name="XrPassthroughStateChangedFlagBitsFB" category="enum"/>
+        <type name="XrPassthroughCapabilityFlagBitsFB" category="enum"/>
 
         <!-- flag bits for XR_FB_space_warp -->
         <type name="XrCompositionLayerSpaceWarpInfoFlagBitsFB" category="enum"/>
@@ -649,7 +654,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="struct" name="XrSwapchainCreateInfo">
             <member values="XR_TYPE_SWAPCHAIN_CREATE_INFO"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*     <name>next</name></member>
-            <member optional="true"><type>XrSwapchainCreateFlags</type>        <name>createFlags</name></member>
+            <member optional="true"><type>XrSwapchainCreateFlags</type>       <name>createFlags</name></member>
             <member optional="true"><type>XrSwapchainUsageFlags</type>        <name>usageFlags</name></member>
             <member><type>int64_t</type>        <name>format</name></member>
             <member><type>uint32_t</type>       <name>sampleCount</name></member>
@@ -659,47 +664,47 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>uint32_t</type>       <name>arraySize</name></member>
             <member><type>uint32_t</type>       <name>mipCount</name></member>
         </type>
-        <type category="struct" name="XrSwapchainImageBaseHeader">
+        <type category="struct" name="XrSwapchainImageBaseHeader" returnedonly="true">
             <member><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*           <name>next</name></member>
         </type>
-        <type category="struct" name="XrSwapchainImageOpenGLKHR" parentstruct="XrSwapchainImageBaseHeader">
+        <type category="struct" name="XrSwapchainImageOpenGLKHR" parentstruct="XrSwapchainImageBaseHeader" returnedonly="true">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                      <name>next</name></member>
             <member><type>uint32_t</type>                   <name>image</name></member>
         </type>
-        <type category="struct" name="XrSwapchainImageOpenGLESKHR" parentstruct="XrSwapchainImageBaseHeader">
+        <type category="struct" name="XrSwapchainImageOpenGLESKHR" parentstruct="XrSwapchainImageBaseHeader" returnedonly="true">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                          <name>next</name></member>
             <member><type>uint32_t</type>                       <name>image</name></member>
         </type>
-        <type category="struct" name="XrSwapchainImageVulkanKHR" parentstruct="XrSwapchainImageBaseHeader">
+        <type category="struct" name="XrSwapchainImageVulkanKHR" parentstruct="XrSwapchainImageBaseHeader" returnedonly="true">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                      <name>next</name></member>
             <member><type>VkImage</type>                    <name>image</name></member>
         </type>
-        <type category="struct" name="XrSwapchainImageD3D11KHR" parentstruct="XrSwapchainImageBaseHeader">
+        <type category="struct" name="XrSwapchainImageD3D11KHR" parentstruct="XrSwapchainImageBaseHeader" returnedonly="true">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR"> <type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                      <name>next</name></member>
             <member><type>ID3D11Texture2D</type>*           <name>texture</name></member>
         </type>
-        <type category="struct" name="XrSwapchainImageD3D12KHR" parentstruct="XrSwapchainImageBaseHeader">
+        <type category="struct" name="XrSwapchainImageD3D12KHR" parentstruct="XrSwapchainImageBaseHeader" returnedonly="true">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR"> <type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                      <name>next</name></member>
             <member><type>ID3D12Resource</type>*            <name>texture</name></member>
         </type>
         <type category="struct" name="XrSwapchainImageAcquireInfo">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*        <name>next</name></member>           <!-- Pointer to next structure -->
+            <member>const <type>void</type>*        <name>next</name></member>
         </type>
         <type category="struct" name="XrSwapchainImageWaitInfo">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*        <name>next</name></member>           <!-- Pointer to next structure -->
+            <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrDuration</type>         <name>timeout</name></member>
         </type>
         <type category="struct" name="XrSwapchainImageReleaseInfo">
             <member values="XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*        <name>next</name></member>           <!-- Pointer to next structure -->
+            <member>const <type>void</type>*        <name>next</name></member>
         </type>
         <type category="struct" name="XrReferenceSpaceCreateInfo">
             <member values="XR_TYPE_REFERENCE_SPACE_CREATE_INFO"><type>XrStructureType</type> <name>type</name></member>
@@ -875,7 +880,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member optional="true"><type>float</type>       <name>frequency</name></member>
             <member><type>float</type>                       <name>amplitude</name></member>
         </type>
-        <type category="struct" name="XrEventDataBaseHeader"> <!-- top-level, parentstruct="XrBaseOutStructure" causes validation failures -->
+        <type category="struct" name="XrEventDataBaseHeader" returnedonly="true"> <!-- top-level, parentstruct="XrBaseOutStructure" causes validation failures -->
             <member><type>XrStructureType</type>             <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
         </type>
@@ -884,24 +889,24 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>uint8_t</type>                     <name>varying</name>[4000]</member>
         </type>
-        <type category="struct" name="XrEventDataEventsLost" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataEventsLost" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_EVENTS_LOST"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>uint32_t</type>                    <name>lostEventCount</name></member>
         </type>
-        <type category="struct" name="XrEventDataInstanceLossPending" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataInstanceLossPending" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>XrTime</type>                      <name>lossTime</name></member>
         </type>
-        <type category="struct" name="XrEventDataSessionStateChanged" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataSessionStateChanged" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED"> <type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>XrSession</type>                   <name>session</name></member>
             <member><type>XrSessionState</type>              <name>state</name></member>
             <member><type>XrTime</type>                      <name>time</name></member>
         </type>
-        <type category="struct" name="XrEventDataReferenceSpaceChangePending" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataReferenceSpaceChangePending" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>XrSession</type>                   <name>session</name></member>
@@ -918,7 +923,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrPerfSettingsNotificationLevelEXT</type>   <name>fromLevel</name></member>
             <member><type>XrPerfSettingsNotificationLevelEXT</type>   <name>toLevel</name></member>
         </type>
-        <type category="struct" name="XrEventDataVisibilityMaskChangedKHR" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataVisibilityMaskChangedKHR" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>XrSession</type>                   <name>session</name></member>
@@ -1030,7 +1035,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrInputSourceLocalizedNameFlags</type> <name>whichComponents</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataInteractionProfileChanged" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataInteractionProfileChanged" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>XrSession</type>                   <name>session</name></member>
@@ -1191,7 +1196,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
 
         <!-- XR_FB_display_refresh_rate structs -->
-        <type category="struct" name="XrEventDataDisplayRefreshRateChangedFB" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataDisplayRefreshRateChangedFB" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                                                                     <name>next</name></member>
             <member><type>float</type>                                                                           <name>fromDisplayRefreshRate</name></member>
@@ -1268,7 +1273,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
 
         <!-- types for XR_EXT_eye_gaze_interaction -->
-        <type category="struct" name="XrSystemEyeGazeInteractionPropertiesEXT" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemEyeGazeInteractionPropertiesEXT" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*    <name>next</name></member>
             <member><type>XrBool32</type> <name>supportsEyeGazeInteraction</name></member>
@@ -1354,14 +1359,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrHandJointEXT" category="enum"/>
         <type name="XrHandJointSetEXT" category="enum"/>
 
-        <type category="struct" name="XrSystemHandTrackingPropertiesEXT" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemHandTrackingPropertiesEXT" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
             <member><type>XrBool32</type> <name>supportsHandTracking</name></member>
         </type>
         <type category="struct" name="XrHandTrackerCreateInfoEXT">
             <member values="XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>* <name>next</name></member> <!-- Pointer to next structure -->
+            <member>const <type>void</type>* <name>next</name></member>
             <member><type>XrHandEXT</type> <name>hand</name></member>
             <member><type>XrHandJointSetEXT</type> <name>handJointSet</name></member>
         </type>
@@ -1442,7 +1447,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrVector3f</type> <name>position</name></member>
             <member><type>XrVector3f</type> <name>normal</name></member>
         </type>
-        <type category="struct" name="XrSystemHandTrackingMeshPropertiesMSFT" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemHandTrackingMeshPropertiesMSFT" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_HAND_TRACKING_MESH_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
             <member><type>XrBool32</type> <name>supportsHandTrackingMesh</name></member>
@@ -1451,7 +1456,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
         <type category="struct" name="XrHandPoseTypeInfoMSFT" structextends="XrHandTrackerCreateInfoEXT">
             <member values="XR_TYPE_HAND_POSE_TYPE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>* <name>next</name></member> <!-- Pointer to next structure -->
+            <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrHandPoseTypeMSFT</type> <name>handPoseType</name></member>
         </type>
 
@@ -1825,7 +1830,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- XR_FB_color_space structs -->
         <type name="XrColorSpaceFB" category="enum"/>
-        <type category="struct" name="XrSystemColorSpacePropertiesFB" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemColorSpacePropertiesFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
             <member><type>XrColorSpaceFB</type> <name>colorSpace</name></member>
@@ -1921,25 +1926,25 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>int16_t</type>          <name>w</name></member>
         </type>
         <type category="struct" name="XrHandTrackingMeshFB">
-            <member values="XR_TYPE_HAND_TRACKING_MESH_FB"><type>XrStructureType</type> <name>type</name></member>
-            <member><type>void</type>*                                    <name>next</name></member>
-            <member><type>uint32_t</type>                                 <name>jointCapacityInput</name></member>
-            <member><type>uint32_t</type>                                 <name>jointCountOutput</name></member>
-            <member len="jointCapacityInput"><type>XrPosef</type>*        <name>jointBindPoses</name></member>
-            <member len="jointCapacityInput"><type>float</type>*          <name>jointRadii</name></member>
-            <member len="jointCapacityInput"><type>XrHandJointEXT</type>* <name>jointParents</name></member>
-            <member><type>uint32_t</type>                                 <name>vertexCapacityInput</name></member>
-            <member><type>uint32_t</type>                                 <name>vertexCountOutput</name></member>
-            <member len="vertexCapacityInput"><type>XrVector3f</type>*    <name>vertexPositions</name></member>
-            <member len="vertexCapacityInput"><type>XrVector3f</type>*    <name>vertexNormals</name></member>
-            <member len="vertexCapacityInput"><type>XrVector2f</type>*    <name>vertexUVs</name></member>
-            <member len="vertexCapacityInput"><type>XrVector4sFB</type>*  <name>vertexBlendIndices</name></member>
-            <member len="vertexCapacityInput"><type>XrVector4f</type>*    <name>vertexBlendWeights</name></member>
-            <member><type>uint32_t</type>                                 <name>indexCapacityInput</name></member>
-            <member><type>uint32_t</type>                                 <name>indexCountOutput</name></member>
-            <member len="indexCapacityInput"><type>int16_t</type>*        <name>indices</name></member>
+            <member values="XR_TYPE_HAND_TRACKING_MESH_FB"><type>XrStructureType</type>   <name>type</name></member>
+            <member><type>void</type>*                                                    <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>jointCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>jointCountOutput</name></member>
+            <member optional="true" len="jointCapacityInput"><type>XrPosef</type>*        <name>jointBindPoses</name></member>
+            <member optional="true" len="jointCapacityInput"><type>float</type>*          <name>jointRadii</name></member>
+            <member optional="true" len="jointCapacityInput"><type>XrHandJointEXT</type>* <name>jointParents</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>vertexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>vertexCountOutput</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector3f</type>*    <name>vertexPositions</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector3f</type>*    <name>vertexNormals</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector2f</type>*    <name>vertexUVs</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector4sFB</type>*  <name>vertexBlendIndices</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector4f</type>*    <name>vertexBlendWeights</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>indexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>indexCountOutput</name></member>
+            <member optional="true" len="indexCapacityInput"><type>int16_t</type>*        <name>indices</name></member>
         </type>
-        <type category="struct" name="XrHandTrackingScaleFB" structextends="XrHandJointLocationsEXT">
+        <type category="struct" name="XrHandTrackingScaleFB" returnedonly="true" structextends="XrHandJointLocationsEXT">
             <member values="XR_TYPE_HAND_TRACKING_SCALE_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
             <member><type>float</type> <name>sensorOutput</name></member>
@@ -1999,12 +2004,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>void</type>*                                                      <name>next</name></member>
             <member><type>XrRenderModelKeyFB</type>                                         <name>modelKey</name></member>
         </type>
-        <type category="struct" name="XrSystemRenderModelPropertiesFB" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemRenderModelPropertiesFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_RENDER_MODEL_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                                                         <name>next</name></member>
             <member><type>XrBool32</type>                                                      <name>supportsRenderModelLoading</name></member>
         </type>
-        <type category="struct" name="XrRenderModelCapabilitiesRequestFB" structextends="XrSystemProperties">
+        <type category="struct" name="XrRenderModelCapabilitiesRequestFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_RENDER_MODEL_CAPABILITIES_REQUEST_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                                                         <name>next</name></member>
             <member><type>XrRenderModelFlagsFB</type>                                          <name>flags</name></member>
@@ -2149,7 +2154,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
 
         <!-- XR_FB_keyboard_tracking structs -->
-        <type category="struct" name="XrSystemKeyboardTrackingPropertiesFB" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemKeyboardTrackingPropertiesFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_KEYBOARD_TRACKING_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
             <member><type>XrBool32</type> <name>supportsKeyboardTracking</name></member>
@@ -2192,7 +2197,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrBool32</type>       <name>foveatedRenderingActive</name></member>
         </type>
 
-        <type category="struct" name="XrSystemFoveatedRenderingPropertiesVARJO" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemFoveatedRenderingPropertiesVARJO" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*          <name>next</name></member>
             <member><type>XrBool32</type>       <name>supportsFoveatedRendering</name></member>
@@ -2226,10 +2231,15 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
 
         <!-- XR_FB_passthrough -->
-        <type category="struct" name="XrSystemPassthroughPropertiesFB" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemPassthroughPropertiesFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>XrBool32</type>    <name>supportsPassthrough</name></member>
+        </type>
+        <type category="struct" name="XrSystemPassthroughProperties2FB" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES2_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                       <name>next</name></member>
+            <member><type>XrPassthroughCapabilityFlagsFB</type>    <name>capabilities</name></member>
         </type>
         <type category="struct" name="XrPassthroughCreateInfoFB">
             <member values="XR_TYPE_PASSTHROUGH_CREATE_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
@@ -2335,7 +2345,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*         <name>next</name></member>
             <member><type>XrFacialTrackingTypeHTC</type> <name>facialTrackingType</name></member>
         </type>
-        <type category="struct" name="XrSystemFacialTrackingPropertiesHTC" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemFacialTrackingPropertiesHTC" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_FACIAL_TRACKING_PROPERTIES_HTC"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*    <name>next</name></member>
             <member><type>XrBool32</type> <name>supportEyeFacialTracking</name></member>
@@ -2377,7 +2387,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>float</type>                                  <name>nearZ</name></member>
             <member><type>float</type>                                  <name>farZ</name></member>
         </type>
-        <type category="struct" name="XrSystemSpaceWarpPropertiesFB" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemSpaceWarpPropertiesFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_SPACE_WARP_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*    <name>next</name></member>
             <member><type>uint32_t</type> <name>recommendedMotionVectorImageRectWidth</name></member>
@@ -2386,13 +2396,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
 
         <!-- XR_VARJO_marker_tracking -->
-        <type category="struct" name="XrSystemMarkerTrackingPropertiesVARJO" structextends="XrSystemProperties">
+        <type category="struct" name="XrSystemMarkerTrackingPropertiesVARJO" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_VARJO"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                     <name>next</name></member>
             <member><type>XrBool32</type>                  <name>supportsMarkerTracking</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataMarkerTrackingUpdateVARJO" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataMarkerTrackingUpdateVARJO" returnedonly="true" parentstruct="XrEventDataBaseHeader">
             <member values="XR_TYPE_EVENT_DATA_MARKER_TRACKING_UPDATE_VARJO"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>uint64_t</type>    <name>markerId</name></member>
@@ -3000,12 +3010,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     </enums>
     <enums name="XrPassthroughFlagBitsFB" type="bitmask">
         <enum bitpos="0" name="XR_PASSTHROUGH_IS_RUNNING_AT_CREATION_BIT_FB" comment="The object (passthrough, layer) is running at creation."/>
+        <enum bitpos="1" name="XR_PASSTHROUGH_LAYER_DEPTH_BIT_FB"            comment="The passthrough system sends depth information to the compositor. Only applicable to layer objects."/>
     </enums>
     <enums name="XrPassthroughStateChangedFlagBitsFB" type="bitmask">
         <enum bitpos="0" name="XR_PASSTHROUGH_STATE_CHANGED_REINIT_REQUIRED_BIT_FB"       comment="Passthrough system requires reinitialization."/>
         <enum bitpos="1" name="XR_PASSTHROUGH_STATE_CHANGED_NON_RECOVERABLE_ERROR_BIT_FB" comment="Non-recoverable error has occurred. A device reboot or a firmware update may be required."/>
         <enum bitpos="2" name="XR_PASSTHROUGH_STATE_CHANGED_RECOVERABLE_ERROR_BIT_FB"     comment="A recoverable error has occurred. The runtime will attempt to recover, but some functionality may be temporarily unavailable."/>
         <enum bitpos="3" name="XR_PASSTHROUGH_STATE_CHANGED_RESTORED_ERROR_BIT_FB"        comment="The runtime has recovered from a previous error and is functioning normally."/>
+    </enums>
+    <enums name="XrPassthroughCapabilityFlagBitsFB" type="bitmask">
+        <enum bitpos="0" name="XR_PASSTHROUGH_CAPABILITY_BIT_FB"             comment="The system supports passthrough."/>
+        <enum bitpos="1" name="XR_PASSTHROUGH_CAPABILITY_COLOR_BIT_FB"       comment="The system can show passthrough with realistic colors. ename:XR_PASSTHROUGH_CAPABILITY_BIT_FB must: be set if ename:XR_PASSTHROUGH_CAPABILITY_COLOR_BIT_FB is set."/>
+        <enum bitpos="2" name="XR_PASSTHROUGH_CAPABILITY_LAYER_DEPTH_BIT_FB" comment="The system supports passthrough layers composited using depth testing. ename:XR_PASSTHROUGH_CAPABILITY_BIT_FB must: be set if ename:XR_PASSTHROUGH_CAPABILITY_LAYER_DEPTH_BIT_FB is set."/>
     </enums>
 
     <!-- enums for XR_FB_spatial_entity_query -->
@@ -3834,7 +3850,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <proto><type>XrResult</type> <name>xrDestroySceneObserverMSFT</name></proto>
             <param externsync="true_with_children"><type>XrSceneObserverMSFT</type> <name>sceneObserver</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_COMPUTE_NEW_SCENE_NOT_COMPLETED_MSFT">
             <proto><type>XrResult</type> <name>xrCreateSceneMSFT</name></proto>
             <param><type>XrSceneObserverMSFT</type> <name>sceneObserver</name></param>
             <param optional="true">const <type>XrSceneCreateInfoMSFT</type>* <name>createInfo</name></param>
@@ -3844,7 +3860,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <proto><type>XrResult</type> <name>xrDestroySceneMSFT</name></proto>
             <param externsync="true_with_children"><type>XrSceneMSFT</type> <name>scene</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_TIME_INVALID,XR_ERROR_POSE_INVALID">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_TIME_INVALID,XR_ERROR_SCENE_COMPUTE_FEATURE_INCOMPATIBLE_MSFT,XR_ERROR_SCENE_COMPUTE_CONSISTENCY_MISMATCH_MSFT,XR_ERROR_POSE_INVALID,XR_ERROR_COMPUTE_NEW_SCENE_NOT_COMPLETED_MSFT">
             <proto><type>XrResult</type> <name>xrComputeNewSceneMSFT</name></proto>
             <param><type>XrSceneObserverMSFT</type> <name>sceneObserver</name></param>
             <param>const <type>XrNewSceneComputeInfoMSFT</type>* <name>computeInfo</name></param>
@@ -3854,7 +3870,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrSceneObserverMSFT</type> <name>sceneObserver</name></param>
             <param><type>XrSceneComputeStateMSFT</type>* <name>state</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SCENE_COMPONENT_TYPE_MISMATCH_MSFT">
             <proto><type>XrResult</type> <name>xrGetSceneComponentsMSFT</name></proto>
             <param><type>XrSceneMSFT</type> <name>scene</name></param>
             <param>const <type>XrSceneComponentsGetInfoMSFT</type>* <name>getInfo</name></param>
@@ -3866,7 +3882,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param>const <type>XrSceneComponentsLocateInfoMSFT</type>* <name>locateInfo</name></param>
             <param><type>XrSceneComponentLocationsMSFT</type>* <name>locations</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SCENE_MESH_BUFFER_ID_INVALID_MSFT,XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT">
             <proto><type>XrResult</type> <name>xrGetSceneMeshBuffersMSFT</name></proto>
             <param><type>XrSceneMSFT</type> <name>scene</name></param>
             <param>const <type>XrSceneMeshBuffersGetInfoMSFT</type>* <name>getInfo</name></param>
@@ -3874,12 +3890,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </command>
 
         <!-- XR_MSFT_scene_understanding_serialization -->
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_COMPUTE_NEW_SCENE_NOT_COMPLETED_MSFT">
             <proto><type>XrResult</type> <name>xrDeserializeSceneMSFT</name></proto>
             <param><type>XrSceneObserverMSFT</type> <name>sceneObserver</name></param>
             <param>const <type>XrSceneDeserializeInfoMSFT</type>* <name>deserializeInfo</name></param>
         </command>
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT">
             <proto><type>XrResult</type> <name>xrGetSerializedSceneFragmentDataMSFT</name></proto>
             <param><type>XrSceneMSFT</type> <name>scene</name></param>
             <param>const <type>XrSerializedSceneFragmentDataGetInfoMSFT</type>* <name>getInfo</name></param>
@@ -5478,7 +5494,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MSFT_scene_understanding" number="98" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_scene_understanding_SPEC_VERSION"/>
+            <enum value="2" name="XR_MSFT_scene_understanding_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_scene_understanding&quot;" name="XR_MSFT_SCENE_UNDERSTANDING_EXTENSION_NAME"/>
             <type name="XrUuidMSFT"/>
             <type name="XrSceneObserverCreateInfoMSFT"/>
@@ -5559,7 +5575,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <extension name="XR_MSFT_scene_understanding_serialization" number="99" type="instance" supported="openxr"
         requires="XR_MSFT_scene_understanding">
         <require>
-            <enum value="1" name="XR_MSFT_scene_understanding_serialization_SPEC_VERSION"/>
+            <enum value="2" name="XR_MSFT_scene_understanding_serialization_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_scene_understanding_serialization&quot;" name="XR_MSFT_SCENE_UNDERSTANDING_SERIALIZATION_EXTENSION_NAME"/>
             <type name="XrSerializedSceneFragmentDataGetInfoMSFT"/>
             <type name="XrDeserializeSceneFragmentMSFT"/>
@@ -5671,7 +5687,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_color_space" number="109" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_FB_color_space_SPEC_VERSION"/>
+            <enum value="3" name="XR_FB_color_space_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_color_space&quot;" name="XR_FB_COLOR_SPACE_EXTENSION_NAME"/>
 
             <type name="XrColorSpaceFB"/>
@@ -5694,7 +5710,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_hand_tracking_mesh" number="111" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="2"                                    name="XR_FB_hand_tracking_mesh_SPEC_VERSION"/>
+            <enum value="3"                                    name="XR_FB_hand_tracking_mesh_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_hand_tracking_mesh&quot;" name="XR_FB_HAND_TRACKING_MESH_EXTENSION_NAME"/>
 
             <type name="XrVector4sFB"/>
@@ -5855,7 +5871,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_passthrough" number="119" type="instance" supported="openxr">
         <require>
-            <enum value="2"                                     name="XR_FB_passthrough_SPEC_VERSION"/>
+            <enum value="3"                                     name="XR_FB_passthrough_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_passthrough&quot;"         name="XR_FB_PASSTHROUGH_EXTENSION_NAME"/>
 
             <enum offset="0"          extends="XrStructureType" name="XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES_FB"/>
@@ -5864,6 +5880,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <enum offset="3"          extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_PASSTHROUGH_FB"/>
             <enum offset="4"          extends="XrStructureType" name="XR_TYPE_GEOMETRY_INSTANCE_CREATE_INFO_FB"/>
             <enum offset="5"          extends="XrStructureType" name="XR_TYPE_GEOMETRY_INSTANCE_TRANSFORM_FB"/>
+            <enum offset="6"          extends="XrStructureType" name="XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES2_FB"/>
             <enum offset="20"         extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_STYLE_FB"/>
             <enum offset="21"         extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_COLOR_MAP_MONO_TO_RGBA_FB"/>
             <enum offset="22"         extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_COLOR_MAP_MONO_TO_MONO_FB"/>
@@ -5884,6 +5901,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <enum offset="4"          extends="XrObjectType"    name="XR_OBJECT_TYPE_GEOMETRY_INSTANCE_FB"             comment="XrGeometryInstanceFB"/>
 
             <type name="XrSystemPassthroughPropertiesFB"/>
+            <type name="XrSystemPassthroughProperties2FB"/>
             <type name="XrPassthroughCreateInfoFB"/>
             <type name="XrPassthroughLayerCreateInfoFB"/>
             <type name="XrCompositionLayerPassthroughFB"/>
@@ -5912,7 +5930,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_render_model" number="120" type="instance" supported="openxr">
         <require>
-            <enum value="2"                              name="XR_FB_render_model_SPEC_VERSION"/>
+            <enum value="3"                              name="XR_FB_render_model_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_render_model&quot;" name="XR_FB_RENDER_MODEL_EXTENSION_NAME"/>
 
             <type name="XrRenderModelPathInfoFB"/>
@@ -6073,10 +6091,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_135" number="135" type="instance" supported="disabled">
+    <extension name="XR_ML_ml2_controller_interaction" number="135" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_ML_extension_135_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_135&quot;" name="XR_ML_extension_135_EXTENSION_NAME"/>
+            <enum value="1"                                            name="XR_ML_ml2_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_ml2_controller_interaction&quot;" name="XR_ML_ML2_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -7868,6 +7886,104 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1"                                name="XR_HTC_extension_370_SPEC_VERSION"/>
             <enum value="&quot;XR_HTC_extension_370&quot;" name="XR_HTC_extension_370_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_371" number="371" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_371_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_371&quot;" name="XR_EXT_extension_371_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_372" number="372" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_372_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_372&quot;" name="XR_EXT_extension_372_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_373" number="373" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_KHR_extension_373_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_373&quot;" name="XR_KHR_extension_373_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_374" number="374" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_374_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_374&quot;" name="XR_EXT_extension_374_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_HUAWEI_6dof_controller_interaction" number="375" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                                 name="XR_HUAWEI_6dof_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_HUAWEI_6dof_controller_interaction&quot;" name="XR_HUAWEI_6DOF_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_376" number="376" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_376_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_376&quot;" name="XR_MNDX_extension_376_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_377" number="377" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_377_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_377&quot;" name="XR_MNDX_extension_377_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_378" number="378" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_378_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_378&quot;" name="XR_MNDX_extension_378_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_379" number="379" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_379_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_379&quot;" name="XR_MNDX_extension_379_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_380" number="380" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_380_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_380&quot;" name="XR_MNDX_extension_380_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_381" number="381" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_381_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_381&quot;" name="XR_MNDX_extension_381_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_382" number="382" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_382_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_382&quot;" name="XR_MNDX_extension_382_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_383" number="383" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_383_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_383&quot;" name="XR_MNDX_extension_383_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MNDX_extension_384" number="384" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MNDX_extension_384_SPEC_VERSION"/>
+            <enum value="&quot;XR_MNDX_extension_384&quot;" name="XR_MNDX_extension_384_EXTENSION_NAME"/>
         </require>
     </extension>
 

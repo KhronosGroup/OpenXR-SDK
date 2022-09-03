@@ -37,6 +37,8 @@ def includeDir = layout.buildDirectory.file("intermediates/includes/openxr")
 def scriptDir = "${project.repoRoot}/specification/scripts"
 def registry = "${project.repoRoot}/specification/registry/xr.xml"
 
+ext.stl = "c++_static"
+
 // Python is used to generate header files
 python {
     pip "jinja2:2.10.3"
@@ -102,13 +104,12 @@ android {
     defaultConfig {
         // for Vulkan, need at least 24
         minSdkVersion 24
-        compileSdkVersion 26
 
         versionName = project.versionOpenXR.toString() + project.versionQualifier
         versionCode = project.versionOpenXR.getVersionCode()
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=c++_static",
+                arguments "-DANDROID_STL=${stl}",
                         "-DBUILD_API_LAYERS=OFF",
                         "-DBUILD_TESTS=OFF",
                         "-DBUILD_LOADER=ON",

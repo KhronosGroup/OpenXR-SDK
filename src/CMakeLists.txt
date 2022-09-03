@@ -139,6 +139,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DXR_OS_LINUX)
 elseif(ANDROID)
     add_definitions(-DXR_OS_ANDROID)
+elseif(APPLE)
+    add_definitions(-DXR_OS_APPLE)
 endif()
 
 # /EHsc (support for C++ exceptions) is default in most configurations but seems missing when building arm/arm64.
