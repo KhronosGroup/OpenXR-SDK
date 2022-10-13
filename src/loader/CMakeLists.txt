@@ -81,6 +81,7 @@ else()
     target_include_directories(openxr_loader
         PRIVATE
         ${PROJECT_SOURCE_DIR}/src/external/jsoncpp/include
+        ${WAYLAND_CLIENT_INCLUDE_DIRS}
     )
     if(SUPPORTS_Werrorunusedparameter)
         # Don't error on this - triggered by jsoncpp
