@@ -85,5 +85,5 @@
 #endif  // XR_USE_GRAPHICS_API_VULKAN
 
 #ifdef XR_USE_PLATFORM_WAYLAND
-#include "wayland-client.h"
+#include <wayland/wayland-client.h>
 #endif  // XR_USE_PLATFORM_WAYLAND
