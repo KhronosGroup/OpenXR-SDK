@@ -108,6 +108,7 @@ target_include_directories(
             # for target-specific generated files
             ${CMAKE_CURRENT_SOURCE_DIR}
             ${CMAKE_CURRENT_BINARY_DIR}
+            ${WAYLAND_CLIENT_INCLUDE_DIRS}
     INTERFACE $<INSTALL_INTERFACE:include>
 )
 
