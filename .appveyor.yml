@@ -1,11 +1,15 @@
-version: 1.0.5.{build}
+# Copyright (c) 2017-2021 The Khronos Group Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+version: 1.0.25.{build}
 image: Visual Studio 2017
 
 
 environment:
-  VULKAN_SDK: c:\VulkanSDK\1.1.106.0
-  VKSDKURL: https://sdk.lunarg.com/sdk/download/1.1.106.0/windows/VulkanSDK-1.1.106.0-Installer.exe
-  VKSDKINSTALLER: c:\tools\vksdk1.1.106.0.exe
+  VULKAN_SDK: c:\VulkanSDK\1.1.114.0
+  VKSDKURL: https://people.collabora.com/~rpavlik/ci_resources/vksdk-1.1.114.0-lite.7z
+  VKSDKPKG: c:\VulkanSDK\vksdk-1.1.114.0-lite.7z
   matrix:
 # 32-bit
     - VCVARS: vcvarsamd64_x86
@@ -22,16 +26,18 @@ shallow_clone: true                 # default is "false"
 
 
 cache:
-  - c:\VulkanSDK\1.1.106.0
+  - c:\VulkanSDK\1.1.114.0
 install:
   - choco install -y ninja
   # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  # Download and install Vulkan SDK if not cached - the "Start-Process" is to not continue until install is done
+  # Download and extract a stripped-down Vulkan SDK if not cached - the "Start-Process" is to not continue until extraction is done
   - ps: >-
       if (-not (Test-Path "$env:VULKAN_SDK/Include/vulkan/vulkan.h")) {
+        mkdir c:\VulkanSDK
         $wc = New-Object System.Net.WebClient
-        $wc.DownloadFile($env:VKSDKURL, $env:VKSDKINSTALLER)
-        Start-Process $env:VKSDKINSTALLER -ArgumentList "/S" -Wait }
+        $wc.DownloadFile($env:VKSDKURL, $env:VKSDKPKG)
+        Start-Process "c:\Program Files\7-Zip\7z" -ArgumentList "x", $env:VKSDKPKG, "-oC:\VulkanSDK" -Wait
+      }
 
 # for future use if we need vcpkg
 # -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -39,7 +45,5 @@ install:
 build_script:
 - cmd: >-
     call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\%VCVARS%.bat" &&
-    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=C:/Python37-x64/python.exe &&
-    cd build &&
-    ninja &&
-    cd ..
+    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=C:/Python37-x64/python.exe -DBUILD_ALL_EXTENSIONS=ON &&
+    ninja -C build
