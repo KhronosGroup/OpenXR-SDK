@@ -1,0 +1,182 @@
+# Copyright 2021, Collabora, Ltd.
+# SPDX-License-Identifier: CC0-1.0
+
+name: Android
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: "Is this a release to publish?"
+        type: boolean
+        default: false
+      snapshot:
+        description: "Is this a snapshot to publish?"
+        type: boolean
+        default: false
+      debug:
+        type: boolean
+        description: "Should we make a debug configured build?"
+        default: true
+
+jobs:
+  # Loader
+  loader:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get modern CMake and Ninja
+        uses: lukka/get-cmake@v3.24.3
+
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: gradle
+
+      # Do this before building aar since it affects the version
+      - name: Touch SNAPSHOT marker file
+        if: ${{ !inputs.release }}
+        run: touch SNAPSHOT
+
+      - name: Build AAR
+        run: ./maintainer-scripts/build-aar.sh
+
+      - name: Upload bare AAR
+        uses: actions/upload-artifact@v3
+        with:
+          name: AAR and POM
+          path: openxr_loader_for_android*
+
+      - name: Add to release
+        if: inputs.release && startsWith(github.ref, 'refs/tags/release-')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: openxr_loader_for_android*
+
+      - name: Publish release to mavencentral
+        if: inputs.release
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishMavenPublicationToBuildDirRepository publishMavenPublicationToOSSRHRepository
+          build-root-directory: ./maintainer-scripts/publish-aar
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_signingKey}}
+          ORG_GRADLE_PROJECT_signingKeyId: ${{secrets.ORG_GRADLE_PROJECT_signingKeyId}}
+          ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_signingPassword}}
+          OSSRH_USER: ${{secrets.OSSRH_USER}}
+          OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
+
+      - name: Publish snapshot to mavencentral
+        if: inputs.snapshot
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishMavenPublicationToBuildDirRepository publishMavenPublicationToOSSRH-SnapshotsRepository
+          build-root-directory: ./maintainer-scripts/publish-aar
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_signingKey}}
+          ORG_GRADLE_PROJECT_signingKeyId: ${{secrets.ORG_GRADLE_PROJECT_signingKeyId}}
+          ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_signingPassword}}
+          OSSRH_USER: ${{secrets.OSSRH_USER}}
+          OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
+
+      - name: Upload Maven repo
+        if: inputs.release || inputs.snapshot
+        uses: actions/upload-artifact@v3
+        with:
+          name: repo
+          path: maintainer-scripts/publish-aar/build/repo/
+
+  # Hello XR
+  build-helloxr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get modern CMake and Ninja
+        uses: lukka/get-cmake@v3.24.3
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: gradle
+
+      # HelloXR OpenGLES version
+      - name: Build HelloXR OpenGLES for Android
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleOpenGLES${{ inputs.release && 'Release' || 'Debug' }}
+          build-root-directory: src/tests/hello_xr
+
+      - name: Upload HelloXR OpenGLES (debug) for Android
+        if: ${{ !inputs.release }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: HelloXR OpenGLES Android
+          path: src/tests/hello_xr/build/outputs/apk/OpenGLES/debug/*.apk
+
+      - name: Sign HelloXR OpenGLES Android release
+        if: inputs.release
+        uses: r0adkll/sign-android-release@349ebdef58775b1e0d8099458af0816dc79b6407
+        id: sign_gles
+        with:
+          releaseDirectory: src/tests/hello_xr/build/outputs/apk/OpenGLES/release
+          signingKeyBase64: ${{ secrets.APK_SIGNING_KEY }}
+          alias: ${{ secrets.APK_ALIAS }}
+          keyStorePassword: ${{ secrets.APK_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.APK_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "30.0.3"
+
+      - name: Rename APK
+        if: inputs.release
+        env:
+          SIGNED_FILE: ${{ steps.sign_gles.outputs.signedReleaseFile }}
+        run: mv $SIGNED_FILE HelloXR_OpenGLES.apk
+
+      - name: Upload signed HelloXR OpenGLES Android
+        if: inputs.release
+        uses: actions/upload-artifact@v3
+        with:
+          name: HelloXR OpenGLES Android
+          path: HelloXR_OpenGLES.apk
+
+      # HelloXR Vulkan version
+      - name: Build HelloXR Vulkan for Android
+        if: inputs.release
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleVulkanRelease
+          build-root-directory: src/tests/hello_xr
+
+      - name: Sign HelloXR Vulkan Android release
+        if: inputs.release
+        uses: r0adkll/sign-android-release@349ebdef58775b1e0d8099458af0816dc79b6407
+        id: sign_vulkan
+        with:
+          releaseDirectory: src/tests/hello_xr/build/outputs/apk/Vulkan/release
+          signingKeyBase64: ${{ secrets.APK_SIGNING_KEY }}
+          alias: ${{ secrets.APK_ALIAS }}
+          keyStorePassword: ${{ secrets.APK_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.APK_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "30.0.3"
+
+      - name: Rename APK
+        if: inputs.release
+        env:
+          SIGNED_FILE: ${{ steps.sign_vulkan.outputs.signedReleaseFile }}
+        run: mv $SIGNED_FILE HelloXR_Vulkan.apk
+
+      - name: Upload HelloXR Vulkan Android
+        if: inputs.release
+        uses: actions/upload-artifact@v3
+        with:
+          name: HelloXR Vulkan Android
+          path: HelloXR_Vulkan.apk
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/release-')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: HelloXR_*.apk

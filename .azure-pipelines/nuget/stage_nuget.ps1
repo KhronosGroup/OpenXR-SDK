@@ -55,15 +55,17 @@ Copy-Item (Join-Path $SDKRelease "include") (Join-Path $NugetStaging "include") 
 #
 function CopyLoader($Platform) {
     $PlatformSDKPath = Join-Path $SDKRelease "$Platform"
-    $NuGetPlatformPath = Join-Path $NugetStaging "native/$Platform/release"
+    if (Test-Path $PlatformSDKPath) {
+        $NuGetPlatformPath = Join-Path $NugetStaging "native/$Platform/release"
 
-    $NugetLibPath = Join-Path $NuGetPlatformPath "lib"
-    New-Item $NugetLibPath -ItemType "directory" -Force
-    Copy-Item (Join-Path $PlatformSDKPath "lib/openxr_loader.lib") $NugetLibPath
+        $NugetLibPath = Join-Path $NuGetPlatformPath "lib"
+        New-Item $NugetLibPath -ItemType "directory" -Force
+        Copy-Item (Join-Path $PlatformSDKPath "lib/openxr_loader.lib") $NugetLibPath
 
-    $NugetBinPath = Join-Path $NuGetPlatformPath "bin"
-    New-Item $NugetBinPath -ItemType "directory" -Force
-    Copy-Item (Join-Path $PlatformSDKPath "bin/openxr_loader.dll") $NugetBinPath
+        $NugetBinPath = Join-Path $NuGetPlatformPath "bin"
+        New-Item $NugetBinPath -ItemType "directory" -Force
+        Copy-Item (Join-Path $PlatformSDKPath "bin/openxr_loader.dll") $NugetBinPath
+    }
 }
 
 # Currently there are no non-UWP ARM/ARM64 binaries available from the SDK release.

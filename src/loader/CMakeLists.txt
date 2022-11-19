@@ -28,6 +28,9 @@ if(NOT MSVC)
     set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 endif()
 
+# make cache variables for install destinations
+include(GNUInstallDirs)
+
 # List of all files externally generated outside of the loader that the loader
 # needs to build with.
 set(LOADER_EXTERNAL_GEN_FILES ${COMMON_GENERATED_OUTPUT})
@@ -108,7 +111,7 @@ target_include_directories(
             # for target-specific generated files
             ${CMAKE_CURRENT_SOURCE_DIR}
             ${CMAKE_CURRENT_BINARY_DIR}
-    INTERFACE $<INSTALL_INTERFACE:include>
+    INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 if(Vulkan_FOUND)
@@ -277,7 +280,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 endif()
 
 add_library(headers INTERFACE)
-target_include_directories(headers INTERFACE $<INSTALL_INTERFACE:include>)
+target_include_directories(headers INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # We will never actually install here, but it's easier to set something than block all install code.
 if(ANDROID AND NOT INSTALL_TO_ARCHITECTURE_PREFIXES)

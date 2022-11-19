@@ -1,0 +1,54 @@
+# Copyright 2021-2022, Collabora, Ltd.
+# SPDX-License-Identifier: CC0-1.0
+
+on:
+  workflow_call:
+    inputs:
+      preset:
+        description: "CMake build preset"
+        type: string
+        required: true
+      buildType:
+        description: "Build type"
+        type: string
+        default: RelWithDebInfo
+      artifactName:
+        description: "Artifact name to upload to."
+        type: string
+        required: false
+
+jobs:
+  msvc-build:
+    runs-on: windows-latest
+    env:
+      VULKAN_SDK_VERSION: "1.1.114.0"
+      INSTALL_DIR: "${{ github.workspace }}/install"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: lukka/get-cmake@latest
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install Vulkan SDK
+        if: ${{ !contains( inputs.preset, 'uwp') }}
+        working-directory: ${{ github.workspace }}
+        shell: pwsh
+        run: ./.github/scripts/install_vulkan.ps1
+
+      - name: Generate build system
+        shell: pwsh
+        run: |
+          Copy-Item .github/scripts/CMakePresets.json .
+          cmake --fresh --preset ${{ inputs.preset }} -S . -B $env:RUNNER_TEMP
+      - name: Build
+        run: cmake --build $env:RUNNER_TEMP --parallel --clean-first --config ${{ inputs.buildType }}
+
+      - name: Install
+        run: cmake --build $env:RUNNER_TEMP --parallel --config ${{ inputs.buildType }} --target install
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        if: inputs.artifactName
+        with:
+          name: ${{ inputs.artifactName }}
+          path: ${{ github.workspace }}/install

@@ -1,0 +1,73 @@
+# Copyright 2021-2022, Collabora, Ltd.
+# SPDX-License-Identifier: CC0-1.0
+
+name: Windows builds
+on:
+  workflow_call:
+    inputs:
+      organizeAndRelease:
+        description: "Should we organize and release our artifacts?"
+        type: boolean
+        default: false
+  workflow_dispatch:
+
+jobs:
+  generate_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: set-matrix
+        run: python3 .github/scripts/generate_windows_matrix_build.py matrix
+  msvc-build:
+    needs: generate_matrix
+    strategy:
+      fail-fast: true
+      matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
+
+    uses: ./.github/workflows/msvc-build-preset.yml
+    with:
+      preset: ${{ matrix.preset }}
+      artifactName: "loader_${{ matrix.preset }}"
+
+  organize-and-release-artifacts:
+    if: inputs.organizeAndRelease
+    needs:
+      - msvc-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Retrieve artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Organize artifacts
+        run: python .github/scripts/organize_windows_artifacts.py "${{ github.workspace }}" "${{ github.workspace }}/openxr_loader"
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: openxr_loader_windows
+          path: "${{ github.workspace }}/openxr_loader"
+
+      # NuGet stuff now
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+        with:
+          nuget-version: "5.x"
+      - name: Stage loader and headers for NuGet
+        shell: pwsh
+        run: ${{ github.workspace }}/.azure-pipelines/nuget/stage_nuget.ps1 "${{ github.workspace }}/openxr_loader" "${{ github.workspace }}/specification/Makefile" "${{ github.workspace }}/openxr_loader_staging"
+
+      - name: Pack NuGet package
+        run: nuget pack ${{ github.workspace }}/openxr_loader_staging/OpenXR.Loader.nuspec -OutputDirectory ${{ github.workspace }}/nuget
+
+      - name: Upload NuGet artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: NuGet
+          path: "${{ github.workspace }}/nuget"

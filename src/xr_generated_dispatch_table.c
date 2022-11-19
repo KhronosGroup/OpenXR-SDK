@@ -375,6 +375,13 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrSetPerformanceMetricsStateMETA", (PFN_xrVoidFunction*)&table->SetPerformanceMetricsStateMETA));
     (get_inst_proc_addr(instance, "xrGetPerformanceMetricsStateMETA", (PFN_xrVoidFunction*)&table->GetPerformanceMetricsStateMETA));
     (get_inst_proc_addr(instance, "xrQueryPerformanceMetricsCounterMETA", (PFN_xrVoidFunction*)&table->QueryPerformanceMetricsCounterMETA));
+
+    // ---- XR_HTC_passthrough extension commands
+    (get_inst_proc_addr(instance, "xrCreatePassthroughHTC", (PFN_xrVoidFunction*)&table->CreatePassthroughHTC));
+    (get_inst_proc_addr(instance, "xrDestroyPassthroughHTC", (PFN_xrVoidFunction*)&table->DestroyPassthroughHTC));
+
+    // ---- XR_HTC_foveation extension commands
+    (get_inst_proc_addr(instance, "xrApplyFoveationHTC", (PFN_xrVoidFunction*)&table->ApplyFoveationHTC));
 }
 
 

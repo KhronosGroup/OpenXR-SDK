@@ -30,7 +30,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="ACER"       author="Acer"                        contact="OC Lin @aceroc"/>
         <tag name="ALMALENCE"  author="Almalence"                   contact="Ivan Chupakhin @ivan.chupakhin, Dmitry Shmunk @dmitry.shmunk"/>
         <tag name="ARM"        author="Arm Limited"                 contact="Andreas Loeve Selvik @selvik, Sam Martin @sammartin"/>
+        <tag name="BYTEDANCE"  author="Bytedance"                   contact="Will Fu @willfu, Bangsen Han @Hansenn"/>
         <tag name="COLLABORA"  author="Collabora"                   contact="Ryan Pavlik @rpavlik"/>
+        <tag name="DANWILLM"   author="Daniel Willmott"             contact="Daniel Willmott @danwillm"/>
         <tag name="EPIC"       author="Epic"                        contact="Nick Whiting @whitingn"/>
         <tag name="EXT"        author="Multivendor"                 contact="Ryan Pavlik @rpavlik"/>
         <tag name="EXTX"       author="Multivendor experimental"    contact="Brad Grantham @bradgrantham-lunarg"/>
@@ -128,7 +130,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 25)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 26)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -325,6 +327,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_META_performance_metrics -->
         <type bitvalues="XrPerformanceMetricsCounterFlagBitsMETA" category="bitmask">typedef <type>XrFlags64</type> <name>XrPerformanceMetricsCounterFlagsMETA</name>;</type>
 
+        <!-- Bitmask types for XR_HTC_foveation -->
+        <type bitvalues="XrFoveationDynamicFlagBitsHTC" category="bitmask">typedef <type>XrFlags64</type> <name>XrFoveationDynamicFlagsHTC</name>;</type>
+
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
         <type category="handle"><type>XR_DEFINE_HANDLE</type>(<name>XrInstance</name>)</type>
@@ -349,6 +354,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrPassthroughFB</name>)</type>
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrPassthroughLayerFB</name>)</type>
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrGeometryInstanceFB</name>)</type>
+
+        <!-- XR_HTC_facial_tracking -->
+        <type category="handle" parent="XrInstance"><type>XR_DEFINE_HANDLE</type>(<name>XrFacialTrackerHTC</name>)</type>
+
+        <!-- XR_HTC_passthrough -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrPassthroughHTC</name>)</type>
 
         <!-- enums and flag bits generated from corresponding <enums> tags below -->
         <type name="XrStructureType" category="enum"/>
@@ -452,6 +463,20 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enum and flag bits for XR_META_performance_metrics -->
         <type name="XrPerformanceMetricsCounterFlagBitsMETA" category="enum"/>
         <type name="XrPerformanceMetricsCounterUnitMETA" category="enum"/>
+
+        <!-- XR_HTC_facial_tracking -->
+        <type name="XrFacialTrackingTypeHTC" category="enum"/>
+        <type name="XrEyeExpressionHTC" category="enum"/>
+        <type name="XrLipExpressionHTC" category="enum"/>
+
+        <!-- enum for XR_HTC_passthrough -->
+        <type name="XrPassthroughFormHTC" category="enum"/>
+
+        <!-- enums for XR_HTC_foveation -->
+        <type name="XrFoveationModeHTC" category="enum"/>
+        <type name="XrFoveationDynamicFlagBitsHTC" category="enum"/>
+        <type name="XrFoveationLevelHTC" category="enum"/>
+
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -915,7 +940,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrBool32</type>                    <name>poseValid</name></member>
             <member><type>XrPosef</type>                     <name>poseInPreviousSpace</name></member>
         </type>
-        <type category="struct" name="XrEventDataPerfSettingsEXT" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataPerfSettingsEXT" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                 <name>next</name></member>
             <member><type>XrPerfSettingsDomainEXT</type>     <name>domain</name></member>
@@ -1188,7 +1213,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrOverlaySessionCreateFlagsEXTX</type>                                                         <name>createFlags</name></member>
             <member><type>uint32_t</type>                                                         <name>sessionLayersPlacement</name></member>
         </type>
-        <type category="struct" name="XrEventDataMainSessionVisibilityChangedEXTX" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataMainSessionVisibilityChangedEXTX" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                                                                     <name>next</name></member>
             <member><type>XrBool32</type>                                                                        <name>visible</name></member>
@@ -2334,15 +2359,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
 
         <!-- XR_HTC_facial_tracking -->
-        <type category="handle" parent="XrInstance"><type>XR_DEFINE_HANDLE</type>(<name>XrFacialTrackerHTC</name>)</type>
-
-        <type name="XrFacialTrackingTypeHTC" category="enum"/>
-        <type name="XrEyeExpressionHTC" category="enum"/>
-        <type name="XrLipExpressionHTC" category="enum"/>
-
         <type category="struct" name="XrFacialTrackerCreateInfoHTC">
             <member values="XR_TYPE_FACIAL_TRACKER_CREATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*         <name>next</name></member>
+            <member>const <type>void</type>*             <name>next</name></member>
             <member><type>XrFacialTrackingTypeHTC</type> <name>facialTrackingType</name></member>
         </type>
         <type category="struct" name="XrSystemFacialTrackingPropertiesHTC" returnedonly="true" structextends="XrSystemProperties">
@@ -2360,6 +2379,38 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>float</type>*      <name>expressionWeightings</name></member>
         </type>
 
+        <!-- XR_HTC_passthrough -->
+        <type category="struct" name="XrPassthroughCreateInfoHTC">
+            <member values="XR_TYPE_PASSTHROUGH_CREATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*               <name>next</name></member>
+            <member><type>XrPassthroughFormHTC</type>      <name>form</name></member>
+        </type>
+        <type category="struct" name="XrPassthroughColorHTC">
+            <member values="XR_TYPE_PASSTHROUGH_COLOR_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>float</type>       <name>alpha</name></member>
+        </type>
+        <type category="struct" name="XrPassthroughMeshTransformInfoHTC" structextends="XrCompositionLayerPassthroughHTC">
+            <member values="XR_TYPE_PASSTHROUGH_MESH_TRANSFORM_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                         <name>next</name></member>
+            <member><type>uint32_t</type>                            <name>vertexCount</name></member>
+            <member len="vertexCount">const <type>XrVector3f</type>* <name>vertices</name></member>
+            <member><type>uint32_t</type>                            <name>indexCount</name></member>
+            <member len="indexCount">const <type>uint32_t</type>*    <name>indices</name></member>
+            <member><type>XrSpace</type>                             <name>baseSpace</name></member>
+            <member><type>XrTime</type>                              <name>time</name></member>
+            <member><type>XrPosef</type>                             <name>pose</name></member>
+            <member><type>XrVector3f</type>                          <name>scale</name></member>
+        </type>
+        <type category="struct" name="XrCompositionLayerPassthroughHTC" parentstruct="XrCompositionLayerBaseHeader">
+            <member values="XR_TYPE_COMPOSITION_LAYER_PASSTHROUGH_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*             <name>next</name></member>
+            <member><type>XrCompositionLayerFlags</type> <name>layerFlags</name></member>
+            <member><type>XrSpace</type>                 <name>space</name></member>
+            <member><type>XrPassthroughHTC</type>        <name>passthrough</name></member>
+            <member><type>XrPassthroughColorHTC</type>   <name>color</name></member>
+        </type>
+
         <!-- XR_HTCX_vive_tracker_interaction structs -->
         <type category="struct" name="XrViveTrackerPathsHTCX" returnedonly="true">
             <member values="XR_TYPE_VIVE_TRACKER_PATHS_HTCX"><type>XrStructureType</type> <name>type</name></member>
@@ -2367,7 +2418,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrPath</type>                 <name>persistentPath</name></member>
             <member optional="true"><type>XrPath</type> <name>rolePath</name></member>
         </type>
-        <type category="struct" name="XrEventDataViveTrackerConnectedHTCX" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataViveTrackerConnectedHTCX" returnedonly="true" parentstruct="XrEventDataBaseHeader">
             <member values="XR_TYPE_EVENT_DATA_VIVE_TRACKER_CONNECTED_HTCX"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                   <name>next</name></member>
             <member><type>XrViveTrackerPathsHTCX</type>*       <name>paths</name></member>
@@ -2454,6 +2505,51 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrPerformanceMetricsCounterUnitMETA</type>                  <name>counterUnit</name></member>
             <member><type>uint32_t</type>                                             <name>uintValue</name></member>
             <member><type>float</type>                                                <name>floatValue</name></member>
+        </type>
+
+        <!-- XR_META_headset_id structs -->
+        <type category="struct" name="XrSystemHeadsetIdPropertiesMETA" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*     <name>next</name></member>
+            <member><type>XrUuidEXT</type> <name>id</name></member>
+        </type>
+
+        <!-- XR_HTC_foveation structs -->
+        <type category="struct" name="XrFoveationApplyInfoHTC">
+            <member values="XR_TYPE_FOVEATION_APPLY_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*            <name>next</name></member>
+            <member><type>XrFoveationModeHTC</type>     <name>mode</name></member>
+            <member><type>uint32_t</type>               <name>subImageCount</name></member>
+            <member len="subImageCount"><type>XrSwapchainSubImage</type>*      <name>subImages</name></member>
+        </type>
+        <type category="struct" name="XrFoveationConfigurationHTC">
+            <member><type>XrFoveationLevelHTC</type>      <name>level</name></member>
+            <member><type>float</type>                    <name>clearFovDegree</name></member>
+            <member><type>XrVector2f</type>               <name>focalCenterOffset</name></member>
+        </type>
+        <type category="struct" name="XrFoveationDynamicModeInfoHTC" structextends="XrFoveationApplyInfoHTC">
+            <member values="XR_TYPE_FOVEATION_DYNAMIC_MODE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                          <name>next</name></member>
+            <member optional="true"><type>XrFoveationDynamicFlagsHTC</type>                             <name>dynamicFlags</name></member>
+        </type>
+        <type category="struct" name="XrFoveationCustomModeInfoHTC" structextends="XrFoveationApplyInfoHTC">
+            <member values="XR_TYPE_FOVEATION_CUSTOM_MODE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                          <name>next</name></member>
+            <member><type>uint32_t</type>                             <name>configCount</name></member>
+            <member len="configCount">const <type>XrFoveationConfigurationHTC</type>* <name>configs</name></member>
+        </type>
+
+        <!-- XR_EXT_active_action_set_priority -->
+        <type category="struct" name="XrActiveActionSetPrioritiesEXT" structextends="XrActionsSyncInfo">
+            <member values="XR_TYPE_ACTIVE_ACTION_SET_PRIORITIES_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                       <name>next</name></member>
+            <member><type>uint32_t</type>                                                          <name>actionSetPriorityCount</name></member>
+            <member len="actionSetPriorityCount">const <type>XrActiveActionSetPriorityEXT</type>*  <name>actionSetPriorities</name></member>
+        </type>
+
+        <type category="struct" name="XrActiveActionSetPriorityEXT">
+            <member><type>XrActionSet</type> <name>actionSet</name></member>
+            <member><type>uint32_t</type>    <name>priorityOverride</name></member>
         </type>
     </types>
 
@@ -2841,7 +2937,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum bitpos="3" name="XR_VIEW_STATE_POSITION_TRACKED_BIT"    comment="Indicates whether all slink:XrView positions are actively tracked"/>
     </enums>
     <enums name="XrCompositionLayerFlagBits" type="bitmask">
-        <enum bitpos="0" name="XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT" comment="Enables chromatic aberration correction when not done by default."/>
+        <enum bitpos="0" name="XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT" comment="Enables chromatic aberration correction when not done by default. This flag has no effect on any known conformant runtime, and is planned for deprecation for OpenXR 1.1"/>
         <enum bitpos="1" name="XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT"   comment="Enables the layer texture alpha channel."/>
         <enum bitpos="2" name="XR_COMPOSITION_LAYER_UNPREMULTIPLIED_ALPHA_BIT"        comment="Indicates the texture color channels have not been premultiplied by the texture alpha channel."/>
     </enums>
@@ -3083,6 +3179,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="2"   name="XR_FACIAL_TRACKING_TYPE_LIP_DEFAULT_HTC" comment="Specifies this handle will observe lip expressions, with values indexed by elink:XrLipExpressionHTC whose count is dlink:XR_FACIAL_EXPRESSION_LIP_COUNT_HTC."/>
     </enums>
 
+    <!-- enums for XR_HTC_passthrough -->
+    <enums name="XrPassthroughFormHTC" type="enum">
+        <enum value="0"   name="XR_PASSTHROUGH_FORM_PLANAR_HTC"    comment="Presents the passthrough with full of the entire screen."/>
+        <enum value="1"   name="XR_PASSTHROUGH_FORM_PROJECTED_HTC" comment="Presents the passthrough projecting onto a custom mesh."/>
+    </enums>
+
     <enums name="XrEyeExpressionHTC" type="enum">
         <enum value="0"    name="XR_EYE_EXPRESSION_LEFT_BLINK_HTC"/>
         <enum value="1"    name="XR_EYE_EXPRESSION_LEFT_WIDE_HTC"/>
@@ -3167,6 +3269,26 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="3"   name="XR_PERFORMANCE_METRICS_COUNTER_UNIT_BYTES_META"        comment="the performance counter unit is byte."/>
         <enum value="4"   name="XR_PERFORMANCE_METRICS_COUNTER_UNIT_HERTZ_META"        comment="the performance counter unit is hertz (Hz)."/>
     </enums>
+
+    <!-- enums for XR_HTC_foveation -->
+    <enums name="XrFoveationModeHTC" type="enum">
+        <enum value="0"   name="XR_FOVEATION_MODE_DISABLE_HTC" comment="No foveation"/>
+        <enum value="1"   name="XR_FOVEATION_MODE_FIXED_HTC"   comment="Apply system default setting with fixed clear FOV and periphery quality."/>
+        <enum value="2"   name="XR_FOVEATION_MODE_DYNAMIC_HTC" comment="Allow system to set foveation dynamically according realtime system metric or other extensions."/>
+        <enum value="3"   name="XR_FOVEATION_MODE_CUSTOM_HTC"  comment="Allow application to set foveation with desired clear FOV, periphery quality, and focal center offset."/>
+    </enums>
+    <enums name="XrFoveationDynamicFlagBitsHTC" type="bitmask">
+        <enum bitpos="0" name="XR_FOVEATION_DYNAMIC_LEVEL_ENABLED_BIT_HTC"               comment="Allow system to set periphery pixel density dynamically."/>
+        <enum bitpos="1" name="XR_FOVEATION_DYNAMIC_CLEAR_FOV_ENABLED_BIT_HTC"           comment="Allow system to set clear FOV degree dynamically."/>
+        <enum bitpos="2" name="XR_FOVEATION_DYNAMIC_FOCAL_CENTER_OFFSET_ENABLED_BIT_HTC" comment="Allow system to set focal center offset dynamically."/>
+    </enums>
+    <enums name="XrFoveationLevelHTC" type="enum">
+        <enum value="0"   name="XR_FOVEATION_LEVEL_NONE_HTC"   comment="No foveation"/>
+        <enum value="1"   name="XR_FOVEATION_LEVEL_LOW_HTC"    comment="Light periphery pixel density drop and lower performance gain."/>
+        <enum value="2"   name="XR_FOVEATION_LEVEL_MEDIUM_HTC" comment="Medium periphery pixel density drop and medium performance gain"/>
+        <enum value="3"   name="XR_FOVEATION_LEVEL_HIGH_HTC"   comment="Heavy periphery pixel density drop and higher performance gain"/>
+    </enums>
+
 
     <!-- SECTION: OpenXR command definitions -->
     <commands>
@@ -4313,6 +4435,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrFacialExpressionsHTC</type>* <name>facialExpressions</name></param>
         </command>
 
+        <!-- XR_HTC_passthrough -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreatePassthroughHTC</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrPassthroughCreateInfoHTC</type>* <name>createInfo</name></param>
+            <param><type>XrPassthroughHTC</type>* <name>passthrough</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyPassthroughHTC</name></proto>
+            <param externsync="true_with_children"><type>XrPassthroughHTC</type> <name>passthrough</name></param>
+        </command>
+
         <!-- XR_HTCX_vive_tracker_interaction -->
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT">
             <proto><type>XrResult</type> <name>xrEnumerateViveTrackerPathsHTCX</name></proto>
@@ -4398,6 +4532,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrPath</type> <name>counterPath</name></param>
             <param><type>XrPerformanceMetricsCounterMETA</type>* <name>counter</name></param>
         </command>
+
+        <!-- commands for XR_HTC_foveation -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrApplyFoveationHTC</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrFoveationApplyInfoHTC</type>* <name>applyInfo</name></param>
+        </command>
+
     </commands>
 
     <!-- SECTION: OpenXR API interface definitions -->
@@ -4642,7 +4784,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Performance Settings extension -->
     <extension name="XR_EXT_performance_settings" number="16" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_EXT_performance_settings_SPEC_VERSION"/>
+            <enum value="4" name="XR_EXT_performance_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_performance_settings&quot;" name="XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT"/>
             <type name="XrPerfSettingsDomainEXT"/>
@@ -5627,7 +5769,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_HTCX_vive_tracker_interaction" number="104" type="instance" provisional="true" supported="openxr">
         <require>
-            <enum value="1"                                            name="XR_HTCX_vive_tracker_interaction_SPEC_VERSION"/>
+            <enum value="2"                                            name="XR_HTCX_vive_tracker_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_HTCX_vive_tracker_interaction&quot;" name="XR_HTCX_VIVE_TRACKER_INTERACTION_EXTENSION_NAME"/>
             <type name="XrViveTrackerPathsHTCX"/>
             <type name="XrEventDataViveTrackerConnectedHTCX"/>
@@ -5640,7 +5782,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_HTC_facial_tracking" number="105" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                  name="XR_HTC_facial_tracking_SPEC_VERSION"/>
+            <enum value="2"                                  name="XR_HTC_facial_tracking_SPEC_VERSION"/>
             <enum value="&quot;XR_HTC_facial_tracking&quot;" name="XR_HTC_FACIAL_TRACKING_EXTENSION_NAME"/>
 
             <type name="XrSystemFacialTrackingPropertiesHTC"/>
@@ -6910,7 +7052,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_META_performance_metrics" number="233" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                       name="XR_META_performance_metrics_SPEC_VERSION"/>
+            <enum value="2"                                       name="XR_META_performance_metrics_SPEC_VERSION"/>
             <enum value="&quot;XR_META_performance_metrics&quot;" name="XR_META_PERFORMANCE_METRICS_EXTENSION_NAME"/>
 
             <enum offset="1" extends="XrStructureType"            name="XR_TYPE_PERFORMANCE_METRICS_STATE_META"/>
@@ -7012,10 +7154,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_246" number="246" type="instance" supported="disabled">
+    <extension name="XR_META_headset_id" number="246" type="instance" requires="XR_EXT_uuid" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_246_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_246&quot;" name="XR_FB_EXTENSION_246_EXTENSION_NAME"/>
+            <enum value="1"                              name="XR_META_headset_id_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_headset_id&quot;" name="XR_META_HEADSET_ID_EXTENSION_NAME"/>
+
+            <type name="XrSystemHeadsetIdPropertiesMETA"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META"/>
         </require>
     </extension>
 
@@ -7518,17 +7664,49 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_HTC_extension_318" number="318" type="instance" supported="disabled">
+    <extension name="XR_HTC_passthrough" number="318" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_HTC_extension_318_SPEC_VERSION"/>
-            <enum value="&quot;XR_HTC_extension_318&quot;" name="XR_HTC_extension_318_EXTENSION_NAME"/>
+            <enum value="1"                              name="XR_HTC_passthrough_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_passthrough&quot;" name="XR_HTC_PASSTHROUGH_EXTENSION_NAME"/>
+
+            <type name="XrPassthroughHTC"/>
+            <enum offset="0" extends="XrObjectType" name="XR_OBJECT_TYPE_PASSTHROUGH_HTC" comment="XrPassthroughHTC"/>
+
+            <type name="XrPassthroughFormHTC"/>
+
+            <type name="XrPassthroughCreateInfoHTC"/>
+            <type name="XrPassthroughColorHTC"/>
+            <type name="XrPassthroughMeshTransformInfoHTC"/>
+            <type name="XrCompositionLayerPassthroughHTC"/>
+
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_CREATE_INFO_HTC"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_COLOR_HTC"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_MESH_TRANSFORM_INFO_HTC"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_PASSTHROUGH_HTC"/>
+
+            <command name="xrCreatePassthroughHTC"/>
+            <command name="xrDestroyPassthroughHTC"/>
         </require>
     </extension>
 
-    <extension name="XR_HTC_extension_319" number="319" type="instance" supported="disabled">
+    <extension name="XR_HTC_foveation" number="319" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_HTC_extension_319_SPEC_VERSION"/>
-            <enum value="&quot;XR_HTC_extension_319&quot;" name="XR_HTC_extension_319_EXTENSION_NAME"/>
+            <enum value="1"                            name="XR_HTC_foveation_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_foveation&quot;" name="XR_HTC_FOVEATION_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_FOVEATION_APPLY_INFO_HTC"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_FOVEATION_DYNAMIC_MODE_INFO_HTC"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_FOVEATION_CUSTOM_MODE_INFO_HTC"/>
+
+            <type name="XrFoveationModeHTC"/>
+            <type name="XrFoveationLevelHTC"/>
+
+            <type name="XrFoveationApplyInfoHTC"/>
+            <type name="XrFoveationConfigurationHTC"/>
+            <type name="XrFoveationDynamicModeInfoHTC"/>
+            <type name="XrFoveationCustomModeInfoHTC"/>
+
+            <command name="xrApplyFoveationHTC"/>
         </require>
     </extension>
 
@@ -7910,10 +8088,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_374" number="374" type="instance" supported="disabled">
+    <extension name="XR_EXT_active_action_set_priority" number="374" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_EXT_extension_374_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_374&quot;" name="XR_EXT_extension_374_EXTENSION_NAME"/>
+            <enum value="1"                                             name="XR_EXT_active_action_set_priority_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_active_action_set_priority&quot;" name="XR_EXT_ACTIVE_ACTION_SET_PRIORITY_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType"                  name="XR_TYPE_ACTIVE_ACTION_SET_PRIORITIES_EXT"/>
+            <type name="XrActiveActionSetPrioritiesEXT"/>
+            <type name="XrActiveActionSetPriorityEXT"/>
         </require>
     </extension>
 
@@ -7984,6 +8165,300 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1"                                 name="XR_MNDX_extension_384_SPEC_VERSION"/>
             <enum value="&quot;XR_MNDX_extension_384&quot;" name="XR_MNDX_extension_384_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_385" number="385" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_385_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_385&quot;" name="XR_BYTEDANCE_extension_385_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_386" number="386" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_386_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_386&quot;" name="XR_BYTEDANCE_extension_386_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_387" number="387" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_387_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_387&quot;" name="XR_BYTEDANCE_extension_387_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_388" number="388" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_388_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_388&quot;" name="XR_BYTEDANCE_extension_388_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_389" number="389" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_389_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_389&quot;" name="XR_BYTEDANCE_extension_389_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_390" number="390" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_390_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_390&quot;" name="XR_BYTEDANCE_extension_390_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_391" number="391" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_391_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_391&quot;" name="XR_BYTEDANCE_extension_391_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_392" number="392" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_392_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_392&quot;" name="XR_BYTEDANCE_extension_392_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_393" number="393" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_393_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_393&quot;" name="XR_BYTEDANCE_extension_393_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_394" number="394" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_394_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_394&quot;" name="XR_BYTEDANCE_extension_394_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_395" number="395" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_395_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_395&quot;" name="XR_BYTEDANCE_extension_395_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_396" number="396" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_396_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_396&quot;" name="XR_BYTEDANCE_extension_396_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_397" number="397" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_397_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_397&quot;" name="XR_BYTEDANCE_extension_397_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_398" number="398" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_398_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_398&quot;" name="XR_BYTEDANCE_extension_398_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_399" number="399" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_399_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_399&quot;" name="XR_BYTEDANCE_extension_399_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_400" number="400" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_400_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_400&quot;" name="XR_BYTEDANCE_extension_400_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_401" number="401" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_401_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_401&quot;" name="XR_BYTEDANCE_extension_401_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_402" number="402" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_402_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_402&quot;" name="XR_BYTEDANCE_extension_402_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_403" number="403" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_403_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_403&quot;" name="XR_BYTEDANCE_extension_403_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_404" number="404" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_404_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_404&quot;" name="XR_BYTEDANCE_extension_404_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_405" number="405" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_405_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_405&quot;" name="XR_BYTEDANCE_extension_405_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_406" number="406" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_406_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_406&quot;" name="XR_BYTEDANCE_extension_406_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_407" number="407" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_407_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_407&quot;" name="XR_BYTEDANCE_extension_407_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_408" number="408" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_408_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_408&quot;" name="XR_BYTEDANCE_extension_408_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_409" number="409" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_409_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_409&quot;" name="XR_BYTEDANCE_extension_409_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_BYTEDANCE_extension_410" number="410" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_BYTEDANCE_extension_410_SPEC_VERSION"/>
+            <enum value="&quot;XR_BYTEDANCE_extension_410&quot;" name="XR_BYTEDANCE_extension_410_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_411" number="411" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_411_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_411&quot;" name="XR_MSFT_EXTENSION_411_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_412" number="412" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_412_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_412&quot;" name="XR_MSFT_EXTENSION_412_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_413" number="413" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_413_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_413&quot;" name="XR_MSFT_EXTENSION_413_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_414" number="414" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_414_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_414&quot;" name="XR_MSFT_EXTENSION_414_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_415" number="415" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_415_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_415&quot;" name="XR_MSFT_EXTENSION_415_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_416" number="416" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_416_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_416&quot;" name="XR_MSFT_EXTENSION_416_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_417" number="417" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_417_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_417&quot;" name="XR_MSFT_EXTENSION_417_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_418" number="418" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_418_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_418&quot;" name="XR_MSFT_EXTENSION_418_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_419" number="419" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_419_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_419&quot;" name="XR_MSFT_EXTENSION_419_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_420" number="420" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_420_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_420&quot;" name="XR_MSFT_EXTENSION_420_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_MSFT_extension_421" number="421" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_MSFT_extension_421_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_extension_421&quot;" name="XR_MSFT_EXTENSION_421_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_DANWILLM_extension_422" number="422" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                     name="XR_DANWILLM_extension_422_SPEC_VERSION"/>
+            <enum value="&quot;XR_DANWILLM_extension_422&quot;" name="XR_DANWILLM_EXTENSION_422_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_DANWILLM_extension_423" number="423" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                     name="XR_DANWILLM_extension_423_SPEC_VERSION"/>
+            <enum value="&quot;XR_DANWILLM_extension_423&quot;" name="XR_DANWILLM_EXTENSION_423_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_DANWILLM_extension_424" number="424" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                     name="XR_DANWILLM_extension_424_SPEC_VERSION"/>
+            <enum value="&quot;XR_DANWILLM_extension_424&quot;" name="XR_DANWILLM_EXTENSION_424_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_DANWILLM_extension_425" number="425" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                     name="XR_DANWILLM_extension_425_SPEC_VERSION"/>
+            <enum value="&quot;XR_DANWILLM_extension_425&quot;" name="XR_DANWILLM_EXTENSION_425_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_DANWILLM_extension_426" number="426" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                     name="XR_DANWILLM_extension_426_SPEC_VERSION"/>
+            <enum value="&quot;XR_DANWILLM_extension_426&quot;" name="XR_DANWILLM_EXTENSION_426_EXTENSION_NAME"/>
         </require>
     </extension>
 

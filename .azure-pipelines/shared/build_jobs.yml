@@ -143,6 +143,11 @@ jobs:
           path: $(System.DefaultWorkingDirectory)/openxr_loader
           artifact: openxr_loader_windows
 
+      # NuGet stuff
+      # See:
+      # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/nuget?view=azure-devops
+      # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/package/nuget?view=azure-devops
+
       - task: PowerShell@2
         displayName: Stage loader and headers for NuGet
         inputs:
@@ -150,6 +155,9 @@ jobs:
           arguments: $(System.DefaultWorkingDirectory)/openxr_loader `
             $(Build.SourcesDirectory)/specification/Makefile `
             $(System.DefaultWorkingDirectory)/openxr_loader_staging
+      - task: NuGetToolInstaller@1
+        inputs:
+          versionSpec: ">=5.0.0"
       - task: NuGetCommand@2
         displayName: Package for NuGet
         inputs:

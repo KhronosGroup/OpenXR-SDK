@@ -1,0 +1,70 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": ".base-msvc",
+            "generator": "Visual Studio 17 2022",
+            "hidden": true,
+            "installDir": "$env{INSTALL_DIR}",
+            "cacheVariables": {
+                "DYNAMIC_LOADER": true,
+                "INSTALL_TO_ARCHITECTURE_PREFIXES": true,
+                "BUILD_ALL_EXTENSIONS": true
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "win32",
+            "inherits": ".base-msvc",
+            "architecture": "Win32"
+        },
+        {
+            "name": "win32_uwp",
+            "inherits": "win32",
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "WindowsStore",
+                "CMAKE_SYSTEM_VERSION": "10.0"
+            }
+        },
+        {
+            "name": "x64",
+            "inherits": ".base-msvc",
+            "architecture": "x64"
+        },
+        {
+            "name": "x64_uwp",
+            "inherits": "x64",
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "WindowsStore",
+                "CMAKE_SYSTEM_VERSION": "10.0"
+            }
+        },
+        {
+            "name": "arm_uwp",
+            "inherits": ".base-msvc",
+            "architecture": "ARM",
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "WindowsStore",
+                "CMAKE_SYSTEM_VERSION": "10.0"
+            }
+        },
+        {
+            "name": "arm64_uwp",
+            "inherits": ".base-msvc",
+            "architecture": "ARM64",
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "WindowsStore",
+                "CMAKE_SYSTEM_VERSION": "10.0"
+            }
+        }
+    ]
+}

@@ -378,6 +378,13 @@ struct XrGeneratedDispatchTable {
     PFN_xrSetPerformanceMetricsStateMETA SetPerformanceMetricsStateMETA;
     PFN_xrGetPerformanceMetricsStateMETA GetPerformanceMetricsStateMETA;
     PFN_xrQueryPerformanceMetricsCounterMETA QueryPerformanceMetricsCounterMETA;
+
+    // ---- XR_HTC_passthrough extension commands
+    PFN_xrCreatePassthroughHTC CreatePassthroughHTC;
+    PFN_xrDestroyPassthroughHTC DestroyPassthroughHTC;
+
+    // ---- XR_HTC_foveation extension commands
+    PFN_xrApplyFoveationHTC ApplyFoveationHTC;
 };
 
 
