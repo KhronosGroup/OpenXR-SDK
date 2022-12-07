@@ -41,7 +41,7 @@ run_xr_xml_generate(loader_source_generator.py xr_generated_loader.cpp)
 if(DYNAMIC_LOADER)
     add_definitions(-DXRAPI_DLL_EXPORT)
     set(LIBRARY_TYPE SHARED)
-    if(WIN32)
+    if(MSVC)
         list(APPEND openxr_loader_RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.def)
     endif()
 else() # build static lib
@@ -335,7 +335,7 @@ install(
     COMPONENT CMakeConfigs
 )
 
-if(WIN32 AND DYNAMIC_LOADER)
+if(MSVC AND DYNAMIC_LOADER)
     install(FILES $<TARGET_PDB_FILE:openxr_loader> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
 endif()
 
