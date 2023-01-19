@@ -50,7 +50,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="ML"         author="Magic Leap"                  contact="Jey Michaelraj @jeymichael"/>
         <tag name="MND"        author="Monado Project"              contact="Jakob Bornecrantz @wallbraker, Ryan Pavlik @rpavlik"/>
         <tag name="MNDX"       author="Monado Project experimental" contact="Jakob Bornecrantz @wallbraker, Ryan Pavlik @rpavlik"/>
-        <tag name="MSFT"       author="Microsoft"                   contact="Alex Turner @alexturn, Yin Li @yl_msft, Bryce Hutchings @brycehutchings, Lachlan Ford @laford_msft, Minmin Gong @gongminmin "/>
+        <tag name="MSFT"       author="Microsoft"                   contact="Alex Turner @alexturn, Yin Li @yl_msft, Bryce Hutchings @brycehutchings, Lachlan Ford @laford_msft, Minmin Gong @gongminmin"/>
         <tag name="NV"         author="NVIDIA Corporation"          contact="Satish Salian @ssalian, Robert Menzel"/>
         <tag name="OCULUS"     author="Oculus"                      contact="Cass Everitt @casseveritt, Jonathan Wright @Nelno"/>
         <tag name="OPPO"       author="OPPO"                        contact="Buyi Xu @fantastxu, Haomiao Jiang @hjiang36"/>
@@ -2754,21 +2754,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <!--enums for Perf setting EXT-->
     <enums name="XrPerfSettingsLevelEXT" type="enum">
-        <enum value="0"      name="XR_PERF_SETTINGS_LEVEL_POWER_SAVINGS_EXT"
-        comment="Performance settings hint used by the application to indicate that it enters a non-XR
-                 section (head-locked / static screen), during which power savings are to be prioritized"/>
-        <enum value="25"     name="XR_PERF_SETTINGS_LEVEL_SUSTAINED_LOW_EXT"
-        comment="Performance settings hint used by the application to indicate that it enters a low
-                 and stable complexity section, during which reducing power is more important than
-                 occasional late rendering frames"/>
-        <enum value="50"     name="XR_PERF_SETTINGS_LEVEL_SUSTAINED_HIGH_EXT"
-        comment="Performance settings hint used by the application to indicate that it enters
-                 a high or dynamic complexity section, during which the XR Runtime strives for consistent
-                 XR compositing and frame rendering within a thermally sustainable range"/>
-        <enum value="75"     name="XR_PERF_SETTINGS_LEVEL_BOOST_EXT"
-        comment="Performance settings hint used by the application to indicate that the application enters
-                 a section with very high complexity, during which the XR Runtime is allowed to step
-                 up beyond the thermally sustainable range"/>
+        <enum value="0"    name="XR_PERF_SETTINGS_LEVEL_POWER_SAVINGS_EXT"  comment="Performance settings hint used by the application to indicate that it enters a non-XR section (head-locked / static screen), during which power savings are to be prioritized"/>
+        <enum value="25"   name="XR_PERF_SETTINGS_LEVEL_SUSTAINED_LOW_EXT"  comment="Performance settings hint used by the application to indicate that it enters a low and stable complexity section, during which reducing power is more important than occasional late rendering frames"/>
+        <enum value="50"   name="XR_PERF_SETTINGS_LEVEL_SUSTAINED_HIGH_EXT" comment="Performance settings hint used by the application to indicate that it enters a high or dynamic complexity section, during which the XR Runtime strives for consistent XR compositing and frame rendering within a thermally sustainable range"/>
+        <enum value="75"   name="XR_PERF_SETTINGS_LEVEL_BOOST_EXT"          comment="Performance settings hint used by the application to indicate that the application enters a section with very high complexity, during which the XR Runtime is allowed to step up beyond the thermally sustainable range"/>
     </enums>
     <enums name="XrPerfSettingsDomainEXT" type="enum">
         <enum value="1"   name="XR_PERF_SETTINGS_DOMAIN_CPU_EXT" comment="Indicates that the performance settings or notification applies to CPU domain"/>
@@ -2780,17 +2769,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="3"   name="XR_PERF_SETTINGS_SUB_DOMAIN_THERMAL_EXT"     comment="Indicates that the performance notification originates from the THERMAL sub-domain"/>
     </enums>
     <enums name="XrPerfSettingsNotificationLevelEXT" type="enum">
-        <enum value="0"      name="XR_PERF_SETTINGS_NOTIF_LEVEL_NORMAL_EXT"
-        comment="Notifies that the sub-domain has reached a level
-                 where no further actions other than currently applied are necessary"/>
-        <enum value="25"     name="XR_PERF_SETTINGS_NOTIF_LEVEL_WARNING_EXT"
-        comment="Notifies that the sub-domain has reached an early warning level
-                 where the application should start proactive mitigation actions
-                 with the goal to return to the ename:XR_PERF_NOTIF_LEVEL_NORMAL level"/>
-        <enum value="75"     name="XR_PERF_SETTINGS_NOTIF_LEVEL_IMPAIRED_EXT"
-        comment="Notifies that the sub-domain has reached a critical
-                 level with significant performance degradation.
-                 The application should take drastic mitigation action"/>
+        <enum value="0"    name="XR_PERF_SETTINGS_NOTIF_LEVEL_NORMAL_EXT"   comment="Notifies that the sub-domain has reached a level where no further actions other than currently applied are necessary"/>
+        <enum value="25"   name="XR_PERF_SETTINGS_NOTIF_LEVEL_WARNING_EXT"  comment="Notifies that the sub-domain has reached an early warning level where the application should start proactive mitigation actions with the goal to return to the ename:XR_PERF_NOTIF_LEVEL_NORMAL level"/>
+        <enum value="75"   name="XR_PERF_SETTINGS_NOTIF_LEVEL_IMPAIRED_EXT" comment="Notifies that the sub-domain has reached a critical level with significant performance degradation. The application should take drastic mitigation action"/>
     </enums>
 
     <!--enums for XR_KHR_visibility_mask -->
@@ -4714,10 +4695,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Android Thread Settings extension -->
     <extension name="XR_KHR_android_thread_settings" number="4" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
         <require>
-            <enum value="5" name="XR_KHR_android_thread_settings_SPEC_VERSION"/>
+            <enum value="5"                                          name="XR_KHR_android_thread_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_thread_settings&quot;" name="XR_KHR_ANDROID_THREAD_SETTINGS_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrResult" dir="-" name="XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR" comment="xrSetAndroidApplicationThreadKHR failed as thread id is invalid."/>
-            <enum offset="1" extends="XrResult" dir="-" name="XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR" comment="xrSetAndroidApplicationThreadKHR failed setting the thread attributes/priority."/>
+            <enum offset="0" dir="-" extends="XrResult"              name="XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR" comment="xrSetAndroidApplicationThreadKHR failed as thread id is invalid."/>
+            <enum offset="1" dir="-" extends="XrResult"              name="XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR"    comment="xrSetAndroidApplicationThreadKHR failed setting the thread attributes/priority."/>
             <type name="XrAndroidThreadTypeKHR"/>
             <command name="xrSetAndroidApplicationThreadKHR"/>
         </require>
@@ -4726,7 +4707,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Android Surface Swapchain extension -->
     <extension name="XR_KHR_android_surface_swapchain" number="5" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
         <require>
-            <enum value="4" name="XR_KHR_android_surface_swapchain_SPEC_VERSION"/>
+            <enum value="4"                                            name="XR_KHR_android_surface_swapchain_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_surface_swapchain&quot;" name="XR_KHR_ANDROID_SURFACE_SWAPCHAIN_EXTENSION_NAME"/>
             <command name="xrCreateSwapchainAndroidSurfaceKHR"/>
         </require>
@@ -4735,7 +4716,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Non-core composition cube layer -->
     <extension name="XR_KHR_composition_layer_cube" number="7" type="instance" supported="openxr">
         <require>
-            <enum value="8" name="XR_KHR_composition_layer_cube_SPEC_VERSION"/>
+            <enum value="8"                                         name="XR_KHR_composition_layer_cube_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_cube&quot;" name="XR_KHR_COMPOSITION_LAYER_CUBE_EXTENSION_NAME"/>
             <type name="XrCompositionLayerCubeKHR"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_CUBE_KHR"/>
@@ -4745,9 +4726,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Android Create Instance extension -->
     <extension name="XR_KHR_android_create_instance" number="9" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
         <require>
-            <enum value="3" name="XR_KHR_android_create_instance_SPEC_VERSION"/>
+            <enum value="3"                                          name="XR_KHR_android_create_instance_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_create_instance&quot;" name="XR_KHR_ANDROID_CREATE_INSTANCE_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_INSTANCE_CREATE_INFO_ANDROID_KHR"/>
+            <enum offset="0" extends="XrStructureType"               name="XR_TYPE_INSTANCE_CREATE_INFO_ANDROID_KHR"/>
             <type name="XrInstanceCreateInfoAndroidKHR"/>
         </require>
     </extension>
@@ -4755,7 +4736,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Runtime support for additional per-layer depth info -->
     <extension name="XR_KHR_composition_layer_depth" number="11" type="instance" supported="openxr">
         <require>
-            <enum value="6" name="XR_KHR_composition_layer_depth_SPEC_VERSION"/>
+            <enum value="6"                                          name="XR_KHR_composition_layer_depth_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_depth&quot;" name="XR_KHR_COMPOSITION_LAYER_DEPTH_EXTENSION_NAME"/>
             <type name="XrCompositionLayerDepthInfoKHR"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_DEPTH_INFO_KHR"/>
@@ -4765,7 +4746,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Reserved for headless "graphics binding" extension -->
     <extension name="XR_KHR_headless" number="14" type="instance" supported="disabled">
         <require>
-            <enum value="4" name="XR_KHR_headless_SPEC_VERSION"/>
+            <enum value="4"                           name="XR_KHR_headless_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_headless&quot;" name="XR_KHR_HEADLESS_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -4774,9 +4755,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Vulkan image format list extension -->
     <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" requires="XR_KHR_vulkan_enable" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN">
         <require>
-            <enum value="4" name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
+            <enum value="4"                                               name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_swapchain_format_list&quot;" name="XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR"/>
+            <enum offset="0" extends="XrStructureType"                    name="XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR"/>
             <type name="XrVulkanSwapchainFormatListCreateInfoKHR"/>
         </require>
     </extension>
@@ -4784,9 +4765,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Performance Settings extension -->
     <extension name="XR_EXT_performance_settings" number="16" type="instance" supported="openxr">
         <require>
-            <enum value="4" name="XR_EXT_performance_settings_SPEC_VERSION"/>
+            <enum value="4"                                       name="XR_EXT_performance_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_performance_settings&quot;" name="XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT"/>
+            <enum offset="0" extends="XrStructureType"            name="XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT"/>
             <type name="XrPerfSettingsDomainEXT"/>
             <type name="XrPerfSettingsSubDomainEXT"/>
             <type name="XrPerfSettingsLevelEXT"/>
@@ -4799,7 +4780,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Thermal Query extension -->
     <extension name="XR_EXT_thermal_query" number="17" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_EXT_thermal_query_SPEC_VERSION"/>
+            <enum value="2"                                name="XR_EXT_thermal_query_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_thermal_query&quot;" name="XR_EXT_THERMAL_QUERY_EXTENSION_NAME"/>
             <type name="XrPerfSettingsDomainEXT"/>
             <type name="XrPerfSettingsNotificationLevelEXT"/>
@@ -4810,7 +4791,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Non-core composition cylinder layer -->
     <extension name="XR_KHR_composition_layer_cylinder" number="18" type="instance" supported="openxr">
         <require>
-            <enum value="4" name="XR_KHR_composition_layer_cylinder_SPEC_VERSION"/>
+            <enum value="4"                                             name="XR_KHR_composition_layer_cylinder_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_cylinder&quot;" name="XR_KHR_COMPOSITION_LAYER_CYLINDER_EXTENSION_NAME"/>
             <type name="XrCompositionLayerCylinderKHR"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_CYLINDER_KHR"/>
@@ -4820,7 +4801,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Non-core composition equilateral rect layer -->
     <extension name="XR_KHR_composition_layer_equirect" number="19" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_KHR_composition_layer_equirect_SPEC_VERSION"/>
+            <enum value="3"                                             name="XR_KHR_composition_layer_equirect_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_equirect&quot;" name="XR_KHR_COMPOSITION_LAYER_EQUIRECT_EXTENSION_NAME"/>
             <type name="XrCompositionLayerEquirectKHR"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_EQUIRECT_KHR"/>
@@ -4830,13 +4811,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Debug Utilities extension -->
     <extension name="XR_EXT_debug_utils" number="20" type="instance" supported="openxr">
         <require>
-            <enum value="4"                                name="XR_EXT_debug_utils_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_debug_utils&quot;"   name="XR_EXT_DEBUG_UTILS_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType"     name="XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT"/>
-            <enum offset="1" extends="XrStructureType"     name="XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"/>
-            <enum offset="2" extends="XrStructureType"     name="XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT"/>
-            <enum offset="3" extends="XrStructureType"     name="XR_TYPE_DEBUG_UTILS_LABEL_EXT"/>
-            <enum offset="0" extends="XrObjectType"        name="XR_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT"  comment="XrDebugUtilsMessengerEXT"/>
+            <enum value="4"                              name="XR_EXT_debug_utils_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_debug_utils&quot;" name="XR_EXT_DEBUG_UTILS_EXTENSION_NAME"/>
+            <enum offset="0" extends="XrStructureType"   name="XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT"/>
+            <enum offset="1" extends="XrStructureType"   name="XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"/>
+            <enum offset="2" extends="XrStructureType"   name="XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT"/>
+            <enum offset="3" extends="XrStructureType"   name="XR_TYPE_DEBUG_UTILS_LABEL_EXT"/>
+            <enum offset="0" extends="XrObjectType"      name="XR_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT"        comment="XrDebugUtilsMessengerEXT"/>
             <type name="PFN_xrDebugUtilsMessengerCallbackEXT"/>
             <type name="XrDebugUtilsObjectNameInfoEXT"/>
             <type name="XrDebugUtilsLabelEXT"/>
@@ -4855,7 +4836,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Reserved space for Variable rate rendering extension -->
     <extension name="XR_KHR_variable_rate_rendering" number="21" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_KHR_variable_rate_rendering_SPEC_VERSION"/>
+            <enum value="1"                                          name="XR_KHR_variable_rate_rendering_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_variable_rate_rendering&quot;" name="XR_KHR_VARIABLE_RATE_RENDERING_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -4863,7 +4844,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Reserved space for Overlays extension -->
     <extension name="XR_KHR_overlays" number="22" type="instance" supported="disabled">
         <require>
-            <enum value="0" name="XR_KHR_overlays_SPEC_VERSION"/>
+            <enum value="0"                           name="XR_KHR_overlays_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_overlays&quot;" name="XR_KHR_OVERLAYS_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -4871,7 +4852,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- OpenGL graphics binding extension -->
     <extension name="XR_KHR_opengl_enable" number="24" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL" supported="openxr">
         <require>
-            <enum value="10" name="XR_KHR_opengl_enable_SPEC_VERSION"/>
+            <enum value="10"                               name="XR_KHR_opengl_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_enable&quot;" name="XR_KHR_OPENGL_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR"/>
             <enum offset="1" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR"/>
@@ -4892,7 +4873,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- OpenGL ES graphics binding extension -->
     <extension name="XR_KHR_opengl_es_enable" number="25" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL_ES" supported="openxr">
         <require>
-            <enum value="8" name="XR_KHR_opengl_es_enable_SPEC_VERSION"/>
+            <enum value="8"                                   name="XR_KHR_opengl_es_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_es_enable&quot;" name="XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME"/>
             <enum offset="1" extends="XrStructureType"        name="XR_TYPE_GRAPHICS_BINDING_OPENGL_ES_ANDROID_KHR"/>
             <enum offset="2" extends="XrStructureType"        name="XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR"/>
@@ -4907,7 +4888,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Vulkan graphics binding extension -->
     <extension name="XR_KHR_vulkan_enable" number="26" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr">
         <require>
-            <enum value="8" name="XR_KHR_vulkan_enable_SPEC_VERSION"/>
+            <enum value="8"                                name="XR_KHR_vulkan_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_enable&quot;" name="XR_KHR_VULKAN_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR"/>
             <enum offset="1" extends="XrStructureType"     name="XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR"/>
@@ -4925,7 +4906,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Value used by obsolete D3D10 graphics binding extension -->
     <extension name="XR_KHR_D3D10_enable_obsolete" number="27" type="instance" supported="disabled">
         <require>
-            <enum value="4" name="XR_KHR_D3D10_enable_obsolete_SPEC_VERSION"/>
+            <enum value="4"                                        name="XR_KHR_D3D10_enable_obsolete_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D10_enable_obsolete&quot;" name="XR_KHR_D3D10_ENABLE_OBSOLETE_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -4933,7 +4914,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- D3D11 graphics binding extension -->
     <extension name="XR_KHR_D3D11_enable" number="28" type="instance" protect="XR_USE_GRAPHICS_API_D3D11" supported="openxr">
         <require>
-            <enum value="9" name="XR_KHR_D3D11_enable_SPEC_VERSION"/>
+            <enum value="9"                               name="XR_KHR_D3D11_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D11_enable&quot;" name="XR_KHR_D3D11_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"    name="XR_TYPE_GRAPHICS_BINDING_D3D11_KHR"/>
             <enum offset="1" extends="XrStructureType"    name="XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR"/>
@@ -4948,7 +4929,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- D3D12 graphics binding extension -->
     <extension name="XR_KHR_D3D12_enable" number="29" type="instance" protect="XR_USE_GRAPHICS_API_D3D12" supported="openxr">
         <require>
-            <enum value="9" name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
+            <enum value="9"                               name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D12_enable&quot;" name="XR_KHR_D3D12_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"    name="XR_TYPE_GRAPHICS_BINDING_D3D12_KHR"/>
             <enum offset="1" extends="XrStructureType"    name="XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR"/>
@@ -4963,7 +4944,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Reserved space for Enable Metal extension -->
     <extension name="XR_KHR_metal_enable" number="30" type="instance" protect="XR_USE_GRAPHICS_API_METAL" supported="disabled">
         <require>
-            <enum value="1" name="XR_KHR_metal_enable_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_KHR_metal_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_metal_enable&quot;" name="XR_KHR_METAL_ENABLE_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -4971,10 +4952,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Eye gaze interaction extension -->
     <extension name="XR_EXT_eye_gaze_interaction" number="31" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_EXT_eye_gaze_interaction_SPEC_VERSION"/>
+            <enum value="2"                                       name="XR_EXT_eye_gaze_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_eye_gaze_interaction&quot;" name="XR_EXT_EYE_GAZE_INTERACTION_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT"/>
+            <enum offset="0" extends="XrStructureType"            name="XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT"/>
+            <enum offset="1" extends="XrStructureType"            name="XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT"/>
             <type name="XrSystemEyeGazeInteractionPropertiesEXT"/>
             <type name="XrEyeGazeSampleTimeEXT"/>
         </require>
@@ -4983,10 +4964,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Visibility mask extension -->
     <extension name="XR_KHR_visibility_mask" number="32" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_KHR_visibility_mask_SPEC_VERSION"/>
+            <enum value="2"                                  name="XR_KHR_visibility_mask_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_visibility_mask&quot;" name="XR_KHR_VISIBILITY_MASK_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VISIBILITY_MASK_KHR"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR"/>
+            <enum offset="0" extends="XrStructureType"       name="XR_TYPE_VISIBILITY_MASK_KHR"/>
+            <enum offset="1" extends="XrStructureType"       name="XR_TYPE_EVENT_DATA_VISIBILITY_MASK_CHANGED_KHR"/>
             <type name="XrVisibilityMaskTypeKHR"/>
             <type name="XrVisibilityMaskKHR"/>
             <type name="XrEventDataVisibilityMaskChangedKHR"/>
@@ -4997,7 +4978,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Reserved space for EXT permissions support -->
     <extension name="XR_EXT_permissions_support" number="33" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_EXT_permissions_support_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_EXT_permissions_support_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_permissions_support&quot;" name="XR_EXT_PERMISSIONS_SUPPORT_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -5005,7 +4986,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Overlay preview extension -->
     <extension name="XR_EXTX_overlay" number="34" type="instance" provisional="true" supported="openxr">
         <require>
-            <enum value="5" name="XR_EXTX_overlay_SPEC_VERSION"/>
+            <enum value="5"                            name="XR_EXTX_overlay_SPEC_VERSION"/>
             <enum value="&quot;XR_EXTX_overlay&quot;"  name="XR_EXTX_OVERLAY_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_SESSION_CREATE_INFO_OVERLAY_EXTX"/>
             <enum offset="3" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_MAIN_SESSION_VISIBILITY_CHANGED_EXTX"/>
@@ -5018,16 +4999,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- per-layer color scale and bias -->
     <extension name="XR_KHR_composition_layer_color_scale_bias" number="35" type="instance" supported="openxr">
         <require>
-            <enum value="5" name="XR_KHR_composition_layer_color_scale_bias_SPEC_VERSION"/>
+            <enum value="5"                                                     name="XR_KHR_composition_layer_color_scale_bias_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_color_scale_bias&quot;" name="XR_KHR_COMPOSITION_LAYER_COLOR_SCALE_BIAS_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR"/>
+            <enum offset="0" extends="XrStructureType"                          name="XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR"/>
             <type name="XrCompositionLayerColorScaleBiasKHR"/>
         </require>
     </extension>
 
     <extension name="XR_KHR_win32_convert_performance_counter_time" number="36" type="instance" supported="openxr" protect="XR_USE_PLATFORM_WIN32">
         <require>
-            <enum value="1" name="XR_KHR_win32_convert_performance_counter_time_SPEC_VERSION"/>
+            <enum value="1"                                                         name="XR_KHR_win32_convert_performance_counter_time_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_win32_convert_performance_counter_time&quot;" name="XR_KHR_WIN32_CONVERT_PERFORMANCE_COUNTER_TIME_EXTENSION_NAME"/>
             <command name="xrConvertWin32PerformanceCounterToTimeKHR"/>
             <command name="xrConvertTimeToWin32PerformanceCounterKHR"/>
@@ -5036,7 +5017,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_KHR_convert_timespec_time" number="37" type="instance" supported="openxr" protect="XR_USE_TIMESPEC">
         <require>
-            <enum value="1" name="XR_KHR_convert_timespec_time_SPEC_VERSION"/>
+            <enum value="1"                                        name="XR_KHR_convert_timespec_time_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_convert_timespec_time&quot;" name="XR_KHR_CONVERT_TIMESPEC_TIME_EXTENSION_NAME"/>
             <command name="xrConvertTimespecTimeToTimeKHR"/>
             <command name="xrConvertTimeToTimespecTimeKHR"/>
@@ -5045,33 +5026,33 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VARJO_quad_views" number="38" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_VARJO_quad_views_SPEC_VERSION"/>
-            <enum value="&quot;XR_VARJO_quad_views&quot;" name="XR_VARJO_QUAD_VIEWS_EXTENSION_NAME"/>
+            <enum value="1"                                    name="XR_VARJO_quad_views_SPEC_VERSION"/>
+            <enum value="&quot;XR_VARJO_quad_views&quot;"      name="XR_VARJO_QUAD_VIEWS_EXTENSION_NAME"/>
             <enum offset="0" extends="XrViewConfigurationType" name="XR_VIEW_CONFIGURATION_TYPE_PRIMARY_QUAD_VARJO"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_unbounded_reference_space" number="39" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_unbounded_reference_space_SPEC_VERSION"/>
+            <enum value="1"                                             name="XR_MSFT_unbounded_reference_space_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_unbounded_reference_space&quot;" name="XR_MSFT_UNBOUNDED_REFERENCE_SPACE_EXTENSION_NAME"/>
 
-            <enum offset="0" extends="XrReferenceSpaceType" name="XR_REFERENCE_SPACE_TYPE_UNBOUNDED_MSFT"/>
+            <enum offset="0" extends="XrReferenceSpaceType"             name="XR_REFERENCE_SPACE_TYPE_UNBOUNDED_MSFT"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_spatial_anchor" number="40" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_MSFT_spatial_anchor_SPEC_VERSION"/>
+            <enum value="2"                                  name="XR_MSFT_spatial_anchor_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_spatial_anchor&quot;" name="XR_MSFT_SPATIAL_ANCHOR_EXTENSION_NAME"/>
 
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT"/>
+            <enum offset="0" extends="XrStructureType"       name="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_MSFT"/>
+            <enum offset="1" extends="XrStructureType"       name="XR_TYPE_SPATIAL_ANCHOR_SPACE_CREATE_INFO_MSFT"/>
             <command name="xrCreateSpatialAnchorMSFT"/>
             <command name="xrCreateSpatialAnchorSpaceMSFT"/>
             <command name="xrDestroySpatialAnchorMSFT"/>
-            <enum offset="0" extends="XrObjectType" name="XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT" comment="XrSpatialAnchorMSFT"/>
-            <enum offset="1" dir="-" extends="XrResult" name="XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT" comment="Spatial anchor could not be created at that location."/>
+            <enum offset="0"         extends="XrObjectType" name="XR_OBJECT_TYPE_SPATIAL_ANCHOR_MSFT"         comment="XrSpatialAnchorMSFT"/>
+            <enum offset="1" dir="-" extends="XrResult"     name="XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT" comment="Spatial anchor could not be created at that location."/>
         </require>
     </extension>
 
@@ -5096,44 +5077,44 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MND_headless" number="43" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_MND_headless_SPEC_VERSION"/>
+            <enum value="2"                           name="XR_MND_headless_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_headless&quot;" name="XR_MND_HEADLESS_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_OCULUS_extension_44" number="44" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_OCULUS_extension_44_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_OCULUS_extension_44_SPEC_VERSION"/>
             <enum value="&quot;XR_OCULUS_extension_44&quot;" name="XR_OCULUS_EXTENSION_44_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_OCULUS_android_session_state_enable" number="45" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_OCULUS_android_session_state_enable_SPEC_VERSION"/>
+            <enum value="1"                                                  name="XR_OCULUS_android_session_state_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_OCULUS_android_session_state_enable&quot;" name="XR_OCULUS_ANDROID_SESSION_STATE_ENABLE_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MND_extension_46" number="46" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MND_extension_46_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_MND_extension_46_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_extension_46&quot;" name="XR_MND_EXTENSION_46_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_view_configuration_depth_range" number="47" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_EXT_view_configuration_depth_range_SPEC_VERSION"/>
+            <enum value="1"                                                 name="XR_EXT_view_configuration_depth_range_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_view_configuration_depth_range&quot;" name="XR_EXT_VIEW_CONFIGURATION_DEPTH_RANGE_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"/>
+            <enum offset="0" extends="XrStructureType"                      name="XR_TYPE_VIEW_CONFIGURATION_DEPTH_RANGE_EXT"/>
             <type name="XrViewConfigurationDepthRangeEXT"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_conformance_automation" number="48" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_EXT_conformance_automation_SPEC_VERSION"/>
+            <enum value="3"                                         name="XR_EXT_conformance_automation_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_conformance_automation&quot;" name="XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME"/>
             <command name="xrSetInputDeviceActiveEXT"/>
             <command name="xrSetInputDeviceStateBoolEXT"/>
@@ -5145,9 +5126,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MNDX_egl_enable" number="49" type="instance" provisional="true" protect="XR_USE_PLATFORM_EGL" supported="openxr">
         <require>
-            <enum value="1" name="XR_MNDX_egl_enable_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_MNDX_egl_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_MNDX_egl_enable&quot;" name="XR_MNDX_EGL_ENABLE_EXTENSION_NAME"/>
-            <enum offset="4" extends="XrStructureType" name="XR_TYPE_GRAPHICS_BINDING_EGL_MNDX"/>
+            <enum offset="4" extends="XrStructureType"   name="XR_TYPE_GRAPHICS_BINDING_EGL_MNDX"/>
             <type name="XrGraphicsBindingEGLMNDX"/>
         </require>
     </extension>
@@ -5176,14 +5157,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MSFT_hand_interaction" number="51" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_hand_interaction_SPEC_VERSION"/>
+            <enum value="1"                                    name="XR_MSFT_hand_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_hand_interaction&quot;" name="XR_MSFT_HAND_INTERACTION_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_hand_tracking" number="52" type="instance" supported="openxr">
         <require>
-            <enum value="4" name="XR_EXT_hand_tracking_SPEC_VERSION"/>
+            <enum value="4"                                name="XR_EXT_hand_tracking_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_tracking&quot;" name="XR_EXT_HAND_TRACKING_EXTENSION_NAME"/>
 
             <command name="xrCreateHandTrackerEXT"/>
@@ -5203,7 +5184,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <type name="XrHandJointVelocitiesEXT"/>
             <type name="XR_HAND_JOINT_COUNT_EXT"/>
 
-            <enum offset="0" extends="XrObjectType" name="XR_OBJECT_TYPE_HAND_TRACKER_EXT" comment="XrHandTrackerEXT"/>
+            <enum offset="0" extends="XrObjectType"    name="XR_OBJECT_TYPE_HAND_TRACKER_EXT"             comment="XrHandTrackerEXT"/>
 
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT"/>
             <enum offset="1" extends="XrStructureType" name="XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT"/>
@@ -5213,10 +5194,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_hand_tracking_mesh" number="53"
-            requires="XR_EXT_hand_tracking" type="instance" supported="openxr">
+    <extension name="XR_MSFT_hand_tracking_mesh" number="53" requires="XR_EXT_hand_tracking" type="instance" supported="openxr">
         <require>
-            <enum value="4" name="XR_MSFT_hand_tracking_mesh_SPEC_VERSION"/>
+            <enum value="4"                                      name="XR_MSFT_hand_tracking_mesh_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_hand_tracking_mesh&quot;" name="XR_MSFT_HAND_TRACKING_MESH_EXTENSION_NAME"/>
 
             <command name="xrCreateHandMeshSpaceMSFT"/>
@@ -5242,7 +5222,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MSFT_secondary_view_configuration" number="54" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_secondary_view_configuration_SPEC_VERSION"/>
+            <enum value="1"                                                name="XR_MSFT_secondary_view_configuration_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_secondary_view_configuration&quot;" name="XR_MSFT_SECONDARY_VIEW_CONFIGURATION_EXTENSION_NAME"/>
             <type name="XrSecondaryViewConfigurationSessionBeginInfoMSFT"/>
             <type name="XrSecondaryViewConfigurationStateMSFT"/>
@@ -5250,28 +5230,27 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <type name="XrSecondaryViewConfigurationFrameEndInfoMSFT"/>
             <type name="XrSecondaryViewConfigurationLayerInfoMSFT"/>
             <type name="XrSecondaryViewConfigurationSwapchainCreateInfoMSFT"/>
-            <enum offset="0" extends="XrStructureType"  name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SESSION_BEGIN_INFO_MSFT"/>
-            <enum offset="1" extends="XrStructureType"  name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_STATE_MSFT"/>
-            <enum offset="2" extends="XrStructureType"  name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_STATE_MSFT"/>
-            <enum offset="3" extends="XrStructureType"  name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_END_INFO_MSFT"/>
-            <enum offset="4" extends="XrStructureType"  name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT"/>
-            <enum offset="5" extends="XrStructureType"  name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT"/>
-            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_SECONDARY_VIEW_CONFIGURATION_TYPE_NOT_ENABLED_MSFT"
-                comment="The secondary view configuration was not enabled when creating the session."/>
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SESSION_BEGIN_INFO_MSFT"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_STATE_MSFT"/>
+            <enum offset="2"         extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_STATE_MSFT"/>
+            <enum offset="3"         extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_FRAME_END_INFO_MSFT"/>
+            <enum offset="4"         extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_LAYER_INFO_MSFT"/>
+            <enum offset="5"         extends="XrStructureType" name="XR_TYPE_SECONDARY_VIEW_CONFIGURATION_SWAPCHAIN_CREATE_INFO_MSFT"/>
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_SECONDARY_VIEW_CONFIGURATION_TYPE_NOT_ENABLED_MSFT"     comment="The secondary view configuration was not enabled when creating the session."/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_first_person_observer" number="55" type="instance" requires="XR_MSFT_secondary_view_configuration" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_first_person_observer_SPEC_VERSION"/>
+            <enum value="1"                                         name="XR_MSFT_first_person_observer_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_first_person_observer&quot;" name="XR_MSFT_FIRST_PERSON_OBSERVER_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrViewConfigurationType" name="XR_VIEW_CONFIGURATION_TYPE_SECONDARY_MONO_FIRST_PERSON_OBSERVER_MSFT"/>
+            <enum offset="0" extends="XrViewConfigurationType"      name="XR_VIEW_CONFIGURATION_TYPE_SECONDARY_MONO_FIRST_PERSON_OBSERVER_MSFT"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_controller_model" number="56" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_MSFT_controller_model_SPEC_VERSION"/>
+            <enum value="2"                                    name="XR_MSFT_controller_model_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_controller_model&quot;" name="XR_MSFT_CONTROLLER_MODEL_EXTENSION_NAME"/>
 
             <type name="XrControllerModelKeyStateMSFT"/>
@@ -5287,21 +5266,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <command name="xrGetControllerModelPropertiesMSFT"/>
             <command name="xrGetControllerModelStateMSFT"/>
 
-            <enum value="64" name="XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT"/>
+            <enum value="64"                                   name="XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT"/>
 
-            <enum offset="0" extends="XrStructureType"  name="XR_TYPE_CONTROLLER_MODEL_KEY_STATE_MSFT"/>
-            <enum offset="1" extends="XrStructureType"  name="XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT"/>
-            <enum offset="2" extends="XrStructureType"  name="XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT"/>
-            <enum offset="3" extends="XrStructureType"  name="XR_TYPE_CONTROLLER_MODEL_NODE_STATE_MSFT"/>
-            <enum offset="4" extends="XrStructureType"  name="XR_TYPE_CONTROLLER_MODEL_STATE_MSFT"/>
-            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT" comment="The controller model key is invalid."/>
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_KEY_STATE_MSFT"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT"/>
+            <enum offset="2"         extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT"/>
+            <enum offset="3"         extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_NODE_STATE_MSFT"/>
+            <enum offset="4"         extends="XrStructureType" name="XR_TYPE_CONTROLLER_MODEL_STATE_MSFT"/>
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_CONTROLLER_MODEL_KEY_INVALID_MSFT"    comment="The controller model key is invalid."/>
 
         </require>
     </extension>
 
     <extension name="XR_MSFT_perception_anchor_interop" number="57" type="instance" supported="openxr" requires="XR_MSFT_spatial_anchor" protect="XR_USE_PLATFORM_WIN32">
         <require>
-            <enum value="1" name="XR_MSFT_perception_anchor_interop_SPEC_VERSION"/>
+            <enum value="1"                                             name="XR_MSFT_perception_anchor_interop_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_perception_anchor_interop&quot;" name="XR_MSFT_PERCEPTION_ANCHOR_INTEROP_EXTENSION_NAME"/>
 
             <command name="xrCreateSpatialAnchorFromPerceptionAnchorMSFT"/>
@@ -5312,37 +5291,37 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_EXT_win32_appcontainer_compatible" number="58" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_EXT_win32_appcontainer_compatible_SPEC_VERSION"/>
+            <enum value="1"                                                name="XR_EXT_win32_appcontainer_compatible_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_win32_appcontainer_compatible&quot;" name="XR_EXT_WIN32_APPCONTAINER_COMPATIBLE_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_59" number="59" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_59_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_ML_extension_59_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_59&quot;" name="XR_ML_extension_59_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_EPIC_view_configuration_fov" number="60" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_EPIC_view_configuration_fov_SPEC_VERSION"/>
+            <enum value="2"                                          name="XR_EPIC_view_configuration_fov_SPEC_VERSION"/>
             <enum value="&quot;XR_EPIC_view_configuration_fov&quot;" name="XR_EPIC_VIEW_CONFIGURATION_FOV_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC"/>
+            <enum offset="0" extends="XrStructureType"               name="XR_TYPE_VIEW_CONFIGURATION_VIEW_FOV_EPIC"/>
             <type name="XrViewConfigurationViewFovEPIC"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_63" number="63" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_63_SPEC_VERSION"/>
+            <enum value="1"                                name="XR_MSFT_extension_63_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_63&quot;" name="XR_MSFT_extension_63_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_holographic_window_attachment" number="64" type="instance" supported="openxr" protect="XR_USE_PLATFORM_WIN32">
         <require>
-            <enum value="1" name="XR_MSFT_holographic_window_attachment_SPEC_VERSION"/>
+            <enum value="1"                                                 name="XR_MSFT_holographic_window_attachment_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_holographic_window_attachment&quot;" name="XR_MSFT_HOLOGRAPHIC_WINDOW_ATTACHMENT_EXTENSION_NAME"/>
             <type name="XrHolographicWindowAttachmentMSFT"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_HOLOGRAPHIC_WINDOW_ATTACHMENT_MSFT"/>
@@ -5351,21 +5330,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MSFT_extension_65" number="65" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_65_SPEC_VERSION"/>
+            <enum value="1"                                name="XR_MSFT_extension_65_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_65&quot;" name="XR_MSFT_extension_65_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_66" number="66" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_66_SPEC_VERSION"/>
+            <enum value="1"                                name="XR_MSFT_extension_66_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_66&quot;" name="XR_MSFT_extension_66_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_composition_layer_reprojection" number="67" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_MSFT_composition_layer_reprojection_SPEC_VERSION"/>
+            <enum value="1"                                                  name="XR_MSFT_composition_layer_reprojection_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_composition_layer_reprojection&quot;" name="XR_MSFT_COMPOSITION_LAYER_REPROJECTION_EXTENSION_NAME"/>
 
             <type name="XrReprojectionModeMSFT"/>
@@ -5374,37 +5353,37 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
             <command name="xrEnumerateReprojectionModesMSFT"/>
 
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_REPROJECTION_INFO_MSFT"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_REPROJECTION_PLANE_OVERRIDE_MSFT"/>
-            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_REPROJECTION_MODE_UNSUPPORTED_MSFT" comment="The reprojection mode is not supported."/>
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_REPROJECTION_INFO_MSFT"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_REPROJECTION_PLANE_OVERRIDE_MSFT"/>
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_REPROJECTION_MODE_UNSUPPORTED_MSFT"                comment="The reprojection mode is not supported."/>
 
         </require>
     </extension>
 
     <extension name="XR_LUNARG_extension_68" number="68" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_LUNARG_extension_68_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_LUNARG_extension_68_SPEC_VERSION"/>
             <enum value="&quot;XR_LUNARG_extension_68&quot;" name="XR_LUNARG_extension_68_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_LUNARG_extension_69" number="69" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_LUNARG_extension_69_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_LUNARG_extension_69_SPEC_VERSION"/>
             <enum value="&quot;XR_LUNARG_extension_69&quot;" name="XR_LUNARG_extension_69_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_HUAWEI_controller_interaction" number="70" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_HUAWEI_controller_interaction_SPEC_VERSION"/>
+            <enum value="1"                                            name="XR_HUAWEI_controller_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_HUAWEI_controller_interaction&quot;" name="XR_HUAWEI_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_android_surface_swapchain_create" number="71" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" requires="XR_KHR_android_surface_swapchain">
         <require>
-            <enum value="1" name="XR_FB_android_surface_swapchain_create_SPEC_VERSION"/>
+            <enum value="1"                                                  name="XR_FB_android_surface_swapchain_create_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_android_surface_swapchain_create&quot;" name="XR_FB_ANDROID_SURFACE_SWAPCHAIN_CREATE_EXTENSION_NAME"/>
 
             <type name="XrAndroidSurfaceSwapchainCreateInfoFB"/>
@@ -5414,7 +5393,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_swapchain_update_state" number="72" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_FB_swapchain_update_state_SPEC_VERSION"/>
+            <enum value="3"                                        name="XR_FB_swapchain_update_state_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_swapchain_update_state&quot;" name="XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME"/>
 
             <type name="XrSwapchainStateBaseHeaderFB"/>
@@ -5435,35 +5414,35 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_74" number="74" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_74_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_FB_extension_74_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_74&quot;" name="XR_FB_extension_74_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_75" number="75" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_75_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_FB_extension_75_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_75&quot;" name="XR_FB_extension_75_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_76" number="76" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_76_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_FB_extension_76_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_76&quot;" name="XR_FB_extension_76_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_77" number="77" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_77_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_FB_extension_77_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_77&quot;" name="XR_FB_extension_77_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_78" number="78" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_78_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_FB_extension_78_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_78&quot;" name="XR_FB_extension_78_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -5479,16 +5458,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VALVE_analog_threshold" number="80" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_VALVE_analog_threshold_SPEC_VERSION"/>
+            <enum value="2"                                     name="XR_VALVE_analog_threshold_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_analog_threshold&quot;" name="XR_VALVE_ANALOG_THRESHOLD_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE"/>
+            <enum offset="0" extends="XrStructureType"          name="XR_TYPE_INTERACTION_PROFILE_ANALOG_THRESHOLD_VALVE"/>
             <type name="XrInteractionProfileAnalogThresholdVALVE"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_hand_joints_motion_range" number="81" type="instance" supported="openxr" requires="XR_EXT_hand_tracking">
         <require>
-            <enum value="1" name="XR_EXT_hand_joints_motion_range_SPEC_VERSION"/>
+            <enum value="1"                                           name="XR_EXT_hand_joints_motion_range_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_joints_motion_range&quot;" name="XR_EXT_HAND_JOINTS_MOTION_RANGE_EXTENSION_NAME"/>
 
             <type name="XrHandJointsMotionRangeEXT"/>
@@ -5500,56 +5479,56 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VALVE_extension_82" number="82" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_82_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_82_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_82&quot;" name="XR_VALVE_extension_82_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VALVE_extension_83" number="83" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_83_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_83_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_83&quot;" name="XR_VALVE_extension_83_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VALVE_extension_84" number="84" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_84_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_84_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_84&quot;" name="XR_VALVE_extension_84_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VALVE_extension_85" number="85" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_85_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_85_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_85&quot;" name="XR_VALVE_extension_85_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VALVE_extension_86" number="86" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_86_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_86_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_86&quot;" name="XR_VALVE_extension_86_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VALVE_extension_87" number="87" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_87_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_87_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_87&quot;" name="XR_VALVE_extension_87_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VALVE_extension_88" number="88" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VALVE_extension_88_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_VALVE_extension_88_SPEC_VERSION"/>
             <enum value="&quot;XR_VALVE_extension_88&quot;" name="XR_VALVE_extension_88_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_KHR_loader_init" number="89" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_KHR_loader_init_SPEC_VERSION"/>
+            <enum value="1"                              name="XR_KHR_loader_init_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_loader_init&quot;" name="XR_KHR_LOADER_INIT_EXTENSION_NAME"/>
             <type name="XrLoaderInitInfoBaseHeaderKHR"/>
             <command name="xrInitializeLoaderKHR"/>
@@ -5558,7 +5537,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_KHR_loader_init_android" number="90" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" requires="XR_KHR_loader_init">
         <require>
-            <enum value="1" name="XR_KHR_loader_init_android_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_KHR_loader_init_android_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_loader_init_android&quot;" name="XR_KHR_LOADER_INIT_ANDROID_EXTENSION_NAME"/>
             <type name="XrLoaderInitInfoAndroidKHR"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR"/>
@@ -5567,7 +5546,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_KHR_vulkan_enable2" number="91" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr">
         <require>
-            <enum value="2" name="XR_KHR_vulkan_enable2_SPEC_VERSION"/>
+            <enum value="2"                                 name="XR_KHR_vulkan_enable2_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_enable2&quot;" name="XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"      name="XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR"/>
             <enum offset="1" extends="XrStructureType"      name="XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR"/>
@@ -5590,7 +5569,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_KHR_composition_layer_equirect2" number="92" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_KHR_composition_layer_equirect2_SPEC_VERSION"/>
+            <enum value="1"                                              name="XR_KHR_composition_layer_equirect2_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_equirect2&quot;" name="XR_KHR_COMPOSITION_LAYER_EQUIRECT2_EXTENSION_NAME"/>
             <type name="XrCompositionLayerEquirect2KHR"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_EQUIRECT2_KHR"/>
@@ -5599,35 +5578,35 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_EXT_extension_93" number="93" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_EXT_extension_93_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_EXT_extension_93_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_extension_93&quot;" name="XR_EXT_extension_93_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_extension_94" number="94" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_EXT_extension_94_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_EXT_extension_94_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_extension_94&quot;" name="XR_EXT_extension_94_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_samsung_odyssey_controller" number="95" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_EXT_samsung_odyssey_controller_SPEC_VERSION"/>
+            <enum value="1"                                             name="XR_EXT_samsung_odyssey_controller_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_samsung_odyssey_controller&quot;" name="XR_EXT_SAMSUNG_ODYSSEY_CONTROLLER_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_EXT_hp_mixed_reality_controller" number="96" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_EXT_hp_mixed_reality_controller_SPEC_VERSION"/>
+            <enum value="1"                                              name="XR_EXT_hp_mixed_reality_controller_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hp_mixed_reality_controller&quot;" name="XR_EXT_HP_MIXED_REALITY_CONTROLLER_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MND_swapchain_usage_input_attachment_bit" number="97" type="instance" supported="openxr" promotedto="XR_KHR_swapchain_usage_input_attachment_bit">
         <require>
-            <enum value="2" name="XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
+            <enum value="2"                                                       name="XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_swapchain_usage_input_attachment_bit&quot;" name="XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME"/>
             <!-- NOTE: This was added before the working group established a process, and has been normalized by promotion to KHR. Future vendor extensions MUST NOT extend core bitmasks. -->
             <enum bitpos="7" extends="XrSwapchainUsageFlagBits" name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND" comment="Specifies that the image may: be used as a input attachment."/>
@@ -5636,7 +5615,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_MSFT_scene_understanding" number="98" type="instance" supported="openxr">
         <require>
-            <enum value="2" name="XR_MSFT_scene_understanding_SPEC_VERSION"/>
+            <enum value="2"                                       name="XR_MSFT_scene_understanding_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_scene_understanding&quot;" name="XR_MSFT_SCENE_UNDERSTANDING_EXTENSION_NAME"/>
             <type name="XrUuidMSFT"/>
             <type name="XrSceneObserverCreateInfoMSFT"/>
@@ -5684,70 +5663,69 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <command name="xrGetSceneComponentsMSFT"/>
             <command name="xrLocateSceneComponentsMSFT"/>
             <command name="xrGetSceneMeshBuffersMSFT"/>
-            <enum offset="0" extends="XrObjectType" name="XR_OBJECT_TYPE_SCENE_OBSERVER_MSFT" comment="XrSceneObserverMSFT"/>
-            <enum offset="1" extends="XrObjectType" name="XR_OBJECT_TYPE_SCENE_MSFT" comment="XrSceneMSFT"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SCENE_OBSERVER_CREATE_INFO_MSFT"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SCENE_CREATE_INFO_MSFT"/>
-            <enum offset="2" extends="XrStructureType" name="XR_TYPE_NEW_SCENE_COMPUTE_INFO_MSFT"/>
-            <enum offset="3" extends="XrStructureType" name="XR_TYPE_VISUAL_MESH_COMPUTE_LOD_INFO_MSFT"/>
-            <enum offset="4" extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENTS_MSFT"/>
-            <enum offset="5" extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENTS_GET_INFO_MSFT"/>
-            <enum offset="6" extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENT_LOCATIONS_MSFT"/>
-            <enum offset="7" extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENTS_LOCATE_INFO_MSFT"/>
-            <enum offset="8" extends="XrStructureType" name="XR_TYPE_SCENE_OBJECTS_MSFT"/>
-            <enum offset="9" extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENT_PARENT_FILTER_INFO_MSFT"/>
-            <enum offset="10" extends="XrStructureType" name="XR_TYPE_SCENE_OBJECT_TYPES_FILTER_INFO_MSFT"/>
-            <enum offset="11" extends="XrStructureType" name="XR_TYPE_SCENE_PLANES_MSFT"/>
-            <enum offset="12" extends="XrStructureType" name="XR_TYPE_SCENE_PLANE_ALIGNMENT_FILTER_INFO_MSFT"/>
-            <enum offset="13" extends="XrStructureType" name="XR_TYPE_SCENE_MESHES_MSFT"/>
-            <enum offset="14" extends="XrStructureType" name="XR_TYPE_SCENE_MESH_BUFFERS_GET_INFO_MSFT"/>
-            <enum offset="15" extends="XrStructureType" name="XR_TYPE_SCENE_MESH_BUFFERS_MSFT"/>
-            <enum offset="16" extends="XrStructureType" name="XR_TYPE_SCENE_MESH_VERTEX_BUFFER_MSFT"/>
-            <enum offset="17" extends="XrStructureType" name="XR_TYPE_SCENE_MESH_INDICES_UINT32_MSFT"/>
-            <enum offset="18" extends="XrStructureType" name="XR_TYPE_SCENE_MESH_INDICES_UINT16_MSFT"/>
-            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_COMPUTE_NEW_SCENE_NOT_COMPLETED_MSFT" comment="Compute new scene not completed."/>
-            <enum offset="1" dir="-" extends="XrResult" name="XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT" comment="Scene component id invalid."/>
-            <enum offset="2" dir="-" extends="XrResult" name="XR_ERROR_SCENE_COMPONENT_TYPE_MISMATCH_MSFT" comment="Scene component type mismatch."/>
-            <enum offset="3" dir="-" extends="XrResult" name="XR_ERROR_SCENE_MESH_BUFFER_ID_INVALID_MSFT" comment="Scene mesh buffer id invalid."/>
-            <enum offset="4" dir="-" extends="XrResult" name="XR_ERROR_SCENE_COMPUTE_FEATURE_INCOMPATIBLE_MSFT" comment="Scene compute feature incompatible."/>
-            <enum offset="5" dir="-" extends="XrResult" name="XR_ERROR_SCENE_COMPUTE_CONSISTENCY_MISMATCH_MSFT" comment="Scene compute consistency mismatch."/>
+            <enum offset="0"          extends="XrObjectType"    name="XR_OBJECT_TYPE_SCENE_OBSERVER_MSFT"               comment="XrSceneObserverMSFT"/>
+            <enum offset="1"          extends="XrObjectType"    name="XR_OBJECT_TYPE_SCENE_MSFT"                        comment="XrSceneMSFT"/>
+            <enum offset="0"          extends="XrStructureType" name="XR_TYPE_SCENE_OBSERVER_CREATE_INFO_MSFT"/>
+            <enum offset="1"          extends="XrStructureType" name="XR_TYPE_SCENE_CREATE_INFO_MSFT"/>
+            <enum offset="2"          extends="XrStructureType" name="XR_TYPE_NEW_SCENE_COMPUTE_INFO_MSFT"/>
+            <enum offset="3"          extends="XrStructureType" name="XR_TYPE_VISUAL_MESH_COMPUTE_LOD_INFO_MSFT"/>
+            <enum offset="4"          extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENTS_MSFT"/>
+            <enum offset="5"          extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENTS_GET_INFO_MSFT"/>
+            <enum offset="6"          extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENT_LOCATIONS_MSFT"/>
+            <enum offset="7"          extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENTS_LOCATE_INFO_MSFT"/>
+            <enum offset="8"          extends="XrStructureType" name="XR_TYPE_SCENE_OBJECTS_MSFT"/>
+            <enum offset="9"          extends="XrStructureType" name="XR_TYPE_SCENE_COMPONENT_PARENT_FILTER_INFO_MSFT"/>
+            <enum offset="10"         extends="XrStructureType" name="XR_TYPE_SCENE_OBJECT_TYPES_FILTER_INFO_MSFT"/>
+            <enum offset="11"         extends="XrStructureType" name="XR_TYPE_SCENE_PLANES_MSFT"/>
+            <enum offset="12"         extends="XrStructureType" name="XR_TYPE_SCENE_PLANE_ALIGNMENT_FILTER_INFO_MSFT"/>
+            <enum offset="13"         extends="XrStructureType" name="XR_TYPE_SCENE_MESHES_MSFT"/>
+            <enum offset="14"         extends="XrStructureType" name="XR_TYPE_SCENE_MESH_BUFFERS_GET_INFO_MSFT"/>
+            <enum offset="15"         extends="XrStructureType" name="XR_TYPE_SCENE_MESH_BUFFERS_MSFT"/>
+            <enum offset="16"         extends="XrStructureType" name="XR_TYPE_SCENE_MESH_VERTEX_BUFFER_MSFT"/>
+            <enum offset="17"         extends="XrStructureType" name="XR_TYPE_SCENE_MESH_INDICES_UINT32_MSFT"/>
+            <enum offset="18"         extends="XrStructureType" name="XR_TYPE_SCENE_MESH_INDICES_UINT16_MSFT"/>
+            <enum offset="0"  dir="-" extends="XrResult"        name="XR_ERROR_COMPUTE_NEW_SCENE_NOT_COMPLETED_MSFT"    comment="Compute new scene not completed."/>
+            <enum offset="1"  dir="-" extends="XrResult"        name="XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT"         comment="Scene component id invalid."/>
+            <enum offset="2"  dir="-" extends="XrResult"        name="XR_ERROR_SCENE_COMPONENT_TYPE_MISMATCH_MSFT"      comment="Scene component type mismatch."/>
+            <enum offset="3"  dir="-" extends="XrResult"        name="XR_ERROR_SCENE_MESH_BUFFER_ID_INVALID_MSFT"       comment="Scene mesh buffer id invalid."/>
+            <enum offset="4"  dir="-" extends="XrResult"        name="XR_ERROR_SCENE_COMPUTE_FEATURE_INCOMPATIBLE_MSFT" comment="Scene compute feature incompatible."/>
+            <enum offset="5"  dir="-" extends="XrResult"        name="XR_ERROR_SCENE_COMPUTE_CONSISTENCY_MISMATCH_MSFT" comment="Scene compute consistency mismatch."/>
         </require>
     </extension>
 
-    <extension name="XR_MSFT_scene_understanding_serialization" number="99" type="instance" supported="openxr"
-        requires="XR_MSFT_scene_understanding">
+    <extension name="XR_MSFT_scene_understanding_serialization" number="99" type="instance" supported="openxr" requires="XR_MSFT_scene_understanding">
         <require>
-            <enum value="2" name="XR_MSFT_scene_understanding_serialization_SPEC_VERSION"/>
+            <enum value="2"                                                     name="XR_MSFT_scene_understanding_serialization_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_scene_understanding_serialization&quot;" name="XR_MSFT_SCENE_UNDERSTANDING_SERIALIZATION_EXTENSION_NAME"/>
             <type name="XrSerializedSceneFragmentDataGetInfoMSFT"/>
             <type name="XrDeserializeSceneFragmentMSFT"/>
             <type name="XrSceneDeserializeInfoMSFT"/>
             <command name="xrDeserializeSceneMSFT"/>
             <command name="xrGetSerializedSceneFragmentDataMSFT"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SERIALIZED_SCENE_FRAGMENT_DATA_GET_INFO_MSFT"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT"/>
+            <enum offset="0" extends="XrStructureType"           name="XR_TYPE_SERIALIZED_SCENE_FRAGMENT_DATA_GET_INFO_MSFT"/>
+            <enum offset="1" extends="XrStructureType"           name="XR_TYPE_SCENE_DESERIALIZE_INFO_MSFT"/>
             <enum offset="0" extends="XrSceneComputeFeatureMSFT" name="XR_SCENE_COMPUTE_FEATURE_SERIALIZE_SCENE_MSFT"/>
-            <enum offset="0" extends="XrSceneComponentTypeMSFT" name="XR_SCENE_COMPONENT_TYPE_SERIALIZED_SCENE_FRAGMENT_MSFT"/>
+            <enum offset="0" extends="XrSceneComponentTypeMSFT"  name="XR_SCENE_COMPONENT_TYPE_SERIALIZED_SCENE_FRAGMENT_MSFT"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_100" number="100" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_100_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_100_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_100&quot;" name="XR_MSFT_extension_100_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_101" number="101" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_101_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_101_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_101&quot;" name="XR_MSFT_extension_101_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_display_refresh_rate" number="102" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_FB_display_refresh_rate_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_FB_display_refresh_rate_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_display_refresh_rate&quot;" name="XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME"/>
 
             <type name="XrEventDataDisplayRefreshRateChangedFB"/>
@@ -5762,7 +5740,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_HTC_vive_cosmos_controller_interaction" number="103" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_HTC_vive_cosmos_controller_interaction_SPEC_VERSION"/>
+            <enum value="1"                                                     name="XR_HTC_vive_cosmos_controller_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_HTC_vive_cosmos_controller_interaction&quot;" name="XR_HTC_VIVE_COSMOS_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -5829,7 +5807,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_color_space" number="109" type="instance" supported="openxr">
         <require>
-            <enum value="3" name="XR_FB_color_space_SPEC_VERSION"/>
+            <enum value="3"                             name="XR_FB_color_space_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_color_space&quot;" name="XR_FB_COLOR_SPACE_EXTENSION_NAME"/>
 
             <type name="XrColorSpaceFB"/>
@@ -5845,7 +5823,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_110" number="110" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_110_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_110_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_110&quot;" name="XR_FB_extension_110_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6029,18 +6007,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <enum offset="23"         extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_BRIGHTNESS_CONTRAST_SATURATION_FB"/>
             <enum offset="30"         extends="XrStructureType" name="XR_TYPE_EVENT_DATA_PASSTHROUGH_STATE_CHANGED_FB"/>
 
-            <enum offset="0"  dir="-" extends="XrResult"        name="XR_ERROR_UNEXPECTED_STATE_PASSTHROUGH_FB"        comment="The object state is unexpected for the issued command."/>
-            <enum offset="1"  dir="-" extends="XrResult"        name="XR_ERROR_FEATURE_ALREADY_CREATED_PASSTHROUGH_FB" comment="Trying to create an MR feature when one was already created and only one instance is allowed."/>
-            <enum offset="2"  dir="-" extends="XrResult"        name="XR_ERROR_FEATURE_REQUIRED_PASSTHROUGH_FB"        comment="Requested functionality requires a feature to be created first."/>
-            <enum offset="3"  dir="-" extends="XrResult"        name="XR_ERROR_NOT_PERMITTED_PASSTHROUGH_FB"           comment="Requested functionality is not permitted - application is not allowed to perform the requested operation."/>
-            <enum offset="4"  dir="-" extends="XrResult"        name="XR_ERROR_INSUFFICIENT_RESOURCES_PASSTHROUGH_FB"  comment="There weren't sufficient resources available to perform an operation."/>
-            <enum offset="50" dir="-" extends="XrResult"        name="XR_ERROR_UNKNOWN_PASSTHROUGH_FB"                 comment="Unknown Passthrough error (no further details provided)."/>
+            <enum offset="0"  dir="-" extends="XrResult"        name="XR_ERROR_UNEXPECTED_STATE_PASSTHROUGH_FB"              comment="The object state is unexpected for the issued command."/>
+            <enum offset="1"  dir="-" extends="XrResult"        name="XR_ERROR_FEATURE_ALREADY_CREATED_PASSTHROUGH_FB"       comment="Trying to create an MR feature when one was already created and only one instance is allowed."/>
+            <enum offset="2"  dir="-" extends="XrResult"        name="XR_ERROR_FEATURE_REQUIRED_PASSTHROUGH_FB"              comment="Requested functionality requires a feature to be created first."/>
+            <enum offset="3"  dir="-" extends="XrResult"        name="XR_ERROR_NOT_PERMITTED_PASSTHROUGH_FB"                 comment="Requested functionality is not permitted - application is not allowed to perform the requested operation."/>
+            <enum offset="4"  dir="-" extends="XrResult"        name="XR_ERROR_INSUFFICIENT_RESOURCES_PASSTHROUGH_FB"        comment="There weren't sufficient resources available to perform an operation."/>
+            <enum offset="50" dir="-" extends="XrResult"        name="XR_ERROR_UNKNOWN_PASSTHROUGH_FB"                       comment="Unknown Passthrough error (no further details provided)."/>
 
             <enum value="256"                                   name="XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB"/>
 
-            <enum offset="0"          extends="XrObjectType"    name="XR_OBJECT_TYPE_PASSTHROUGH_FB"                   comment="XrPassthroughFB"/>
-            <enum offset="2"          extends="XrObjectType"    name="XR_OBJECT_TYPE_PASSTHROUGH_LAYER_FB"             comment="XrPassthroughLayerFB"/>
-            <enum offset="4"          extends="XrObjectType"    name="XR_OBJECT_TYPE_GEOMETRY_INSTANCE_FB"             comment="XrGeometryInstanceFB"/>
+            <enum offset="0"          extends="XrObjectType"    name="XR_OBJECT_TYPE_PASSTHROUGH_FB"                         comment="XrPassthroughFB"/>
+            <enum offset="2"          extends="XrObjectType"    name="XR_OBJECT_TYPE_PASSTHROUGH_LAYER_FB"                   comment="XrPassthroughLayerFB"/>
+            <enum offset="4"          extends="XrObjectType"    name="XR_OBJECT_TYPE_GEOMETRY_INSTANCE_FB"                   comment="XrGeometryInstanceFB"/>
 
             <type name="XrSystemPassthroughPropertiesFB"/>
             <type name="XrSystemPassthroughProperties2FB"/>
@@ -6096,16 +6074,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <enum offset="3"          extends="XrStructureType" name="XR_TYPE_RENDER_MODEL_LOAD_INFO_FB"/>
             <enum offset="4"          extends="XrStructureType" name="XR_TYPE_SYSTEM_RENDER_MODEL_PROPERTIES_FB"/>
             <enum offset="5"          extends="XrStructureType" name="XR_TYPE_RENDER_MODEL_CAPABILITIES_REQUEST_FB"/>
-            <enum offset="0"  dir="-" extends="XrResult"        name="XR_ERROR_RENDER_MODEL_KEY_INVALID_FB"      comment="The model key is invalid."/>
-            <enum offset="20"         extends="XrResult"        name="XR_RENDER_MODEL_UNAVAILABLE_FB"            comment="The model is unavailable."/>
+            <enum offset="0"  dir="-" extends="XrResult"        name="XR_ERROR_RENDER_MODEL_KEY_INVALID_FB"         comment="The model key is invalid."/>
+            <enum offset="20"         extends="XrResult"        name="XR_RENDER_MODEL_UNAVAILABLE_FB"               comment="The model is unavailable."/>
         </require>
     </extension>
 
     <extension name="XR_KHR_binding_modification" number="121" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_KHR_binding_modification_SPEC_VERSION"/>
+            <enum value="1"                                       name="XR_KHR_binding_modification_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_binding_modification&quot;" name="XR_KHR_BINDING_MODIFICATION_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_BINDING_MODIFICATIONS_KHR"/>
+            <enum offset="0" extends="XrStructureType"            name="XR_TYPE_BINDING_MODIFICATIONS_KHR"/>
             <type name="XrBindingModificationsKHR"/>
             <type name="XrBindingModificationBaseHeaderKHR"/>
         </require>
@@ -6113,13 +6091,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VARJO_foveated_rendering" number="122" type="instance" requires="XR_VARJO_quad_views" supported="openxr">
         <require>
-            <enum value="2" name="XR_VARJO_foveated_rendering_SPEC_VERSION"/>
+            <enum value="2"                                       name="XR_VARJO_foveated_rendering_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_foveated_rendering&quot;" name="XR_VARJO_FOVEATED_RENDERING_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_VIEW_LOCATE_FOVEATED_RENDERING_VARJO"/>
-            <enum offset="1" extends="XrStructureType" name="XR_TYPE_FOVEATED_VIEW_CONFIGURATION_VIEW_VARJO"/>
-            <enum offset="2" extends="XrStructureType" name="XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO"/>
+            <enum offset="0" extends="XrStructureType"            name="XR_TYPE_VIEW_LOCATE_FOVEATED_RENDERING_VARJO"/>
+            <enum offset="1" extends="XrStructureType"            name="XR_TYPE_FOVEATED_VIEW_CONFIGURATION_VIEW_VARJO"/>
+            <enum offset="2" extends="XrStructureType"            name="XR_TYPE_SYSTEM_FOVEATED_RENDERING_PROPERTIES_VARJO"/>
 
-            <enum offset="0" extends="XrReferenceSpaceType" name="XR_REFERENCE_SPACE_TYPE_COMBINED_EYE_VARJO"/>
+            <enum offset="0" extends="XrReferenceSpaceType"       name="XR_REFERENCE_SPACE_TYPE_COMBINED_EYE_VARJO"/>
 
             <type name="XrViewLocateFoveatedRenderingVARJO"/>
             <type name="XrFoveatedViewConfigurationViewVARJO"/>
@@ -6129,16 +6107,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VARJO_composition_layer_depth_test" number="123" type="instance" requires="XR_KHR_composition_layer_depth" supported="openxr">
         <require>
-            <enum value="2" name="XR_VARJO_composition_layer_depth_test_SPEC_VERSION"/>
+            <enum value="2"                                                 name="XR_VARJO_composition_layer_depth_test_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_composition_layer_depth_test&quot;" name="XR_VARJO_COMPOSITION_LAYER_DEPTH_TEST_EXTENSION_NAME"/>
-            <enum offset="0" extends="XrStructureType" name="XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO"/>
+            <enum offset="0" extends="XrStructureType"                      name="XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO"/>
             <type name="XrCompositionLayerDepthTestVARJO"/>
         </require>
     </extension>
 
     <extension name="XR_VARJO_environment_depth_estimation" number="124" type="instance" supported="openxr">
         <require>
-            <enum value="1" name="XR_VARJO_environment_depth_estimation_SPEC_VERSION"/>
+            <enum value="1"                                                 name="XR_VARJO_environment_depth_estimation_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_environment_depth_estimation&quot;" name="XR_VARJO_ENVIRONMENT_DEPTH_ESTIMATION_EXTENSION_NAME"/>
             <command name="xrSetEnvironmentDepthEstimationVARJO"/>
         </require>
@@ -6179,56 +6157,56 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_VARJO_extension_127" number="127" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VARJO_extension_127_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_VARJO_extension_127_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_extension_127&quot;" name="XR_VARJO_extension_127_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VARJO_extension_128" number="128" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VARJO_extension_128_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_VARJO_extension_128_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_extension_128&quot;" name="XR_VARJO_extension_128_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VARJO_extension_129" number="129" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VARJO_extension_129_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_VARJO_extension_129_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_extension_129&quot;" name="XR_VARJO_extension_129_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VARJO_extension_130" number="130" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VARJO_extension_130_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_VARJO_extension_130_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_extension_130&quot;" name="XR_VARJO_extension_130_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VARJO_extension_131" number="131" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VARJO_extension_131_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_VARJO_extension_131_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_extension_131&quot;" name="XR_VARJO_extension_131_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_VARJO_extension_132" number="132" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_VARJO_extension_132_SPEC_VERSION"/>
+            <enum value="1"                                  name="XR_VARJO_extension_132_SPEC_VERSION"/>
             <enum value="&quot;XR_VARJO_extension_132&quot;" name="XR_VARJO_extension_132_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_133" number="133" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_133_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_133_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_133&quot;" name="XR_ML_extension_133_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_134" number="134" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_134_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_134_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_134&quot;" name="XR_ML_extension_134_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6242,49 +6220,49 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_ML_extension_136" number="136" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_136_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_136_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_136&quot;" name="XR_ML_extension_136_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_137" number="137" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_137_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_137_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_137&quot;" name="XR_ML_extension_137_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_138" number="138" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_138_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_138_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_138&quot;" name="XR_ML_extension_138_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_139" number="139" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_139_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_139_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_139&quot;" name="XR_ML_extension_139_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_140" number="140" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_140_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_140_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_140&quot;" name="XR_ML_extension_140_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_141" number="141" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_141_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_141_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_141&quot;" name="XR_ML_extension_141_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ML_extension_142" number="142" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ML_extension_142_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_ML_extension_142_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_142&quot;" name="XR_ML_extension_142_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6320,42 +6298,42 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     </extension>
     <extension name="XR_MSFT_extension_144" number="144" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_144_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_144_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_144&quot;" name="XR_MSFT_extension_144_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_145" number="145" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_145_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_145_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_145&quot;" name="XR_MSFT_extension_145_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_146" number="146" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_146_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_146_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_146&quot;" name="XR_MSFT_extension_146_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_147" number="147" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_147_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_147_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_147&quot;" name="XR_MSFT_extension_147_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_MSFT_extension_148" number="148" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_MSFT_extension_148_SPEC_VERSION"/>
+            <enum value="1"                                 name="XR_MSFT_extension_148_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_extension_148&quot;" name="XR_MSFT_extension_148_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_KHR_extension_149" number="149" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_KHR_extension_149_SPEC_VERSION"/>
+            <enum value="1"                                name="XR_KHR_extension_149_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_extension_149&quot;" name="XR_KHR_extension_149_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6374,42 +6352,42 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_ULTRALEAP_extension_151" number="151" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ULTRALEAP_extension_151_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_ULTRALEAP_extension_151_SPEC_VERSION"/>
             <enum value="&quot;XR_ULTRALEAP_extension_151&quot;" name="XR_ULTRALEAP_extension_151_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ULTRALEAP_extension_152" number="152" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ULTRALEAP_extension_152_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_ULTRALEAP_extension_152_SPEC_VERSION"/>
             <enum value="&quot;XR_ULTRALEAP_extension_152&quot;" name="XR_ULTRALEAP_extension_152_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ULTRALEAP_extension_153" number="153" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ULTRALEAP_extension_153_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_ULTRALEAP_extension_153_SPEC_VERSION"/>
             <enum value="&quot;XR_ULTRALEAP_extension_153&quot;" name="XR_ULTRALEAP_extension_153_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ULTRALEAP_extension_154" number="154" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ULTRALEAP_extension_154_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_ULTRALEAP_extension_154_SPEC_VERSION"/>
             <enum value="&quot;XR_ULTRALEAP_extension_154&quot;" name="XR_ULTRALEAP_extension_154_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_ULTRALEAP_extension_155" number="155" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_ULTRALEAP_extension_155_SPEC_VERSION"/>
+            <enum value="1"                                      name="XR_ULTRALEAP_extension_155_SPEC_VERSION"/>
             <enum value="&quot;XR_ULTRALEAP_extension_155&quot;" name="XR_ULTRALEAP_extension_155_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_156" number="156" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_156_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_156_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_156&quot;" name="XR_FB_extension_156_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6448,7 +6426,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_158" number="158" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_158_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_158_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_158&quot;" name="XR_FB_extension_158_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6479,9 +6457,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_OCULUS_audio_device_guid" number="160" type="instance" supported="openxr" protect="XR_USE_PLATFORM_WIN32">
         <require>
-            <enum value="1" name="XR_OCULUS_audio_device_guid_SPEC_VERSION"/>
+            <enum value="1"                                       name="XR_OCULUS_audio_device_guid_SPEC_VERSION"/>
             <enum value="&quot;XR_OCULUS_audio_device_guid&quot;" name="XR_OCULUS_AUDIO_DEVICE_GUID_EXTENSION_NAME"/>
-            <enum value="128" name="XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS"/>
+            <enum value="128"                                     name="XR_MAX_AUDIO_DEVICE_STR_SIZE_OCULUS"/>
             <command name="xrGetAudioOutputDeviceGuidOculus"/>
             <command name="xrGetAudioInputDeviceGuidOculus"/>
         </require>
@@ -6500,7 +6478,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_swapchain_update_state_android_surface" number="162" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" requires="XR_KHR_android_surface_swapchain,XR_FB_swapchain_update_state">
         <require>
-            <enum value="1" name="XR_FB_swapchain_update_state_android_surface_SPEC_VERSION"/>
+            <enum value="1"                                                        name="XR_FB_swapchain_update_state_android_surface_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_swapchain_update_state_android_surface&quot;" name="XR_FB_SWAPCHAIN_UPDATE_STATE_ANDROID_SURFACE_EXTENSION_NAME"/>
             <type name="XrSwapchainStateAndroidSurfaceDimensionsFB"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_SWAPCHAIN_STATE_ANDROID_SURFACE_DIMENSIONS_FB"/>
@@ -6509,7 +6487,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_swapchain_update_state_opengl_es" number="163" type="instance" supported="openxr" protect="XR_USE_GRAPHICS_API_OPENGL_ES" requires="XR_KHR_opengl_es_enable,XR_FB_swapchain_update_state">
         <require>
-            <enum value="1" name="XR_FB_swapchain_update_state_opengl_es_SPEC_VERSION"/>
+            <enum value="1"                                                  name="XR_FB_swapchain_update_state_opengl_es_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_swapchain_update_state_opengl_es&quot;" name="XR_FB_SWAPCHAIN_UPDATE_STATE_OPENGL_ES_EXTENSION_NAME"/>
             <type name="XrSwapchainStateSamplerOpenGLESFB"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_SWAPCHAIN_STATE_SAMPLER_OPENGL_ES_FB"/>
@@ -6518,7 +6496,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_swapchain_update_state_vulkan" number="164" type="instance" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN" requires="XR_KHR_vulkan_enable,XR_FB_swapchain_update_state">
         <require>
-            <enum value="1" name="XR_FB_swapchain_update_state_vulkan_SPEC_VERSION"/>
+            <enum value="1"                                               name="XR_FB_swapchain_update_state_vulkan_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_swapchain_update_state_vulkan&quot;" name="XR_FB_SWAPCHAIN_UPDATE_STATE_VULKAN_EXTENSION_NAME"/>
             <type name="XrSwapchainStateSamplerVulkanFB"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_SWAPCHAIN_STATE_SAMPLER_VULKAN_FB"/>
@@ -6527,7 +6505,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_165" number="165" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_165_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_165_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_165&quot;" name="XR_FB_extension_165_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6542,35 +6520,35 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_167" number="167" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_167_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_167_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_167&quot;" name="XR_FB_extension_167_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_168" number="168" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_168_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_168_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_168&quot;" name="XR_FB_extension_168_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_169" number="169" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_169_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_169_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_169&quot;" name="XR_FB_extension_169_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_170" number="170" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_170_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_170_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_170&quot;" name="XR_FB_extension_170_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_171" number="171" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_171_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_171_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_171&quot;" name="XR_FB_extension_171_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6588,21 +6566,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_173" number="173" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_173_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_173_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_173&quot;" name="XR_FB_extension_173_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_174" number="174" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_174_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_174_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_174&quot;" name="XR_FB_extension_174_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_175" number="175" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_175_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_175_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_175&quot;" name="XR_FB_extension_175_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6785,14 +6763,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_198" number="198" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_198_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_198_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_198&quot;" name="XR_FB_EXTENSION_198_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_199" number="199" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_199_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_199_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_199&quot;" name="XR_FB_EXTENSION_199_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6812,21 +6790,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_201" number="201" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_201_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_201_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_201&quot;" name="XR_FB_EXTENSION_201_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_202" number="202" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_202_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_202_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_202&quot;" name="XR_FB_EXTENSION_202_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_203" number="203" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_203_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_203_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_203&quot;" name="XR_FB_EXTENSION_203_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -6859,14 +6837,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_FB_extension_206" number="206" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_206_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_206_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_206&quot;" name="XR_FB_EXTENSION_206_EXTENSION_NAME"/>
         </require>
     </extension>
 
     <extension name="XR_FB_extension_207" number="207" type="instance" supported="disabled">
         <require>
-            <enum value="1" name="XR_FB_extension_207_SPEC_VERSION"/>
+            <enum value="1"                               name="XR_FB_extension_207_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_extension_207&quot;" name="XR_FB_EXTENSION_207_EXTENSION_NAME"/>
         </require>
     </extension>
