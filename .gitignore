@@ -1,10 +1,13 @@
-# Copyright (c) 2017-2022, The Khronos Group Inc.
+# Copyright (c) 2017-2023, The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
 /build/
 build*/
 CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+*/CMakeFiles
 *.orig
 .*
 *~
@@ -12,6 +15,9 @@ CMakeLists.txt.user
 *.tar.gz
 *.log
 pregen/
+generated-includes
+cmake_install.cmake
+cmake_uninstall.cmake
 
 # Marker file for a snapshot build
 SNAPSHOT
@@ -35,6 +41,8 @@ out/build/
 # VS misc
 *.sln
 *.pyproj
+*.vcxproj
+*.vcxproj.filters
 CMakeSettings.json
 CppProperties.json
 

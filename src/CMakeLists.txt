@@ -432,4 +432,5 @@ endif()
 
 if(BUILD_CONFORMANCE_TESTS)
     add_subdirectory(conformance)
+    add_subdirectory(external/catch2)
 endif()

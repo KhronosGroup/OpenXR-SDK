@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2022, The Khronos Group Inc.
+# Copyright (c) 2017-2023, The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -132,7 +132,7 @@ elseif(PRESENTATION_BACKEND MATCHES "wayland")
             ${WAYLAND_PROTOCOLS_DIR}/${PROTOCOL}.h
         )
 
-        target_include_directories(openxr-gfxwrapper PUBLIC ${WAYLAND_PROTOCOLS_DIR})
+        target_include_directories(openxr-gfxwrapper PUBLIC ${WAYLAND_PROTOCOLS_DIR} ${WAYLAND_CLIENT_INCLUDE_DIRS})
         target_link_libraries(
             openxr-gfxwrapper PRIVATE ${EGL_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES}
         )

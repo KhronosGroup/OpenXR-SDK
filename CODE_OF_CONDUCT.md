@@ -1,6 +1,6 @@
 
 <!--
-Copyright (c) 2014-2022, The Khronos Group Inc.
+Copyright (c) 2014-2023, The Khronos Group Inc.
 
 SPDX-License-Identifier: CC-BY-4.0
 -->

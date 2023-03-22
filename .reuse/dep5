@@ -4,8 +4,12 @@ Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
 Source: https://khronos.org/registry/OpenXR/
 
 Files: changes/*
-Copyright: 2019-2022, The Khronos Group Inc.
+Copyright: 2019-2023, The Khronos Group Inc.
 License: CC-BY-4.0
+
+Files: specification/config/copyright-spec.adoc
+Copyright: 2014-2023 The Khronos Group Inc
+License: LicenseRef-KhronosSpecCopyright-WithNormativeWording-v10
 
 Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/vulkan/mipmap-mdpi/ic_helloxr_launcher.png
@@ -17,12 +21,17 @@ Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_laun
        src/tests/hello_xr/android_resources/opengles/mipmap-xhdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/opengles/mipmap-hdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/opengles/mipmap-xxxhdpi/ic_helloxr_launcher.png
-Copyright: Copyright (c) 2020-2022, The Khronos Group Inc.
+Copyright: Copyright (c) 2020-2023, The Khronos Group Inc.
   Copyright (c) 2020, Google
 License: Apache-2.0
 Comment: Based on a Material Icons asset ("emoji-people") with added text
   in "Miriam Libre" Bold, converted to path, and manually simplified.
   Rasterized with Android Studio.
+
+Files: src/external/catch2/*
+Copyright: Copyright (c) 2022 Two Blue Cubes Ltd.
+License: BSL-1.0
+Comment: Unmodified, vendored copy of Catch2 3.1.1
 
 Files: src/external/jsoncpp/*
 Copyright: 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
@@ -33,7 +42,7 @@ Files: src/external/jnipp/*
 Copyright: 2016-2020, Mitchell Dowd
   2020, Collabora, Ltd.
 License: MIT
-Comment: Ryan Pavlik at Collabora's fork
+Comment: Unmodified, vendored copy of commit e6c415837c5a487809fdbb2f71f1080d454eb99a
 
 Files: external/python/jinja2/*
   external/python/Jinja2-2.10.3.dist-info/*
@@ -74,6 +83,6 @@ Comment: Generated .png versions of an icon, created in Android Studio
   based on a Material Icons asset.
 
 Files: specification/scripts/vuidCounts.py
-Copyright: 2022 The Khronos Group Inc.
+Copyright: 2022-2023, The Khronos Group Inc.
 License: Apache-2.0
 Comment: File automatically rewritten by VUID assignment.

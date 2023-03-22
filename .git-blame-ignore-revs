@@ -1,4 +1,4 @@
-# Copyright 2021-2022, The Khronos Group Inc. Inc.
+# Copyright 2021-2023, The Khronos Group Inc. Inc.
 #
 # SPDX-License-Identifier: CC-BY-4.0
 
@@ -40,3 +40,24 @@ bd1f05a6f5da8662c6969996177063a5a98bf0ea
 
 # OpenXR-CTS
 1224c0ba88b6f000a5f00f56c0dbb8265a6c6350
+
+
+## 1.0.27 - Bulk-apply PrettyRegistryXML
+
+# Khronos GitLab (commit also includes adding an extension)
+ff2037bc6aa951610f4e21d133056d3f547d2374
+
+# Khronos GitLab (finishing formatting)
+4bb0766ec6d7101b17b0bc02ba04c86c4159bd16
+
+# OpenXR-Docs
+09b6b4bae7d691e1406ee6951e5ab8ed4e620ff3
+
+# OpenXR-SDK-Source
+2c1b77dcdc6ace701e4b08477e5fae5312a866b4
+
+# OpenXR-CTS
+e774b36cfc7bfc721e97de6c8435fcb14866e6fa
+
+# OpenXR-SDK
+db11d03216666f2b574da46a39c4b565dbe90124

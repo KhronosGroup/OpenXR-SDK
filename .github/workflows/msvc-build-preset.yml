@@ -25,9 +25,9 @@ jobs:
       INSTALL_DIR: "${{ github.workspace }}/install"
     steps:
       - uses: actions/checkout@v3
-      - uses: lukka/get-cmake@latest
+      - uses: lukka/get-cmake@v3.25.2
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1.3
 
       - name: Install Vulkan SDK
         if: ${{ !contains( inputs.preset, 'uwp') }}

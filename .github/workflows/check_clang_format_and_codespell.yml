@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022, The Khronos Group Inc.
+# Copyright (c) 2019-2023, The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 name: Check code formatting and spelling
@@ -10,7 +10,7 @@ jobs:
   clang-format:
     runs-on: ubuntu-latest
     container:
-      image: khronosgroup/docker-images:openxr-sdk.202110
+      image: khronosgroup/docker-images:openxr-sdk.20230209
     steps:
       - uses: actions/checkout@v3
       - run: ./runClangFormat.sh
