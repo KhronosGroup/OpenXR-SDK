@@ -3,6 +3,7 @@
 
 import json
 import sys
+import os
 from dataclasses import dataclass
 from itertools import product
 
@@ -25,6 +26,10 @@ class BuildConfig:
         # can switch to just doing x64 for speed of testing
         # return self.arch != "x64"
 
+    def has_cts_build(self) -> bool:
+        # No UWP CTS right now
+        return not self.uwp and not self.should_skip()
+
     def preset(self) -> str:
         if self.uwp:
             return f"{self.arch.lower()}_uwp"
@@ -32,6 +37,9 @@ class BuildConfig:
         return self.arch.lower()
 
     def win_artifact_name(self) -> str:
+        return f"loader_{self.preset()}"
+
+    def win_cts_artifact_name(self) -> str:
         return f"loader_{self.preset()}"
 
     def platform_dirname(self) -> str:
@@ -46,9 +54,14 @@ _UNFILTERED_BUILD_CONFIGS = [
 
 BUILD_CONFIGS = [c for c in _UNFILTERED_BUILD_CONFIGS if not c.should_skip()]
 
+CTS_BUILD_CONFIGS = [c for c in _UNFILTERED_BUILD_CONFIGS if c.has_cts_build()]
+
 
 def output_json(data, variable_name=None):
     if variable_name:
-        print(f"::set-output name={variable_name}::{json.dumps(data)}")
+        envfile = os.getenv("GITHUB_ENV")
+        assert envfile
+        with open(envfile, "w", encoding="utf-8") as fp:
+            fp.write(f"{variable_name}={json.dumps(data)}")
     else:
         print(json.dumps(data, indent=4))

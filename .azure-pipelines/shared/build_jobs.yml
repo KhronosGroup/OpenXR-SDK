@@ -26,7 +26,8 @@ jobs:
           presentationBackend: wayland
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr-sdk.20230209
+    container: khronosgroup/docker-images:openxr-sdk.20230323
+    # container: khronosgroup/docker-images@sha256:20edadbaa6cdec4fed7417c24b18dfb4b93eec940fdf1a27b5f97272dec47032
     steps:
       # First build as debug
       - template: build_linux.yml
@@ -130,7 +131,7 @@ jobs:
       # Use the specified version of Python from the tool cache
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: "3.9"
+          versionSpec: "3.10"
       - task: PythonScript@0
         displayName: Move artifact contents
         inputs:

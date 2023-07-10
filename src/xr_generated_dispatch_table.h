@@ -406,6 +406,19 @@ struct XrGeneratedDispatchTable {
     // ---- XR_FB_haptic_pcm extension commands
     PFN_xrGetDeviceSampleRateFB GetDeviceSampleRateFB;
 
+    // ---- XR_META_virtual_keyboard extension commands
+    PFN_xrCreateVirtualKeyboardMETA CreateVirtualKeyboardMETA;
+    PFN_xrDestroyVirtualKeyboardMETA DestroyVirtualKeyboardMETA;
+    PFN_xrCreateVirtualKeyboardSpaceMETA CreateVirtualKeyboardSpaceMETA;
+    PFN_xrSuggestVirtualKeyboardLocationMETA SuggestVirtualKeyboardLocationMETA;
+    PFN_xrGetVirtualKeyboardScaleMETA GetVirtualKeyboardScaleMETA;
+    PFN_xrSetVirtualKeyboardModelVisibilityMETA SetVirtualKeyboardModelVisibilityMETA;
+    PFN_xrGetVirtualKeyboardModelAnimationStatesMETA GetVirtualKeyboardModelAnimationStatesMETA;
+    PFN_xrGetVirtualKeyboardDirtyTexturesMETA GetVirtualKeyboardDirtyTexturesMETA;
+    PFN_xrGetVirtualKeyboardTextureDataMETA GetVirtualKeyboardTextureDataMETA;
+    PFN_xrSendVirtualKeyboardInputMETA SendVirtualKeyboardInputMETA;
+    PFN_xrChangeVirtualKeyboardTextContextMETA ChangeVirtualKeyboardTextContextMETA;
+
     // ---- XR_OCULUS_external_camera extension commands
     PFN_xrEnumerateExternalCamerasOCULUS EnumerateExternalCamerasOCULUS;
 
@@ -423,6 +436,11 @@ struct XrGeneratedDispatchTable {
     PFN_xrGetSpaceUserIdFB GetSpaceUserIdFB;
     PFN_xrDestroySpaceUserFB DestroySpaceUserFB;
 
+    // ---- XR_META_passthrough_color_lut extension commands
+    PFN_xrCreatePassthroughColorLutMETA CreatePassthroughColorLutMETA;
+    PFN_xrDestroyPassthroughColorLutMETA DestroyPassthroughColorLutMETA;
+    PFN_xrUpdatePassthroughColorLutMETA UpdatePassthroughColorLutMETA;
+
     // ---- XR_QCOM_tracking_optimization_settings extension commands
     PFN_xrSetTrackingOptimizationSettingsHintQCOM SetTrackingOptimizationSettingsHintQCOM;
 
@@ -435,6 +453,14 @@ struct XrGeneratedDispatchTable {
 
     // ---- XR_MNDX_force_feedback_curl extension commands
     PFN_xrApplyForceFeedbackCurlMNDX ApplyForceFeedbackCurlMNDX;
+
+    // ---- XR_EXT_plane_detection extension commands
+    PFN_xrCreatePlaneDetectorEXT CreatePlaneDetectorEXT;
+    PFN_xrDestroyPlaneDetectorEXT DestroyPlaneDetectorEXT;
+    PFN_xrBeginPlaneDetectionEXT BeginPlaneDetectionEXT;
+    PFN_xrGetPlaneDetectionStateEXT GetPlaneDetectionStateEXT;
+    PFN_xrGetPlaneDetectionsEXT GetPlaneDetectionsEXT;
+    PFN_xrGetPlanePolygonBufferEXT GetPlanePolygonBufferEXT;
 };
 
 

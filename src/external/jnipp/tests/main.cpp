@@ -304,6 +304,21 @@ TEST(Object_call_byNameWithArgs)
     ASSERT(str2.call<wchar_t>("charAt", 1) == L'e');
 }
 
+TEST(Object_call_returningArray) {
+    jni::Object str = jni::Class("java/lang/String").newInstance("Testing");
+
+    {
+        auto getBytes =
+            jni::Class("java/lang/String").getMethod("getBytes", "()[B");
+        auto bytes = str.call<jni::Array<jni::byte_t>>(getBytes);
+        ASSERT(bytes.getLength() == 7);
+    }
+    {
+        auto bytes = str.call<jni::Array<jni::byte_t>>("getBytes");
+        ASSERT(bytes.getLength() == 7);
+    }
+}
+
 TEST(Object_makeLocalReference)
 {
     jni::Object str = jni::Class("java/lang/String").newInstance("Testing");
@@ -593,6 +608,7 @@ int main()
         RUN_TEST(Object_call_byName);
         RUN_TEST(Object_call_withArgs);
         RUN_TEST(Object_call_byNameWithArgs);
+        RUN_TEST(Object_call_returningArray);
         RUN_TEST(Object_makeLocalReference);
 
         // jni::Enum Tests

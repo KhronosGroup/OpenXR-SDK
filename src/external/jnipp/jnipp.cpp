@@ -465,6 +465,13 @@ namespace jni
         return Object(result, DeleteLocalInput);
     }
 
+    jarray Object::callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<jarray> const&) const
+    {
+        auto result = env()->CallObjectMethodA(_handle, method, (jvalue*) args);
+        handleJavaExceptions();
+        return (jarray)result;
+    }
+
     byte_t Object::getFieldValue(field_t field, internal::ReturnTypeWrapper<byte_t> const&) const
     {
         return env()->GetByteField(_handle, field);

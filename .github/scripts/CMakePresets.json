@@ -65,6 +65,31 @@
                 "CMAKE_SYSTEM_NAME": "WindowsStore",
                 "CMAKE_SYSTEM_VERSION": "10.0"
             }
+        },
+        {
+            "name": ".base-cts-msvc",
+            "generator": "Visual Studio 17 2022",
+            "hidden": true,
+            "installDir": "$env{INSTALL_DIR}",
+            "cacheVariables": {
+                "DYNAMIC_LOADER": false,
+                "BUILD_ALL_EXTENSIONS": true
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "cts-win32",
+            "inherits": ".base-cts-msvc",
+            "architecture": "Win32"
+        },
+        {
+            "name": "cts-x64",
+            "inherits": ".base-cts-msvc",
+            "architecture": "x64"
         }
     ]
 }

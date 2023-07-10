@@ -73,6 +73,7 @@ namespace jni
 
     // Foward Declarations
     class Object;
+    template <class TElement> class Array;
 
     /**
         This namespace is for messy implementation details only. It is not a part
@@ -102,6 +103,9 @@ namespace jni
         inline std::string valueSig(const wchar_t* const*) { return "Ljava/lang/String;"; }
         std::string valueSig(const Object* obj);
         inline std::string valueSig(const Object* const* obj) { return valueSig(obj ? *obj : nullptr); }
+
+        template <class TArg>
+        inline std::string valueSig(const Array<TArg>*) { return "[" + valueSig((TArg*) nullptr); }
 
         template <int n, class TArg>
         inline std::string valueSig(const TArg(*arg)[n]) { return valueSig((const TArg* const*)arg); }
@@ -452,7 +456,10 @@ namespace jni
         std::string callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<std::string> const&) const;
         std::wstring callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<std::wstring> const&) const;
         jni::Object callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<jni::Object> const&) const;
+        jarray callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<jarray> const&) const;
 
+        template<typename T>
+        jni::Array<T> callMethod(method_t method, internal::value_t* args, internal::ReturnTypeWrapper<jni::Array<T>> const&) const;
 
         void getFieldValue(field_t field, internal::ReturnTypeWrapper<void> const&) const;
         bool getFieldValue(field_t field, internal::ReturnTypeWrapper<bool> const&) const;
@@ -1024,6 +1031,17 @@ namespace jni
          */
         InitializationException(const char* msg) : Exception(msg) {}
     };
+
+    /*
+        Call method returning array: implementation
+    */
+    template <typename T>
+    inline jni::Array<T> Object::callMethod(method_t method, internal::value_t* args,
+                                            internal::ReturnTypeWrapper<jni::Array<T>> const&) const
+    {
+        jarray result = callMethod(method, args, internal::ReturnTypeWrapper<jarray>{});
+        return jni::Array<T>(result, DeleteLocalInput);
+    }
 
     /*
         Array Implementation

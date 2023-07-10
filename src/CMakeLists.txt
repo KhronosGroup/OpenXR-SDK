@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The Khronos Group Inc.
+# Copyright (c) 2017-2023, The Khronos Group Inc.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Author:
 #
 
 if(POLICY CMP0075)
@@ -39,6 +37,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR (WIN32 AND CMAKE_GENERATOR_PLATF
     set(OPENGL_INCOMPATIBLE TRUE)
     set(VULKAN_INCOMPATIBLE TRUE)
     message(STATUS "OpenGL/Vulkan disabled due to incompatibility")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(OPENGL_INCOMPATIBLE TRUE)
+    message(STATUS "OpenGL disabled as no bindings exist for OpenGL on Darwin")
 elseif(ANDROID)
     set(OPENGL_INCOMPATIBLE TRUE)
     find_path(ANDROID_NATIVE_APP_GLUE android_native_app_glue.h PATHS ${ANDROID_NDK}/sources/android/native_app_glue)
@@ -179,7 +180,20 @@ if((OPENGL_FOUND OR OpenGLES_FOUND) AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/comm
         add_library(android_native_app_glue OBJECT "${ANDROID_NATIVE_APP_GLUE}/android_native_app_glue.c")
         target_include_directories(android_native_app_glue PUBLIC ${ANDROID_NATIVE_APP_GLUE})
         target_compile_options(android_native_app_glue PRIVATE -Wno-unused-parameter)
+    elseif(APPLE)
+        set(apple_c_compile_options
+            -x objective-c++
+        )
+        target_compile_options(openxr-gfxwrapper PRIVATE
+             ${apple_c_compile_options}
+        )
+        target_link_libraries(openxr-gfxwrapper PUBLIC
+            "-framework AppKit"
+            "-framework Foundation"
+            "-framework CoreGraphics"
+        )
     endif()
+    set_target_properties(openxr-gfxwrapper PROPERTIES FOLDER ${HELPER_FOLDER})
     message(STATUS "Enabling OpenGL support in hello_xr, loader_test, and conformance, if configured")
 endif()
 
@@ -192,6 +206,14 @@ endif()
 # Several files use these compile time platform switches
 if(WIN32)
     add_definitions(-DXR_USE_PLATFORM_WIN32)
+elseif(APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        if(DARWIN_TARGET_OS_NAME STREQUAL "ios")
+            add_definitions(-DXR_USE_PLATFORM_IOS)
+        else()
+            add_definitions(-DXR_USE_PLATFORM_MACOS)
+        endif()
+    endif()
 elseif(ANDROID)
     add_definitions(-DXR_USE_PLATFORM_ANDROID)
     set(OPENXR_ANDROID_VERSION_SUFFIX "" CACHE STRING "Suffix for generated Android artifacts.")
@@ -410,7 +432,11 @@ if(NOT MSVC)
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAG}")
         endif()
     endforeach()
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+    if(APPLE)
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
+    else()
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+    endif()
 endif()
 
 if(ANDROID)

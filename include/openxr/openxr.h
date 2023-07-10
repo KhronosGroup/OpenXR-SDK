@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 27)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 28)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -72,6 +72,12 @@ extern "C" {
 
 
 #define XR_MAX_EVENT_DATA_SIZE sizeof(XrEventDataBuffer)
+
+
+#define XR_EXTENSION_ENUM_BASE 1000000000
+
+
+#define XR_EXTENSION_ENUM_STRIDE 1000
 
 
 #if !defined(XR_MAY_ALIAS)
@@ -219,7 +225,10 @@ typedef enum XrResult {
     XR_ERROR_SPACE_NETWORK_TIMEOUT_FB = -1000169002,
     XR_ERROR_SPACE_NETWORK_REQUEST_FAILED_FB = -1000169003,
     XR_ERROR_SPACE_CLOUD_STORAGE_DISABLED_FB = -1000169004,
+    XR_ERROR_PASSTHROUGH_COLOR_LUT_BUFFER_SIZE_MISMATCH_META = -1000266000,
     XR_ERROR_HINT_ALREADY_SET_QCOM = -1000306000,
+    XR_ERROR_SPACE_NOT_LOCATABLE_EXT = -1000429000,
+    XR_ERROR_PLANE_DETECTION_PERMISSION_DENIED_EXT = -1000429001,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
 } XrResult;
 
@@ -460,6 +469,7 @@ typedef enum XrStructureType {
     XR_TYPE_SEMANTIC_LABELS_FB = 1000175000,
     XR_TYPE_ROOM_LAYOUT_FB = 1000175001,
     XR_TYPE_BOUNDARY_2D_FB = 1000175002,
+    XR_TYPE_SEMANTIC_LABELS_SUPPORT_INFO_FB = 1000175010,
     XR_TYPE_DIGITAL_LENS_CONTROL_ALMALENCE = 1000196000,
     XR_TYPE_EVENT_DATA_SCENE_CAPTURE_COMPLETE_FB = 1000198001,
     XR_TYPE_SCENE_CAPTURE_REQUEST_INFO_FB = 1000198050,
@@ -481,6 +491,21 @@ typedef enum XrStructureType {
     XR_TYPE_DEVICE_PCM_SAMPLE_RATE_STATE_FB = 1000209002,
     XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_FB = 1000212000,
     XR_TYPE_LOCAL_DIMMING_FRAME_END_INFO_META = 1000216000,
+    XR_TYPE_SYSTEM_VIRTUAL_KEYBOARD_PROPERTIES_META = 1000219001,
+    XR_TYPE_VIRTUAL_KEYBOARD_CREATE_INFO_META = 1000219002,
+    XR_TYPE_VIRTUAL_KEYBOARD_SPACE_CREATE_INFO_META = 1000219003,
+    XR_TYPE_VIRTUAL_KEYBOARD_LOCATION_INFO_META = 1000219004,
+    XR_TYPE_VIRTUAL_KEYBOARD_MODEL_VISIBILITY_SET_INFO_META = 1000219005,
+    XR_TYPE_VIRTUAL_KEYBOARD_ANIMATION_STATE_META = 1000219006,
+    XR_TYPE_VIRTUAL_KEYBOARD_MODEL_ANIMATION_STATES_META = 1000219007,
+    XR_TYPE_VIRTUAL_KEYBOARD_TEXTURE_DATA_META = 1000219009,
+    XR_TYPE_VIRTUAL_KEYBOARD_INPUT_INFO_META = 1000219010,
+    XR_TYPE_VIRTUAL_KEYBOARD_TEXT_CONTEXT_CHANGE_INFO_META = 1000219011,
+    XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_COMMIT_TEXT_META = 1000219014,
+    XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_BACKSPACE_META = 1000219015,
+    XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_ENTER_META = 1000219016,
+    XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_SHOWN_META = 1000219017,
+    XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_HIDDEN_META = 1000219018,
     XR_TYPE_EXTERNAL_CAMERA_OCULUS = 1000226000,
     XR_TYPE_VULKAN_SWAPCHAIN_CREATE_INFO_META = 1000227000,
     XR_TYPE_PERFORMANCE_METRICS_STATE_META = 1000232001,
@@ -489,6 +514,11 @@ typedef enum XrStructureType {
     XR_TYPE_EVENT_DATA_SPACE_LIST_SAVE_COMPLETE_FB = 1000238001,
     XR_TYPE_SPACE_USER_CREATE_INFO_FB = 1000241001,
     XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META = 1000245000,
+    XR_TYPE_SYSTEM_PASSTHROUGH_COLOR_LUT_PROPERTIES_META = 1000266000,
+    XR_TYPE_PASSTHROUGH_COLOR_LUT_CREATE_INFO_META = 1000266001,
+    XR_TYPE_PASSTHROUGH_COLOR_LUT_UPDATE_INFO_META = 1000266002,
+    XR_TYPE_PASSTHROUGH_COLOR_MAP_LUT_META = 1000266100,
+    XR_TYPE_PASSTHROUGH_COLOR_MAP_INTERPOLATED_LUT_META = 1000266101,
     XR_TYPE_PASSTHROUGH_CREATE_INFO_HTC = 1000317001,
     XR_TYPE_PASSTHROUGH_COLOR_HTC = 1000317002,
     XR_TYPE_PASSTHROUGH_MESH_TRANSFORM_INFO_HTC = 1000317003,
@@ -499,6 +529,15 @@ typedef enum XrStructureType {
     XR_TYPE_ACTIVE_ACTION_SET_PRIORITIES_EXT = 1000373000,
     XR_TYPE_SYSTEM_FORCE_FEEDBACK_CURL_PROPERTIES_MNDX = 1000375000,
     XR_TYPE_FORCE_FEEDBACK_CURL_APPLY_LOCATIONS_MNDX = 1000375001,
+    XR_TYPE_HAND_TRACKING_DATA_SOURCE_INFO_EXT = 1000428000,
+    XR_TYPE_HAND_TRACKING_DATA_SOURCE_STATE_EXT = 1000428001,
+    XR_TYPE_PLANE_DETECTOR_CREATE_INFO_EXT = 1000429001,
+    XR_TYPE_PLANE_DETECTOR_BEGIN_INFO_EXT = 1000429002,
+    XR_TYPE_PLANE_DETECTOR_GET_INFO_EXT = 1000429003,
+    XR_TYPE_PLANE_DETECTOR_LOCATIONS_EXT = 1000429004,
+    XR_TYPE_PLANE_DETECTOR_LOCATION_EXT = 1000429005,
+    XR_TYPE_PLANE_DETECTOR_POLYGON_BUFFER_EXT = 1000429006,
+    XR_TYPE_SYSTEM_PLANE_DETECTION_PROPERTIES_EXT = 1000429007,
     XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR = XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR,
     XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR = XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR,
     XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR,
@@ -590,8 +629,11 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_SPATIAL_ANCHOR_STORE_CONNECTION_MSFT = 1000142000,
     XR_OBJECT_TYPE_FACE_TRACKER_FB = 1000201000,
     XR_OBJECT_TYPE_EYE_TRACKER_FB = 1000202000,
+    XR_OBJECT_TYPE_VIRTUAL_KEYBOARD_META = 1000219000,
     XR_OBJECT_TYPE_SPACE_USER_FB = 1000241000,
+    XR_OBJECT_TYPE_PASSTHROUGH_COLOR_LUT_META = 1000266000,
     XR_OBJECT_TYPE_PASSTHROUGH_HTC = 1000317000,
+    XR_OBJECT_TYPE_PLANE_DETECTOR_EXT = 1000429000,
     XR_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrObjectType;
 typedef XrFlags64 XrInstanceCreateFlags;
@@ -4042,7 +4084,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGeometryInstanceSetTransformFB(
 #define XR_NULL_RENDER_MODEL_KEY_FB 0
 
 XR_DEFINE_ATOM(XrRenderModelKeyFB)
-#define XR_FB_render_model_SPEC_VERSION   3
+#define XR_FB_render_model_SPEC_VERSION   4
 #define XR_FB_RENDER_MODEL_EXTENSION_NAME "XR_FB_render_model"
 #define XR_MAX_RENDER_MODEL_NAME_SIZE_FB  64
 typedef XrFlags64 XrRenderModelFlagsFB;
@@ -4641,8 +4683,14 @@ typedef struct XrHapticAmplitudeEnvelopeVibrationFB {
 
 
 #define XR_FB_scene 1
-#define XR_FB_scene_SPEC_VERSION          1
+#define XR_FB_scene_SPEC_VERSION          3
 #define XR_FB_SCENE_EXTENSION_NAME        "XR_FB_scene"
+typedef XrFlags64 XrSemanticLabelsSupportFlagsFB;
+
+// Flag bits for XrSemanticLabelsSupportFlagsFB
+static const XrSemanticLabelsSupportFlagsFB XR_SEMANTIC_LABELS_SUPPORT_MULTIPLE_SEMANTIC_LABELS_BIT_FB = 0x00000001;
+static const XrSemanticLabelsSupportFlagsFB XR_SEMANTIC_LABELS_SUPPORT_ACCEPT_DESK_TO_TABLE_MIGRATION_BIT_FB = 0x00000002;
+
 typedef struct XrExtent3DfFB {
     float    width;
     float    height;
@@ -4685,6 +4733,13 @@ typedef struct XrBoundary2DFB {
     uint32_t                    vertexCountOutput;
     XrVector2f*                 vertices;
 } XrBoundary2DFB;
+
+typedef struct XrSemanticLabelsSupportInfoFB {
+    XrStructureType                   type;
+    const void* XR_MAY_ALIAS          next;
+    XrSemanticLabelsSupportFlagsFB    flags;
+    const char*                       recognizedLabels;
+} XrSemanticLabelsSupportInfoFB;
 
 typedef XrResult (XRAPI_PTR *PFN_xrGetSpaceBoundingBox2DFB)(XrSession session, XrSpace space, XrRect2Df* boundingBox2DOutput);
 typedef XrResult (XRAPI_PTR *PFN_xrGetSpaceBoundingBox3DFB)(XrSession session, XrSpace space, XrRect3DfFB* boundingBox3DOutput);
@@ -5183,6 +5238,208 @@ typedef struct XrLocalDimmingFrameEndInfoMETA {
 
 
 
+#define XR_META_virtual_keyboard 1
+XR_DEFINE_HANDLE(XrVirtualKeyboardMETA)
+#define XR_MAX_VIRTUAL_KEYBOARD_COMMIT_TEXT_SIZE_META 3992
+#define XR_META_virtual_keyboard_SPEC_VERSION 1
+#define XR_META_VIRTUAL_KEYBOARD_EXTENSION_NAME "XR_META_virtual_keyboard"
+
+typedef enum XrVirtualKeyboardLocationTypeMETA {
+    XR_VIRTUAL_KEYBOARD_LOCATION_TYPE_CUSTOM_META = 0,
+    XR_VIRTUAL_KEYBOARD_LOCATION_TYPE_FAR_META = 1,
+    XR_VIRTUAL_KEYBOARD_LOCATION_TYPE_DIRECT_META = 2,
+    XR_VIRTUAL_KEYBOARD_LOCATION_TYPE_MAX_ENUM_META = 0x7FFFFFFF
+} XrVirtualKeyboardLocationTypeMETA;
+
+typedef enum XrVirtualKeyboardInputSourceMETA {
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_CONTROLLER_RAY_LEFT_META = 1,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_CONTROLLER_RAY_RIGHT_META = 2,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_HAND_RAY_LEFT_META = 3,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_HAND_RAY_RIGHT_META = 4,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_CONTROLLER_DIRECT_LEFT_META = 5,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_CONTROLLER_DIRECT_RIGHT_META = 6,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_HAND_DIRECT_INDEX_TIP_LEFT_META = 7,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_HAND_DIRECT_INDEX_TIP_RIGHT_META = 8,
+    XR_VIRTUAL_KEYBOARD_INPUT_SOURCE_MAX_ENUM_META = 0x7FFFFFFF
+} XrVirtualKeyboardInputSourceMETA;
+typedef XrFlags64 XrVirtualKeyboardInputStateFlagsMETA;
+
+// Flag bits for XrVirtualKeyboardInputStateFlagsMETA
+static const XrVirtualKeyboardInputStateFlagsMETA XR_VIRTUAL_KEYBOARD_INPUT_STATE_PRESSED_BIT_META = 0x00000001;
+
+// XrSystemVirtualKeyboardPropertiesMETA extends XrSystemProperties
+typedef struct XrSystemVirtualKeyboardPropertiesMETA {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsVirtualKeyboard;
+} XrSystemVirtualKeyboardPropertiesMETA;
+
+typedef struct XrVirtualKeyboardCreateInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrVirtualKeyboardCreateInfoMETA;
+
+typedef struct XrVirtualKeyboardSpaceCreateInfoMETA {
+    XrStructureType                      type;
+    const void* XR_MAY_ALIAS             next;
+    XrVirtualKeyboardLocationTypeMETA    locationType;
+    XrSpace                              space;
+    XrPosef                              poseInSpace;
+} XrVirtualKeyboardSpaceCreateInfoMETA;
+
+typedef struct XrVirtualKeyboardLocationInfoMETA {
+    XrStructureType                      type;
+    const void* XR_MAY_ALIAS             next;
+    XrVirtualKeyboardLocationTypeMETA    locationType;
+    XrSpace                              space;
+    XrPosef                              poseInSpace;
+    float                                scale;
+} XrVirtualKeyboardLocationInfoMETA;
+
+typedef struct XrVirtualKeyboardModelVisibilitySetInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrBool32                    visible;
+} XrVirtualKeyboardModelVisibilitySetInfoMETA;
+
+typedef struct XrVirtualKeyboardAnimationStateMETA {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    int32_t               animationIndex;
+    float                 fraction;
+} XrVirtualKeyboardAnimationStateMETA;
+
+typedef struct XrVirtualKeyboardModelAnimationStatesMETA {
+    XrStructureType                         type;
+    void* XR_MAY_ALIAS                      next;
+    uint32_t                                stateCapacityInput;
+    uint32_t                                stateCountOutput;
+    XrVirtualKeyboardAnimationStateMETA*    states;
+} XrVirtualKeyboardModelAnimationStatesMETA;
+
+typedef struct XrVirtualKeyboardTextureDataMETA {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              textureWidth;
+    uint32_t              textureHeight;
+    uint32_t              bufferCapacityInput;
+    uint32_t              bufferCountOutput;
+    uint8_t*              buffer;
+} XrVirtualKeyboardTextureDataMETA;
+
+typedef struct XrVirtualKeyboardInputInfoMETA {
+    XrStructureType                         type;
+    const void* XR_MAY_ALIAS                next;
+    XrVirtualKeyboardInputSourceMETA        inputSource;
+    XrSpace                                 inputSpace;
+    XrPosef                                 inputPoseInSpace;
+    XrVirtualKeyboardInputStateFlagsMETA    inputState;
+} XrVirtualKeyboardInputInfoMETA;
+
+typedef struct XrVirtualKeyboardTextContextChangeInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    const char*                 textContext;
+} XrVirtualKeyboardTextContextChangeInfoMETA;
+
+typedef struct XrEventDataVirtualKeyboardCommitTextMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrVirtualKeyboardMETA       keyboard;
+    char                        text[XR_MAX_VIRTUAL_KEYBOARD_COMMIT_TEXT_SIZE_META];
+} XrEventDataVirtualKeyboardCommitTextMETA;
+
+typedef struct XrEventDataVirtualKeyboardBackspaceMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrVirtualKeyboardMETA       keyboard;
+} XrEventDataVirtualKeyboardBackspaceMETA;
+
+typedef struct XrEventDataVirtualKeyboardEnterMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrVirtualKeyboardMETA       keyboard;
+} XrEventDataVirtualKeyboardEnterMETA;
+
+typedef struct XrEventDataVirtualKeyboardShownMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrVirtualKeyboardMETA       keyboard;
+} XrEventDataVirtualKeyboardShownMETA;
+
+typedef struct XrEventDataVirtualKeyboardHiddenMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrVirtualKeyboardMETA       keyboard;
+} XrEventDataVirtualKeyboardHiddenMETA;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateVirtualKeyboardMETA)(XrSession session, const XrVirtualKeyboardCreateInfoMETA* createInfo, XrVirtualKeyboardMETA* keyboard);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyVirtualKeyboardMETA)(XrVirtualKeyboardMETA keyboard);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateVirtualKeyboardSpaceMETA)(XrSession session, XrVirtualKeyboardMETA keyboard, const XrVirtualKeyboardSpaceCreateInfoMETA* createInfo, XrSpace* keyboardSpace);
+typedef XrResult (XRAPI_PTR *PFN_xrSuggestVirtualKeyboardLocationMETA)(XrVirtualKeyboardMETA keyboard, const XrVirtualKeyboardLocationInfoMETA* locationInfo);
+typedef XrResult (XRAPI_PTR *PFN_xrGetVirtualKeyboardScaleMETA)(XrVirtualKeyboardMETA keyboard, float* scale);
+typedef XrResult (XRAPI_PTR *PFN_xrSetVirtualKeyboardModelVisibilityMETA)(XrVirtualKeyboardMETA keyboard, const XrVirtualKeyboardModelVisibilitySetInfoMETA* modelVisibility);
+typedef XrResult (XRAPI_PTR *PFN_xrGetVirtualKeyboardModelAnimationStatesMETA)(XrVirtualKeyboardMETA keyboard, XrVirtualKeyboardModelAnimationStatesMETA* animationStates);
+typedef XrResult (XRAPI_PTR *PFN_xrGetVirtualKeyboardDirtyTexturesMETA)(XrVirtualKeyboardMETA keyboard, uint32_t textureIdCapacityInput, uint32_t* textureIdCountOutput, uint64_t* textureIds);
+typedef XrResult (XRAPI_PTR *PFN_xrGetVirtualKeyboardTextureDataMETA)(XrVirtualKeyboardMETA keyboard, uint64_t textureId, XrVirtualKeyboardTextureDataMETA* textureData);
+typedef XrResult (XRAPI_PTR *PFN_xrSendVirtualKeyboardInputMETA)(XrVirtualKeyboardMETA keyboard, const XrVirtualKeyboardInputInfoMETA* info, XrPosef* interactorRootPose);
+typedef XrResult (XRAPI_PTR *PFN_xrChangeVirtualKeyboardTextContextMETA)(XrVirtualKeyboardMETA keyboard, const XrVirtualKeyboardTextContextChangeInfoMETA* changeInfo);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateVirtualKeyboardMETA(
+    XrSession                                   session,
+    const XrVirtualKeyboardCreateInfoMETA*      createInfo,
+    XrVirtualKeyboardMETA*                      keyboard);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyVirtualKeyboardMETA(
+    XrVirtualKeyboardMETA                       keyboard);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateVirtualKeyboardSpaceMETA(
+    XrSession                                   session,
+    XrVirtualKeyboardMETA                       keyboard,
+    const XrVirtualKeyboardSpaceCreateInfoMETA* createInfo,
+    XrSpace*                                    keyboardSpace);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSuggestVirtualKeyboardLocationMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    const XrVirtualKeyboardLocationInfoMETA*    locationInfo);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetVirtualKeyboardScaleMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    float*                                      scale);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSetVirtualKeyboardModelVisibilityMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    const XrVirtualKeyboardModelVisibilitySetInfoMETA* modelVisibility);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetVirtualKeyboardModelAnimationStatesMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    XrVirtualKeyboardModelAnimationStatesMETA*  animationStates);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetVirtualKeyboardDirtyTexturesMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    uint32_t                                    textureIdCapacityInput,
+    uint32_t*                                   textureIdCountOutput,
+    uint64_t*                                   textureIds);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetVirtualKeyboardTextureDataMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    uint64_t                                    textureId,
+    XrVirtualKeyboardTextureDataMETA*           textureData);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrSendVirtualKeyboardInputMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    const XrVirtualKeyboardInputInfoMETA*       info,
+    XrPosef*                                    interactorRootPose);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrChangeVirtualKeyboardTextContextMETA(
+    XrVirtualKeyboardMETA                       keyboard,
+    const XrVirtualKeyboardTextContextChangeInfoMETA* changeInfo);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 #define XR_OCULUS_external_camera 1
 #define XR_MAX_EXTERNAL_CAMERA_NAME_SIZE_OCULUS 32
 #define XR_OCULUS_external_camera_SPEC_VERSION 1
@@ -5376,9 +5633,88 @@ typedef struct XrSystemHeadsetIdPropertiesMETA {
 
 
 
+#define XR_META_passthrough_color_lut 1
+XR_DEFINE_HANDLE(XrPassthroughColorLutMETA)
+#define XR_META_passthrough_color_lut_SPEC_VERSION 1
+#define XR_META_PASSTHROUGH_COLOR_LUT_EXTENSION_NAME "XR_META_passthrough_color_lut"
+
+typedef enum XrPassthroughColorLutChannelsMETA {
+    XR_PASSTHROUGH_COLOR_LUT_CHANNELS_RGB_META = 1,
+    XR_PASSTHROUGH_COLOR_LUT_CHANNELS_RGBA_META = 2,
+    XR_PASSTHROUGH_COLOR_LUT_CHANNELS_MAX_ENUM_META = 0x7FFFFFFF
+} XrPassthroughColorLutChannelsMETA;
+typedef struct XrPassthroughColorLutDataMETA {
+    uint32_t          bufferSize;
+    const uint8_t*    buffer;
+} XrPassthroughColorLutDataMETA;
+
+typedef struct XrPassthroughColorLutCreateInfoMETA {
+    XrStructureType                      type;
+    const void* XR_MAY_ALIAS             next;
+    XrPassthroughColorLutChannelsMETA    channels;
+    uint32_t                             resolution;
+    XrPassthroughColorLutDataMETA        data;
+} XrPassthroughColorLutCreateInfoMETA;
+
+typedef struct XrPassthroughColorLutUpdateInfoMETA {
+    XrStructureType                  type;
+    const void* XR_MAY_ALIAS         next;
+    XrPassthroughColorLutDataMETA    data;
+} XrPassthroughColorLutUpdateInfoMETA;
+
+// XrPassthroughColorMapLutMETA extends XrPassthroughStyleFB
+typedef struct XrPassthroughColorMapLutMETA {
+    XrStructureType              type;
+    const void* XR_MAY_ALIAS     next;
+    XrPassthroughColorLutMETA    colorLut;
+    float                        weight;
+} XrPassthroughColorMapLutMETA;
+
+// XrPassthroughColorMapInterpolatedLutMETA extends XrPassthroughStyleFB
+typedef struct XrPassthroughColorMapInterpolatedLutMETA {
+    XrStructureType              type;
+    const void* XR_MAY_ALIAS     next;
+    XrPassthroughColorLutMETA    sourceColorLut;
+    XrPassthroughColorLutMETA    targetColorLut;
+    float                        weight;
+} XrPassthroughColorMapInterpolatedLutMETA;
+
+// XrSystemPassthroughColorLutPropertiesMETA extends XrSystemProperties
+typedef struct XrSystemPassthroughColorLutPropertiesMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    maxColorLutResolution;
+} XrSystemPassthroughColorLutPropertiesMETA;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreatePassthroughColorLutMETA)(XrPassthroughFB passthrough, const XrPassthroughColorLutCreateInfoMETA* createInfo, XrPassthroughColorLutMETA* colorLut);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyPassthroughColorLutMETA)(XrPassthroughColorLutMETA colorLut);
+typedef XrResult (XRAPI_PTR *PFN_xrUpdatePassthroughColorLutMETA)(XrPassthroughColorLutMETA colorLut, const XrPassthroughColorLutUpdateInfoMETA* updateInfo);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreatePassthroughColorLutMETA(
+    XrPassthroughFB                             passthrough,
+    const XrPassthroughColorLutCreateInfoMETA*  createInfo,
+    XrPassthroughColorLutMETA*                  colorLut);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyPassthroughColorLutMETA(
+    XrPassthroughColorLutMETA                   colorLut);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrUpdatePassthroughColorLutMETA(
+    XrPassthroughColorLutMETA                   colorLut,
+    const XrPassthroughColorLutUpdateInfoMETA*  updateInfo);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 #define XR_EXT_uuid 1
 #define XR_EXT_uuid_SPEC_VERSION          1
 #define XR_EXT_UUID_EXTENSION_NAME        "XR_EXT_uuid"
+
+
+#define XR_EXT_hand_interaction 1
+#define XR_EXT_hand_interaction_SPEC_VERSION 1
+#define XR_EXT_HAND_INTERACTION_EXTENSION_NAME "XR_EXT_hand_interaction"
 
 
 #define XR_QCOM_tracking_optimization_settings 1
@@ -5605,6 +5941,192 @@ XRAPI_ATTR XrResult XRAPI_CALL xrApplyForceFeedbackCurlMNDX(
 #define XR_EXT_local_floor 1
 #define XR_EXT_local_floor_SPEC_VERSION   1
 #define XR_EXT_LOCAL_FLOOR_EXTENSION_NAME "XR_EXT_local_floor"
+
+
+#define XR_EXT_hand_tracking_data_source 1
+#define XR_EXT_hand_tracking_data_source_SPEC_VERSION 1
+#define XR_EXT_HAND_TRACKING_DATA_SOURCE_EXTENSION_NAME "XR_EXT_hand_tracking_data_source"
+
+typedef enum XrHandTrackingDataSourceEXT {
+    XR_HAND_TRACKING_DATA_SOURCE_UNOBSTRUCTED_EXT = 1,
+    XR_HAND_TRACKING_DATA_SOURCE_CONTROLLER_EXT = 2,
+    XR_HAND_TRACKING_DATA_SOURCE_MAX_ENUM_EXT = 0x7FFFFFFF
+} XrHandTrackingDataSourceEXT;
+// XrHandTrackingDataSourceInfoEXT extends XrHandTrackerCreateInfoEXT
+typedef struct XrHandTrackingDataSourceInfoEXT {
+    XrStructureType                 type;
+    const void* XR_MAY_ALIAS        next;
+    uint32_t                        requestedDataSourceCount;
+    XrHandTrackingDataSourceEXT*    requestedDataSources;
+} XrHandTrackingDataSourceInfoEXT;
+
+// XrHandTrackingDataSourceStateEXT extends XrHandJointLocationsEXT
+typedef struct XrHandTrackingDataSourceStateEXT {
+    XrStructureType                type;
+    void* XR_MAY_ALIAS             next;
+    XrBool32                       isActive;
+    XrHandTrackingDataSourceEXT    dataSource;
+} XrHandTrackingDataSourceStateEXT;
+
+
+
+#define XR_EXT_plane_detection 1
+XR_DEFINE_HANDLE(XrPlaneDetectorEXT)
+#define XR_EXT_plane_detection_SPEC_VERSION 1
+#define XR_EXT_PLANE_DETECTION_EXTENSION_NAME "XR_EXT_plane_detection"
+
+typedef enum XrPlaneDetectorOrientationEXT {
+    XR_PLANE_DETECTOR_ORIENTATION_HORIZONTAL_UPWARD_EXT = 0,
+    XR_PLANE_DETECTOR_ORIENTATION_HORIZONTAL_DOWNWARD_EXT = 1,
+    XR_PLANE_DETECTOR_ORIENTATION_VERTICAL_EXT = 2,
+    XR_PLANE_DETECTOR_ORIENTATION_ARBITRARY_EXT = 3,
+    XR_PLANE_DETECTOR_ORIENTATION_MAX_ENUM_EXT = 0x7FFFFFFF
+} XrPlaneDetectorOrientationEXT;
+
+typedef enum XrPlaneDetectorSemanticTypeEXT {
+    XR_PLANE_DETECTOR_SEMANTIC_TYPE_UNDEFINED_EXT = 0,
+    XR_PLANE_DETECTOR_SEMANTIC_TYPE_CEILING_EXT = 1,
+    XR_PLANE_DETECTOR_SEMANTIC_TYPE_FLOOR_EXT = 2,
+    XR_PLANE_DETECTOR_SEMANTIC_TYPE_WALL_EXT = 3,
+    XR_PLANE_DETECTOR_SEMANTIC_TYPE_PLATFORM_EXT = 4,
+    XR_PLANE_DETECTOR_SEMANTIC_TYPE_MAX_ENUM_EXT = 0x7FFFFFFF
+} XrPlaneDetectorSemanticTypeEXT;
+
+typedef enum XrPlaneDetectionStateEXT {
+    XR_PLANE_DETECTION_STATE_NONE_EXT = 0,
+    XR_PLANE_DETECTION_STATE_PENDING_EXT = 1,
+    XR_PLANE_DETECTION_STATE_DONE_EXT = 2,
+    XR_PLANE_DETECTION_STATE_ERROR_EXT = 3,
+    XR_PLANE_DETECTION_STATE_FATAL_EXT = 4,
+    XR_PLANE_DETECTION_STATE_MAX_ENUM_EXT = 0x7FFFFFFF
+} XrPlaneDetectionStateEXT;
+typedef XrFlags64 XrPlaneDetectionCapabilityFlagsEXT;
+
+// Flag bits for XrPlaneDetectionCapabilityFlagsEXT
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_PLANE_DETECTION_BIT_EXT = 0x00000001;
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_PLANE_HOLES_BIT_EXT = 0x00000002;
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_SEMANTIC_CEILING_BIT_EXT = 0x00000004;
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_SEMANTIC_FLOOR_BIT_EXT = 0x00000008;
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_SEMANTIC_WALL_BIT_EXT = 0x00000010;
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_SEMANTIC_PLATFORM_BIT_EXT = 0x00000020;
+static const XrPlaneDetectionCapabilityFlagsEXT XR_PLANE_DETECTION_CAPABILITY_ORIENTATION_BIT_EXT = 0x00000040;
+
+typedef XrFlags64 XrPlaneDetectorFlagsEXT;
+
+// Flag bits for XrPlaneDetectorFlagsEXT
+static const XrPlaneDetectorFlagsEXT XR_PLANE_DETECTOR_ENABLE_CONTOUR_BIT_EXT = 0x00000001;
+
+// XrSystemPlaneDetectionPropertiesEXT extends XrSystemProperties
+typedef struct XrSystemPlaneDetectionPropertiesEXT {
+    XrStructureType                       type;
+    void* XR_MAY_ALIAS                    next;
+    XrPlaneDetectionCapabilityFlagsEXT    supportedFeatures;
+} XrSystemPlaneDetectionPropertiesEXT;
+
+typedef struct XrPlaneDetectorCreateInfoEXT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrPlaneDetectorFlagsEXT     flags;
+} XrPlaneDetectorCreateInfoEXT;
+
+typedef struct XrExtent3DfEXT {
+    float    width;
+    float    height;
+    float    depth;
+} XrExtent3DfEXT;
+
+typedef struct XrPlaneDetectorBeginInfoEXT {
+    XrStructureType                          type;
+    const void* XR_MAY_ALIAS                 next;
+    XrSpace                                  baseSpace;
+    XrTime                                   time;
+    uint32_t                                 orientationCount;
+    const XrPlaneDetectorOrientationEXT*     orientations;
+    uint32_t                                 semanticTypeCount;
+    const XrPlaneDetectorSemanticTypeEXT*    semanticTypes;
+    uint32_t                                 maxPlanes;
+    float                                    minArea;
+    XrPosef                                  boundingBoxPose;
+    XrExtent3DfEXT                           boundingBoxExtent;
+} XrPlaneDetectorBeginInfoEXT;
+
+typedef struct XrPlaneDetectorGetInfoEXT {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpace                     baseSpace;
+    XrTime                      time;
+} XrPlaneDetectorGetInfoEXT;
+
+typedef struct XrPlaneDetectorLocationEXT {
+    XrStructureType                   type;
+    void* XR_MAY_ALIAS                next;
+    uint64_t                          planeId;
+    XrSpaceLocationFlags              locationFlags;
+    XrPosef                           pose;
+    XrExtent2Df                       extents;
+    XrPlaneDetectorOrientationEXT     orientation;
+    XrPlaneDetectorSemanticTypeEXT    semanticType;
+    uint32_t                          polygonBufferCount;
+} XrPlaneDetectorLocationEXT;
+
+typedef struct XrPlaneDetectorLocationsEXT {
+    XrStructureType                type;
+    void* XR_MAY_ALIAS             next;
+    uint32_t                       planeLocationCapacityInput;
+    uint32_t                       planeLocationCountOutput;
+    XrPlaneDetectorLocationEXT*    planeLocations;
+} XrPlaneDetectorLocationsEXT;
+
+typedef struct XrPlaneDetectorPolygonBufferEXT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              vertexCapacityInput;
+    uint32_t              vertexCountOutput;
+    XrVector2f*           vertices;
+} XrPlaneDetectorPolygonBufferEXT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreatePlaneDetectorEXT)(XrSession                            session, const XrPlaneDetectorCreateInfoEXT*  createInfo, XrPlaneDetectorEXT*                  planeDetector);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyPlaneDetectorEXT)(XrPlaneDetectorEXT planeDetector);
+typedef XrResult (XRAPI_PTR *PFN_xrBeginPlaneDetectionEXT)(XrPlaneDetectorEXT                 planeDetector, const XrPlaneDetectorBeginInfoEXT* beginInfo);
+typedef XrResult (XRAPI_PTR *PFN_xrGetPlaneDetectionStateEXT)(XrPlaneDetectorEXT               planeDetector, XrPlaneDetectionStateEXT*        state);
+typedef XrResult (XRAPI_PTR *PFN_xrGetPlaneDetectionsEXT)(XrPlaneDetectorEXT               planeDetector, const XrPlaneDetectorGetInfoEXT* info, XrPlaneDetectorLocationsEXT*     locations);
+typedef XrResult (XRAPI_PTR *PFN_xrGetPlanePolygonBufferEXT)(XrPlaneDetectorEXT               planeDetector, uint64_t                         planeId, uint32_t                         polygonBufferIndex, XrPlaneDetectorPolygonBufferEXT* polygonBuffer);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreatePlaneDetectorEXT(
+    XrSession                                   session,
+    const XrPlaneDetectorCreateInfoEXT*         createInfo,
+    XrPlaneDetectorEXT*                         planeDetector);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyPlaneDetectorEXT(
+    XrPlaneDetectorEXT                          planeDetector);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrBeginPlaneDetectionEXT(
+    XrPlaneDetectorEXT                          planeDetector,
+    const XrPlaneDetectorBeginInfoEXT*          beginInfo);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetPlaneDetectionStateEXT(
+    XrPlaneDetectorEXT                          planeDetector,
+    XrPlaneDetectionStateEXT*                   state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetPlaneDetectionsEXT(
+    XrPlaneDetectorEXT                          planeDetector,
+    const XrPlaneDetectorGetInfoEXT*            info,
+    XrPlaneDetectorLocationsEXT*                locations);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetPlanePolygonBufferEXT(
+    XrPlaneDetectorEXT                          planeDetector,
+    uint64_t                                    planeId,
+    uint32_t                                    polygonBufferIndex,
+    XrPlaneDetectorPolygonBufferEXT*            polygonBuffer);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+#define XR_OPPO_controller_interaction 1
+#define XR_OPPO_controller_interaction_SPEC_VERSION 1
+#define XR_OPPO_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_OPPO_controller_interaction"
 
 #ifdef __cplusplus
 }

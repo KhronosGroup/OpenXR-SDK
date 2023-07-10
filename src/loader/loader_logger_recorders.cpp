@@ -160,12 +160,15 @@ bool DebugUtilsLogRecorder::LogMessage(XrLoaderLogMessageSeverityFlagBits messag
         XrDebugUtilsMessageTypeFlagsEXT utils_type = LoaderLogMessageTypesToDebugUtilsMessageTypes(message_type);
 
         // Convert the loader log message into the debug utils log message information
-        XrDebugUtilsMessengerCallbackDataEXT utils_callback_data = {XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT};
+        XrDebugUtilsMessengerCallbackDataEXT utils_callback_data{};
+        utils_callback_data.type = XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT;
         utils_callback_data.messageId = callback_data->message_id;
         utils_callback_data.functionName = callback_data->command_name;
         utils_callback_data.message = callback_data->message;
-        std::vector<XrDebugUtilsObjectNameInfoEXT> utils_objects(callback_data->object_count,
-                                                                 {XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT});
+
+        XrDebugUtilsObjectNameInfoEXT example_utils_info{};
+        example_utils_info.type = XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+        std::vector<XrDebugUtilsObjectNameInfoEXT> utils_objects(callback_data->object_count, example_utils_info);
         for (uint8_t object = 0; object < callback_data->object_count; ++object) {
             utils_objects[object].objectHandle = callback_data->objects[object].handle;
             utils_objects[object].objectType = callback_data->objects[object].type;

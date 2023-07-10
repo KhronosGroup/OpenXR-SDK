@@ -33,6 +33,8 @@ set(LOADER_FOLDER "Loader")
 set(HELPER_FOLDER "Helpers")
 set(CODEGEN_FOLDER "Generated")
 set(TESTS_FOLDER "Tests")
+set(CONFORMANCE_TESTS_FOLDER "Conformance Test Suite")
+set(LOADER_TESTS_FOLDER "Loader Tests")
 set(API_LAYERS_FOLDER "Layers")
 set(SAMPLES_FOLDER "Samples")
 
