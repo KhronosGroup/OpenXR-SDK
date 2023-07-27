@@ -14,8 +14,10 @@
 
     <!-- so client-side code of runtime/layers can talk to their service sides -->
     <intent>
-      <action android:name="org.khronos.openxr.OpenXRRuntimeService" />
-      <action android:name="org.khronos.openxr.OpenXRApiLayerService" />
+        <action android:name="org.khronos.openxr.OpenXRRuntimeService" />
+    </intent>
+    <intent>
+        <action android:name="org.khronos.openxr.OpenXRApiLayerService" />
     </intent>
   </queries>
 

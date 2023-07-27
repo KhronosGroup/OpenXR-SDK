@@ -28,6 +28,28 @@ the loader documentation now describes how OpenXR handles compatibility with
 Android API levels of 30 and above: runtimes may need to update accordingly to
 support this compatibility solution.
 
+- **OpenXR SDK 1.0.28.2** hotfix release includes the following fixes
+  - Loader spec: Fix description of `<queries>` element contents: existing
+    description would fail to install.
+    ([internal MR 2840](https://gitlab.khronos.org/openxr/openxr/merge_requests/2840),
+    [internal issue 2053](https://gitlab.khronos.org/openxr/openxr/issues/2053))
+  - Android AAR artifacts (loader) and hello_xr: Fix `<queries>` element contents.
+    ([internal MR 2840](https://gitlab.khronos.org/openxr/openxr/merge_requests/2840),
+    [internal issue 2053](https://gitlab.khronos.org/openxr/openxr/issues/2053))
+  - Android AAR artifacts: Fix C++ standard library selection for Android artifacts
+    in `build-aar.sh`
+    ([internal MR 2836](https://gitlab.khronos.org/openxr/openxr/merge_requests/2836),
+    [internal issue 2052](https://gitlab.khronos.org/openxr/openxr/issues/2052))
+  - Android AAR artifacts: Use `jar` instead of 7-zip to perform archiving, and
+    document requirements in `build-aar.sh`
+    ([internal MR 2836](https://gitlab.khronos.org/openxr/openxr/merge_requests/2836),
+    [OpenXR-SDK-Source issue 303](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/303),
+    [internal issue 1711](https://gitlab.khronos.org/openxr/openxr/issues/1711))
+  - build system: Support SDK hotfix versions (fourth version component).
+    ([internal MR 2836](https://gitlab.khronos.org/openxr/openxr/merge_requests/2836))
+- **OpenXR SDK 1.0.28.1** hotfix release includes the following fix
+  - API dump layer: Fix build on Windows on ARM64.
+    ([OpenXR-SDK-Source PR 414](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/414))
 - Registry
   - Added defines to `xr.xml` for extension enum base and enum stride.
     ([internal MR 2693](https://gitlab.khronos.org/openxr/openxr/merge_requests/2693),

@@ -4,6 +4,7 @@ Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
 Source: https://khronos.org/registry/OpenXR/
 
 Files: changes/*
+       HOTFIX
 Copyright: 2019-2023, The Khronos Group Inc.
 License: CC-BY-4.0
 

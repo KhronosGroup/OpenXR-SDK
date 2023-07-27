@@ -166,11 +166,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_compile_definitions(openxr_loader PRIVATE EXTRASYSCONFDIR="/etc")
     endif()
 
-    set_target_properties(openxr_loader PROPERTIES SOVERSION "${MAJOR}" VERSION "${MAJOR}.${MINOR}.${PATCH}")
+    set_target_properties(openxr_loader PROPERTIES SOVERSION "${MAJOR}" VERSION "${OPENXR_FULL_VERSION}")
 
     add_custom_target(
         libopenxr_loader.so.${MAJOR}.${MINOR} ALL
-        COMMAND ${CMAKE_COMMAND} -E create_symlink libopenxr_loader.so.${MAJOR}.${MINOR}.${PATCH}
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libopenxr_loader.so.${OPENXR_FULL_VERSION}
                 libopenxr_loader.so.${MAJOR}.${MINOR}
     )
 elseif(WIN32)
@@ -338,7 +338,7 @@ configure_package_config_file(
 )
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/OpenXRConfigVersion.cmake
-    VERSION "${MAJOR}.${MINOR}.${PATCH}"
+    VERSION "${OPENXR_FULL_VERSION}"
     COMPATIBILITY SameMajorVersion
 )
 install(
@@ -401,5 +401,5 @@ elseif(ANDROID AND INSTALL_TO_ARCHITECTURE_PREFIXES)
 
     # This gets used directly by build-aar.sh
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/openxr_loader_for_android.pom
-        ${CMAKE_CURRENT_BINARY_DIR}/openxr_loader_for_android-${MAJOR}.${MINOR}.${PATCH}${OPENXR_ANDROID_VERSION_SUFFIX}.pom)
+        ${CMAKE_CURRENT_BINARY_DIR}/openxr_loader_for_android-${OPENXR_FULL_VERSION}${OPENXR_ANDROID_VERSION_SUFFIX}.pom)
 endif()
