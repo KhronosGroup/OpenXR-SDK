@@ -3,7 +3,12 @@ Upstream-Name: OpenXR
 Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
 Source: https://khronos.org/registry/OpenXR/
 
-Files: changes/*
+Files: changes/conformance/*
+       changes/registry/*
+       changes/sdk/*
+       changes/specification/*
+       changes/README.md
+       changes/template.md
        HOTFIX
 Copyright: 2019-2023, The Khronos Group Inc.
 License: CC-BY-4.0
@@ -30,24 +35,21 @@ Comment: Based on a Material Icons asset ("emoji-people") with added text
   Rasterized with Android Studio.
 
 Files: src/external/catch2/*
-Copyright: Copyright (c) 2022 Two Blue Cubes Ltd.
+Copyright: Copyright (c) 2023 Two Blue Cubes Ltd.
 License: BSL-1.0
-Comment: Unmodified, vendored copy of Catch2 3.1.1
+Comment: Unmodified, vendored copy of Catch2 v3.3.2
 
 Files: src/external/jsoncpp/*
 Copyright: 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
 License: MIT OR LicenseRef-jsoncpp-public-domain
 Comment: Unmodified, vendored copy of jsoncpp 1.9.5
 
-Files: src/external/tinygltf/*
-Copyright: 2017 Syoyo Fujita, Aurélien Chatelain and many contributors
+Files: src/external/tinygltf/README.md
+  src/external/tinygltf/tiny_gltf.cc
+  src/external/tinygltf/tiny_gltf.h
+Copyright: 2015-Present, Syoyo Fujita, Aurélien Chatelain and many contributors
 License: MIT
 Comment: Unmodified, vendored copy of a subset of the tiny-gltf repo v2.8.9
-
-Files: src/external/tinygltf/json.hpp
-Copyright: 2013-2017 Niels Lohmann <http://nlohmann.me>
-License: MIT
-Comment: Unmodified, included in tiny-gltf repo.
 
 Files: src/external/d3dx12/*
 Copyright: Copyright (c) Microsoft Corporation.
@@ -81,11 +83,6 @@ Files: specification/sources/chapters/extensions/epic/epic_view_configuration_fo
 Copyright: 2020, Epic Games, Inc.
 License: CC-BY-4.0
 Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1422
-
-Files: specification/sources/chapters/extensions/oculus/oculus_android_session_state_enable.adoc
-Copyright: 2019, Oculus VR, LLC.
-License: CC-BY-4.0
-Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1418
 
 Files: specification/sources/chapters/extensions/ext/ext_performance_settings.adoc
   specification/sources/chapters/extensions/ext/ext_thermal_query.adoc

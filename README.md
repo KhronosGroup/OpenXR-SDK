@@ -24,6 +24,7 @@ That repository is also where sample code (hello_xr) and API layer source can be
 
 ## Directory Structure
 
+<!-- REUSE-IgnoreStart -->
 - `BUILDING.md` - Instructions for building the projects
 - `README.md` - This file
 - `COPYING.md` - Copyright and licensing information
@@ -32,6 +33,7 @@ That repository is also where sample code (hello_xr) and API layer source can be
 - `include/` - OpenXR header files
 - `src/external/jsoncpp` - The jsoncpp project source code, an included dependency of the loader.
 - `src/loader` - OpenXR loader code, **including generated code**
+<!-- REUSE-IgnoreEnd -->
 
 ## Building
 

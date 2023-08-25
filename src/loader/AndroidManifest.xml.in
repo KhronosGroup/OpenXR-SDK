@@ -4,7 +4,7 @@
   android:versionName="${OPENXR_FULL_VERSION}${OPENXR_ANDROID_VERSION_SUFFIX}">
   <!--
   Copyright (c) 2020-2023, The Khronos Group Inc.
-  SPDX-License-Identifier: Apache-2.0
+  SPDX-License-Identifier: Apache-2.0 OR MIT
   -->
 
   <uses-permission android:name="org.khronos.openxr.permission.OPENXR" />

@@ -305,12 +305,10 @@ function(compile_glsl run_target_name)
 
 endfunction()
 
-if(WIN32)
+# Not available in MinGW
+if(MSVC)
     add_definitions(-DXR_USE_GRAPHICS_API_D3D11)
-    if(MSVC)
-        # Not available in MinGW right now
-        add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
-    endif()
+    add_definitions(-DXR_USE_GRAPHICS_API_D3D12)
 endif()
 
 # Check for the existence of the secure_getenv or __secure_getenv commands
@@ -408,16 +406,34 @@ set(GENERATED_OUTPUT)
 set(GENERATED_DEPENDS)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.h)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.c)
-if(GENERATED_DEPENDS)
-    add_custom_target(xr_global_generated_files DEPENDS ${GENERATED_DEPENDS})
+set(COMMON_GENERATED_OUTPUT ${GENERATED_OUTPUT})
+set(COMMON_GENERATED_DEPENDS ${GENERATED_DEPENDS})
+unset(GENERATED_OUTPUT)
+unset(GENERATED_DEPENDS)
+
+run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table_core.h)
+run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table_core.c)
+set(LOADER_GENERATED_OUTPUT ${GENERATED_OUTPUT})
+set(LOADER_GENERATED_DEPENDS ${GENERATED_DEPENDS})
+unset(GENERATED_OUTPUT)
+unset(GENERATED_DEPENDS)
+
+if(LOADER_GENERATED_DEPENDS)
+    add_custom_target(xr_global_generated_files DEPENDS ${LOADER_GENERATED_DEPENDS})
 else()
     add_custom_target(xr_global_generated_files)
 endif()
 
 set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
-set(COMMON_GENERATED_OUTPUT ${GENERATED_OUTPUT})
-set(COMMON_GENERATED_DEPENDS ${GENERATED_DEPENDS})
+if(COMMON_GENERATED_DEPENDS)
+    add_custom_target(xr_common_generated_files DEPENDS ${COMMON_GENERATED_DEPENDS})
+else()
+    add_custom_target(xr_common_generated_files)
+endif()
+
+set_target_properties(xr_common_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
+
 if(NOT MSVC)
     include(CheckCXXCompilerFlag)
     include(CheckCCompilerFlag)

@@ -8,10 +8,17 @@
 // Initial Author: Mark Young <marky@LunarG.com>
 //
 
+// The years here should always match the Khronos line above!
+#define COPYRIGHT_NOTICE "2017-2023, The Khronos Group Inc. and others"
+
+// REUSE-IgnoreStart
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Start customize section
 // Edit this section for your build
+// The normal OpenXR CMake build will define the XR_CURRENT_API_*_VERSION
+// symbols automatically so no manual changes are needed in that case.
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +70,7 @@ BEGIN
         BEGIN
             VALUE "FileDescription", "OpenXR Loader"
             VALUE "FileVersion", VER_FILE_VERSION_STR
-            VALUE "LegalCopyright", "Copyright (C) 2015-2020"
+            VALUE "LegalCopyright", "Copyright (C) " COPYRIGHT_NOTICE
             VALUE "ProductName", "OpenXR Loader"
             VALUE "ProductVersion", VER_FILE_VERSION_STR
         END

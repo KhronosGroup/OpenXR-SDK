@@ -1,3 +1,7 @@
+# Copyright (c) 2017-2023, The Khronos Group Inc.
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=@CMAKE_INSTALL_PREFIX@
 libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@

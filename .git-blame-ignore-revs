@@ -9,8 +9,11 @@
 # and do try to make sure that the bulk change is made
 # **separate from a release commit** on all repos.
 # See <https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt>
-# for how to use this.
+# for how to use this, probably something like:
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
 
+## Old changes
+767537d9523253de1615b01450a8b22c8e2cc6a2
 
 ## 1.0.17 - Fix XML indentation
 

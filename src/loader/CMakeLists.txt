@@ -31,8 +31,8 @@ include(GNUInstallDirs)
 
 # List of all files externally generated outside of the loader that the loader
 # needs to build with.
-set(LOADER_EXTERNAL_GEN_FILES ${COMMON_GENERATED_OUTPUT})
-set(LOADER_EXTERNAL_GEN_DEPENDS ${COMMON_GENERATED_DEPENDS})
+set(LOADER_EXTERNAL_GEN_FILES ${LOADER_GENERATED_OUTPUT})
+set(LOADER_EXTERNAL_GEN_DEPENDS ${LOADER_GENERATED_DEPENDS})
 run_xr_xml_generate(loader_source_generator.py xr_generated_loader.hpp)
 run_xr_xml_generate(loader_source_generator.py xr_generated_loader.cpp)
 

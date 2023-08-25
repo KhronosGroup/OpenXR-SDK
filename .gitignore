@@ -54,6 +54,7 @@ local.properties
 
 # Don't ignore these things
 !.*.license
+!.artifact-bot.md
 !.appveyor.yml
 !.azure-pipelines/
 !.azure-pipelines/nuget/NugetTemplate/build

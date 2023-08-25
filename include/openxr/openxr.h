@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 28)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 29)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -491,6 +491,7 @@ typedef enum XrStructureType {
     XR_TYPE_DEVICE_PCM_SAMPLE_RATE_STATE_FB = 1000209002,
     XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_FB = 1000212000,
     XR_TYPE_LOCAL_DIMMING_FRAME_END_INFO_META = 1000216000,
+    XR_TYPE_PASSTHROUGH_PREFERENCES_META = 1000217000,
     XR_TYPE_SYSTEM_VIRTUAL_KEYBOARD_PROPERTIES_META = 1000219001,
     XR_TYPE_VIRTUAL_KEYBOARD_CREATE_INFO_META = 1000219002,
     XR_TYPE_VIRTUAL_KEYBOARD_SPACE_CREATE_INFO_META = 1000219003,
@@ -3266,7 +3267,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrRequestDisplayRefreshRateFB(
 
 
 #define XR_HTCX_vive_tracker_interaction 1
-#define XR_HTCX_vive_tracker_interaction_SPEC_VERSION 2
+#define XR_HTCX_vive_tracker_interaction_SPEC_VERSION 3
 #define XR_HTCX_VIVE_TRACKER_INTERACTION_EXTENSION_NAME "XR_HTCX_vive_tracker_interaction"
 typedef struct XrViveTrackerPathsHTCX {
     XrStructureType       type;
@@ -5236,6 +5237,31 @@ typedef struct XrLocalDimmingFrameEndInfoMETA {
     XrLocalDimmingModeMETA      localDimmingMode;
 } XrLocalDimmingFrameEndInfoMETA;
 
+
+
+#define XR_META_passthrough_preferences 1
+#define XR_META_passthrough_preferences_SPEC_VERSION 1
+#define XR_META_PASSTHROUGH_PREFERENCES_EXTENSION_NAME "XR_META_passthrough_preferences"
+typedef XrFlags64 XrPassthroughPreferenceFlagsMETA;
+
+// Flag bits for XrPassthroughPreferenceFlagsMETA
+static const XrPassthroughPreferenceFlagsMETA XR_PASSTHROUGH_PREFERENCE_DEFAULT_TO_ACTIVE_BIT_META = 0x00000001;
+
+typedef struct XrPassthroughPreferencesMETA {
+    XrStructureType                     type;
+    const void* XR_MAY_ALIAS            next;
+    XrPassthroughPreferenceFlagsMETA    flags;
+} XrPassthroughPreferencesMETA;
+
+typedef XrResult (XRAPI_PTR *PFN_xrGetPassthroughPreferencesMETA)(XrSession session, XrPassthroughPreferencesMETA* preferences);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrGetPassthroughPreferencesMETA(
+    XrSession                                   session,
+    XrPassthroughPreferencesMETA*               preferences);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 #define XR_META_virtual_keyboard 1

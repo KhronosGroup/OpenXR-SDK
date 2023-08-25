@@ -62,6 +62,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="UNITY"      author="Unity Technologies"    contact="Jack Pritz @jackpritz, Peter Kuhn @peterunity"/>
         <tag name="VALVE"      author="Valve"                 contact="Joe Ludwig @JoeLudwig"/>
         <tag name="VARJO"      author="Varjo"                 contact="Sergiy Dubovik @dubik, Rémi Arnaud @VarjoRemi"/>
+        <tag name="YVR"        author="YVR"                   contact="Pengpeng Zhang @zhangpengpeng"/>
     </tags>
 
     <!-- SECTION: OpenXR type definitions -->
@@ -131,7 +132,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 28)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 29)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -359,6 +360,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_META_performance_metrics -->
         <type bitvalues="XrPerformanceMetricsCounterFlagBitsMETA" category="bitmask">typedef <type>XrFlags64</type> <name>XrPerformanceMetricsCounterFlagsMETA</name>;</type>
 
+        <!-- Bitmask types for XR_META_passthrough_preferences -->
+        <type bitvalues="XrPassthroughPreferenceFlagBitsMETA" category="bitmask">typedef <type>XrFlags64</type> <name>XrPassthroughPreferenceFlagsMETA</name>;</type>
+
         <!-- Bitmask types for XR_HTC_foveation -->
         <type bitvalues="XrFoveationDynamicFlagBitsHTC" category="bitmask">typedef <type>XrFlags64</type> <name>XrFoveationDynamicFlagsHTC</name>;</type>
 
@@ -543,6 +547,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enum and flag bits for XR_META_performance_metrics -->
         <type name="XrPerformanceMetricsCounterFlagBitsMETA" category="enum"/>
         <type name="XrPerformanceMetricsCounterUnitMETA" category="enum"/>
+
+        <!-- enum and flag bits for XR_META_passthrough_preferences -->
+        <type name="XrPassthroughPreferenceFlagBitsMETA" category="enum"/>
 
         <!-- XR_HTC_facial_tracking -->
         <type name="XrFacialTrackingTypeHTC" category="enum"/>
@@ -1465,11 +1472,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrBlendFactorFB</type> <name>dstFactorAlpha</name></member>
         </type>
 
+
         <!-- types for XR_MNDX_egl_enable -->
+        <type category="funcpointer">typedef void *(*<name>PFN_xrEglGetProcAddressMNDX</name>)(const <type>char</type> *name);</type>
+
         <type category="struct" name="XrGraphicsBindingEGLMNDX" structextends="XrSessionCreateInfo">
             <member values="XR_TYPE_GRAPHICS_BINDING_EGL_MNDX"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
-            <member><type>PFNEGLGETPROCADDRESSPROC</type> <name>getProcAddress</name></member>
+            <member><type>PFN_xrEglGetProcAddressMNDX</type> <name>getProcAddress</name></member>
             <member><type>EGLDisplay</type> <name>display</name></member>
             <member><type>EGLConfig</type> <name>config</name></member>
             <member><type>EGLContext</type> <name>context</name></member>
@@ -2859,6 +2869,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>float</type>                                                <name>floatValue</name></member>
         </type>
 
+        <!-- XR_META_passthrough_preferences structs -->
+        <type category="struct" name="XrPassthroughPreferencesMETA" returnedonly="true">
+            <member values="XR_TYPE_PASSTHROUGH_PREFERENCES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrPassthroughPreferenceFlagsMETA</type> <name>flags</name></member>
+        </type>
+
         <!-- XR_META_headset_id structs -->
         <type category="struct" name="XrSystemHeadsetIdPropertiesMETA" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
@@ -4102,6 +4119,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="2"   name="XR_PERFORMANCE_METRICS_COUNTER_UNIT_MILLISECONDS_META" comment="the performance counter unit is millisecond."/>
         <enum value="3"   name="XR_PERFORMANCE_METRICS_COUNTER_UNIT_BYTES_META"        comment="the performance counter unit is byte."/>
         <enum value="4"   name="XR_PERFORMANCE_METRICS_COUNTER_UNIT_HERTZ_META"        comment="the performance counter unit is hertz (Hz)."/>
+    </enums>
+
+    <!-- flags for XR_META_passthrough_preferences -->
+    <enums name="XrPassthroughPreferenceFlagBitsMETA" type="bitmask">
+        <enum bitpos="0" name="XR_PASSTHROUGH_PREFERENCE_DEFAULT_TO_ACTIVE_BIT_META" comment="Indicates that the runtime recommends apps to default to a mixed reality experience with passthrough (if supported)."/>
     </enums>
 
     <!-- enums for XR_HTC_foveation -->
@@ -5589,6 +5611,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrPerformanceMetricsCounterMETA</type>* <name>counter</name></param>
         </command>
 
+        <!-- commands for XR_META_passthrough_preferences -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrGetPassthroughPreferencesMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrPassthroughPreferencesMETA</type>* <name>preferences</name></param>
+        </command>
+
         <!-- commands for XR_HTC_foveation -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LIMIT_REACHED">
             <proto><type>XrResult</type> <name>xrApplyFoveationHTC</name></proto>
@@ -6063,6 +6092,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <user_path path="/user/vive_tracker_htcx/role/right_elbow"/>
             <user_path path="/user/vive_tracker_htcx/role/left_knee"/>
             <user_path path="/user/vive_tracker_htcx/role/right_knee"/>
+            <user_path path="/user/vive_tracker_htcx/role/left_wrist"/>
+            <user_path path="/user/vive_tracker_htcx/role/right_wrist"/>
+            <user_path path="/user/vive_tracker_htcx/role/left_ankle"/>
+            <user_path path="/user/vive_tracker_htcx/role/right_ankle"/>
             <user_path path="/user/vive_tracker_htcx/role/waist"/>
             <user_path path="/user/vive_tracker_htcx/role/chest"/>
             <user_path path="/user/vive_tracker_htcx/role/camera"/>
@@ -7720,7 +7753,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_HTCX_vive_tracker_interaction" number="104" type="instance" provisional="true" supported="openxr">
         <require>
-            <enum value="2"                                            name="XR_HTCX_vive_tracker_interaction_SPEC_VERSION"/>
+            <enum value="3"                                            name="XR_HTCX_vive_tracker_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_HTCX_vive_tracker_interaction&quot;" name="XR_HTCX_VIVE_TRACKER_INTERACTION_EXTENSION_NAME"/>
             <type name="XrViveTrackerPathsHTCX"/>
             <type name="XrEventDataViveTrackerConnectedHTCX"/>
@@ -9116,10 +9149,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_218" number="218" type="instance" supported="disabled">
+    <extension name="XR_META_passthrough_preferences" number="218" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_218_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_218&quot;" name="XR_FB_EXTENSION_218_EXTENSION_NAME"/>
+            <enum value="1"                                           name="XR_META_passthrough_preferences_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_passthrough_preferences&quot;" name="XR_META_PASSTHROUGH_PREFERENCES_EXTENSION_NAME"/>
+
+            <type name="XrPassthroughPreferencesMETA"/>
+            <type name="XrPassthroughPreferenceFlagsMETA"/>
+            <type name="XrPassthroughPreferenceFlagBitsMETA"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_PASSTHROUGH_PREFERENCES_META"/>
+
+            <command name="xrGetPassthroughPreferencesMETA"/>
         </require>
     </extension>
 
@@ -11340,6 +11381,188 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <require>
             <enum value="1"                               name="XR_ML_extension_497_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_extension_497&quot;" name="XR_ML_extension_497_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_498" number="498" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_498_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_498&quot;" name="XR_YVR_extension_498_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_499" number="499" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_499_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_499&quot;" name="XR_YVR_extension_499_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_500" number="500" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_500_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_500&quot;" name="XR_YVR_extension_500_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_501" number="501" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_501_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_501&quot;" name="XR_YVR_extension_501_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_502" number="502" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_502_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_502&quot;" name="XR_YVR_extension_502_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_503" number="503" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_503_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_503&quot;" name="XR_YVR_extension_503_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_504" number="504" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_504_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_504&quot;" name="XR_YVR_extension_504_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_505" number="505" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_505_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_505&quot;" name="XR_YVR_extension_505_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_506" number="506" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_506_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_506&quot;" name="XR_YVR_extension_506_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_507" number="507" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_507_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_507&quot;" name="XR_YVR_extension_507_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_508" number="508" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_508_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_508&quot;" name="XR_YVR_extension_508_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_509" number="509" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_509_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_509&quot;" name="XR_YVR_extension_509_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_510" number="510" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_510_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_510&quot;" name="XR_YVR_extension_510_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_511" number="511" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_511_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_511&quot;" name="XR_YVR_extension_511_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_512" number="512" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_512_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_512&quot;" name="XR_YVR_extension_512_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_513" number="513" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_513_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_513&quot;" name="XR_YVR_extension_513_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_514" number="514" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_514_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_514&quot;" name="XR_YVR_extension_514_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_515" number="515" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_515_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_515&quot;" name="XR_YVR_extension_515_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_516" number="516" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_516_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_516&quot;" name="XR_YVR_extension_516_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_517" number="517" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_517_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_517&quot;" name="XR_YVR_extension_517_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_518" number="518" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_518_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_518&quot;" name="XR_YVR_extension_518_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_519" number="519" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_519_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_519&quot;" name="XR_YVR_extension_519_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_520" number="520" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_520_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_520&quot;" name="XR_YVR_extension_520_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_521" number="521" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_521_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_521&quot;" name="XR_YVR_extension_521_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_522" number="522" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_522_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_522&quot;" name="XR_YVR_extension_522_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_YVR_extension_523" number="523" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_YVR_extension_523_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_extension_523&quot;" name="XR_YVR_extension_523_EXTENSION_NAME"/>
         </require>
     </extension>
 

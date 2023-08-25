@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The Khronos Group Inc.
+# Copyright (c) 2019-2023, The Khronos Group Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 if (-not $env:VULKAN_SDK_VERSION) {

@@ -1,6 +1,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--
-  Copyright (c) 2020 The Khronos Group Inc.
+  Copyright (c) 2020-2023, The Khronos Group Inc.
   SPDX-License-Identifier: CC-BY-4.0
   -->
   <PropertyGroup>
