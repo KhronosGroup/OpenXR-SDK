@@ -19,6 +19,45 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.30 (2023-09-20)
+
+This release is primarily a quality improvement release, fixing a range of
+issues in the registry and SDK, including fixing a loader bug related to layers,
+in addition to a new vendor extension and an updated vendor extension.
+
+- Registry
+  - Add missing enum tags for enum-sized array struct members.
+    ([internal MR 2731](https://gitlab.khronos.org/openxr/openxr/merge_requests/2731))
+  - Fix EGL "get proc addr" function pointer typedef.
+    ([internal MR 2939](https://gitlab.khronos.org/openxr/openxr/merge_requests/2939))
+  - New vendor extension: `XR_YVR_controller_interaction`
+    ([internal MR 2841](https://gitlab.khronos.org/openxr/openxr/merge_requests/2841))
+  - `XR_BD_controller_interaction`: Add support for G3 devices
+    ([internal MR 2872](https://gitlab.khronos.org/openxr/openxr/merge_requests/2872))
+  - Fix specification errors highlighted by fixed tooling.
+    ([internal MR 2923](https://gitlab.khronos.org/openxr/openxr/merge_requests/2923))
+- SDK
+  - Add installable manual page for `openxr_runtime_list_json`.
+    ([internal MR 2899](https://gitlab.khronos.org/openxr/openxr/merge_requests/2899))
+  - Remove unused diagram exports from loader directory.
+    ([internal MR 2907](https://gitlab.khronos.org/openxr/openxr/merge_requests/2907))
+  - Update URLs in manual pages.
+    ([internal MR 2935](https://gitlab.khronos.org/openxr/openxr/merge_requests/2935))
+  - Validation Layer: Remove conditional `XR_KHR_headless` support as the extension
+    is not part of OpenXR 1.0.
+    ([internal MR 2901](https://gitlab.khronos.org/openxr/openxr/merge_requests/2901))
+  - build system: Add CTest support for running the loader test.
+    ([internal MR 2289](https://gitlab.khronos.org/openxr/openxr/merge_requests/2289),
+    [OpenXR-SDK-Source issue 309](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/309),
+    [internal issue 1733](https://gitlab.khronos.org/openxr/openxr/issues/1733))
+  - hello_xr: Clean up how we specify the default graphics plugin on Android.
+    ([internal MR 2917](https://gitlab.khronos.org/openxr/openxr/merge_requests/2917))
+  - list_json: Add missing return statement for exit code.
+    ([internal MR 2936](https://gitlab.khronos.org/openxr/openxr/merge_requests/2936))
+  - loader: fix for implicit/explicit api layer loading logic
+    ([OpenXR-SDK-Source PR 421](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/421),
+    [internal issue 2079](https://gitlab.khronos.org/openxr/openxr/issues/2079))
+
 ## OpenXR SDK 1.0.29 (2023-08-25)
 
 This release contains several fixes to the specification registry, improvements

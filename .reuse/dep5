@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: OpenXR
 Upstream-Contact: Ryan Pavlik <openxr-speceditor AT khronos DOT org>
-Source: https://khronos.org/registry/OpenXR/
+Source: https://registry.khronos.org/OpenXR/
 
 Files: changes/conformance/*
        changes/registry/*
@@ -54,8 +54,8 @@ Comment: Unmodified, vendored copy of a subset of the tiny-gltf repo v2.8.9
 Files: src/external/d3dx12/*
 Copyright: Copyright (c) Microsoft Corporation.
 License: MIT
-Comment: Unmodified, vendored copy of DirectX-Headers commit da7aedb
-  of https://github.com/microsoft/DirectX-Headers filtered to just d3dx12 headers
+Comment: Unmodified, vendored copy of d3dx12.h from directx-vs-templates commit 86b9c45
+  This repo includes ifdefs to improve compatibility with older Windows SDK verions.
 
 Files: src/external/mikktspace/*
 Copyright: 2011 by Morten S. Mikkelsen

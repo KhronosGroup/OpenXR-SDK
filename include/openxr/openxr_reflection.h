@@ -4588,6 +4588,7 @@ XR_ENUM_STR(XrResult);
     _(XR_EXT_hand_tracking_data_source, 429) \
     _(XR_EXT_plane_detection, 430) \
     _(XR_OPPO_controller_interaction, 454) \
+    _(XR_YVR_controller_interaction, 498) \
 
 
 #endif

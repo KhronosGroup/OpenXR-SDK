@@ -82,7 +82,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type requires="EGL/egl.h" name="EGLConfig"/>
         <type requires="EGL/egl.h" name="EGLContext"/>
         <type requires="EGL/egl.h" name="EGLenum"/>
-        <type requires="EGL/egl.h" name="PFNEGLGETPROCADDRESSPROC"/>
         <type requires="GL/glxext.h" name="GLXFBConfig"/>
         <type requires="GL/glxext.h" name="GLXDrawable"/>
         <type requires="GL/glxext.h" name="GLXContext"/>
@@ -132,7 +131,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 29)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 30)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -1238,8 +1237,8 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="struct" name="XrDebugUtilsMessengerCallbackDataEXT">
             <member values="XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"><type>XrStructureType</type>               <name>type</name></member>
             <member>const <type>void</type>*                                                                            <name>next</name></member>
-            <member len="null-terminated">const <type>char</type>*                                                      <name>messageId</name></member>
-            <member len="null-terminated">const <type>char</type>*                                                      <name>functionName</name></member>
+            <member optional="true" len="null-terminated">const <type>char</type>*                                      <name>messageId</name></member>
+            <member optional="true" len="null-terminated">const <type>char</type>*                                      <name>functionName</name></member>
             <member len="null-terminated">const <type>char</type>*                                                      <name>message</name></member>
             <member optional="true"><type>uint32_t</type>                                                               <name>objectCount</name></member>
             <member noautovalidity="true" optional="true" len="objectCount"><type>XrDebugUtilsObjectNameInfoEXT</type>* <name>objects</name></member>
@@ -1474,7 +1473,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
 
         <!-- types for XR_MNDX_egl_enable -->
-        <type category="funcpointer">typedef void *(*<name>PFN_xrEglGetProcAddressMNDX</name>)(const <type>char</type> *name);</type>
+        <type category="funcpointer">typedef PFN_xrVoidFunction (*<name>PFN_xrEglGetProcAddressMNDX</name>)(const <type>char</type> *name);</type>
 
         <type category="struct" name="XrGraphicsBindingEGLMNDX" structextends="XrSessionCreateInfo">
             <member values="XR_TYPE_GRAPHICS_BINDING_EGL_MNDX"><type>XrStructureType</type> <name>type</name></member>
@@ -1491,7 +1490,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member values="XR_TYPE_SPATIAL_GRAPH_NODE_SPACE_CREATE_INFO_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                            <name>next</name></member>
             <member><type>XrSpatialGraphNodeTypeMSFT</type>             <name>nodeType</name></member>
-            <member><type>uint8_t</type>                                <name>nodeId</name>[XR_GUID_SIZE_MSFT]</member>
+            <member><type>uint8_t</type>                                <name>nodeId</name>[<enum>XR_GUID_SIZE_MSFT</enum>]</member>
             <member><type>XrPosef</type>                                <name>pose</name></member>
         </type>
         <type category="struct" name="XrSpatialGraphStaticNodeBindingCreateInfoMSFT">
@@ -1508,7 +1507,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="struct" name="XrSpatialGraphNodeBindingPropertiesMSFT">
             <member values="XR_TYPE_SPATIAL_GRAPH_NODE_BINDING_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*   <name>next</name></member>
-            <member><type>uint8_t</type> <name>nodeId</name>[XR_GUID_SIZE_MSFT]</member>
+            <member><type>uint8_t</type> <name>nodeId</name>[<enum>XR_GUID_SIZE_MSFT</enum>]</member>
             <member><type>XrPosef</type> <name>poseInNodeSpace</name></member>
         </type>
 
@@ -1890,8 +1889,8 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="struct" name="XrControllerModelNodePropertiesMSFT">
             <member values="XR_TYPE_CONTROLLER_MODEL_NODE_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
-            <member><type>char</type> <name>parentNodeName</name>[XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT]</member>
-            <member><type>char</type> <name>nodeName</name>[XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT]</member>
+            <member><type>char</type> <name>parentNodeName</name>[<enum>XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT</enum>]</member>
+            <member><type>char</type> <name>nodeName</name>[<enum>XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT</enum>]</member>
         </type>
         <type category="struct" name="XrControllerModelPropertiesMSFT">
             <member values="XR_TYPE_CONTROLLER_MODEL_PROPERTIES_MSFT"><type>XrStructureType</type> <name>type</name></member>
@@ -2281,7 +2280,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member values="XR_TYPE_RENDER_MODEL_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                                                       <name>next</name></member>
             <member><type>uint32_t</type>                                                    <name>vendorId</name></member>
-            <member><type>char</type>                                                        <name>modelName</name>[XR_MAX_RENDER_MODEL_NAME_SIZE_FB]</member>
+            <member><type>char</type>                                                        <name>modelName</name>[<enum>XR_MAX_RENDER_MODEL_NAME_SIZE_FB</enum>]</member>
             <member><type>XrRenderModelKeyFB</type>                                          <name>modelKey</name></member>
             <member><type>uint32_t</type>                                                    <name>modelVersion</name></member>
             <member><type>XrRenderModelFlagsFB</type>                                        <name>flags</name></member>
@@ -2508,7 +2507,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>uint64_t</type> <name>trackedKeyboardId</name></member>
             <member><type>XrVector3f</type> <name>size</name></member>
             <member><type>XrKeyboardTrackingFlagsFB</type> <name>flags</name></member>
-            <member><type>char</type> <name>name</name>[XR_MAX_KEYBOARD_TRACKING_NAME_SIZE_FB]</member>
+            <member><type>char</type> <name>name</name>[<enum>XR_MAX_KEYBOARD_TRACKING_NAME_SIZE_FB</enum>]</member>
         </type>
         <type category="struct" name="XrKeyboardSpaceCreateInfoFB">
             <member values="XR_TYPE_KEYBOARD_SPACE_CREATE_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
@@ -2631,12 +2630,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="struct" name="XrPassthroughColorMapMonoToRgbaFB" structextends="XrPassthroughStyleFB">
             <member values="XR_TYPE_PASSTHROUGH_COLOR_MAP_MONO_TO_RGBA_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
-            <member><type>XrColor4f</type>   <name>textureColorMap</name>[XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB]</member>
+            <member><type>XrColor4f</type>   <name>textureColorMap</name>[<enum>XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB</enum>]</member>
         </type>
         <type category="struct" name="XrPassthroughColorMapMonoToMonoFB" structextends="XrPassthroughStyleFB">
             <member values="XR_TYPE_PASSTHROUGH_COLOR_MAP_MONO_TO_MONO_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
-            <member><type>uint8_t</type>     <name>textureColorMap</name>[XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB]</member>
+            <member><type>uint8_t</type>     <name>textureColorMap</name>[<enum>XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB</enum>]</member>
         </type>
         <type category="struct" name="XrPassthroughBrightnessContrastSaturationFB" structextends="XrPassthroughStyleFB">
             <member values="XR_TYPE_PASSTHROUGH_BRIGHTNESS_CONTRAST_SATURATION_FB"><type>XrStructureType</type> <name>type</name></member>
@@ -5102,7 +5101,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_COLOR_SPACE_UNSUPPORTED_FB">
             <proto><type>XrResult</type> <name>xrSetColorSpaceFB</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
-            <param>const <type>XrColorSpaceFB</type> <name>colorspace</name></param>
+            <param>const <type>XrColorSpaceFB</type> <name>colorSpace</name></param>
         </command>
 
         <!-- XR_FB_foveation -->
@@ -5524,7 +5523,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <proto><type>XrResult</type> <name>xrSetMarkerTrackingPredictionVARJO</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>uint64_t</type> <name>markerId</name></param>
-            <param><type>XrBool32</type> <name>enabled</name></param>
+            <param><type>XrBool32</type> <name>enable</name></param>
         </command>
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_MARKER_NOT_TRACKED_VARJO,XR_ERROR_MARKER_ID_INVALID_VARJO,XR_ERROR_FEATURE_UNSUPPORTED">
@@ -6272,6 +6271,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <component                                subpath="/output/haptic"            type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <interaction_profile name="/interaction_profiles/bytedance/pico_g3_controller" title="Bytedance PICO G3 Controller">
+            <user_path path="/user/hand/left"/>
+            <user_path path="/user/hand/right"/>
+            <component subpath="/input/trigger/click"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/trigger/value"      type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/menu/click"         type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/grip/pose"          type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/input/aim/pose"           type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/input/thumbstick"         type="XR_ACTION_TYPE_VECTOR2F_INPUT"/>
+            <component subpath="/input/thumbstick/click"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+        </interaction_profile>
+
         <!-- XR_EXT_hand_interaction -->
         <interaction_profile name="/interaction_profiles/ext/hand_interaction_ext" title="EXT hand interaction profile">
             <user_path path="/user/hand/left"/>
@@ -6316,6 +6327,32 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <component                                subpath="/output/haptic"                type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- XR_YVR_controller_interaction -->
+        <interaction_profile name="/interaction_profiles/yvr/touch_controller_yvr" title="YVR Touch Controller">
+            <user_path path="/user/hand/left"/>
+            <user_path path="/user/hand/right"/>
+            <component user_path="/user/hand/left"    subpath="/input/x/click"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/x/touch"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/y/click"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/y/touch"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/menu/click"         type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/a/click"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/a/touch"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/b/click"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/b/touch"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/system/click"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"    system="true"/>
+            <component                                subpath="/input/squeeze/click"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/trigger/value"      type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/trigger/touch"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/thumbstick"         type="XR_ACTION_TYPE_VECTOR2F_INPUT"/>
+            <component                                subpath="/input/thumbstick/x"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick/y"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick/click"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/thumbstick/touch"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/grip/pose"          type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/input/aim/pose"           type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/output/haptic"            type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
+        </interaction_profile>
 
     </interaction_profiles>
 
@@ -6619,7 +6656,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <!-- Debug Utilities extension -->
     <extension name="XR_EXT_debug_utils" number="20" type="instance" supported="openxr">
         <require>
-            <enum value="4"                              name="XR_EXT_debug_utils_SPEC_VERSION"/>
+            <enum value="5"                              name="XR_EXT_debug_utils_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_debug_utils&quot;" name="XR_EXT_DEBUG_UTILS_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"   name="XR_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT"/>
             <enum offset="1" extends="XrStructureType"   name="XR_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"/>
@@ -10510,10 +10547,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_BD_controller_interaction" number="385" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                        name="XR_BD_controller_interaction_SPEC_VERSION"/>
+            <enum value="2"                                        name="XR_BD_controller_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_BD_controller_interaction&quot;" name="XR_BD_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
             <interaction_profile name="/interaction_profiles/bytedance/pico_neo3_controller"/>
             <interaction_profile name="/interaction_profiles/bytedance/pico4_controller"/>
+            <interaction_profile name="/interaction_profiles/bytedance/pico_g3_controller"/>
         </require>
         <require extension="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_neo3_controller">
@@ -10530,6 +10568,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
                 <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
                 <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
+            <extend interaction_profile_path="/interaction_profiles/bytedance/pico_g3_controller">
+                <component subpath="/input/trackpad/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
         </require>
         <require extension="XR_EXT_palm_pose">
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_neo3_controller">
@@ -10538,19 +10583,22 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico4_controller">
                 <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
+            <extend interaction_profile_path="/interaction_profiles/bytedance/pico_g3_controller">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
         </require>
         <require extension="XR_EXT_hand_interaction">
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_neo3_controller">
                 <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
                 <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
-                <component subpath="/input/grip/pose"        type="XR_ACTION_TYPE_POSE_INPUT"/>
-                <component subpath="/input/aim/pose"         type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico4_controller">
                 <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
                 <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
-                <component subpath="/input/grip/pose"        type="XR_ACTION_TYPE_POSE_INPUT"/>
-                <component subpath="/input/aim/pose"         type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+            <extend interaction_profile_path="/interaction_profiles/bytedance/pico_g3_controller">
+                <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
         </require>
     </extension>
@@ -11384,10 +11432,33 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_YVR_extension_498" number="498" type="instance" supported="disabled">
+    <extension name="XR_YVR_controller_interaction" number="498" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_YVR_extension_498_SPEC_VERSION"/>
-            <enum value="&quot;XR_YVR_extension_498&quot;" name="XR_YVR_extension_498_EXTENSION_NAME"/>
+            <enum value="1"                                         name="XR_YVR_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_YVR_controller_interaction&quot;" name="XR_YVR_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
+            <interaction_profile name="/interaction_profiles/yvr/touch_controller_yvr"/>
+        </require>
+        <require extension="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/yvr/touch_controller_yvr">
+                <component subpath="/input/trackpad/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
+        </require>
+        <require extension="XR_EXT_palm_pose">
+            <extend interaction_profile_path="/interaction_profiles/yvr/touch_controller_yvr">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+        <require extension="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/yvr/touch_controller_yvr">
+                <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/grip/pose"        type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/aim/pose"         type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
         </require>
     </extension>
 

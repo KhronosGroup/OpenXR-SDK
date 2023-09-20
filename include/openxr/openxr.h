@@ -25,7 +25,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 29)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 0, 30)
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -1800,7 +1800,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrThermalGetTemperatureTrendEXT(
 
 #define XR_EXT_debug_utils 1
 XR_DEFINE_HANDLE(XrDebugUtilsMessengerEXT)
-#define XR_EXT_debug_utils_SPEC_VERSION   4
+#define XR_EXT_debug_utils_SPEC_VERSION   5
 #define XR_EXT_DEBUG_UTILS_EXTENSION_NAME "XR_EXT_debug_utils"
 typedef XrFlags64 XrDebugUtilsMessageSeverityFlagsEXT;
 
@@ -2116,9 +2116,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetInputDeviceLocationEXT(
 
 #define XR_MSFT_spatial_graph_bridge 1
 XR_DEFINE_HANDLE(XrSpatialGraphNodeBindingMSFT)
+#define XR_GUID_SIZE_MSFT                 16
 #define XR_MSFT_spatial_graph_bridge_SPEC_VERSION 2
 #define XR_MSFT_SPATIAL_GRAPH_BRIDGE_EXTENSION_NAME "XR_MSFT_spatial_graph_bridge"
-#define XR_GUID_SIZE_MSFT                 16
 
 typedef enum XrSpatialGraphNodeTypeMSFT {
     XR_SPATIAL_GRAPH_NODE_TYPE_STATIC_MSFT = 1,
@@ -2454,9 +2454,9 @@ typedef struct XrSecondaryViewConfigurationSwapchainCreateInfoMSFT {
 #define XR_NULL_CONTROLLER_MODEL_KEY_MSFT 0
 
 XR_DEFINE_ATOM(XrControllerModelKeyMSFT)
+#define XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT 64
 #define XR_MSFT_controller_model_SPEC_VERSION 2
 #define XR_MSFT_CONTROLLER_MODEL_EXTENSION_NAME "XR_MSFT_controller_model"
-#define XR_MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT 64
 typedef struct XrControllerModelKeyStateMSFT {
     XrStructureType             type;
     void* XR_MAY_ALIAS          next;
@@ -3452,7 +3452,7 @@ typedef struct XrSystemColorSpacePropertiesFB {
 } XrSystemColorSpacePropertiesFB;
 
 typedef XrResult (XRAPI_PTR *PFN_xrEnumerateColorSpacesFB)(XrSession session, uint32_t colorSpaceCapacityInput, uint32_t* colorSpaceCountOutput, XrColorSpaceFB* colorSpaces);
-typedef XrResult (XRAPI_PTR *PFN_xrSetColorSpaceFB)(XrSession session, const XrColorSpaceFB colorspace);
+typedef XrResult (XRAPI_PTR *PFN_xrSetColorSpaceFB)(XrSession session, const XrColorSpaceFB colorSpace);
 
 #ifndef XR_NO_PROTOTYPES
 #ifdef XR_EXTENSION_PROTOTYPES
@@ -3464,7 +3464,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateColorSpacesFB(
 
 XRAPI_ATTR XrResult XRAPI_CALL xrSetColorSpaceFB(
     XrSession                                   session,
-    const XrColorSpaceFB                        colorspace);
+    const XrColorSpaceFB                        colorSpace);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
 
@@ -3757,9 +3757,9 @@ typedef struct XrFoveationLevelProfileCreateInfoFB {
 
 
 #define XR_FB_keyboard_tracking 1
+#define XR_MAX_KEYBOARD_TRACKING_NAME_SIZE_FB 128
 #define XR_FB_keyboard_tracking_SPEC_VERSION 1
 #define XR_FB_KEYBOARD_TRACKING_EXTENSION_NAME "XR_FB_keyboard_tracking"
-#define XR_MAX_KEYBOARD_TRACKING_NAME_SIZE_FB 128
 typedef XrFlags64 XrKeyboardTrackingFlagsFB;
 
 // Flag bits for XrKeyboardTrackingFlagsFB
@@ -3894,9 +3894,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrTriangleMeshEndVertexBufferUpdateFB(
 XR_DEFINE_HANDLE(XrPassthroughFB)
 XR_DEFINE_HANDLE(XrPassthroughLayerFB)
 XR_DEFINE_HANDLE(XrGeometryInstanceFB)
+#define XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB 256
 #define XR_FB_passthrough_SPEC_VERSION    3
 #define XR_FB_PASSTHROUGH_EXTENSION_NAME  "XR_FB_passthrough"
-#define XR_PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB 256
 
 typedef enum XrPassthroughLayerPurposeFB {
     XR_PASSTHROUGH_LAYER_PURPOSE_RECONSTRUCTION_FB = 0,
@@ -4085,9 +4085,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGeometryInstanceSetTransformFB(
 #define XR_NULL_RENDER_MODEL_KEY_FB 0
 
 XR_DEFINE_ATOM(XrRenderModelKeyFB)
+#define XR_MAX_RENDER_MODEL_NAME_SIZE_FB  64
 #define XR_FB_render_model_SPEC_VERSION   4
 #define XR_FB_RENDER_MODEL_EXTENSION_NAME "XR_FB_render_model"
-#define XR_MAX_RENDER_MODEL_NAME_SIZE_FB  64
 typedef XrFlags64 XrRenderModelFlagsFB;
 
 // Flag bits for XrRenderModelFlagsFB
@@ -4244,7 +4244,7 @@ typedef struct XrMarkerSpaceCreateInfoVARJO {
 
 typedef XrResult  (XRAPI_PTR *PFN_xrSetMarkerTrackingVARJO)(XrSession session, XrBool32  enabled);
 typedef XrResult (XRAPI_PTR *PFN_xrSetMarkerTrackingTimeoutVARJO)(XrSession session, uint64_t markerId, XrDuration timeout);
-typedef XrResult (XRAPI_PTR *PFN_xrSetMarkerTrackingPredictionVARJO)(XrSession session, uint64_t markerId, XrBool32 enabled);
+typedef XrResult (XRAPI_PTR *PFN_xrSetMarkerTrackingPredictionVARJO)(XrSession session, uint64_t markerId, XrBool32 enable);
 typedef XrResult (XRAPI_PTR *PFN_xrGetMarkerSizeVARJO)(XrSession session, uint64_t markerId, XrExtent2Df* size);
 typedef XrResult (XRAPI_PTR *PFN_xrCreateMarkerSpaceVARJO)(XrSession session, const XrMarkerSpaceCreateInfoVARJO* createInfo, XrSpace* space);
 
@@ -4262,7 +4262,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSetMarkerTrackingTimeoutVARJO(
 XRAPI_ATTR XrResult XRAPI_CALL xrSetMarkerTrackingPredictionVARJO(
     XrSession                                   session,
     uint64_t                                    markerId,
-    XrBool32                                    enabled);
+    XrBool32                                    enable);
 
 XRAPI_ATTR XrResult XRAPI_CALL xrGetMarkerSizeVARJO(
     XrSession                                   session,
@@ -5960,7 +5960,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrApplyForceFeedbackCurlMNDX(
 
 
 #define XR_BD_controller_interaction 1
-#define XR_BD_controller_interaction_SPEC_VERSION 1
+#define XR_BD_controller_interaction_SPEC_VERSION 2
 #define XR_BD_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_BD_controller_interaction"
 
 
@@ -6153,6 +6153,11 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetPlanePolygonBufferEXT(
 #define XR_OPPO_controller_interaction 1
 #define XR_OPPO_controller_interaction_SPEC_VERSION 1
 #define XR_OPPO_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_OPPO_controller_interaction"
+
+
+#define XR_YVR_controller_interaction 1
+#define XR_YVR_controller_interaction_SPEC_VERSION 1
+#define XR_YVR_CONTROLLER_INTERACTION_EXTENSION_NAME "XR_YVR_controller_interaction"
 
 #ifdef __cplusplus
 }
