@@ -21,7 +21,7 @@
 # It should contain only definitions that are applicable to the
 # entire project and includes for the sub-directories.
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.16)
 project(OPENXR)
 
 find_package(PythonInterp 3)

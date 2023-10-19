@@ -29,10 +29,10 @@ jobs:
       VULKAN_SDK_VERSION: "1.1.114.0"
       INSTALL_DIR: "${{ github.workspace }}/install"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.26.4
+        uses: lukka/get-cmake@v3.27.7
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.3

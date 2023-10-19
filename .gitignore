@@ -77,3 +77,7 @@ local.properties
 # Output artifact
 *.aar
 *.pom
+clang-format-patches/
+
+# Key stores
+*.jks

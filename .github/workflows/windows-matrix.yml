@@ -17,7 +17,7 @@ jobs:
   #   outputs:
   #     matrix: "${{ steps.set-matrix.outputs.matrix }}"
   #   steps:
-  #     - uses: "actions/checkout@v3"
+  #     - uses: "actions/checkout@v4"
   #     - id: set-matrix
   #       run: "python3 .github/scripts/generate_windows_matrix_build.py matrix"
   msvc-build:
@@ -47,7 +47,7 @@ jobs:
       - msvc-build
     runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v3"
+      - uses: "actions/checkout@v4"
 
       - name: Retrieve artifacts
         uses: "actions/download-artifact@v3"

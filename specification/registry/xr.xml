@@ -131,7 +131,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 30)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 31)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -601,6 +601,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrVirtualKeyboardLocationTypeMETA" category="enum"/>
         <type name="XrVirtualKeyboardInputSourceMETA" category="enum"/>
         <type name="XrVirtualKeyboardInputStateFlagBitsMETA" category="enum"/>
+
+        <!-- enums for XR_ML_user_calibration -->
+        <type name="XrHeadsetFitStatusML" category="enum"/>
+        <type name="XrEyeCalibrationStatusML" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -1707,16 +1711,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrHandMeshVertexBufferMSFT</type> <name>vertexBuffer</name></member>
         </type>
         <type category="struct" name="XrHandMeshIndexBufferMSFT">
-            <member optional="true"><type>uint32_t</type> <name>indexBufferKey</name></member>
-            <member><type>uint32_t</type> <name>indexCapacityInput</name></member>
-            <member optional="true"><type>uint32_t</type> <name>indexCountOutput</name></member>
-            <member len="indexCapacityInput"><type>uint32_t</type>* <name>indices</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexBufferKey</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexCountOutput</name></member>
+            <member optional="true" len="indexCapacityInput"><type>uint32_t</type>* <name>indices</name></member>
         </type>
         <type category="struct" name="XrHandMeshVertexBufferMSFT">
-            <member optional="true"><type>XrTime</type> <name>vertexUpdateTime</name></member>
-            <member><type>uint32_t</type> <name>vertexCapacityInput</name></member>
-            <member optional="true"><type>uint32_t</type> <name>vertexCountOutput</name></member>
-            <member len="vertexCapacityInput"><type>XrHandMeshVertexMSFT</type>* <name>vertices</name></member>
+            <member optional="true"><type>XrTime</type>                                          <name>vertexUpdateTime</name></member>
+            <member optional="true"><type>uint32_t</type>                                        <name>vertexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                        <name>vertexCountOutput</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrHandMeshVertexMSFT</type>* <name>vertices</name></member>
         </type>
         <type category="struct" name="XrHandMeshVertexMSFT">
             <member><type>XrVector3f</type> <name>position</name></member>
@@ -1978,10 +1982,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrTime</type> <name>updateTime</name></member>
         </type>
         <type category="struct" name="XrSceneComponentsMSFT">
-            <member values="XR_TYPE_SCENE_COMPONENTS_MSFT"><type>XrStructureType</type> <name>type</name></member>
-            <member><type>void</type>* <name>next</name></member>
-            <member optional="true"><type>uint32_t</type> <name>componentCapacityInput</name></member>
-            <member><type>uint32_t</type> <name>componentCountOutput</name></member>
+            <member values="XR_TYPE_SCENE_COMPONENTS_MSFT"><type>XrStructureType</type>             <name>type</name></member>
+            <member><type>void</type>*                                                              <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                           <name>componentCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                           <name>componentCountOutput</name></member>
             <member optional="true" len="componentCapacityInput"><type>XrSceneComponentMSFT</type>* <name>components</name></member>
         </type>
         <type category="struct" name="XrSceneComponentsGetInfoMSFT">
@@ -2066,23 +2070,23 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </type>
         <type category="struct" name="XrSceneMeshVertexBufferMSFT">
             <member values="XR_TYPE_SCENE_MESH_VERTEX_BUFFER_MSFT"><type>XrStructureType</type> <name>type</name></member>
-            <member><type>void</type>* <name>next</name></member>
-            <member optional="true"><type>uint32_t</type> <name>vertexCapacityInput</name></member>
-            <member><type>uint32_t</type> <name>vertexCountOutput</name></member>
+            <member><type>void</type>*                                                 <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                              <name>vertexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                              <name>vertexCountOutput</name></member>
             <member optional="true" len="vertexCapacityInput"><type>XrVector3f</type>* <name>vertices</name></member>
         </type>
         <type category="struct" name="XrSceneMeshIndicesUint32MSFT">
             <member values="XR_TYPE_SCENE_MESH_INDICES_UINT32_MSFT"><type>XrStructureType</type> <name>type</name></member>
-            <member><type>void</type>* <name>next</name></member>
-            <member optional="true"><type>uint32_t</type> <name>indexCapacityInput</name></member>
-            <member><type>uint32_t</type> <name>indexCountOutput</name></member>
+            <member><type>void</type>*                                              <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexCountOutput</name></member>
             <member optional="true" len="indexCapacityInput"><type>uint32_t</type>* <name>indices</name></member>
         </type>
         <type category="struct" name="XrSceneMeshIndicesUint16MSFT">
             <member values="XR_TYPE_SCENE_MESH_INDICES_UINT16_MSFT"><type>XrStructureType</type> <name>type</name></member>
-            <member><type>void</type>* <name>next</name></member>
-            <member optional="true"><type>uint32_t</type> <name>indexCapacityInput</name></member>
-            <member><type>uint32_t</type> <name>indexCountOutput</name></member>
+            <member><type>void</type>*                                              <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>indexCountOutput</name></member>
             <member optional="true" len="indexCapacityInput"><type>uint16_t</type>* <name>indices</name></member>
         </type>
 
@@ -2101,6 +2105,38 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>* <name>next</name></member>
             <member optional="true"><type>uint32_t</type> <name>fragmentCount</name></member>
             <member optional="true" len="fragmentCount">const <type>XrDeserializeSceneFragmentMSFT</type>* <name>fragments</name></member>
+        </type>
+
+        <!-- XR_MSFT_scene_marker -->
+        <type name="XrSceneMarkerTypeMSFT" category="enum"/>
+        <type name="XrSceneMarkerQRCodeSymbolTypeMSFT" category="enum"/>
+        <type category="struct" name="XrSceneMarkerMSFT" returnedonly="true">
+            <member><type>XrSceneMarkerTypeMSFT</type> <name>markerType</name></member>
+            <member><type>XrTime</type>                <name>lastSeenTime</name></member>
+            <member><type>XrOffset2Df</type>           <name>center</name></member>
+            <member><type>XrExtent2Df</type>           <name>size</name></member>
+        </type>
+        <type category="struct" name="XrSceneMarkersMSFT" structextends="XrSceneComponentsMSFT">
+            <member values="XR_TYPE_SCENE_MARKERS_MSFT"><type>XrStructureType</type>               <name>type</name></member>
+            <member>const <type>void</type>*                                                       <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                          <name>sceneMarkerCapacityInput</name></member>
+            <member optional="true" len="sceneMarkerCapacityInput"><type>XrSceneMarkerMSFT</type>* <name>sceneMarkers</name></member>
+        </type>
+        <type category="struct" name="XrSceneMarkerTypeFilterMSFT" structextends="XrSceneComponentsGetInfoMSFT">
+            <member values="XR_TYPE_SCENE_MARKER_TYPE_FILTER_MSFT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                    <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                       <name>markerTypeCount</name></member>
+            <member optional="true" len="markerTypeCount"><type>XrSceneMarkerTypeMSFT</type>*   <name>markerTypes</name></member>
+        </type>
+        <type category="struct" name="XrSceneMarkerQRCodeMSFT" returnedonly="true">
+            <member><type>XrSceneMarkerQRCodeSymbolTypeMSFT</type> <name>symbolType</name></member>
+            <member><type>uint8_t</type>                           <name>version</name></member>
+        </type>
+        <type category="struct" name="XrSceneMarkerQRCodesMSFT" structextends="XrSceneComponentsMSFT">
+            <member values="XR_TYPE_SCENE_MARKER_QR_CODES_MSFT"><type>XrStructureType</type>        <name>type</name></member>
+            <member>const <type>void</type>*                                                        <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                           <name>qrCodeCapacityInput</name></member>
+            <member optional="true" len="qrCodeCapacityInput"><type>XrSceneMarkerQRCodeMSFT</type>* <name>qrCodes</name></member>
         </type>
 
         <!-- XR_FB_color_space structs -->
@@ -2285,6 +2321,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>uint32_t</type>                                                    <name>modelVersion</name></member>
             <member><type>XrRenderModelFlagsFB</type>                                        <name>flags</name></member>
         </type>
+        <type category="struct" name="XrRenderModelCapabilitiesRequestFB" structextends="XrRenderModelPropertiesFB">
+            <member values="XR_TYPE_RENDER_MODEL_CAPABILITIES_REQUEST_FB"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                         <name>next</name></member>
+            <member><type>XrRenderModelFlagsFB</type>                                          <name>flags</name></member>
+        </type>
         <type category="struct" name="XrRenderModelBufferFB">
             <member values="XR_TYPE_RENDER_MODEL_BUFFER_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                                                   <name>next</name></member>
@@ -2301,11 +2342,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member values="XR_TYPE_SYSTEM_RENDER_MODEL_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                                                         <name>next</name></member>
             <member><type>XrBool32</type>                                                      <name>supportsRenderModelLoading</name></member>
-        </type>
-        <type category="struct" name="XrRenderModelCapabilitiesRequestFB" returnedonly="true" structextends="XrSystemProperties">
-            <member values="XR_TYPE_RENDER_MODEL_CAPABILITIES_REQUEST_FB"><type>XrStructureType</type> <name>type</name></member>
-            <member><type>void</type>*                                                         <name>next</name></member>
-            <member><type>XrRenderModelFlagsFB</type>                                          <name>flags</name></member>
         </type>
 
         <!-- XR_FB_spatial_entity_query structs -->
@@ -3206,7 +3242,30 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></member>
         </type>
+
+        <!-- XR_ML_user_calibration -->
+        <type category="struct" name="XrUserCalibrationEnableEventsInfoML">
+            <member values="XR_TYPE_USER_CALIBRATION_ENABLE_EVENTS_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type>    <name>enabled</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataHeadsetFitChangedML" parentstruct="XrEventDataBaseHeader" returnedonly="true">
+            <member values="XR_TYPE_EVENT_DATA_HEADSET_FIT_CHANGED_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*          <name>next</name></member>
+            <member><type>XrHeadsetFitStatusML</type> <name>status</name></member>
+            <member><type>XrTime</type>               <name>time</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataEyeCalibrationChangedML" parentstruct="XrEventDataBaseHeader" returnedonly="true">
+            <member values="XR_TYPE_EVENT_DATA_EYE_CALIBRATION_CHANGED_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*              <name>next</name></member>
+            <member><type>XrEyeCalibrationStatusML</type> <name>status</name></member>
+        </type>
+
+
     </types>
+
 
     <!-- SECTION: OpenXR enumerant (token) definitions. -->
 
@@ -3846,6 +3905,15 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="4"   name="XR_MESH_COMPUTE_LOD_UNLIMITED_MSFT"/>
     </enums>
 
+    <!-- enums for XR_MSFT_scene_marker -->
+    <enums name="XrSceneMarkerTypeMSFT" type="enum">
+        <enum value="1"   name="XR_SCENE_MARKER_TYPE_QR_CODE_MSFT"/>
+    </enums>
+    <enums name="XrSceneMarkerQRCodeSymbolTypeMSFT" type="enum">
+        <enum value="1"   name="XR_SCENE_MARKER_QR_CODE_SYMBOL_TYPE_QR_CODE_MSFT"/>
+        <enum value="2"   name="XR_SCENE_MARKER_QR_CODE_SYMBOL_TYPE_MICRO_QR_CODE_MSFT"/>
+    </enums>
+
     <!-- flags for XR_FB_android_surface_swapchain_create -->
     <enums name="XrAndroidSurfaceSwapchainFlagBitsFB" type="bitmask">
         <enum bitpos="0" name="XR_ANDROID_SURFACE_SWAPCHAIN_SYNCHRONOUS_BIT_FB"    comment="Create the underlying BufferQueue in synchronous mode"/>
@@ -4247,6 +4315,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <enums name="XrVirtualKeyboardInputStateFlagBitsMETA" type="bitmask">
         <enum bitpos="0" name="XR_VIRTUAL_KEYBOARD_INPUT_STATE_PRESSED_BIT_META" comment="If the input source is considered 'pressed' at all. Pinch for hands, Primary button for controllers."/>
+    </enums>
+
+    <!-- XR_ML_user_calibration -->
+    <enums name="XrHeadsetFitStatusML" type="enum">
+        <enum value="0"   name="XR_HEADSET_FIT_STATUS_UNKNOWN_ML"  comment="Headset fit status not available for unknown reason."/>
+        <enum value="1"   name="XR_HEADSET_FIT_STATUS_NOT_WORN_ML" comment="Headset not worn."/>
+        <enum value="2"   name="XR_HEADSET_FIT_STATUS_GOOD_FIT_ML" comment="Good fit."/>
+        <enum value="3"   name="XR_HEADSET_FIT_STATUS_BAD_FIT_ML"  comment="Bad fit."/>
+    </enums>
+
+    <enums name="XrEyeCalibrationStatusML" type="enum">
+        <enum value="0"   name="XR_EYE_CALIBRATION_STATUS_UNKNOWN_ML" comment="Eye calibration status not available for unknown reason."/>
+        <enum value="1"   name="XR_EYE_CALIBRATION_STATUS_NONE_ML"    comment="User has not performed the eye calibration step. Use system provided app to perform eye calibration."/>
+        <enum value="2"   name="XR_EYE_CALIBRATION_STATUS_COARSE_ML"  comment="Eye calibration is of lower accuracy."/>
+        <enum value="3"   name="XR_EYE_CALIBRATION_STATUS_FINE_ML"    comment="Eye calibration is of higher accuracy."/>
     </enums>
 
     <!-- SECTION: OpenXR command definitions -->
@@ -5044,6 +5127,24 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param optional="true" len="countInput"><type>uint8_t</type>* <name>buffer</name></param>
         </command>
 
+        <!-- XR_MSFT_scene_marker -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SCENE_COMPONENT_TYPE_MISMATCH_MSFT,XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT">
+            <proto><type>XrResult</type> <name>xrGetSceneMarkerRawDataMSFT</name></proto>
+            <param><type>XrSceneMSFT</type> <name>scene</name></param>
+            <param>const <type>XrUuidMSFT</type>* <name>markerId</name></param>
+            <param optional="true"><type>uint32_t</type> <name>bufferCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>bufferCountOutput</name></param>
+            <param optional="true" len="bufferCapacityInput"><type>uint8_t</type>* <name>buffer</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SCENE_MARKER_DATA_NOT_STRING_MSFT" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SCENE_COMPONENT_TYPE_MISMATCH_MSFT,XR_ERROR_SCENE_COMPONENT_ID_INVALID_MSFT">
+            <proto><type>XrResult</type> <name>xrGetSceneMarkerDecodedStringMSFT</name></proto>
+            <param><type>XrSceneMSFT</type> <name>scene</name></param>
+            <param>const <type>XrUuidMSFT</type>* <name>markerId</name></param>
+            <param optional="true"><type>uint32_t</type> <name>bufferCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>bufferCountOutput</name></param>
+            <param optional="true" len="bufferCapacityInput"><type>char</type>* <name>buffer</name></param>
+        </command>
+
         <!-- XR_FB_display_refresh_rate -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SIZE_INSUFFICIENT">
             <proto><type>XrResult</type> <name>xrEnumerateDisplayRefreshRatesFB</name></proto>
@@ -5447,9 +5548,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT">
             <proto><type>XrResult</type> <name>xrEnumeratePersistedSpatialAnchorNamesMSFT</name></proto>
             <param><type>XrSpatialAnchorStoreConnectionMSFT</type> <name>spatialAnchorStore</name></param>
-            <param optional="true"><type>uint32_t</type> <name>spatialAnchorNamesCapacityInput</name></param>
-            <param optional="true"><type>uint32_t</type>* <name>spatialAnchorNamesCountOutput</name></param>
-            <param optional="true" len="spatialAnchorNamesCapacityInput"><type>XrSpatialAnchorPersistenceNameMSFT</type>* <name>persistedAnchorNames</name></param>
+            <param optional="true"><type>uint32_t</type> <name>spatialAnchorNameCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>spatialAnchorNameCountOutput</name></param>
+            <param optional="true" len="spatialAnchorNameCapacityInput"><type>XrSpatialAnchorPersistenceNameMSFT</type>* <name>spatialAnchorNames</name></param>
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_SPATIAL_ANCHOR_NAME_NOT_FOUND_MSFT,XR_ERROR_SPATIAL_ANCHOR_NAME_INVALID_MSFT">
             <proto><type>XrResult</type> <name>xrCreateSpatialAnchorFromPersistedNameMSFT</name></proto>
@@ -5786,6 +5887,13 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></param>
             <param>const <type>XrVirtualKeyboardTextContextChangeInfoMETA</type>* <name>changeInfo</name></param>
         </command>
+
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST">
+            <proto><type>XrResult</type> <name>xrEnableUserCalibrationEventsML</name></proto>
+            <param><type>XrInstance</type>                                       <name>instance</name></param>
+            <param>const <type>XrUserCalibrationEnableEventsInfoML</type>*            <name>enableInfo</name></param>
+        </command>
+
     </commands>
 
     <interaction_profiles>
@@ -8391,6 +8499,29 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
+    <extension name="XR_ML_user_calibration" number="473" type="instance" supported="openxr">
+        <require>
+            <enum value="1"                                  name="XR_ML_user_calibration_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_user_calibration&quot;" name="XR_ML_USER_CALIBRATION_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"       name="XR_TYPE_EVENT_DATA_HEADSET_FIT_CHANGED_ML"/>
+            <enum offset="1" extends="XrStructureType"       name="XR_TYPE_EVENT_DATA_EYE_CALIBRATION_CHANGED_ML"/>
+            <enum offset="2" extends="XrStructureType"       name="XR_TYPE_USER_CALIBRATION_ENABLE_EVENTS_INFO_ML"/>
+
+            <type name="XrHeadsetFitStatusML"/>
+            <type name="XrEyeCalibrationStatusML"/>
+
+            <type name="XrEventDataHeadsetFitChangedML"/>
+            <type name="XrEventDataEyeCalibrationChangedML"/>
+            <type name="XrUserCalibrationEnableEventsInfoML"/>
+
+            <command name="xrEnableUserCalibrationEventsML"/>
+
+        </require>
+    </extension>
+
+
+
     <extension name="XR_MSFT_spatial_anchor_persistence" number="143" requires="XR_MSFT_spatial_anchor" type="instance" supported="openxr">
         <require>
             <enum value="2"                                              name="XR_MSFT_spatial_anchor_persistence_SPEC_VERSION"/>
@@ -8448,10 +8579,25 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_MSFT_extension_148" number="148" type="instance" supported="disabled">
+    <extension name="XR_MSFT_scene_marker" number="148" type="instance" supported="openxr" requires="XR_MSFT_scene_understanding">
         <require>
-            <enum value="1"                                 name="XR_MSFT_extension_148_SPEC_VERSION"/>
-            <enum value="&quot;XR_MSFT_extension_148&quot;" name="XR_MSFT_extension_148_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_MSFT_scene_marker_SPEC_VERSION"/>
+            <enum value="&quot;XR_MSFT_scene_marker&quot;" name="XR_MSFT_SCENE_MARKER_EXTENSION_NAME"/>
+            <type name="XrSceneMarkerTypeMSFT"/>
+            <type name="XrSceneMarkerQRCodeSymbolTypeMSFT"/>
+            <type name="XrSceneMarkerMSFT"/>
+            <type name="XrSceneMarkersMSFT"/>
+            <type name="XrSceneMarkerTypeFilterMSFT"/>
+            <type name="XrSceneMarkerQRCodeMSFT"/>
+            <type name="XrSceneMarkerQRCodesMSFT"/>
+            <enum offset="0" extends="XrSceneComputeFeatureMSFT" name="XR_SCENE_COMPUTE_FEATURE_MARKER_MSFT"/>
+            <enum offset="0" extends="XrSceneComponentTypeMSFT"  name="XR_SCENE_COMPONENT_TYPE_MARKER_MSFT"/>
+            <enum offset="0" extends="XrStructureType"           name="XR_TYPE_SCENE_MARKERS_MSFT"/>
+            <enum offset="1" extends="XrStructureType"           name="XR_TYPE_SCENE_MARKER_TYPE_FILTER_MSFT"/>
+            <enum offset="2" extends="XrStructureType"           name="XR_TYPE_SCENE_MARKER_QR_CODES_MSFT"/>
+            <enum offset="0" extends="XrResult"                  name="XR_SCENE_MARKER_DATA_NOT_STRING_MSFT"  comment="Marker does not encode a string."/>
+            <command name="xrGetSceneMarkerRawDataMSFT"/>
+            <command name="xrGetSceneMarkerDecodedStringMSFT"/>
         </require>
     </extension>
 
@@ -11257,13 +11403,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_473" number="473" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_ML_extension_473_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_473&quot;" name="XR_ML_extension_473_EXTENSION_NAME"/>
-        </require>
-    </extension>
-
     <extension name="XR_ML_extension_474" number="474" type="instance" supported="disabled">
         <require>
             <enum value="1"                               name="XR_ML_extension_474_SPEC_VERSION"/>
@@ -11637,6 +11776,1314 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
+    <extension name="XR_NV_extension_524" number="524" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_NV_extension_524_SPEC_VERSION"/>
+            <enum value="&quot;XR_NV_extension_524&quot;" name="XR_NV_extension_524_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_NV_extension_525" number="525" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_NV_extension_525_SPEC_VERSION"/>
+            <enum value="&quot;XR_NV_extension_525&quot;" name="XR_NV_extension_525_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_NV_extension_526" number="526" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_NV_extension_526_SPEC_VERSION"/>
+            <enum value="&quot;XR_NV_extension_526&quot;" name="XR_NV_extension_526_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_NV_extension_527" number="527" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_NV_extension_527_SPEC_VERSION"/>
+            <enum value="&quot;XR_NV_extension_527&quot;" name="XR_NV_extension_527_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_NV_extension_528" number="528" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_NV_extension_528_SPEC_VERSION"/>
+            <enum value="&quot;XR_NV_extension_528&quot;" name="XR_NV_extension_528_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_529" number="529" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_529_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_529&quot;" name="XR_META_extension_529_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_530" number="530" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_530_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_530&quot;" name="XR_META_extension_530_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_531" number="531" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_531_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_531&quot;" name="XR_META_extension_531_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_532" number="532" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_532_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_532&quot;" name="XR_META_extension_532_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_533" number="533" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_533_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_533&quot;" name="XR_META_extension_533_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_534" number="534" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_534_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_534&quot;" name="XR_META_extension_534_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_535" number="535" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_535_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_535&quot;" name="XR_META_extension_535_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_536" number="536" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_536_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_536&quot;" name="XR_META_extension_536_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_537" number="537" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_537_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_537&quot;" name="XR_META_extension_537_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_538" number="538" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_538_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_538&quot;" name="XR_META_extension_538_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_539" number="539" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_539_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_539&quot;" name="XR_META_extension_539_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_540" number="540" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_540_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_540&quot;" name="XR_META_extension_540_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_541" number="541" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_541_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_541&quot;" name="XR_META_extension_541_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_542" number="542" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_542_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_542&quot;" name="XR_META_extension_542_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_543" number="543" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_543_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_543&quot;" name="XR_META_extension_543_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_544" number="544" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_544_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_544&quot;" name="XR_META_extension_544_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_545" number="545" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_545_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_545&quot;" name="XR_META_extension_545_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_546" number="546" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_546_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_546&quot;" name="XR_META_extension_546_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_547" number="547" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_547_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_547&quot;" name="XR_META_extension_547_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_548" number="548" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_548_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_548&quot;" name="XR_META_extension_548_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_549" number="549" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_549_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_549&quot;" name="XR_META_extension_549_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_550" number="550" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_550_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_550&quot;" name="XR_META_extension_550_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_551" number="551" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_551_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_551&quot;" name="XR_META_extension_551_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_552" number="552" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_552_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_552&quot;" name="XR_META_extension_552_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_553" number="553" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_553_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_553&quot;" name="XR_META_extension_553_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_554" number="554" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_554_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_554&quot;" name="XR_META_extension_554_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_555" number="555" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_555_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_555&quot;" name="XR_META_extension_555_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_556" number="556" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_556_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_556&quot;" name="XR_META_extension_556_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_557" number="557" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_557_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_557&quot;" name="XR_META_extension_557_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_558" number="558" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_558_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_558&quot;" name="XR_META_extension_558_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_559" number="559" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_559_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_559&quot;" name="XR_META_extension_559_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_560" number="560" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_560_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_560&quot;" name="XR_META_extension_560_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_561" number="561" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_561_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_561&quot;" name="XR_META_extension_561_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_562" number="562" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_562_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_562&quot;" name="XR_META_extension_562_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_563" number="563" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_563_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_563&quot;" name="XR_META_extension_563_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_564" number="564" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_564_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_564&quot;" name="XR_META_extension_564_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_565" number="565" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_565_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_565&quot;" name="XR_META_extension_565_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_566" number="566" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_566_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_566&quot;" name="XR_META_extension_566_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_567" number="567" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_567_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_567&quot;" name="XR_META_extension_567_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_568" number="568" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_568_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_568&quot;" name="XR_META_extension_568_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_569" number="569" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_569_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_569&quot;" name="XR_META_extension_569_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_570" number="570" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_570_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_570&quot;" name="XR_META_extension_570_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_571" number="571" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_571_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_571&quot;" name="XR_META_extension_571_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_572" number="572" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_572_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_572&quot;" name="XR_META_extension_572_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_573" number="573" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_573_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_573&quot;" name="XR_META_extension_573_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_574" number="574" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_574_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_574&quot;" name="XR_META_extension_574_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_575" number="575" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_575_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_575&quot;" name="XR_META_extension_575_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_576" number="576" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_576_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_576&quot;" name="XR_META_extension_576_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_577" number="577" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_577_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_577&quot;" name="XR_META_extension_577_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_578" number="578" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_578_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_578&quot;" name="XR_META_extension_578_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_579" number="579" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_579_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_579&quot;" name="XR_META_extension_579_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_580" number="580" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_580_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_580&quot;" name="XR_META_extension_580_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_581" number="581" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_581_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_581&quot;" name="XR_META_extension_581_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_582" number="582" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_582_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_582&quot;" name="XR_META_extension_582_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_583" number="583" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_583_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_583&quot;" name="XR_META_extension_583_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_584" number="584" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_584_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_584&quot;" name="XR_META_extension_584_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_585" number="585" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_585_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_585&quot;" name="XR_META_extension_585_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_586" number="586" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_586_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_586&quot;" name="XR_META_extension_586_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_587" number="587" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_587_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_587&quot;" name="XR_META_extension_587_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_588" number="588" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_588_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_588&quot;" name="XR_META_extension_588_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_589" number="589" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_589_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_589&quot;" name="XR_META_extension_589_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_590" number="590" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_590_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_590&quot;" name="XR_META_extension_590_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_591" number="591" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_591_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_591&quot;" name="XR_META_extension_591_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_592" number="592" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_592_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_592&quot;" name="XR_META_extension_592_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_593" number="593" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_593_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_593&quot;" name="XR_META_extension_593_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_594" number="594" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_594_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_594&quot;" name="XR_META_extension_594_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_595" number="595" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_595_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_595&quot;" name="XR_META_extension_595_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_596" number="596" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_596_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_596&quot;" name="XR_META_extension_596_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_597" number="597" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_597_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_597&quot;" name="XR_META_extension_597_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_598" number="598" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_598_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_598&quot;" name="XR_META_extension_598_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_599" number="599" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_599_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_599&quot;" name="XR_META_extension_599_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_600" number="600" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_600_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_600&quot;" name="XR_META_extension_600_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_601" number="601" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_601_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_601&quot;" name="XR_META_extension_601_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_602" number="602" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_602_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_602&quot;" name="XR_META_extension_602_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_603" number="603" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_603_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_603&quot;" name="XR_META_extension_603_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_604" number="604" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_604_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_604&quot;" name="XR_META_extension_604_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_605" number="605" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_605_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_605&quot;" name="XR_META_extension_605_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_606" number="606" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_606_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_606&quot;" name="XR_META_extension_606_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_607" number="607" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_607_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_607&quot;" name="XR_META_extension_607_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_608" number="608" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_608_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_608&quot;" name="XR_META_extension_608_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_609" number="609" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_609_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_609&quot;" name="XR_META_extension_609_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_610" number="610" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_610_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_610&quot;" name="XR_META_extension_610_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_611" number="611" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_611_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_611&quot;" name="XR_META_extension_611_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_612" number="612" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_612_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_612&quot;" name="XR_META_extension_612_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_613" number="613" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_613_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_613&quot;" name="XR_META_extension_613_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_614" number="614" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_614_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_614&quot;" name="XR_META_extension_614_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_615" number="615" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_615_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_615&quot;" name="XR_META_extension_615_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_616" number="616" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_616_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_616&quot;" name="XR_META_extension_616_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_617" number="617" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_617_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_617&quot;" name="XR_META_extension_617_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_618" number="618" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_618_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_618&quot;" name="XR_META_extension_618_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_619" number="619" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_619_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_619&quot;" name="XR_META_extension_619_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_620" number="620" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_620_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_620&quot;" name="XR_META_extension_620_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_621" number="621" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_621_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_621&quot;" name="XR_META_extension_621_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_622" number="622" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_622_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_622&quot;" name="XR_META_extension_622_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_623" number="623" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_623_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_623&quot;" name="XR_META_extension_623_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_624" number="624" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_624_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_624&quot;" name="XR_META_extension_624_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_625" number="625" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_625_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_625&quot;" name="XR_META_extension_625_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_626" number="626" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_626_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_626&quot;" name="XR_META_extension_626_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_627" number="627" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_627_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_627&quot;" name="XR_META_extension_627_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_628" number="628" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_628_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_628&quot;" name="XR_META_extension_628_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_629" number="629" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_629_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_629&quot;" name="XR_META_extension_629_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_630" number="630" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_630_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_630&quot;" name="XR_META_extension_630_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_631" number="631" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_631_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_631&quot;" name="XR_META_extension_631_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_632" number="632" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_632_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_632&quot;" name="XR_META_extension_632_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_633" number="633" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_633_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_633&quot;" name="XR_META_extension_633_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_634" number="634" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_634_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_634&quot;" name="XR_META_extension_634_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_635" number="635" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_635_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_635&quot;" name="XR_META_extension_635_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_636" number="636" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_636_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_636&quot;" name="XR_META_extension_636_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_637" number="637" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_637_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_637&quot;" name="XR_META_extension_637_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_638" number="638" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_638_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_638&quot;" name="XR_META_extension_638_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_639" number="639" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_639_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_639&quot;" name="XR_META_extension_639_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_640" number="640" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_640_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_640&quot;" name="XR_META_extension_640_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_641" number="641" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_641_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_641&quot;" name="XR_META_extension_641_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_642" number="642" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_642_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_642&quot;" name="XR_META_extension_642_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_643" number="643" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_643_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_643&quot;" name="XR_META_extension_643_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_644" number="644" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_644_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_644&quot;" name="XR_META_extension_644_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_645" number="645" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_645_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_645&quot;" name="XR_META_extension_645_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_646" number="646" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_646_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_646&quot;" name="XR_META_extension_646_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_647" number="647" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_647_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_647&quot;" name="XR_META_extension_647_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_648" number="648" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_648_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_648&quot;" name="XR_META_extension_648_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_649" number="649" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_649_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_649&quot;" name="XR_META_extension_649_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_650" number="650" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_650_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_650&quot;" name="XR_META_extension_650_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_651" number="651" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_651_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_651&quot;" name="XR_META_extension_651_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_652" number="652" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_652_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_652&quot;" name="XR_META_extension_652_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_653" number="653" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_653_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_653&quot;" name="XR_META_extension_653_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_654" number="654" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_654_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_654&quot;" name="XR_META_extension_654_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_655" number="655" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_655_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_655&quot;" name="XR_META_extension_655_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_656" number="656" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_656_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_656&quot;" name="XR_META_extension_656_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_657" number="657" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_657_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_657&quot;" name="XR_META_extension_657_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_658" number="658" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_658_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_658&quot;" name="XR_META_extension_658_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_659" number="659" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_659_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_659&quot;" name="XR_META_extension_659_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_660" number="660" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_660_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_660&quot;" name="XR_META_extension_660_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_661" number="661" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_661_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_661&quot;" name="XR_META_extension_661_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_662" number="662" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_662_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_662&quot;" name="XR_META_extension_662_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_663" number="663" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_663_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_663&quot;" name="XR_META_extension_663_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_664" number="664" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_664_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_664&quot;" name="XR_META_extension_664_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_665" number="665" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_665_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_665&quot;" name="XR_META_extension_665_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_666" number="666" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_666_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_666&quot;" name="XR_META_extension_666_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_667" number="667" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_667_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_667&quot;" name="XR_META_extension_667_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_668" number="668" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_668_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_668&quot;" name="XR_META_extension_668_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_669" number="669" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_669_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_669&quot;" name="XR_META_extension_669_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_670" number="670" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_670_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_670&quot;" name="XR_META_extension_670_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_671" number="671" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_671_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_671&quot;" name="XR_META_extension_671_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_672" number="672" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_672_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_672&quot;" name="XR_META_extension_672_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_673" number="673" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_673_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_673&quot;" name="XR_META_extension_673_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_674" number="674" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_674_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_674&quot;" name="XR_META_extension_674_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_675" number="675" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_675_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_675&quot;" name="XR_META_extension_675_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_676" number="676" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_676_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_676&quot;" name="XR_META_extension_676_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_677" number="677" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_677_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_677&quot;" name="XR_META_extension_677_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_678" number="678" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_678_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_678&quot;" name="XR_META_extension_678_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_679" number="679" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_679_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_679&quot;" name="XR_META_extension_679_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_680" number="680" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_680_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_680&quot;" name="XR_META_extension_680_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_681" number="681" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_681_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_681&quot;" name="XR_META_extension_681_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_682" number="682" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_682_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_682&quot;" name="XR_META_extension_682_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_683" number="683" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_683_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_683&quot;" name="XR_META_extension_683_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_684" number="684" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_684_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_684&quot;" name="XR_META_extension_684_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_685" number="685" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_685_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_685&quot;" name="XR_META_extension_685_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_686" number="686" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_686_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_686&quot;" name="XR_META_extension_686_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_687" number="687" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_687_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_687&quot;" name="XR_META_extension_687_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_688" number="688" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_688_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_688&quot;" name="XR_META_extension_688_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_689" number="689" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_689_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_689&quot;" name="XR_META_extension_689_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_690" number="690" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_690_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_690&quot;" name="XR_META_extension_690_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_691" number="691" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_691_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_691&quot;" name="XR_META_extension_691_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_692" number="692" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_692_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_692&quot;" name="XR_META_extension_692_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_693" number="693" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_693_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_693&quot;" name="XR_META_extension_693_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_694" number="694" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_694_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_694&quot;" name="XR_META_extension_694_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_695" number="695" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_695_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_695&quot;" name="XR_META_extension_695_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_696" number="696" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_696_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_696&quot;" name="XR_META_extension_696_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_697" number="697" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_697_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_697&quot;" name="XR_META_extension_697_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_698" number="698" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_698_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_698&quot;" name="XR_META_extension_698_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_META_extension_699" number="699" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_META_extension_699_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_extension_699&quot;" name="XR_META_extension_699_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_egl_enable" number="700" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                             name="XR_KHR_egl_enable_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_egl_enable&quot;" name="XR_KHR_EGL_ENABLE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_701" number="701" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_701_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_701&quot;" name="XR_ANDROID_EXTENSION_701_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_702" number="702" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_702_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_702&quot;" name="XR_ANDROID_EXTENSION_702_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_703" number="703" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_703_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_703&quot;" name="XR_ANDROID_EXTENSION_703_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_704" number="704" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_704_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_704&quot;" name="XR_ANDROID_EXTENSION_704_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_705" number="705" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_705_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_705&quot;" name="XR_ANDROID_EXTENSION_705_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_706" number="706" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_706_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_706&quot;" name="XR_ANDROID_EXTENSION_706_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_707" number="707" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_707_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_707&quot;" name="XR_ANDROID_EXTENSION_707_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_708" number="708" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_708_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_708&quot;" name="XR_ANDROID_EXTENSION_708_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_709" number="709" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_709_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_709&quot;" name="XR_ANDROID_EXTENSION_709_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_ANDROID_extension_710" number="710" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_ANDROID_extension_710_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_extension_710&quot;" name="XR_ANDROID_EXTENSION_710_EXTENSION_NAME"/>
+        </require>
+    </extension>
     </extensions>
 
 </registry>

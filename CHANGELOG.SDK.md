@@ -19,6 +19,63 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.31 (2023-10-18)
+
+This release features two new vendor extensions and minor extension XML
+revisions, in addition to compatibility and logging improvements in the
+software.
+
+- Registry
+  - Extension reservation: Reserve extensions for NVIDIA.
+    ([internal MR 2952](https://gitlab.khronos.org/openxr/openxr/merge_requests/2952))
+  - Extension reservation: Reserve extensions for Meta.
+    ([internal MR 2959](https://gitlab.khronos.org/openxr/openxr/merge_requests/2959))
+  - Extension reservation: Reserve extensions for Android.
+    ([internal MR 2966](https://gitlab.khronos.org/openxr/openxr/merge_requests/2966))
+  - Extension reservation: Reserve an extension for `XR_KHR_egl_enable`.
+    ([internal MR 2982](https://gitlab.khronos.org/openxr/openxr/merge_requests/2982))
+  - New vendor extension: `XR_MSFT_scene_marker`
+    ([internal MR 2601](https://gitlab.khronos.org/openxr/openxr/merge_requests/2601))
+  - New vendor extension: `XR_ML_user_calibration`
+    ([internal MR 2849](https://gitlab.khronos.org/openxr/openxr/merge_requests/2849))
+  - Schematron: Allow chained structs that extend a two-call-idiom struct to carry
+    only a `*CapacityInput` member.
+    ([internal MR 2892](https://gitlab.khronos.org/openxr/openxr/merge_requests/2892),
+    [internal issue 2059](https://gitlab.khronos.org/openxr/openxr/issues/2059))
+  - `XR_FB_render_model`: Fix `structextends` attribute and remove `returnedonly`
+    attribute of `XrRenderModelCapabilitiesRequestFB`, to match the specification
+    prose.
+    ([internal MR 2765](https://gitlab.khronos.org/openxr/openxr/merge_requests/2765),
+    [OpenXR-Docs issue 153](https://github.com/KhronosGroup/OpenXR-Docs/issues/153),
+    [internal issue 2017](https://gitlab.khronos.org/openxr/openxr/issues/2017))
+  - xml: Fixed a few errors in MSFT extensions discovered by Schematron checks.
+    ([internal MR 2892](https://gitlab.khronos.org/openxr/openxr/merge_requests/2892))
+- SDK
+  - API Layers: Add logging on API layer negotiation failure.
+    ([internal MR 2926](https://gitlab.khronos.org/openxr/openxr/merge_requests/2926))
+  - Fix: Enable build with clang-cl on Windows through Visual Studio.
+    ([internal MR 2948](https://gitlab.khronos.org/openxr/openxr/merge_requests/2948))
+  - Fix: Remove unused pthread prototypes declaration in `_USE_GNU` ifdef, fixing
+    builds on some systems.
+    ([internal MR 2981](https://gitlab.khronos.org/openxr/openxr/merge_requests/2981))
+  - Fix comment typo in platform utils header.
+    ([internal MR 2991](https://gitlab.khronos.org/openxr/openxr/merge_requests/2991))
+  - gfxwrapper: Add OpenGL 3.3 functions to an internal utility library used by
+    hello_xr, shared with the CTS.
+    ([internal MR 2941](https://gitlab.khronos.org/openxr/openxr/merge_requests/2941))
+  - loader: Modify `jnipp`, used by the loader on Android, to no longer use
+    `basic_string<>` with types that are technically not in the C++ specification
+    as permissible, to fix compatibility with an upcoming `libc++` update.
+    ([internal MR 2974](https://gitlab.khronos.org/openxr/openxr/merge_requests/2974),
+    [internal issue 2094](https://gitlab.khronos.org/openxr/openxr/issues/2094),
+    [OpenXR-SDK-Source PR 426](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/426))
+  - loader_test: Refactor to use existing macros for all test to avoid repetition.
+    ([internal MR 2922](https://gitlab.khronos.org/openxr/openxr/merge_requests/2922))
+  - scripts: Small fixes and cleanups
+    ([internal MR 2998](https://gitlab.khronos.org/openxr/openxr/merge_requests/2998),
+    [internal MR 2894](https://gitlab.khronos.org/openxr/openxr/merge_requests/2894),
+    [internal MR 2896](https://gitlab.khronos.org/openxr/openxr/merge_requests/2896))
+
 ## OpenXR SDK 1.0.30 (2023-09-20)
 
 This release is primarily a quality improvement release, fixing a range of

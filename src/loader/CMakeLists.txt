@@ -261,14 +261,20 @@ if(DYNAMIC_LOADER AND BUILD_CONFORMANCE_CLI)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+    if(NOT MSVC)
+        # Do not do this for clang-cl
+        target_compile_options(
+            openxr_loader
+            PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>"
+                    -ffunction-sections
+                    -fdata-sections
+        )
+    endif()
     target_compile_options(
         openxr_loader
         PRIVATE -Wextra
                 -fno-strict-aliasing
                 -fno-builtin-memcmp
-                "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>"
-                -ffunction-sections
-                -fdata-sections
     )
     # Make build depend on the version script/export map
     target_sources(openxr_loader PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.map)
