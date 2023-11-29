@@ -33,10 +33,14 @@
 # Since pre-1.0.0.
 
 # SPDX-License-Identifier: BSD-3-Clause
+#
+# Note: This module is originally from the KDE "Extra CMake Modules" repo,
+# adapted to work standalone. Original source:
+# https://github.com/KDE/extra-cmake-modules/blob/3b0bf71a72789eb2b79310b4f67602115e347f56/find-modules/FindEGL.cmake
 #=============================================================================
 # Copyright 2014 Alex Merry <alex.merry@kde.org>
 # Copyright 2014 Martin Gräßlin <mgraesslin@kde.org>
-# Copyright 2019 Ryan Pavlik <ryan.pavlik@collabora.com>
+# Copyright 2019, 2021 Ryan Pavlik <ryan.pavlik@collabora.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -67,8 +71,12 @@ include(CMakePushCheckState)
 
 # Use pkg-config to get the directories and then use these values
 # in the FIND_PATH() and FIND_LIBRARY() calls
-find_package(PkgConfig)
-pkg_check_modules(PKG_EGL QUIET egl)
+if(NOT ANDROID)
+    find_package(PkgConfig QUIET)
+    if(PKGCONFIG_FOUND)
+        pkg_check_modules(PKG_EGL QUIET egl)
+    endif()
+endif()
 
 set(EGL_DEFINITIONS ${PKG_EGL_CFLAGS_OTHER})
 
@@ -167,5 +175,5 @@ set(EGL_VERSION_STRING ${EGL_VERSION})
 include(FeatureSummary)
 set_package_properties(EGL PROPERTIES
     URL "https://www.khronos.org/egl/"
-    DESCRIPTION "A platform-agnostic mechanism for creating rendering surfaces for use with other graphics libraries, such as OpenGL|ES and OpenVG."
+    DESCRIPTION "A platform-independent mechanism for creating rendering surfaces for use with other graphics libraries, such as OpenGL|ES and OpenVG."
 )

@@ -57,11 +57,14 @@ if(PRESENTATION_BACKEND MATCHES "xlib")
         target_compile_definitions(openxr-gfxwrapper PUBLIC OS_LINUX_XLIB)
         target_link_libraries(openxr-gfxwrapper PRIVATE ${X11_X11_LIB} ${X11_Xxf86vm_LIB} ${X11_Xrandr_LIB})
 
-        if(TARGET OpenGL::OpenGL AND TARGET OpenGL::GLX)
-            # OpenGL::OpenGL already linked, we just need to add GLX.
+        # OpenGL::OpenGL already linked, we just need to add GLX.
+        if(TARGET OpenGL::GLX)
             target_link_libraries(openxr-gfxwrapper PUBLIC OpenGL::GLX)
         else()
-            target_link_libraries(openxr-gfxwrapper PUBLIC ${OPENGL_LIBRARIES} ${OPENGL_glx_LIBRARY})
+            if(${OPENGL_glx_LIBRARY})
+                target_link_libraries(openxr-gfxwrapper PUBLIC ${OPENGL_glx_LIBRARY})
+            endif()
+            target_link_libraries(openxr-gfxwrapper PUBLIC ${OPENGL_LIBRARIES})
         endif()
     endif()
 elseif(PRESENTATION_BACKEND MATCHES "xcb")
@@ -143,10 +146,13 @@ endif()
 
 
 if(TARGET openxr-gfxwrapper AND NOT (PRESENTATION_BACKEND MATCHES "wayland"))
-    if(TARGET OpenGL::OpenGL AND TARGET OpenGL::GLX)
+    if(TARGET OpenGL::GLX)
         # OpenGL::OpenGL already linked, we just need to add GLX.
         target_link_libraries(openxr-gfxwrapper PUBLIC OpenGL::GLX)
     else()
-        target_link_libraries(openxr-gfxwrapper PUBLIC ${OPENGL_LIBRARIES} ${OPENGL_glx_LIBRARY})
+        if(${OPENGL_glx_LIBRARY})
+            target_link_libraries(openxr-gfxwrapper PUBLIC ${OPENGL_glx_LIBRARY})
+        endif()
+            target_link_libraries(openxr-gfxwrapper PUBLIC ${OPENGL_LIBRARIES})
     endif()
 endif()

@@ -7,6 +7,9 @@
   SPDX-License-Identifier: Apache-2.0 OR MIT
   -->
 
+  <!-- If this is not included as a minimum, the manifest merger assumes we target an ancient SDK and adds permissions. -->
+  <uses-sdk android:minSdkVersion="${ANDROID_PLATFORM}" android:targetSdkVersion="${ANDROID_PLATFORM}" />
+
   <uses-permission android:name="org.khronos.openxr.permission.OPENXR" />
   <uses-permission android:name="org.khronos.openxr.permission.OPENXR_SYSTEM" />
 

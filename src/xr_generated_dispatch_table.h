@@ -346,6 +346,27 @@ struct XrGeneratedDispatchTable {
     PFN_xrCreateSpaceFromCoordinateFrameUIDML CreateSpaceFromCoordinateFrameUIDML;
 #endif // defined(XR_USE_PLATFORM_ML)
 
+    // ---- XR_ML_marker_understanding extension commands
+    PFN_xrCreateMarkerDetectorML CreateMarkerDetectorML;
+    PFN_xrDestroyMarkerDetectorML DestroyMarkerDetectorML;
+    PFN_xrSnapshotMarkerDetectorML SnapshotMarkerDetectorML;
+    PFN_xrGetMarkerDetectorStateML GetMarkerDetectorStateML;
+    PFN_xrGetMarkersML GetMarkersML;
+    PFN_xrGetMarkerReprojectionErrorML GetMarkerReprojectionErrorML;
+    PFN_xrGetMarkerLengthML GetMarkerLengthML;
+    PFN_xrGetMarkerNumberML GetMarkerNumberML;
+    PFN_xrGetMarkerStringML GetMarkerStringML;
+    PFN_xrCreateMarkerSpaceML CreateMarkerSpaceML;
+
+    // ---- XR_ML_localization_map extension commands
+    PFN_xrEnableLocalizationEventsML EnableLocalizationEventsML;
+    PFN_xrQueryLocalizationMapsML QueryLocalizationMapsML;
+    PFN_xrRequestMapLocalizationML RequestMapLocalizationML;
+    PFN_xrImportLocalizationMapML ImportLocalizationMapML;
+    PFN_xrCreateExportedLocalizationMapML CreateExportedLocalizationMapML;
+    PFN_xrDestroyExportedLocalizationMapML DestroyExportedLocalizationMapML;
+    PFN_xrGetExportedLocalizationMapDataML GetExportedLocalizationMapDataML;
+
     // ---- XR_MSFT_spatial_anchor_persistence extension commands
     PFN_xrCreateSpatialAnchorStoreConnectionMSFT CreateSpatialAnchorStoreConnectionMSFT;
     PFN_xrDestroySpatialAnchorStoreConnectionMSFT DestroySpatialAnchorStoreConnectionMSFT;
@@ -460,6 +481,10 @@ struct XrGeneratedDispatchTable {
 
     // ---- XR_HTC_foveation extension commands
     PFN_xrApplyFoveationHTC ApplyFoveationHTC;
+
+    // ---- XR_HTC_anchor extension commands
+    PFN_xrCreateSpatialAnchorHTC CreateSpatialAnchorHTC;
+    PFN_xrGetSpatialAnchorNameHTC GetSpatialAnchorNameHTC;
 
     // ---- XR_MNDX_force_feedback_curl extension commands
     PFN_xrApplyForceFeedbackCurlMNDX ApplyForceFeedbackCurlMNDX;

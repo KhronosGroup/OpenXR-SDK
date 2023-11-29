@@ -1,11 +1,11 @@
-# Copyright 2020 Collabora, Ltd.
+# Copyright 2020-2021 Collabora, Ltd.
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 # Original Author:
-# 2020 Ryan Pavlik <ryan.pavlik@collabora.com>
+# 2020-2021, Ryan Pavlik <ryan.pavlik@collabora.com> <abiryan@ryand.net>
 
 #[[.rst:
 FindOpenGLES
@@ -53,18 +53,22 @@ set(OpenGLES_ROOT_DIR
 if(NOT OpenGLES_FIND_COMPONENTS)
     set(OpenGLES_FIND_COMPONENTS V2)
 endif()
-find_package(PkgConfig QUIET)
-if(PKG_CONFIG_FOUND)
-    set(_old_prefix_path "${CMAKE_PREFIX_PATH}")
-    # So pkg-config uses OpenGLES_ROOT_DIR too.
-    if(OpenGLES_ROOT_DIR)
-        list(APPEND CMAKE_PREFIX_PATH ${OpenGLES_ROOT_DIR})
+
+if(NOT ANDROID)
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+        set(_old_prefix_path "${CMAKE_PREFIX_PATH}")
+        # So pkg-config uses OpenGLES_ROOT_DIR too.
+        if(OpenGLES_ROOT_DIR)
+            list(APPEND CMAKE_PREFIX_PATH ${OpenGLES_ROOT_DIR})
+        endif()
+        pkg_check_modules(PC_glesv1_cm QUIET glesv1_cm)
+        pkg_check_modules(PC_glesv2 QUIET glesv2)
+        # Restore
+        set(CMAKE_PREFIX_PATH "${_old_prefix_path}")
     endif()
-    pkg_check_modules(PC_glesv1_cm QUIET glesv1_cm)
-    pkg_check_modules(PC_glesv2 QUIET glesv2)
-    # Restore
-    set(CMAKE_PREFIX_PATH "${_old_prefix_path}")
 endif()
+
 find_path(
     OpenGLES_V1_INCLUDE_DIR
     NAMES GLES/gl.h

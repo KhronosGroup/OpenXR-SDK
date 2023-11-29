@@ -22,7 +22,7 @@ endif()
 # Entire project uses C++14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(StdFilesystemFlags)
 
@@ -39,23 +39,33 @@ set(OPENGL_INCOMPATIBLE FALSE)
 set(VULKAN_INCOMPATIBLE FALSE)
 
 # CMake will detect OpenGL/Vulkan which are not compatible with UWP and ARM/ARM64 on Windows so skip it in these cases.
-if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR (WIN32 AND CMAKE_GENERATOR_PLATFORM_UPPER MATCHES "ARM.*"))
+if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore"
+   OR (WIN32 AND CMAKE_GENERATOR_PLATFORM_UPPER MATCHES "ARM.*")
+)
     set(OPENGL_INCOMPATIBLE TRUE)
     set(VULKAN_INCOMPATIBLE TRUE)
     message(STATUS "OpenGL/Vulkan disabled due to incompatibility")
+
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(OPENGL_INCOMPATIBLE TRUE)
     message(STATUS "OpenGL disabled as no bindings exist for OpenGL on Darwin")
+
 elseif(ANDROID)
     set(OPENGL_INCOMPATIBLE TRUE)
-    find_path(ANDROID_NATIVE_APP_GLUE android_native_app_glue.h PATHS ${ANDROID_NDK}/sources/android/native_app_glue)
+    find_path(
+        ANDROID_NATIVE_APP_GLUE android_native_app_glue.h
+        PATHS "${ANDROID_NDK}/sources/android/native_app_glue"
+    )
     if(ANDROID_NATIVE_APP_GLUE)
         # Needed by gfxwrapper
         set(OPENGLES_INCOMPATIBLE FALSE)
     endif()
     if(ANDROID_PLATFORM_LEVEL LESS 24)
         set(VULKAN_INCOMPATIBLE TRUE)
-        message(STATUS "Vulkan disabled due to incompatibility: need to target at least API 24")
+        message(
+            STATUS
+                "Vulkan disabled due to incompatibility: need to target at least API 24"
+        )
     endif()
 endif()
 
@@ -85,10 +95,8 @@ if(NOT OPENGLES_INCOMPATIBLE)
 endif()
 
 if(NOT VULKAN_INCOMPATIBLE)
-    if(NOT CMAKE_VERSION VERSION_LESS 3.7.0)
-        # Find the Vulkan headers
-        find_package(Vulkan)
-    endif()
+    # Find the Vulkan headers
+    find_package(Vulkan)
     if(Vulkan_FOUND)
         set(XR_USE_GRAPHICS_API_VULKAN TRUE)
         add_definitions(-DXR_USE_GRAPHICS_API_VULKAN)
@@ -111,9 +119,15 @@ option(
 )
 
 if(WIN32)
-    set(OPENXR_DEBUG_POSTFIX d CACHE STRING "OpenXR loader debug postfix.")
+    set(OPENXR_DEBUG_POSTFIX
+        d
+        CACHE STRING "OpenXR loader debug postfix."
+    )
 else()
-    set(OPENXR_DEBUG_POSTFIX "" CACHE STRING "OpenXR loader debug postfix.")
+    set(OPENXR_DEBUG_POSTFIX
+        ""
+        CACHE STRING "OpenXR loader debug postfix."
+    )
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -133,10 +147,16 @@ endif()
 include(CMakeDependentOption)
 
 cmake_dependent_option(
-    BUILD_WITH_SYSTEM_JSONCPP "Use system jsoncpp instead of vendored source" ON "JSONCPP_FOUND" OFF
+    BUILD_WITH_SYSTEM_JSONCPP
+    "Use system jsoncpp instead of vendored source"
+    ON
+    "JSONCPP_FOUND"
+    OFF
 )
 cmake_dependent_option(
-    BUILD_WITH_STD_FILESYSTEM "Use std::[experimental::]filesystem." ON
+    BUILD_WITH_STD_FILESYSTEM
+    "Use std::[experimental::]filesystem."
+    ON
     "HAVE_FILESYSTEM_WITHOUT_LIB OR HAVE_FILESYSTEM_NEEDING_LIBSTDCXXFS OR HAVE_FILESYSTEM_NEEDING_LIBCXXFS"
     OFF
 )
@@ -159,9 +179,16 @@ if(MSVC)
 endif()
 
 # This is a little helper library for setting up OpenGL
-if((OPENGL_FOUND OR OpenGLES_FOUND) AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/common/gfxwrapper_opengl.c")
-    add_library(openxr-gfxwrapper STATIC common/gfxwrapper_opengl.c common/gfxwrapper_opengl.h)
-    target_include_directories(openxr-gfxwrapper PUBLIC ${PROJECT_SOURCE_DIR}/external/include)
+if((OPENGL_FOUND OR OpenGLES_FOUND)
+   AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/common/gfxwrapper_opengl.c"
+)
+    add_library(
+        openxr-gfxwrapper STATIC common/gfxwrapper_opengl.c
+                                 common/gfxwrapper_opengl.h
+    )
+    target_include_directories(
+        openxr-gfxwrapper PUBLIC "${PROJECT_SOURCE_DIR}/external/include"
+    )
     if(OPENGL_FOUND)
         if(TARGET OpenGL::OpenGL)
             target_link_libraries(openxr-gfxwrapper PUBLIC OpenGL::OpenGL)
@@ -182,28 +209,35 @@ if((OPENGL_FOUND OR OpenGLES_FOUND) AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/comm
         target_link_libraries(openxr-gfxwrapper PUBLIC EGL::EGL)
     endif()
     if(ANDROID)
-        target_include_directories(openxr-gfxwrapper PUBLIC ${ANDROID_NATIVE_APP_GLUE})
+        target_include_directories(
+            openxr-gfxwrapper PUBLIC "${ANDROID_NATIVE_APP_GLUE}"
+        )
 
         # Note: For some reason, just adding this to the gfxwrapper library results in failure at load time.
         # So, each consuming target must add $<TARGET_OBJECTS:android_native_app_glue> to their sources
-        add_library(android_native_app_glue OBJECT "${ANDROID_NATIVE_APP_GLUE}/android_native_app_glue.c")
-        target_include_directories(android_native_app_glue PUBLIC ${ANDROID_NATIVE_APP_GLUE})
-        target_compile_options(android_native_app_glue PRIVATE -Wno-unused-parameter)
+        add_library(
+            android_native_app_glue OBJECT
+            "${ANDROID_NATIVE_APP_GLUE}/android_native_app_glue.c"
+        )
+        target_include_directories(
+            android_native_app_glue PUBLIC "${ANDROID_NATIVE_APP_GLUE}"
+        )
+        target_compile_options(
+            android_native_app_glue PRIVATE -Wno-unused-parameter
+        )
     elseif(APPLE)
-        set(apple_c_compile_options
-            -x objective-c++
-        )
-        target_compile_options(openxr-gfxwrapper PRIVATE
-             ${apple_c_compile_options}
-        )
-        target_link_libraries(openxr-gfxwrapper PUBLIC
-            "-framework AppKit"
-            "-framework Foundation"
-            "-framework CoreGraphics"
+        target_compile_options(openxr-gfxwrapper PRIVATE -x objective-c++)
+        target_link_libraries(
+            openxr-gfxwrapper
+            PUBLIC "-framework AppKit" "-framework Foundation"
+                   "-framework CoreGraphics"
         )
     endif()
     set_target_properties(openxr-gfxwrapper PROPERTIES FOLDER ${HELPER_FOLDER})
-    message(STATUS "Enabling OpenGL support in hello_xr, loader_test, and conformance, if configured")
+    message(
+        STATUS
+            "Enabling OpenGL support in hello_xr, loader_test, and conformance, if configured"
+    )
 endif()
 
 # Determine the presentation backend for Linux systems.
@@ -225,7 +259,10 @@ elseif(APPLE)
     endif()
 elseif(ANDROID)
     add_definitions(-DXR_USE_PLATFORM_ANDROID)
-    set(OPENXR_ANDROID_VERSION_SUFFIX "" CACHE STRING "Suffix for generated Android artifacts.")
+    set(OPENXR_ANDROID_VERSION_SUFFIX
+        ""
+        CACHE STRING "Suffix for generated Android artifacts."
+    )
 elseif(PRESENTATION_BACKEND MATCHES "xlib")
     add_definitions(-DXR_USE_PLATFORM_XLIB)
 elseif(PRESENTATION_BACKEND MATCHES "xcb")
@@ -262,17 +299,37 @@ endif()
 # Find glslc shader compiler.
 # On Android, the NDK includes the binary, so no external dependency.
 if(ANDROID)
-    file(GLOB glslc_folders ${ANDROID_NDK}/shader-tools/*)
+    file(
+        GLOB
+        glslc_folders
+        CONFIGURE_DEPENDS
+        ${ANDROID_NDK}/shader-tools/*
+    )
     find_program(
         GLSL_COMPILER glslc
         PATHS ${glslc_folders}
         NO_DEFAULT_PATH
     )
 else()
-    file(GLOB glslc_folders $ENV{VULKAN_SDK}/*)
-    find_program(GLSL_COMPILER glslc PATHS ${glslc_folders} HINTS ${Vulkan_GLSLC_EXECUTABLE})
+    if($ENV{VULKAN_SDK})
+        file(TO_CMAKE_PATH "$ENV{VULKAN_SDK}" VULKAN_SDK)
+        file(
+            GLOB
+            glslc_folders
+            CONFIGURE_DEPENDS
+            ${VULKAN_SDK}/*
+        )
+    endif()
+    find_program(
+        GLSL_COMPILER glslc
+        PATHS ${glslc_folders}
+        HINTS "${Vulkan_GLSLC_EXECUTABLE}"
+    )
 endif()
-find_program(GLSLANG_VALIDATOR glslangValidator HINTS ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE})
+find_program(
+    GLSLANG_VALIDATOR glslangValidator
+    HINTS "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}"
+)
 if(GLSL_COMPILER)
     message(STATUS "Found glslc: ${GLSL_COMPILER}")
 elseif(GLSLANG_VALIDATOR)
@@ -284,30 +341,37 @@ endif()
 function(compile_glsl run_target_name)
     set(glsl_output_files "")
     foreach(in_file IN LISTS ARGN)
-        get_filename_component(glsl_stage ${in_file} NAME_WE)
-        set(out_file ${CMAKE_CURRENT_BINARY_DIR}/${glsl_stage}.spv)
+        get_filename_component(glsl_stage "${in_file}" NAME_WE)
+        set(out_file "${CMAKE_CURRENT_BINARY_DIR}/${glsl_stage}.spv")
         if(GLSL_COMPILER)
             # Run glslc if we can find it
             add_custom_command(
-                OUTPUT ${out_file}
-                COMMAND ${GLSL_COMPILER} -mfmt=c -fshader-stage=${glsl_stage} ${in_file} -o ${out_file}
-                DEPENDS ${in_file}
+                OUTPUT "${out_file}"
+                COMMAND
+                    "${GLSL_COMPILER}" -mfmt=c -fshader-stage=${glsl_stage}
+                    "${in_file}" -o "${out_file}"
+                DEPENDS "${in_file}"
+                WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                VERBATIM
             )
         elseif(GLSLANG_VALIDATOR)
             # Run glslangValidator if we can find it
             add_custom_command(
-                OUTPUT ${out_file}
-                COMMAND ${GLSLANG_VALIDATOR} -V -S ${glsl_stage} ${in_file} -x -o ${out_file}
-                DEPENDS ${in_file}
+                OUTPUT "${out_file}"
+                COMMAND
+                    "${GLSLANG_VALIDATOR}" -V -S ${glsl_stage} "${in_file}" -x
+                    -o "${out_file}"
+                DEPENDS "${in_file}"
+                WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                 VERBATIM
             )
         else()
             # Use the precompiled .spv files
-            get_filename_component(glsl_src_dir ${in_file} DIRECTORY)
-            set(precompiled_file ${glsl_src_dir}/${glsl_stage}.spv)
-            configure_file(${precompiled_file} ${out_file} COPYONLY)
+            get_filename_component(glsl_src_dir "${in_file}" DIRECTORY)
+            set(precompiled_file "${glsl_src_dir}/${glsl_stage}.spv")
+            configure_file("${precompiled_file}" "${out_file}" COPYONLY)
         endif()
-        list(APPEND glsl_output_files ${out_file})
+        list(APPEND glsl_output_files "${out_file}")
     endforeach()
     add_custom_target(${run_target_name} ALL DEPENDS ${glsl_output_files})
     set_target_properties(${run_target_name} PROPERTIES FOLDER ${HELPER_FOLDER})
@@ -327,11 +391,8 @@ include(CheckFunctionExists)
 
 check_function_exists(secure_getenv HAVE_SECURE_GETENV)
 check_function_exists(__secure_getenv HAVE___SECURE_GETENV)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/common_config.h)
+configure_file(common_config.h.in "${CMAKE_CURRENT_BINARY_DIR}/common_config.h")
 add_definitions(-DOPENXR_HAVE_COMMON_CONFIG)
-
-# Be able to find pre-generated files, if used.
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(CheckSymbolExists)
 check_symbol_exists(timespec_get time.h HAVE_TIMESPEC_GET)
@@ -342,23 +403,15 @@ endif()
 # Set up the OpenXR version variables, used by several targets in this project.
 include(${CMAKE_CURRENT_SOURCE_DIR}/version.cmake)
 
-# Path separators ( : or ; ) are not handled well in CMake.
-# This seems like a reasonable approach.
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
-    set(CODEGEN_PYTHON_PATH
-        "${PROJECT_SOURCE_DIR}/specification/scripts;${PROJECT_SOURCE_DIR}/src/scripts;$ENV{PYTHONPATH}"
-    )
-else()
-    set(CODEGEN_PYTHON_PATH
-        "${PROJECT_SOURCE_DIR}/specification/scripts:${PROJECT_SOURCE_DIR}/src/scripts:$ENV{PYTHONPATH}"
-    )
-endif()
-
 # General code generation macro used by several targets.
 macro(run_xr_xml_generate dependency output)
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${output}" AND NOT BUILD_FORCE_GENERATION)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${output}"
+       AND NOT BUILD_FORCE_GENERATION
+    )
         # pre-generated found
-        message(STATUS "Found and will use pre-generated ${output} in source tree")
+        message(
+            STATUS "Found and will use pre-generated ${output} in source tree"
+        )
         list(APPEND GENERATED_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${output}")
     else()
         if(NOT PYTHON_EXECUTABLE)
@@ -368,21 +421,24 @@ macro(run_xr_xml_generate dependency output)
             )
         endif()
         add_custom_command(
-            OUTPUT ${output}
+            OUTPUT "${output}"
             COMMAND
-                ${CMAKE_COMMAND} -E env "PYTHONPATH=${CODEGEN_PYTHON_PATH}"
-                ${PYTHON_EXECUTABLE}
-                ${PROJECT_SOURCE_DIR}/src/scripts/src_genxr.py
-                -registry ${PROJECT_SOURCE_DIR}/specification/registry/xr.xml
-                ${output}
+                "${CMAKE_COMMAND}" -E env "PYTHONPATH=${CODEGEN_PYTHON_PATH}"
+                "${PYTHON_EXECUTABLE}"
+                "${PROJECT_SOURCE_DIR}/src/scripts/src_genxr.py" -registry
+                "${PROJECT_SOURCE_DIR}/specification/registry/xr.xml"
+                "${output}"
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            DEPENDS "${PROJECT_SOURCE_DIR}/specification/registry/xr.xml"
-                    "${PROJECT_SOURCE_DIR}/specification/scripts/generator.py"
-                    "${PROJECT_SOURCE_DIR}/specification/scripts/reg.py"
-                    "${PROJECT_SOURCE_DIR}/src/scripts/${dependency}"
-                    "${PROJECT_SOURCE_DIR}/src/scripts/src_genxr.py"
-                    ${ARGN}
-            COMMENT "Generating ${output} using ${PYTHON_EXECUTABLE} on ${dependency}"
+            DEPENDS
+                "${PROJECT_SOURCE_DIR}/specification/registry/xr.xml"
+                "${PROJECT_SOURCE_DIR}/specification/scripts/generator.py"
+                "${PROJECT_SOURCE_DIR}/specification/scripts/reg.py"
+                "${PROJECT_SOURCE_DIR}/src/scripts/${dependency}"
+                "${PROJECT_SOURCE_DIR}/src/scripts/src_genxr.py"
+                ${ARGN}
+            VERBATIM
+            COMMENT
+                "Generating ${output} using ${PYTHON_EXECUTABLE} on ${dependency}"
         )
         set_source_files_properties(${output} PROPERTIES GENERATED TRUE)
         list(APPEND GENERATED_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${output}")
@@ -391,65 +447,96 @@ macro(run_xr_xml_generate dependency output)
 endmacro()
 
 # Layer JSON generation macro used by several targets.
-macro(gen_xr_layer_json filename layername libfile version desc genbad)
+macro(
+    gen_xr_layer_json
+    filename
+    layername
+    libfile
+    version
+    desc
+    genbad
+)
     add_custom_command(
-        OUTPUT ${filename}
+        OUTPUT "${filename}"
         COMMAND
-            ${CMAKE_COMMAND} -E env "PYTHONPATH=${CODEGEN_PYTHON_PATH}"
-            ${PYTHON_EXECUTABLE}
-            ${PROJECT_SOURCE_DIR}/src/scripts/generate_api_layer_manifest.py
-            -f ${filename}
-            -n ${layername}
-            -l ${libfile}
-            -a ${MAJOR}.${MINOR}
-            -v ${version}
-            ${genbad}
-            -d ${desc}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS ${PROJECT_SOURCE_DIR}/src/scripts/generate_api_layer_manifest.py
+            "${CMAKE_COMMAND}" -E env "PYTHONPATH=${CODEGEN_PYTHON_PATH}"
+            "${PYTHON_EXECUTABLE}"
+            "${PROJECT_SOURCE_DIR}/src/scripts/generate_api_layer_manifest.py"
+            -f "${filename}" -n ${layername} -l ${libfile} -a ${MAJOR}.${MINOR}
+            -v ${version} ${genbad} -d ${desc}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        DEPENDS
+            "${PROJECT_SOURCE_DIR}/src/scripts/generate_api_layer_manifest.py"
         COMMENT
             "Generating API Layer JSON ${filename} using -f ${filename} -n ${layername} -l ${libfile} -a ${MAJOR}.${MINOR} -v ${version} ${genbad} -d ${desc}"
+        VERBATIM
     )
 endmacro()
 
 # Custom target for generated dispatch table sources, used by several targets.
-set(GENERATED_OUTPUT)
-set(GENERATED_DEPENDS)
+unset(GENERATED_OUTPUT)
+unset(GENERATED_DEPENDS)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.h)
 run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table.c)
 set(COMMON_GENERATED_OUTPUT ${GENERATED_OUTPUT})
 set(COMMON_GENERATED_DEPENDS ${GENERATED_DEPENDS})
-unset(GENERATED_OUTPUT)
-unset(GENERATED_DEPENDS)
-
-run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table_core.h)
-run_xr_xml_generate(utility_source_generator.py xr_generated_dispatch_table_core.c)
-set(LOADER_GENERATED_OUTPUT ${GENERATED_OUTPUT})
-set(LOADER_GENERATED_DEPENDS ${GENERATED_DEPENDS})
-unset(GENERATED_OUTPUT)
-unset(GENERATED_DEPENDS)
-
-if(LOADER_GENERATED_DEPENDS)
-    add_custom_target(xr_global_generated_files DEPENDS ${LOADER_GENERATED_DEPENDS})
-else()
-    add_custom_target(xr_global_generated_files)
-endif()
-
-set_target_properties(xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
 
 if(COMMON_GENERATED_DEPENDS)
-    add_custom_target(xr_common_generated_files DEPENDS ${COMMON_GENERATED_DEPENDS})
+    add_custom_target(
+        xr_common_generated_files DEPENDS ${COMMON_GENERATED_DEPENDS}
+    )
 else()
     add_custom_target(xr_common_generated_files)
 endif()
 
-set_target_properties(xr_common_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER})
+set_target_properties(
+    xr_common_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER}
+)
+
+unset(GENERATED_OUTPUT)
+unset(GENERATED_DEPENDS)
+run_xr_xml_generate(
+    utility_source_generator.py xr_generated_dispatch_table_core.h
+)
+run_xr_xml_generate(
+    utility_source_generator.py xr_generated_dispatch_table_core.c
+)
+set(LOADER_GENERATED_OUTPUT ${GENERATED_OUTPUT})
+set(LOADER_GENERATED_DEPENDS ${GENERATED_DEPENDS})
+
+unset(GENERATED_OUTPUT)
+unset(GENERATED_DEPENDS)
+
+if(LOADER_GENERATED_DEPENDS)
+    add_custom_target(
+        xr_global_generated_files DEPENDS ${LOADER_GENERATED_DEPENDS}
+    )
+else()
+    add_custom_target(xr_global_generated_files)
+endif()
+
+set_target_properties(
+    xr_global_generated_files PROPERTIES FOLDER ${CODEGEN_FOLDER}
+)
 
 if(NOT MSVC)
     include(CheckCXXCompilerFlag)
     include(CheckCCompilerFlag)
-    foreach(FLAG -Wall -Werror=unused-parameter -Werror=unused-argument -Wpointer-arith)
-        string(REGEX REPLACE "[^A-Za-z0-9]" "" _flagvar "${FLAG}")
+    foreach(
+        FLAG
+        -Wall
+        -Werror=unused-parameter
+        -Werror=unused-argument
+        -Wpointer-arith
+    )
+        string(
+            REGEX
+            REPLACE
+                "[^A-Za-z0-9]"
+                ""
+                _flagvar
+                "${FLAG}"
+        )
         check_cxx_compiler_flag(${FLAG} SUPPORTS_${_flagvar})
         if(SUPPORTS_${_flagvar})
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAG}")
@@ -460,9 +547,13 @@ if(NOT MSVC)
         endif()
     endforeach()
     if(APPLE)
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
+        set(CMAKE_SHARED_LINKER_FLAGS
+            "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error"
+        )
     elseif(NOT WIN32)
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+        set(CMAKE_SHARED_LINKER_FLAGS
+            "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined"
+        )
     endif()
 endif()
 

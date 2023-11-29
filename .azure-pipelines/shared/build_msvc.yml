@@ -20,6 +20,9 @@ parameters:
     default: "true"
 
 steps:
+  - checkout: self
+    lfs: true
+
   - powershell: ./.azure-pipelines/shared/install_vulkan.ps1
     displayName: Install Vulkan SDK
     workingDirectory: "${{ parameters.sourceDir }}"

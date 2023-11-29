@@ -30,6 +30,8 @@ jobs:
       INSTALL_DIR: "${{ github.workspace }}/install"
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Get modern CMake and Ninja
         uses: lukka/get-cmake@v3.27.7

@@ -21,28 +21,76 @@ set(PATCH "0")
 set(OPENXR_SDK_HOTFIX_VERSION)
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/specification/registry/xr.xml")
-    file(STRINGS ${PROJECT_SOURCE_DIR}/specification/registry/xr.xml lines REGEX "#define <name>XR_CURRENT_API_VERSION")
+    file(
+        STRINGS ${PROJECT_SOURCE_DIR}/specification/registry/xr.xml lines
+        REGEX "#define <name>XR_CURRENT_API_VERSION"
+    )
 else()
-    file(STRINGS ${PROJECT_SOURCE_DIR}/include/openxr/openxr.h lines REGEX "#define XR_CURRENT_API_VERSION")
+    file(
+        STRINGS ${PROJECT_SOURCE_DIR}/include/openxr/openxr.h lines
+        REGEX "#define XR_CURRENT_API_VERSION"
+    )
 endif()
 
 list(LENGTH lines len)
 if(${len} EQUAL 1)
-    list(GET lines 0 cur_line)
+    list(
+        GET
+        lines
+        0
+        cur_line
+    )
 
     # Grab just the stuff in the parentheses of XR_MAKE_VERSION( ),
     # by replacing the whole line with the stuff in the parentheses
-    string(REGEX REPLACE "^.+\\(([^\)]+)\\).+$" "\\1" VERSION_WITH_WHITESPACE ${cur_line})
+    string(
+        REGEX
+        REPLACE
+            "^.+\\(([^\)]+)\\).+$"
+            "\\1"
+            VERSION_WITH_WHITESPACE
+            ${cur_line}
+    )
 
     # Remove whitespace
-    string(REPLACE " " "" VERSION_NO_WHITESPACE ${VERSION_WITH_WHITESPACE})
+    string(
+        REPLACE
+            " "
+            ""
+            VERSION_NO_WHITESPACE
+            ${VERSION_WITH_WHITESPACE}
+    )
 
     # Grab components
-    string(REGEX REPLACE "^([0-9]+)\\,[0-9]+\\,[0-9]+" "\\1" MAJOR "${VERSION_NO_WHITESPACE}")
-    string(REGEX REPLACE "^[0-9]+\\,([0-9]+)\\,[0-9]+" "\\1" MINOR "${VERSION_NO_WHITESPACE}")
-    string(REGEX REPLACE "^[0-9]+\\,[0-9]+\\,([0-9]+)" "\\1" PATCH "${VERSION_NO_WHITESPACE}")
+    string(
+        REGEX
+        REPLACE
+            "^([0-9]+)\\,[0-9]+\\,[0-9]+"
+            "\\1"
+            MAJOR
+            "${VERSION_NO_WHITESPACE}"
+    )
+    string(
+        REGEX
+        REPLACE
+            "^[0-9]+\\,([0-9]+)\\,[0-9]+"
+            "\\1"
+            MINOR
+            "${VERSION_NO_WHITESPACE}"
+    )
+    string(
+        REGEX
+        REPLACE
+            "^[0-9]+\\,[0-9]+\\,([0-9]+)"
+            "\\1"
+            PATCH
+            "${VERSION_NO_WHITESPACE}"
+    )
 else()
-    message(FATAL_ERROR "Unable to fetch major/minor/patch version from registry or header")
+    message(
+        FATAL_ERROR
+            "Unable to fetch major/minor/patch version from registry or header"
+    )
 endif()
 
 # Check for an SDK hotfix version indicator file.

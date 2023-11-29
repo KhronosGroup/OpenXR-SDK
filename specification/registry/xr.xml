@@ -131,7 +131,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 31)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 0, 32)</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -266,6 +266,8 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrAsyncRequestIdFB</name>)</type>
         <!-- XR_FB_render_model -->
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrRenderModelKeyFB</name>)</type>
+        <!-- XR_ML_marker_understanding -->
+        <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrMarkerML</name>)</type>
 
         <!-- Basic C types, pulled in via openxr_platform_defines.h -->
         <type requires="openxr_platform_defines" name="void"/>
@@ -378,6 +380,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_META_virtual_keyboard -->
         <type bitvalues="XrVirtualKeyboardInputStateFlagBitsMETA" category="bitmask">typedef <type>XrFlags64</type> <name>XrVirtualKeyboardInputStateFlagsMETA</name>;</type>
 
+        <!-- Bitmask types for XR_ML_localization_map -->
+        <type bitvalues="XrLocalizationMapErrorFlagBitsML" category="bitmask">typedef <type>XrFlags64</type> <name>XrLocalizationMapErrorFlagsML</name>;</type>
+
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
         <type category="handle"><type>XR_DEFINE_HANDLE</type>(<name>XrInstance</name>)</type>
@@ -429,6 +434,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- XR_META_virtual_keyboard -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrVirtualKeyboardMETA</name>)</type>
+
+        <!-- XR_ML_localization_map -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrExportedLocalizationMapML</name>)</type>
+
+        <!-- XR_ML_marker_understanding -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrMarkerDetectorML</name>)</type>
 
         <!-- enums and flag bits generated from corresponding <enums> tags below -->
         <type name="XrStructureType" category="enum"/>
@@ -605,6 +616,24 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enums for XR_ML_user_calibration -->
         <type name="XrHeadsetFitStatusML" category="enum"/>
         <type name="XrEyeCalibrationStatusML" category="enum"/>
+
+        <!-- XR_ML_localization_map -->
+        <type name="XrLocalizationMapStateML" category="enum"/>
+        <type name="XrLocalizationMapTypeML" category="enum"/>
+        <type name="XrLocalizationMapConfidenceML" category="enum"/>
+        <type name="XrLocalizationMapErrorFlagBitsML" category="enum"/>
+
+        <!-- XR_ML_marker_understanding -->
+        <type name="XrMarkerDetectorProfileML" category="enum"/>
+        <type name="XrMarkerTypeML" category="enum"/>
+        <type name="XrMarkerArucoDictML" category="enum"/>
+        <type name="XrMarkerAprilTagDictML" category="enum"/>
+        <type name="XrMarkerDetectorFpsML" category="enum"/>
+        <type name="XrMarkerDetectorResolutionML" category="enum"/>
+        <type name="XrMarkerDetectorCameraML" category="enum"/>
+        <type name="XrMarkerDetectorCornerRefineMethodML" category="enum"/>
+        <type name="XrMarkerDetectorFullAnalysisIntervalML" category="enum"/>
+        <type name="XrMarkerDetectorStatusML" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -2773,6 +2802,23 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrPassthroughColorHTC</type>   <name>color</name></member>
         </type>
 
+        <!-- XR_HTC_anchor -->
+        <type category="struct" name="XrSpatialAnchorCreateInfoHTC">
+            <member values="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*            <name>next</name></member>
+            <member><type>XrSpace</type>                <name>space</name></member>
+            <member><type>XrPosef</type>                <name>poseInSpace</name></member>
+            <member><type>XrSpatialAnchorNameHTC</type> <name>name</name></member>
+        </type>
+        <type category="struct" name="XrSpatialAnchorNameHTC">
+            <member><type>char</type> <name>name</name>[<enum>XR_MAX_SPATIAL_ANCHOR_NAME_SIZE_HTC</enum>]</member>
+        </type>
+        <type category="struct" name="XrSystemAnchorPropertiesHTC" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_ANCHOR_PROPERTIES_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsAnchor</name></member>
+        </type>
+
         <!-- XR_HTCX_vive_tracker_interaction structs -->
         <type category="struct" name="XrViveTrackerPathsHTCX" returnedonly="true">
             <member values="XR_TYPE_VIVE_TRACKER_PATHS_HTCX"><type>XrStructureType</type> <name>type</name></member>
@@ -3263,6 +3309,111 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <member><type>XrEyeCalibrationStatusML</type> <name>status</name></member>
         </type>
 
+        <!-- XR_ML_localization_map -->
+        <type category="struct" name="XrLocalizationMapML">
+            <member values="XR_TYPE_LOCALIZATION_MAP_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                   <name>next</name></member>
+            <member optional="true"><type>char</type>                    <name>name</name>[<enum>XR_MAX_LOCALIZATION_MAP_NAME_LENGTH_ML</enum>]</member>
+            <member optional="true"><type>XrUuidEXT</type>               <name>mapUuid</name></member>
+            <member optional="true"><type>XrLocalizationMapTypeML</type> <name>mapType</name></member>
+        </type>
+
+        <type category="struct" name="XrLocalizationEnableEventsInfoML">
+            <member values="XR_TYPE_LOCALIZATION_ENABLE_EVENTS_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                             <name>next</name></member>
+            <member><type>XrBool32</type>                                <name>enabled</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataLocalizationChangedML" parentstruct="XrEventDataBaseHeader" returnedonly="true">
+            <member values="XR_TYPE_EVENT_DATA_LOCALIZATION_CHANGED_ML"> <type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                   <name>next</name></member>
+            <member><type>XrSession</type>                     <name>session</name></member>
+            <member><type>XrLocalizationMapStateML</type>      <name>state</name></member>
+            <member><type>XrLocalizationMapML</type>           <name>map</name></member>
+            <member><type>XrLocalizationMapConfidenceML</type> <name>confidence</name></member>
+            <member><type>XrLocalizationMapErrorFlagsML</type> <name>errorFlags</name></member>
+        </type>
+
+        <type category="struct" name="XrLocalizationMapQueryInfoBaseHeaderML">
+            <member><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrMapLocalizationRequestInfoML">
+            <member values="XR_TYPE_MAP_LOCALIZATION_REQUEST_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrUuidEXT</type>   <name>mapUuid</name></member>
+        </type>
+
+        <type category="struct" name="XrLocalizationMapImportInfoML">
+            <member values="XR_TYPE_LOCALIZATION_MAP_IMPORT_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*      <name>next</name></member>
+            <member><type>uint32_t</type>         <name>size</name></member>
+            <member len="size"><type>char</type>* <name>data</name></member>
+        </type>
+
+
+        <!-- XR_ML_marker_understanding -->
+        <type category="struct" name="XrSystemMarkerUnderstandingPropertiesML" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_MARKER_UNDERSTANDING_PROPERTIES_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsMarkerUnderstanding</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorCreateInfoML">
+            <member values="XR_TYPE_MARKER_DETECTOR_CREATE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*               <name>next</name></member>
+            <member><type>XrMarkerDetectorProfileML</type> <name>profile</name></member>
+            <member><type>XrMarkerTypeML</type>            <name>markerType</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorArucoInfoML" structextends="XrMarkerDetectorCreateInfoML">
+            <member values="XR_TYPE_MARKER_DETECTOR_ARUCO_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*         <name>next</name></member>
+            <member><type>XrMarkerArucoDictML</type> <name>arucoDict</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorSizeInfoML" structextends="XrMarkerDetectorCreateInfoML">
+            <member values="XR_TYPE_MARKER_DETECTOR_SIZE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>float</type>       <name>markerLength</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorAprilTagInfoML" structextends="XrMarkerDetectorCreateInfoML">
+            <member values="XR_TYPE_MARKER_DETECTOR_APRIL_TAG_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*            <name>next</name></member>
+            <member><type>XrMarkerAprilTagDictML</type> <name>aprilTagDict</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorCustomProfileInfoML" structextends="XrMarkerDetectorCreateInfoML">
+            <member values="XR_TYPE_MARKER_DETECTOR_CUSTOM_PROFILE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                            <name>next</name></member>
+            <member><type>XrMarkerDetectorFpsML</type>                  <name>fpsHint</name></member>
+            <member><type>XrMarkerDetectorResolutionML</type>           <name>resolutionHint</name></member>
+            <member><type>XrMarkerDetectorCameraML</type>               <name>cameraHint</name></member>
+            <member><type>XrMarkerDetectorCornerRefineMethodML</type>   <name>cornerRefineMethod</name></member>
+            <member><type>XrBool32</type>                               <name>useEdgeRefinement</name></member>
+            <member><type>XrMarkerDetectorFullAnalysisIntervalML</type> <name>fullAnalysisIntervalHint</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorSnapshotInfoML">
+            <member values="XR_TYPE_MARKER_DETECTOR_SNAPSHOT_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerDetectorStateML" returnedonly="true">
+            <member values="XR_TYPE_MARKER_DETECTOR_STATE_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                    <name>next</name></member>
+            <member><type>XrMarkerDetectorStatusML</type> <name>state</name></member>
+        </type>
+
+        <type category="struct" name="XrMarkerSpaceCreateInfoML">
+            <member values="XR_TYPE_MARKER_SPACE_CREATE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrMarkerDetectorML</type> <name>markerDetector</name></member>
+            <member><type>XrMarkerML</type>         <name>marker</name></member>
+            <member><type>XrPosef</type>            <name>poseInMarkerSpace</name></member>
+        </type>
 
     </types>
 
@@ -3773,6 +3924,80 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="24"   name="XR_HAND_FOREARM_JOINT_LITTLE_DISTAL_ULTRALEAP"/>
         <enum value="25"   name="XR_HAND_FOREARM_JOINT_LITTLE_TIP_ULTRALEAP"/>
         <enum value="26"   name="XR_HAND_FOREARM_JOINT_ELBOW_ULTRALEAP"/>
+    </enums>
+
+    <!-- enums for XR_ML_marker_understanding -->
+    <enums name="XrMarkerDetectorProfileML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_PROFILE_DEFAULT_ML"       comment="Tracker profile that covers standard use cases. If this does not suite the needs of the application try the other profiles listed below."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_PROFILE_SPEED_ML"         comment="Optimized for speed. Use this profile to reduce the compute load and increase detection/tracker speed. This can result in low accuracy poses."/>
+        <enum value="2"   name="XR_MARKER_DETECTOR_PROFILE_ACCURACY_ML"      comment="Optimized for accuracy. Use this profile to optimize for accurate marker poses. This can cause increased load on the compute."/>
+        <enum value="3"   name="XR_MARKER_DETECTOR_PROFILE_SMALL_TARGETS_ML" comment="Optimized for small targets. Use this profile to optimize for markers that are small or for larger markers that need to be detected from afar."/>
+        <enum value="4"   name="XR_MARKER_DETECTOR_PROFILE_LARGE_FOV_ML"     comment="Optimized for FoV. Use this profile to be able to detect markers across a larger FoV. The marker tracker system will attempt to use multiple cameras to detect the markers."/>
+        <enum value="5"   name="XR_MARKER_DETECTOR_PROFILE_CUSTOM_ML"        comment="Custom Tracker Profile. The application can define a custom tracker profile. See slink:XrMarkerDetectorCustomProfileInfoML for more details."/>
+    </enums>
+    <enums name="XrMarkerTypeML" type="enum">
+        <enum value="0"   name="XR_MARKER_TYPE_ARUCO_ML"     comment="Aruco Marker detection and localization. The marker id of the Aruco marker is available via flink:xrGetMarkerNumberML."/>
+        <enum value="1"   name="XR_MARKER_TYPE_APRIL_TAG_ML" comment="AprilTag detection and localization. The marker id of the AprilTags is available via flink:xrGetMarkerNumberML."/>
+        <enum value="2"   name="XR_MARKER_TYPE_QR_ML"        comment="QR code detection and localization. The contents of the QR code is available via flink:xrGetMarkerStringML."/>
+        <enum value="3"   name="XR_MARKER_TYPE_EAN_13_ML"    comment="EAN-13, detection only, not locatable. The contents of the barcode is available via flink:xrGetMarkerStringML."/>
+        <enum value="4"   name="XR_MARKER_TYPE_UPC_A_ML"     comment="UPC-A, detection only, not locatable. The contents of the barcode is available via flink:xrGetMarkerStringML."/>
+        <enum value="5"   name="XR_MARKER_TYPE_CODE_128_ML"  comment="Code 128, detection only, not locatable. The contents of the barcode is available via flink:xrGetMarkerStringML."/>
+    </enums>
+    <enums name="XrMarkerArucoDictML" type="enum">
+        <enum value="0"    name="XR_MARKER_ARUCO_DICT_4X4_50_ML"   comment="4 by 4 pixel Aruco marker dictionary with 50 IDs."/>
+        <enum value="1"    name="XR_MARKER_ARUCO_DICT_4X4_100_ML"  comment="4 by 4 pixel Aruco marker dictionary with 100 IDs."/>
+        <enum value="2"    name="XR_MARKER_ARUCO_DICT_4X4_250_ML"  comment="4 by 4 pixel Aruco marker dictionary with 250 IDs."/>
+        <enum value="3"    name="XR_MARKER_ARUCO_DICT_4X4_1000_ML" comment="4 by 4 pixel Aruco marker dictionary with 1000 IDs."/>
+        <enum value="4"    name="XR_MARKER_ARUCO_DICT_5X5_50_ML"   comment="5 by 5 pixel Aruco marker dictionary with 50 IDs."/>
+        <enum value="5"    name="XR_MARKER_ARUCO_DICT_5X5_100_ML"  comment="5 by 5 pixel Aruco marker dictionary with 100 IDs."/>
+        <enum value="6"    name="XR_MARKER_ARUCO_DICT_5X5_250_ML"  comment="5 by 5 pixel Aruco marker dictionary with 250 IDs."/>
+        <enum value="7"    name="XR_MARKER_ARUCO_DICT_5X5_1000_ML" comment="5 by 5 pixel Aruco marker dictionary with 1000 IDs."/>
+        <enum value="8"    name="XR_MARKER_ARUCO_DICT_6X6_50_ML"   comment="6 by 6 pixel Aruco marker dictionary with 50 IDs."/>
+        <enum value="9"    name="XR_MARKER_ARUCO_DICT_6X6_100_ML"  comment="6 by 6 pixel Aruco marker dictionary with 100 IDs."/>
+        <enum value="10"   name="XR_MARKER_ARUCO_DICT_6X6_250_ML"  comment="6 by 6 pixel Aruco marker dictionary with 250 IDs."/>
+        <enum value="11"   name="XR_MARKER_ARUCO_DICT_6X6_1000_ML" comment="6 by 6 pixel Aruco marker dictionary with 1000 IDs."/>
+        <enum value="12"   name="XR_MARKER_ARUCO_DICT_7X7_50_ML"   comment="7 by 7 pixel Aruco marker dictionary with 50 IDs."/>
+        <enum value="13"   name="XR_MARKER_ARUCO_DICT_7X7_100_ML"  comment="7 by 7 pixel Aruco marker dictionary with 100 IDs."/>
+        <enum value="14"   name="XR_MARKER_ARUCO_DICT_7X7_250_ML"  comment="7 by 7 pixel Aruco marker dictionary with 250 IDs."/>
+        <enum value="15"   name="XR_MARKER_ARUCO_DICT_7X7_1000_ML" comment="7 by 7 pixel Aruco marker dictionary with 1000 IDs."/>
+    </enums>
+    <enums name="XrMarkerAprilTagDictML" type="enum">
+        <enum value="0"   name="XR_MARKER_APRIL_TAG_DICT_16H5_ML"  comment="4 by 4 bits, minimum Hamming distance between any two codes = 5, 30 codes."/>
+        <enum value="1"   name="XR_MARKER_APRIL_TAG_DICT_25H9_ML"  comment="5 by 5 bits, minimum Hamming distance between any two codes = 9, 35 codes."/>
+        <enum value="2"   name="XR_MARKER_APRIL_TAG_DICT_36H10_ML" comment="6 by 6 bits, minimum Hamming distance between any two codes = 10, 2320 codes."/>
+        <enum value="3"   name="XR_MARKER_APRIL_TAG_DICT_36H11_ML" comment="6 by 6 bits, minimum Hamming distance between any two codes = 11, 587 codes."/>
+    </enums>
+    <enums name="XrMarkerDetectorFpsML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_FPS_LOW_ML"    comment="Low FPS."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_FPS_MEDIUM_ML" comment="Medium FPS."/>
+        <enum value="2"   name="XR_MARKER_DETECTOR_FPS_HIGH_ML"   comment="High FPS."/>
+        <enum value="3"   name="XR_MARKER_DETECTOR_FPS_MAX_ML"    comment="Max possible FPS."/>
+    </enums>
+    <enums name="XrMarkerDetectorResolutionML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_RESOLUTION_LOW_ML"    comment="Low Resolution."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_RESOLUTION_MEDIUM_ML" comment="Medium Resolution."/>
+        <enum value="2"   name="XR_MARKER_DETECTOR_RESOLUTION_HIGH_ML"   comment="High Resolution."/>
+    </enums>
+    <enums name="XrMarkerDetectorCameraML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_CAMERA_RGB_CAMERA_ML"    comment="Single RGB camera."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_CAMERA_WORLD_CAMERAS_ML" comment="One or more world cameras."/>
+    </enums>
+    <enums name="XrMarkerDetectorCornerRefineMethodML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_CORNER_REFINE_METHOD_NONE_ML"      comment="No refinement. Inaccurate corners."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_CORNER_REFINE_METHOD_SUBPIX_ML"    comment="Subpixel refinement. Corners have subpixel coordinates. High detection rate, very fast, reasonable accuracy."/>
+        <enum value="2"   name="XR_MARKER_DETECTOR_CORNER_REFINE_METHOD_CONTOUR_ML"   comment="Contour refinement. High detection rate, fast, reasonable accuracy."/>
+        <enum value="3"   name="XR_MARKER_DETECTOR_CORNER_REFINE_METHOD_APRIL_TAG_ML" comment="AprilTag refinement. Reasonable detection rate, slowest, but very accurate. Only valid with AprilTags."/>
+    </enums>
+    <enums name="XrMarkerDetectorFullAnalysisIntervalML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_FULL_ANALYSIS_INTERVAL_MAX_ML"    comment="Detector analyzes every frame fully."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_FULL_ANALYSIS_INTERVAL_FAST_ML"   comment="Detector analyzes frame fully very often."/>
+        <enum value="2"   name="XR_MARKER_DETECTOR_FULL_ANALYSIS_INTERVAL_MEDIUM_ML" comment="Detector analyzes frame fully a few times per second."/>
+        <enum value="3"   name="XR_MARKER_DETECTOR_FULL_ANALYSIS_INTERVAL_SLOW_ML"   comment="Detector analyzes frame fully about every second."/>
+    </enums>
+    <enums name="XrMarkerDetectorStatusML" type="enum">
+        <enum value="0"   name="XR_MARKER_DETECTOR_STATUS_PENDING_ML" comment="The marker detector is working on a new snapshot."/>
+        <enum value="1"   name="XR_MARKER_DETECTOR_STATUS_READY_ML"   comment="The marker detector is ready to be inspected."/>
+        <enum value="2"   name="XR_MARKER_DETECTOR_STATUS_ERROR_ML"   comment="The marker detector has encountered a fatal error."/>
     </enums>
 
     <!-- Flags -->
@@ -4331,6 +4556,36 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <enum value="2"   name="XR_EYE_CALIBRATION_STATUS_COARSE_ML"  comment="Eye calibration is of lower accuracy."/>
         <enum value="3"   name="XR_EYE_CALIBRATION_STATUS_FINE_ML"    comment="Eye calibration is of higher accuracy."/>
     </enums>
+
+    <!-- XR_ML_localization_map -->
+    <enums name="XrLocalizationMapStateML" type="enum">
+        <enum value="0"   name="XR_LOCALIZATION_MAP_STATE_NOT_LOCALIZED_ML"                      comment="The system is not localized into a map. Features like Spatial Anchors relying on localization will not work."/>
+        <enum value="1"   name="XR_LOCALIZATION_MAP_STATE_LOCALIZED_ML"                          comment="The system is localized into a map."/>
+        <enum value="2"   name="XR_LOCALIZATION_MAP_STATE_LOCALIZATION_PENDING_ML"               comment="The system is localizing into a map."/>
+        <enum value="3"   name="XR_LOCALIZATION_MAP_STATE_LOCALIZATION_SLEEPING_BEFORE_RETRY_ML" comment="Initial localization failed, the system will retry localization."/>
+    </enums>
+
+    <enums name="XrLocalizationMapTypeML" type="enum">
+        <enum value="0"   name="XR_LOCALIZATION_MAP_TYPE_ON_DEVICE_ML" comment="The system is localized into an On-Device map, published anchors are not shared between different devices."/>
+        <enum value="1"   name="XR_LOCALIZATION_MAP_TYPE_CLOUD_ML"     comment="The system is localized into a Cloud Map, anchors are shared per cloud account settings."/>
+    </enums>
+
+    <enums name="XrLocalizationMapConfidenceML" type="enum">
+        <enum value="0"   name="XR_LOCALIZATION_MAP_CONFIDENCE_POOR_ML"      comment="The localization map has poor confidence, systems relying on the localization map are likely to have poor performance."/>
+        <enum value="1"   name="XR_LOCALIZATION_MAP_CONFIDENCE_FAIR_ML"      comment="The confidence is fair, current environmental conditions may adversely affect localization."/>
+        <enum value="2"   name="XR_LOCALIZATION_MAP_CONFIDENCE_GOOD_ML"      comment="The confidence is high, persistent content should be stable."/>
+        <enum value="3"   name="XR_LOCALIZATION_MAP_CONFIDENCE_EXCELLENT_ML" comment="This is a very high-confidence localization, persistent content will be very stable."/>
+    </enums>
+
+    <enums name="XrLocalizationMapErrorFlagBitsML" type="bitmask">
+        <enum bitpos="0" name="XR_LOCALIZATION_MAP_ERROR_UNKNOWN_BIT_ML"            comment="Localization failed for an unknown reason."/>
+        <enum bitpos="1" name="XR_LOCALIZATION_MAP_ERROR_OUT_OF_MAPPED_AREA_BIT_ML" comment="Localization failed because the user is outside of the mapped area."/>
+        <enum bitpos="2" name="XR_LOCALIZATION_MAP_ERROR_LOW_FEATURE_COUNT_BIT_ML"  comment="There are not enough features in the environment to successfully localize."/>
+        <enum bitpos="3" name="XR_LOCALIZATION_MAP_ERROR_EXCESSIVE_MOTION_BIT_ML"   comment="Localization failed due to excessive motion."/>
+        <enum bitpos="4" name="XR_LOCALIZATION_MAP_ERROR_LOW_LIGHT_BIT_ML"          comment="Localization failed because the lighting levels are too low in the environment."/>
+        <enum bitpos="5" name="XR_LOCALIZATION_MAP_ERROR_HEADPOSE_BIT_ML"           comment="A headpose failure caused localization to be unsuccessful."/>
+    </enums>
+
 
     <!-- SECTION: OpenXR command definitions -->
     <commands>
@@ -5597,6 +5852,19 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param externsync="true_with_children"><type>XrPassthroughHTC</type> <name>passthrough</name></param>
         </command>
 
+        <!-- XR_HTC_anchor -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_POSE_INVALID,XR_ERROR_NAME_INVALID">
+            <proto><type>XrResult</type> <name>xrCreateSpatialAnchorHTC</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpatialAnchorCreateInfoHTC</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>anchor</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_NOT_AN_ANCHOR_HTC">
+            <proto><type>XrResult</type> <name>xrGetSpatialAnchorNameHTC</name></proto>
+            <param><type>XrSpace</type> <name>anchor</name></param>
+            <param><type>XrSpatialAnchorNameHTC</type>* <name>name</name></param>
+        </command>
+
         <!-- XR_HTCX_vive_tracker_interaction -->
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT">
             <proto><type>XrResult</type> <name>xrEnumerateViveTrackerPathsHTCX</name></proto>
@@ -5814,7 +6082,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param><type>XrPlaneDetectorPolygonBufferEXT</type>* <name>polygonBuffer</name></param>
         </command>
 
-
         <!-- commands for XR_META_virtual_keyboard -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrCreateVirtualKeyboardMETA</name></proto>
@@ -5888,10 +6155,121 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <param>const <type>XrVirtualKeyboardTextContextChangeInfoMETA</type>* <name>changeInfo</name></param>
         </command>
 
+        <!-- XR_ML_user_calibration -->
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST">
             <proto><type>XrResult</type> <name>xrEnableUserCalibrationEventsML</name></proto>
-            <param><type>XrInstance</type>                                       <name>instance</name></param>
-            <param>const <type>XrUserCalibrationEnableEventsInfoML</type>*            <name>enableInfo</name></param>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param>const <type>XrUserCalibrationEnableEventsInfoML</type>* <name>enableInfo</name></param>
+        </command>
+
+        <!-- XR_ML_localization_map -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LOCALIZATION_MAP_PERMISSION_DENIED_ML">
+            <proto><type>XrResult</type> <name>xrEnableLocalizationEventsML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrLocalizationEnableEventsInfoML</type> * <name>info</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LOCALIZATION_MAP_PERMISSION_DENIED_ML">
+            <proto><type>XrResult</type> <name>xrQueryLocalizationMapsML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param optional="true">const <type>XrLocalizationMapQueryInfoBaseHeaderML</type>* <name>queryInfo</name></param>
+            <param optional="true"><type>uint32_t</type> <name>mapCapacityInput</name></param>
+            <param><type>uint32_t</type> * <name>mapCountOutput</name></param>
+            <param optional="true" len="mapCapacityInput"><type>XrLocalizationMapML</type>* <name>maps</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LOCALIZATION_MAP_UNAVAILABLE_ML,XR_ERROR_LOCALIZATION_MAP_PERMISSION_DENIED_ML,XR_ERROR_LOCALIZATION_MAP_FAIL_ML">
+            <proto><type>XrResult</type> <name>xrRequestMapLocalizationML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrMapLocalizationRequestInfoML</type>* <name>requestInfo</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LOCALIZATION_MAP_INCOMPATIBLE_ML,XR_ERROR_LOCALIZATION_MAP_IMPORT_EXPORT_PERMISSION_DENIED_ML,XR_ERROR_LOCALIZATION_MAP_ALREADY_EXISTS_ML">
+            <proto><type>XrResult</type> <name>xrImportLocalizationMapML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrLocalizationMapImportInfoML</type>* <name>importInfo</name></param>
+            <param optional="true"><type>XrUuidEXT</type>* <name>mapUuid</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_LOCALIZATION_MAP_UNAVAILABLE_ML,XR_ERROR_LOCALIZATION_MAP_IMPORT_EXPORT_PERMISSION_DENIED_ML,XR_ERROR_LOCALIZATION_MAP_CANNOT_EXPORT_CLOUD_MAP_ML">
+            <proto><type>XrResult</type> <name>xrCreateExportedLocalizationMapML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrUuidEXT</type>* <name>mapUuid</name></param>
+            <param><type>XrExportedLocalizationMapML</type>* <name>map</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyExportedLocalizationMapML</name></proto>
+            <param externsync="true_with_children"><type>XrExportedLocalizationMapML</type> <name>map</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrGetExportedLocalizationMapDataML</name></proto>
+            <param><type>XrExportedLocalizationMapML</type>                     <name>map</name></param>
+            <param optional="true"><type>uint32_t</type>                        <name>bufferCapacityInput</name></param>
+            <param><type>uint32_t</type>*                                       <name>bufferCountOutput</name></param>
+            <param optional="true" len="bufferCapacityInput"><type>char</type>* <name>buffer</name></param>
+        </command>
+
+        <!-- commands for XR_ML_marker_understanding -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_MARKER_DETECTOR_PERMISSION_DENIED_ML,XR_ERROR_MARKER_DETECTOR_INVALID_CREATE_INFO_ML">
+            <proto><type>XrResult</type> <name>xrCreateMarkerDetectorML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrMarkerDetectorCreateInfoML</type>* <name>createInfo</name></param>
+            <param><type>XrMarkerDetectorML</type>* <name>markerDetector</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyMarkerDetectorML</name></proto>
+            <param externsync="true_with_children"><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrSnapshotMarkerDetectorML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param><type>XrMarkerDetectorSnapshotInfoML</type>* <name>snapshotInfo</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_CALL_ORDER_INVALID">
+            <proto><type>XrResult</type> <name>xrGetMarkerDetectorStateML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param><type>XrMarkerDetectorStateML</type>* <name>state</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_CALL_ORDER_INVALID">
+            <proto><type>XrResult</type> <name>xrGetMarkersML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param optional="true"><type>uint32_t</type> <name>markerCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>markerCountOutput</name></param>
+            <param optional="true" len="markerCapacityInput"><type>XrMarkerML</type>* <name>markers</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_MARKER_INVALID_ML,XR_ERROR_CALL_ORDER_INVALID">
+            <proto><type>XrResult</type> <name>xrGetMarkerReprojectionErrorML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param><type>XrMarkerML</type> <name>marker</name></param>
+            <param><type>float</type>* <name>reprojectionErrorMeters</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_MARKER_INVALID_ML,XR_ERROR_CALL_ORDER_INVALID">
+            <proto><type>XrResult</type> <name>xrGetMarkerLengthML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param><type>XrMarkerML</type> <name>marker</name></param>
+            <param><type>float</type>* <name>meters</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_MARKER_INVALID_ML,XR_ERROR_MARKER_DETECTOR_INVALID_DATA_QUERY_ML">
+            <proto><type>XrResult</type> <name>xrGetMarkerNumberML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param><type>XrMarkerML</type> <name>marker</name></param>
+            <param><type>uint64_t</type>* <name>number</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_MARKER_INVALID_ML,XR_ERROR_MARKER_DETECTOR_INVALID_DATA_QUERY_ML">
+            <proto><type>XrResult</type> <name>xrGetMarkerStringML</name></proto>
+            <param><type>XrMarkerDetectorML</type> <name>markerDetector</name></param>
+            <param><type>XrMarkerML</type> <name>marker</name></param>
+            <param optional="true"><type>uint32_t</type> <name>bufferCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>bufferCountOutput</name></param>
+            <param optional="true" len="bufferCapacityInput"><type>char</type>* <name>buffer</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_POSE_INVALID,XR_ERROR_MARKER_INVALID_ML,XR_ERROR_MARKER_DETECTOR_LOCATE_FAILED_ML,XR_ERROR_CALL_ORDER_INVALID">
+            <proto><type>XrResult</type> <name>xrCreateMarkerSpaceML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrMarkerSpaceCreateInfoML</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>space</name></param>
         </command>
 
     </commands>
@@ -6319,6 +6697,39 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <component                                subpath="/input/trigger/proximity_fb"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             <component                                subpath="/output/haptic_trigger_fb"      type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
             <component                                subpath="/output/haptic_thumb_fb"        type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
+        </interaction_profile>
+
+        <!-- XR_META_touch_controller_plus -->
+        <interaction_profile name="/interaction_profiles/meta/touch_controller_plus" title="Meta Quest Touch Plus Controller">
+            <user_path path="/user/hand/left"/>
+            <user_path path="/user/hand/right"/>
+            <component user_path="/user/hand/left"    subpath="/input/x/click"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/x/touch"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/y/click"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/y/touch"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/menu/click"                  type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/a/click"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/a/touch"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/b/click"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/b/touch"                     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/system/click"                type="XR_ACTION_TYPE_BOOLEAN_INPUT"    system="true"/>
+            <component                                subpath="/input/squeeze/value"               type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/trigger/value"               type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/trigger/touch"               type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/thumbstick"                  type="XR_ACTION_TYPE_VECTOR2F_INPUT"/>
+            <component                                subpath="/input/thumbstick/x"                type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick/y"                type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick/click"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/thumbstick/touch"            type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/thumbrest/touch"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/grip/pose"                   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/input/aim/pose"                    type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/output/haptic"                     type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
+            <component                                subpath="/input/thumb_meta/proximity_meta"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/trigger/proximity_meta"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/trigger/curl_meta"           type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/trigger/slide_meta"          type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/trigger/force"               type="XR_ACTION_TYPE_FLOAT_INPUT"/>
         </interaction_profile>
 
         <!-- XR_BD_controller_interaction -->
@@ -7605,7 +8016,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
     <extension name="XR_KHR_loader_init" number="89" type="instance" supported="openxr">
         <require>
-            <enum value="1"                              name="XR_KHR_loader_init_SPEC_VERSION"/>
+            <enum value="2"                              name="XR_KHR_loader_init_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_loader_init&quot;" name="XR_KHR_LOADER_INIT_EXTENSION_NAME"/>
             <type name="XrLoaderInitInfoBaseHeaderKHR"/>
             <command name="xrInitializeLoaderKHR"/>
@@ -8471,17 +8882,114 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_139" number="139" type="instance" supported="disabled">
+    <extension name="XR_ML_marker_understanding" number="139" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_139_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_139&quot;" name="XR_ML_extension_139_EXTENSION_NAME"/>
+            <enum value="1"                                      name="XR_ML_marker_understanding_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_marker_understanding&quot;" name="XR_ML_MARKER_UNDERSTANDING_EXTENSION_NAME"/>
+
+            <type name="XrMarkerML"/>
+            <type name="XrMarkerDetectorML"/>
+
+            <type name="XrMarkerDetectorProfileML"/>
+            <type name="XrMarkerTypeML"/>
+            <type name="XrMarkerArucoDictML"/>
+            <type name="XrMarkerAprilTagDictML"/>
+            <type name="XrMarkerDetectorFpsML"/>
+            <type name="XrMarkerDetectorResolutionML"/>
+            <type name="XrMarkerDetectorCameraML"/>
+            <type name="XrMarkerDetectorCornerRefineMethodML"/>
+            <type name="XrMarkerDetectorFullAnalysisIntervalML"/>
+            <type name="XrMarkerDetectorStatusML"/>
+
+            <type name="XrSystemMarkerUnderstandingPropertiesML"/>
+            <type name="XrMarkerDetectorCreateInfoML"/>
+            <type name="XrMarkerDetectorArucoInfoML"/>
+            <type name="XrMarkerDetectorSizeInfoML"/>
+            <type name="XrMarkerDetectorAprilTagInfoML"/>
+            <type name="XrMarkerDetectorCustomProfileInfoML"/>
+            <type name="XrMarkerDetectorSnapshotInfoML"/>
+            <type name="XrMarkerDetectorStateML"/>
+            <type name="XrMarkerSpaceCreateInfoML"/>
+
+            <command name="xrCreateMarkerDetectorML"/>
+            <command name="xrDestroyMarkerDetectorML"/>
+            <command name="xrSnapshotMarkerDetectorML"/>
+            <command name="xrGetMarkerDetectorStateML"/>
+            <command name="xrGetMarkersML"/>
+            <command name="xrGetMarkerReprojectionErrorML"/>
+            <command name="xrGetMarkerLengthML"/>
+            <command name="xrGetMarkerNumberML"/>
+            <command name="xrGetMarkerStringML"/>
+            <command name="xrCreateMarkerSpaceML"/>
+
+            <enum offset="0"         extends="XrObjectType"    name="XR_OBJECT_TYPE_MARKER_DETECTOR_ML"                 comment="XrMarkerDetectorML"/>
+
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_SYSTEM_MARKER_UNDERSTANDING_PROPERTIES_ML"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_CREATE_INFO_ML"/>
+            <enum offset="2"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_ARUCO_INFO_ML"/>
+            <enum offset="3"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_SIZE_INFO_ML"/>
+            <enum offset="4"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_APRIL_TAG_INFO_ML"/>
+            <enum offset="5"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_CUSTOM_PROFILE_INFO_ML"/>
+            <enum offset="6"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_SNAPSHOT_INFO_ML"/>
+            <enum offset="7"         extends="XrStructureType" name="XR_TYPE_MARKER_DETECTOR_STATE_ML"/>
+            <enum offset="8"         extends="XrStructureType" name="XR_TYPE_MARKER_SPACE_CREATE_INFO_ML"/>
+
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_MARKER_DETECTOR_PERMISSION_DENIED_ML"     comment="The com.magicleap.permission.MARKER_TRACKING permission was denied."/>
+            <enum offset="1" dir="-" extends="XrResult"        name="XR_ERROR_MARKER_DETECTOR_LOCATE_FAILED_ML"         comment="The specified marker could not be located spatially."/>
+            <enum offset="2" dir="-" extends="XrResult"        name="XR_ERROR_MARKER_DETECTOR_INVALID_DATA_QUERY_ML"    comment="The marker queried does not contain data of the requested type."/>
+            <enum offset="3" dir="-" extends="XrResult"        name="XR_ERROR_MARKER_DETECTOR_INVALID_CREATE_INFO_ML"   comment="pname:createInfo contains mutually exclusive parameters, such as setting ename:XR_MARKER_DETECTOR_CORNER_REFINE_METHOD_APRIL_TAG_ML with ename:XR_MARKER_TYPE_ARUCO_ML."/>
+            <enum offset="4" dir="-" extends="XrResult"        name="XR_ERROR_MARKER_INVALID_ML"                        comment="The marker id passed to the function was invalid."/>
+
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_140" number="140" type="instance" supported="disabled">
+    <extension name="XR_ML_localization_map" number="140" type="instance" requires="XR_EXT_uuid" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_140_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_140&quot;" name="XR_ML_extension_140_EXTENSION_NAME"/>
+            <enum value="1"                                         name="XR_ML_localization_map_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_localization_map&quot;"        name="XR_ML_LOCALIZATION_MAP_EXTENSION_NAME"/>
+
+            <enum offset="0"         extends="XrObjectType"         name="XR_OBJECT_TYPE_EXPORTED_LOCALIZATION_MAP_ML"                  comment="XrExportedLocalizationMapML"/>
+
+            <enum offset="0"         extends="XrStructureType"      name="XR_TYPE_LOCALIZATION_MAP_ML"/>
+            <enum offset="1"         extends="XrStructureType"      name="XR_TYPE_EVENT_DATA_LOCALIZATION_CHANGED_ML"/>
+            <enum offset="2"         extends="XrStructureType"      name="XR_TYPE_MAP_LOCALIZATION_REQUEST_INFO_ML"/>
+            <enum offset="3"         extends="XrStructureType"      name="XR_TYPE_LOCALIZATION_MAP_IMPORT_INFO_ML"/>
+            <enum offset="4"         extends="XrStructureType"      name="XR_TYPE_LOCALIZATION_ENABLE_EVENTS_INFO_ML"/>
+
+            <enum offset="0" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_INCOMPATIBLE_ML"                    comment="The localization map being imported is not compatible with current OS or mode."/>
+            <enum offset="1" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_UNAVAILABLE_ML"                     comment="The localization map requested is not available."/>
+            <enum offset="2" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_FAIL_ML"                            comment="The map localization service failed to fulfill the request, retry later."/>
+            <enum offset="3" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_IMPORT_EXPORT_PERMISSION_DENIED_ML" comment="The com.magicleap.permission.SPACE_IMPORT_EXPORT permission was denied."/>
+            <enum offset="4" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_PERMISSION_DENIED_ML"               comment="The com.magicleap.permission.SPACE_MANAGER permission was denied."/>
+            <enum offset="5" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_ALREADY_EXISTS_ML"                  comment="The map being imported already exists in the system."/>
+            <enum offset="6" dir="-" extends="XrResult"             name="XR_ERROR_LOCALIZATION_MAP_CANNOT_EXPORT_CLOUD_MAP_ML"         comment="The map localization service cannot export cloud based maps."/>
+
+            <enum offset="0"         extends="XrReferenceSpaceType" name="XR_REFERENCE_SPACE_TYPE_LOCALIZATION_MAP_ML"/>
+
+            <enum value="64"                                        name="XR_MAX_LOCALIZATION_MAP_NAME_LENGTH_ML"/>
+
+            <type name="XrLocalizationMapStateML"/>
+            <type name="XrLocalizationMapTypeML"/>
+            <type name="XrLocalizationMapConfidenceML"/>
+
+            <type name="XrLocalizationMapML"/>
+            <type name="XrEventDataLocalizationChangedML"/>
+            <type name="XrLocalizationMapQueryInfoBaseHeaderML"/>
+            <type name="XrMapLocalizationRequestInfoML"/>
+            <type name="XrLocalizationMapImportInfoML"/>
+            <type name="XrLocalizationEnableEventsInfoML"/>
+            <type name="XrLocalizationMapErrorFlagsML"/>
+            <type name="XrLocalizationMapErrorFlagBitsML"/>
+
+            <command name="xrEnableLocalizationEventsML"/>
+            <command name="xrQueryLocalizationMapsML"/>
+            <command name="xrRequestMapLocalizationML"/>
+            <command name="xrImportLocalizationMapML"/>
+
+            <command name="xrCreateExportedLocalizationMapML"/>
+            <command name="xrDestroyExportedLocalizationMapML"/>
+            <command name="xrGetExportedLocalizationMapDataML"/>
+
         </require>
     </extension>
 
@@ -9896,10 +10404,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_280" number="280" type="instance" supported="disabled">
+    <extension name="XR_META_touch_controller_plus" number="280" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_280_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_280&quot;" name="XR_FB_EXTENSION_280_EXTENSION_NAME"/>
+            <enum value="1"                                         name="XR_META_touch_controller_plus_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_touch_controller_plus&quot;" name="XR_META_TOUCH_CONTROLLER_PLUS_EXTENSION_NAME"/>
+            <interaction_profile name="/interaction_profiles/meta/touch_controller_plus"/>
         </require>
     </extension>
 
@@ -10223,10 +10732,19 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         </require>
     </extension>
 
-    <extension name="XR_HTC_extension_320" number="320" type="instance" supported="disabled">
+    <extension name="XR_HTC_anchor" number="320" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_HTC_extension_320_SPEC_VERSION"/>
-            <enum value="&quot;XR_HTC_extension_320&quot;" name="XR_HTC_extension_320_EXTENSION_NAME"/>
+            <enum value="1"                         name="XR_HTC_anchor_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_anchor&quot;" name="XR_HTC_ANCHOR_EXTENSION_NAME"/>
+            <enum value="256"                       name="XR_MAX_SPATIAL_ANCHOR_NAME_SIZE_HTC"/>
+            <type name="XrSystemAnchorPropertiesHTC"/>
+            <type name="XrSpatialAnchorCreateInfoHTC"/>
+            <type name="XrSpatialAnchorNameHTC"/>
+            <command name="xrCreateSpatialAnchorHTC"/>
+            <command name="xrGetSpatialAnchorNameHTC"/>
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_SYSTEM_ANCHOR_PROPERTIES_HTC"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_HTC"/>
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_NOT_AN_ANCHOR_HTC"             comment="The provided space is valid but not an anchor."/>
         </require>
     </extension>
 
@@ -13084,6 +13602,21 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
             <enum value="&quot;XR_ANDROID_extension_710&quot;" name="XR_ANDROID_EXTENSION_710_EXTENSION_NAME"/>
         </require>
     </extension>
+
+    <extension name="XR_KHR_maintenance1" number="711" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                               name="XR_KHR_maintenance1_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_maintenance1&quot;" name="XR_KHR_MAINTENANCE1_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_game_controller" number="712" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                  name="XR_KHR_game_controller_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_game_controller&quot;" name="XR_KHR_GAME_CONTROLLER_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
     </extensions>
 
 </registry>

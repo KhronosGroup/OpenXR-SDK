@@ -6,9 +6,13 @@ jobs:
     displayName: "clang-format"
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr-sdk.20230323
-    # container: khronosgroup/docker-images@sha256:20edadbaa6cdec4fed7417c24b18dfb4b93eec940fdf1a27b5f97272dec47032
+    # 20230614
+    container: khronosgroup/docker-images:openxr-sdk@sha256:fbc5fe29a0787cccc8f66bd9bd03c9dbddf591c7d1aea673108c38c908b280f5
+
     steps:
+      - checkout: self
+        lfs: true
+
       - script: ./runClangFormat.sh
         displayName: Run clang-format
 

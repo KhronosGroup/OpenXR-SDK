@@ -19,21 +19,9 @@
 #include <mutex>
 #include <memory>
 
-#ifdef XR_USE_PLATFORM_ANDROID
-#define XR_KHR_LOADER_INIT_SUPPORT
-#endif
-
 namespace Json {
 class Value;
 }
-
-#ifdef XR_KHR_LOADER_INIT_SUPPORT
-//! Initialize loader, where required.
-XrResult InitializeLoader(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo);
-XrResult GetPlatformRuntimeVirtualManifest(Json::Value& out_manifest);
-std::string GetAndroidNativeLibraryDir();
-void* Android_Get_Asset_Manager();
-#endif
 
 class RuntimeManifestFile;
 struct XrGeneratedDispatchTable;

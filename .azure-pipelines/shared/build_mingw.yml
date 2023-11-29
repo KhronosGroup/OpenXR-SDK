@@ -17,6 +17,9 @@ parameters:
     default: "true"
 
 steps:
+  - checkout: self
+    lfs: true
+
   # - script: choco install -y ninja
   #   displayName: 'Install Ninja'
 

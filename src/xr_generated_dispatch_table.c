@@ -340,6 +340,27 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrCreateSpaceFromCoordinateFrameUIDML", (PFN_xrVoidFunction*)&table->CreateSpaceFromCoordinateFrameUIDML));
 #endif // defined(XR_USE_PLATFORM_ML)
 
+    // ---- XR_ML_marker_understanding extension commands
+    (get_inst_proc_addr(instance, "xrCreateMarkerDetectorML", (PFN_xrVoidFunction*)&table->CreateMarkerDetectorML));
+    (get_inst_proc_addr(instance, "xrDestroyMarkerDetectorML", (PFN_xrVoidFunction*)&table->DestroyMarkerDetectorML));
+    (get_inst_proc_addr(instance, "xrSnapshotMarkerDetectorML", (PFN_xrVoidFunction*)&table->SnapshotMarkerDetectorML));
+    (get_inst_proc_addr(instance, "xrGetMarkerDetectorStateML", (PFN_xrVoidFunction*)&table->GetMarkerDetectorStateML));
+    (get_inst_proc_addr(instance, "xrGetMarkersML", (PFN_xrVoidFunction*)&table->GetMarkersML));
+    (get_inst_proc_addr(instance, "xrGetMarkerReprojectionErrorML", (PFN_xrVoidFunction*)&table->GetMarkerReprojectionErrorML));
+    (get_inst_proc_addr(instance, "xrGetMarkerLengthML", (PFN_xrVoidFunction*)&table->GetMarkerLengthML));
+    (get_inst_proc_addr(instance, "xrGetMarkerNumberML", (PFN_xrVoidFunction*)&table->GetMarkerNumberML));
+    (get_inst_proc_addr(instance, "xrGetMarkerStringML", (PFN_xrVoidFunction*)&table->GetMarkerStringML));
+    (get_inst_proc_addr(instance, "xrCreateMarkerSpaceML", (PFN_xrVoidFunction*)&table->CreateMarkerSpaceML));
+
+    // ---- XR_ML_localization_map extension commands
+    (get_inst_proc_addr(instance, "xrEnableLocalizationEventsML", (PFN_xrVoidFunction*)&table->EnableLocalizationEventsML));
+    (get_inst_proc_addr(instance, "xrQueryLocalizationMapsML", (PFN_xrVoidFunction*)&table->QueryLocalizationMapsML));
+    (get_inst_proc_addr(instance, "xrRequestMapLocalizationML", (PFN_xrVoidFunction*)&table->RequestMapLocalizationML));
+    (get_inst_proc_addr(instance, "xrImportLocalizationMapML", (PFN_xrVoidFunction*)&table->ImportLocalizationMapML));
+    (get_inst_proc_addr(instance, "xrCreateExportedLocalizationMapML", (PFN_xrVoidFunction*)&table->CreateExportedLocalizationMapML));
+    (get_inst_proc_addr(instance, "xrDestroyExportedLocalizationMapML", (PFN_xrVoidFunction*)&table->DestroyExportedLocalizationMapML));
+    (get_inst_proc_addr(instance, "xrGetExportedLocalizationMapDataML", (PFN_xrVoidFunction*)&table->GetExportedLocalizationMapDataML));
+
     // ---- XR_MSFT_spatial_anchor_persistence extension commands
     (get_inst_proc_addr(instance, "xrCreateSpatialAnchorStoreConnectionMSFT", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorStoreConnectionMSFT));
     (get_inst_proc_addr(instance, "xrDestroySpatialAnchorStoreConnectionMSFT", (PFN_xrVoidFunction*)&table->DestroySpatialAnchorStoreConnectionMSFT));
@@ -454,6 +475,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
 
     // ---- XR_HTC_foveation extension commands
     (get_inst_proc_addr(instance, "xrApplyFoveationHTC", (PFN_xrVoidFunction*)&table->ApplyFoveationHTC));
+
+    // ---- XR_HTC_anchor extension commands
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorHTC", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorHTC));
+    (get_inst_proc_addr(instance, "xrGetSpatialAnchorNameHTC", (PFN_xrVoidFunction*)&table->GetSpatialAnchorNameHTC));
 
     // ---- XR_MNDX_force_feedback_curl extension commands
     (get_inst_proc_addr(instance, "xrApplyForceFeedbackCurlMNDX", (PFN_xrVoidFunction*)&table->ApplyForceFeedbackCurlMNDX));

@@ -1,5 +1,5 @@
 {
-    "export_libraries": [],
+    "export_libraries": [":headers"],
     "library_name": "libopenxr_loader",
     "android": {
         "export_libraries": null,
