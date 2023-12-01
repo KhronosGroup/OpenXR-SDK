@@ -205,16 +205,19 @@ elseif(WIN32)
     )
 
     if(MSVC)
+        if(DYNAMIC_LOADER)
+            target_sources(
+                openxr_loader
+                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.def"
+            )
+        endif()
+
         if(DYNAMIC_LOADER AND NOT (CMAKE_SYSTEM_NAME STREQUAL "WindowsStore"))
             # If building DLLs, force static CRT linkage
             set_target_properties(
                 openxr_loader
                 PROPERTIES MSVC_RUNTIME_LIBRARY
                            "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-            )
-            target_sources(
-                openxr_loader
-                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/openxr-loader.def"
             )
         else()
             # WindowsStore (UWP) apps must be compiled with dynamic CRT linkage (default)

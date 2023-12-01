@@ -10,15 +10,13 @@ parameters:
     default: ""
   - name: sourceDir
     type: string
-    default: "$(System.DefaultWorkingDirectory)"
+    default: "$(Pipeline.Workspace)"
   - name: buildDir
     type: string
-    default: build
+    default: "$(Build.BinariesDirectory)"
 
 steps:
-  - checkout: self
-    lfs: true
-  - script: "rm -rf ${{ parameters.sourceDir }}/${{ parameters.buildDir }}"
+  - script: "rm -rf ${{ parameters.buildDir }}"
     displayName: "Clean up build directory"
 
   - script: "cmake -G Ninja -S . -B ${{ parameters.buildDir }} -DCMAKE_BUILD_TYPE=${{ parameters.buildType }} ${{ parameters.cmakeArgs }}"
