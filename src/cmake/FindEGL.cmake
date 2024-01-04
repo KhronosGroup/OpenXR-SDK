@@ -40,7 +40,7 @@
 #=============================================================================
 # Copyright 2014 Alex Merry <alex.merry@kde.org>
 # Copyright 2014 Martin Gräßlin <mgraesslin@kde.org>
-# Copyright 2019, 2021 Ryan Pavlik <ryan.pavlik@collabora.com>
+# Copyright 2019, 2021 Rylie Pavlik <rylie.pavlik@collabora.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, The Khronos Group Inc.
+// Copyright (c) 2017-2024, The Khronos Group Inc.
 // Copyright (c) 2017-2019 Valve Corporation
 // Copyright (c) 2017-2019 LunarG, Inc.
 //
@@ -9,7 +9,6 @@
 
 #include "api_layer_interface.hpp"
 
-#include "loader_interfaces.h"
 #include "loader_init_data.hpp"
 #include "loader_logger.hpp"
 #include "loader_platform.hpp"
@@ -17,6 +16,7 @@
 #include "platform_utils.hpp"
 
 #include <openxr/openxr.h>
+#include <openxr/openxr_loader_negotiation.h>
 
 #include <cstring>
 #include <memory>

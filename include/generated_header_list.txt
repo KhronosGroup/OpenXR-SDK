@@ -1,4 +1,5 @@
 openxr.h
+openxr_loader_negotiation.h
 openxr_platform.h
 openxr_reflection.h
 openxr_reflection_structs.h

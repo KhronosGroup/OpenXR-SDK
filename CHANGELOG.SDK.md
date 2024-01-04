@@ -1,7 +1,7 @@
 # Changelog for OpenXR-SDK-Source and OpenXR-SDK Repo
 
 <!--
-Copyright (c) 2019-2023, The Khronos Group Inc.
+Copyright (c) 2019-2024, The Khronos Group Inc.
 
 SPDX-License-Identifier: CC-BY-4.0
 -->
@@ -10,7 +10,9 @@ Update log for the OpenXR-SDK-Source and OpenXR-SDK repo on GitHub. Updates are
 in reverse chronological order starting with the latest public release.
 
 Note that only changes relating to the loader and some of the build changes will
-affect the OpenXR-SDK repository.
+affect the OpenXR-SDK repository. Changes mentioned in this changelog related to
+hello_xr, API layers, and the loader tests do *not* apply to the OpenXR-SDK
+repository.
 
 This summarizes the periodic public updates, not individual commits. Updates
 on GitHub are generally done as single large patches at the release point,
@@ -18,6 +20,54 @@ collecting together the resolution of many Khronos internal issues,
 along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
+
+## OpenXR SDK 1.0.33 (2024-01-03)
+
+This release primarily adds new ratified functionality describing the loader
+interaction with runtimes and API layers. Corresponding definitions are now in
+the official `openxr_loader_negotiation.h` generated header, rather than the
+`loader_interfaces.h` header previously shipped only with the OpenXR-SDK-Source
+repository. This change only affects vendors of runtimes and API layers as well
+as contributors to the OpenXR loader: applications do not directly use this API,
+the loader uses it on their behalf. A number of other small fixes are also
+included.
+
+- Registry
+  - Extension reservation: Update author ID and reserve extensions for Varjo.
+    ([internal MR 3083](https://gitlab.khronos.org/openxr/openxr/merge_requests/3083))
+  - Extension reservation: Reserve 10 extension ids each for `ANDROIDX` &
+    `ANDROIDSYS`.
+    ([internal MR 3086](https://gitlab.khronos.org/openxr/openxr/merge_requests/3086))
+  - Khronos ratified addition: Specify the existing loader negotiation functions
+    (without modification) in the XML, moving from `loader_interfaces.h` to a new
+    generated header `openxr_loader_negotiation.h`.
+    ([internal MR 2807](https://gitlab.khronos.org/openxr/openxr/merge_requests/2807),
+    [internal issue 1953](https://gitlab.khronos.org/openxr/openxr/issues/1953))
+  - `XR_KHR_android_thread_settings`: Fix the description of
+    `XrAndroidThreadTypeKHR` enum values - they were swapped relative to their
+    implicit meaning from their name.
+    ([internal MR 3077](https://gitlab.khronos.org/openxr/openxr/merge_requests/3077))
+  - `XR_MNDX_egl_enable`: Update version to 2 to reflect function pointer type
+    change released in 1.0.29.
+    ([OpenXR-Docs PR 159](https://github.com/KhronosGroup/OpenXR-Docs/pull/159))
+- SDK
+  - Loader: Fix loader build on Universal Windows Platform: build-system-only
+    change. (Included in SDK hotfix 1.0.32.1.)
+    ([internal MR 3071](https://gitlab.khronos.org/openxr/openxr/merge_requests/3071))
+  - Loader: Correctly destroy the LoaderInstance when loader is done.
+    ([internal MR 3041](https://gitlab.khronos.org/openxr/openxr/merge_requests/3041))
+  - Remove obsolete `loader_interfaces.h` header, migrating uses (in loader and
+    layers) to use the newly specified and ratified `openxr_loader_negotiation.h`,
+    and adjust scripts for the addition of the loader negotiation APIs.
+    ([internal MR 2807](https://gitlab.khronos.org/openxr/openxr/merge_requests/2807),
+    [internal issue 1953](https://gitlab.khronos.org/openxr/openxr/issues/1953),
+    [internal MR 3122](https://gitlab.khronos.org/openxr/openxr/merge_requests/3122))
+- Misc
+  - Update/correct names.
+  - Ship a `.mailmap` file in the public repositories, maintained separately
+    from the larger one used in the private monorepo, to correct names/emails
+    and unify contributor identities.
+  - Update Khronos Group copyright dates.
 
 ## OpenXR SDK 1.0.32 (2023-11-29)
 

@@ -2,7 +2,7 @@
 #define OPENXR_REFLECTION_H_ 1
 
 /*
-** Copyright (c) 2017-2023, The Khronos Group Inc.
+** Copyright (c) 2017-2024, The Khronos Group Inc.
 **
 ** SPDX-License-Identifier: Apache-2.0 OR MIT
 */
@@ -558,6 +558,15 @@ XR_ENUM_STR(XrResult);
     _(XR_OBJECT_TYPE_PASSTHROUGH_HTC, 1000317000) \
     _(XR_OBJECT_TYPE_PLANE_DETECTOR_EXT, 1000429000) \
     _(XR_OBJECT_TYPE_MAX_ENUM, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrLoaderInterfaceStructs(_) \
+    _(XR_LOADER_INTERFACE_STRUCT_UNINTIALIZED, 0) \
+    _(XR_LOADER_INTERFACE_STRUCT_LOADER_INFO, 1) \
+    _(XR_LOADER_INTERFACE_STRUCT_API_LAYER_REQUEST, 2) \
+    _(XR_LOADER_INTERFACE_STRUCT_RUNTIME_REQUEST, 3) \
+    _(XR_LOADER_INTERFACE_STRUCT_API_LAYER_CREATE_INFO, 4) \
+    _(XR_LOADER_INTERFACE_STRUCT_API_LAYER_NEXT_INFO, 5) \
+    _(XR_LOADER_INTERFACE_STRUCTS_MAX_ENUM, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrAndroidThreadTypeKHR(_) \
     _(XR_ANDROID_THREAD_TYPE_APPLICATION_MAIN_KHR, 1) \
@@ -1991,6 +2000,54 @@ XR_ENUM_STR(XrResult);
     _(g) \
     _(b) \
     _(a) \
+
+/// Calls your macro with the name of each member of XrApiLayerNextInfo, in order.
+#define XR_LIST_STRUCT_XrApiLayerNextInfo(_) \
+    _(structType) \
+    _(structVersion) \
+    _(structSize) \
+    _(layerName) \
+    _(nextGetInstanceProcAddr) \
+    _(nextCreateApiLayerInstance) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrApiLayerCreateInfo, in order.
+#define XR_LIST_STRUCT_XrApiLayerCreateInfo(_) \
+    _(structType) \
+    _(structVersion) \
+    _(structSize) \
+    _(loaderInstance) \
+    _(settings_file_location) \
+    _(nextInfo) \
+
+/// Calls your macro with the name of each member of XrNegotiateLoaderInfo, in order.
+#define XR_LIST_STRUCT_XrNegotiateLoaderInfo(_) \
+    _(structType) \
+    _(structVersion) \
+    _(structSize) \
+    _(minInterfaceVersion) \
+    _(maxInterfaceVersion) \
+    _(minApiVersion) \
+    _(maxApiVersion) \
+
+/// Calls your macro with the name of each member of XrNegotiateRuntimeRequest, in order.
+#define XR_LIST_STRUCT_XrNegotiateRuntimeRequest(_) \
+    _(structType) \
+    _(structVersion) \
+    _(structSize) \
+    _(runtimeInterfaceVersion) \
+    _(runtimeApiVersion) \
+    _(getInstanceProcAddr) \
+
+/// Calls your macro with the name of each member of XrNegotiateApiLayerRequest, in order.
+#define XR_LIST_STRUCT_XrNegotiateApiLayerRequest(_) \
+    _(structType) \
+    _(structVersion) \
+    _(structSize) \
+    _(layerInterfaceVersion) \
+    _(layerApiVersion) \
+    _(getInstanceProcAddr) \
+    _(createApiLayerInstance) \
 
 /// Calls your macro with the name of each member of XrCompositionLayerCubeKHR, in order.
 #define XR_LIST_STRUCT_XrCompositionLayerCubeKHR(_) \

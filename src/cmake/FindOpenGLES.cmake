@@ -5,7 +5,7 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 # Original Author:
-# 2020-2021, Ryan Pavlik <ryan.pavlik@collabora.com> <abiryan@ryand.net>
+# 2020-2021, Rylie Pavlik <rylie.pavlik@collabora.com> <rylie@ryliepavlik.com>
 
 #[[.rst:
 FindOpenGLES

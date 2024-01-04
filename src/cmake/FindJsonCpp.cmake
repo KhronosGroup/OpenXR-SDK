@@ -22,7 +22,7 @@
 #  JSONCPP_FOUND - True if JsonCpp was found.
 #
 # Original Author:
-# 2016 Ryan Pavlik <ryan.pavlik@gmail.com>
+# 2016 Rylie Pavlik <rylie@ryliepavlik.com>
 # Incorporates work from the module contributed to VRPN under the same license:
 # 2011 Philippe Crassous (ENSAM ParisTech / Institut Image) p.crassous _at_ free.fr
 #
