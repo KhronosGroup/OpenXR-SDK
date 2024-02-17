@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-version: 1.0.33.{build}
+version: 1.0.34.{build}
 image: Visual Studio 2017
 
 

@@ -69,7 +69,7 @@ License: MIT
 Comment: Unmodified, vendored copy of commit e6c415837c5a487809fdbb2f71f1080d454eb99a
 
 Files: external/python/jinja2/*
-  external/python/Jinja2-2.10.3.dist-info/*
+  external/python/Jinja2-2.11.3.dist-info/*
 Copyright: 2013-2019 by the Jinja team
   2007 Pallets
 License: BSD-3-Clause

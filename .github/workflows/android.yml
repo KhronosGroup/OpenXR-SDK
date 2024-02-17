@@ -25,60 +25,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.27.7
-
-      - name: set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: "11"
-          distribution: "temurin"
-          cache: gradle
+        uses: "lukka/get-cmake@v3.28.3"
 
       # Do this before building aar since it affects the version
       - name: Touch SNAPSHOT marker file
-        if: ${{ !inputs.release }}
-        run: touch SNAPSHOT
+        if: "!inputs.release"
+        run: "touch SNAPSHOT"
 
-      - name: Build AAR
-        run: ./maintainer-scripts/build-aar.sh
+      - name: "Build AAR"
+        run: "./maintainer-scripts/build-aar.sh"
 
       - name: Upload bare AAR
-        uses: actions/upload-artifact@v3
+        uses: "actions/upload-artifact@v3"
         with:
           name: AAR and POM
           path: openxr_loader_for_android*
-
-      - name: Upload Maven repo
-        if: inputs.release || inputs.snapshot
-        uses: actions/upload-artifact@v3
-        with:
-          name: repo
-          path: maintainer-scripts/publish-aar/build/repo/
 
   # Hello XR
   build-helloxr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.27.7
-      - name: set up JDK 11
-        uses: actions/setup-java@v3
+      - uses: "actions/checkout@v4"
+      - name: "Get modern CMake and Ninja"
+        uses: "lukka/get-cmake@v3.28.3"
+      - name: "set up JDK 11"
+        uses: "actions/setup-java@v4"
         with:
           java-version: "11"
           distribution: "temurin"
-          cache: gradle
+      - uses: "gradle/actions/setup-gradle@v3"
 
       # HelloXR OpenGLES version
       - name: Build HelloXR OpenGLES for Android
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assembleOpenGLES${{ inputs.release && 'Release' || 'Debug' }}
-          build-root-directory: src/tests/hello_xr
+        run: "cd src/tests/hello_xr && ./gradlew assembleOpenGLES${{ inputs.release && 'Release' || 'Debug' }}"
 
       - name: Upload HelloXR OpenGLES (debug) for Android
-        if: ${{ !inputs.release }}
-        uses: actions/upload-artifact@v3
+        if: "!inputs.release"
+        uses: "actions/upload-artifact@v3"
         with:
           name: HelloXR OpenGLES Android
-          path: src/tests/hello_xr/build/outputs/apk/OpenGLES/debug/*.apk
+          path: "src/tests/hello_xr/build/outputs/apk/OpenGLES/debug/*.apk"

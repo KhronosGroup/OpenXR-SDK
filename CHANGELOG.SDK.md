@@ -21,6 +21,62 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.0.34 (2024-02-16)
+
+This release features a number of new multi-vendor and vendor extensions,
+additional functionality in the reflection header, as well as compatibility
+improvements for the loader on Android.
+
+- Registry
+  - Extension reservation: Register author ID and reserve extensions for Leia.
+    ([internal MR 3203](https://gitlab.khronos.org/openxr/openxr/merge_requests/3203))
+  - Fix: Remove erroneous interaction profile component additions from extensions.
+    ([internal MR 3223](https://gitlab.khronos.org/openxr/openxr/merge_requests/3223))
+  - New multi-vendor extension: `XR_EXT_user_presence`
+    ([internal MR 2706](https://gitlab.khronos.org/openxr/openxr/merge_requests/2706),
+    [internal issue 1585](https://gitlab.khronos.org/openxr/openxr/issues/1585))
+  - New vendor extension: `XR_META_recommended_layer_resolution`
+    ([internal MR 2570](https://gitlab.khronos.org/openxr/openxr/merge_requests/2570))
+  - New vendor extension: `XR_META_automatic_layer_filter`
+    ([internal MR 2696](https://gitlab.khronos.org/openxr/openxr/merge_requests/2696))
+  - New vendor extension: `XR_META_spatial_entity_mesh`
+    ([internal MR 2773](https://gitlab.khronos.org/openxr/openxr/merge_requests/2773))
+  - New vendor extension: `XR_FB_face_tracking2`
+    ([internal MR 2811](https://gitlab.khronos.org/openxr/openxr/merge_requests/2811))
+  - New vendor extension: `XR_VARJO_xr4_controller_interaction`
+    ([internal MR 3078](https://gitlab.khronos.org/openxr/openxr/merge_requests/3078))
+  - `XR_FB_scene`: Update to spec version 4.
+    ([internal MR 2774](https://gitlab.khronos.org/openxr/openxr/merge_requests/2774))
+  - `XR_META_headset_id` and `XR_FB_spatial_entity`: Drop `XR_EXT_uuid` dependency,
+    they use the data structure but do not require any runtime support specific to
+    `XR_EXT_uuid`
+    ([internal MR 2577](https://gitlab.khronos.org/openxr/openxr/merge_requests/2577))
+- SDK
+  - API Layers: Add version-script for linking API Layers on Linux and Android.
+    ([internal MR 3112](https://gitlab.khronos.org/openxr/openxr/merge_requests/3112))
+  - Fix typo in `gfxwrapper_opengl` that did not affect the use in this repository
+    directly, but may affect downstream users of this code.
+    ([internal MR 3215](https://gitlab.khronos.org/openxr/openxr/merge_requests/3215))
+  - Loader: fix to Android Loader so that the
+    `/<path_to_apk>/my_apk_file.apk!/libs/libstuff.so` will not get blocked
+    ([internal MR 3054](https://gitlab.khronos.org/openxr/openxr/merge_requests/3054))
+  - Loader: Add missing ifdef guards for `XR_KHR_LOADER_INIT_SUPPORT`.
+    ([internal MR 3152](https://gitlab.khronos.org/openxr/openxr/merge_requests/3152),
+    [internal MR 3159](https://gitlab.khronos.org/openxr/openxr/merge_requests/3159))
+  - Loader: Fix crash in case of calling `xrEnumerateInstanceExtensionProperties`
+    before calling `xrInitializeLoaderKHR` on Android.
+    ([internal MR 3159](https://gitlab.khronos.org/openxr/openxr/merge_requests/3159))
+  - Loader design: Add a note about environment variables being ignored when run on
+    Windows as admin.
+    ([internal MR 3214](https://gitlab.khronos.org/openxr/openxr/merge_requests/3214))
+  - `openxr_reflection.h`: Add macros to list functions provided by each feature /
+    extension.
+    ([internal MR 3129](https://gitlab.khronos.org/openxr/openxr/merge_requests/3129))
+  - external: Update Jinja2 Python module shipped with repository (for source code
+    generation) to 2.11.3.
+    ([internal MR 3221](https://gitlab.khronos.org/openxr/openxr/merge_requests/3221),
+    [internal MR 3237](https://gitlab.khronos.org/openxr/openxr/merge_requests/3237))
+
 ## OpenXR SDK 1.0.33 (2024-01-03)
 
 This release primarily adds new ratified functionality describing the loader
