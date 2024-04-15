@@ -99,6 +99,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrApplyHapticFeedback ApplyHapticFeedback;
     PFN_xrStopHapticFeedback StopHapticFeedback;
 
+    // ---- Core 1.1 commands
+    PFN_xrLocateSpaces LocateSpaces;
+
     // ---- XR_KHR_android_thread_settings extension commands
 #if defined(XR_USE_PLATFORM_ANDROID)
     PFN_xrSetAndroidApplicationThreadKHR SetAndroidApplicationThreadKHR;
@@ -178,6 +181,9 @@ struct XrGeneratedDispatchTable {
 #if defined(XR_USE_GRAPHICS_API_VULKAN)
     PFN_xrGetVulkanGraphicsRequirements2KHR GetVulkanGraphicsRequirements2KHR;
 #endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+
+    // ---- XR_KHR_locate_spaces extension commands
+    PFN_xrLocateSpacesKHR LocateSpacesKHR;
 
     // ---- XR_EXT_performance_settings extension commands
     PFN_xrPerfSettingsSetPerformanceLevelEXT PerfSettingsSetPerformanceLevelEXT;
@@ -483,6 +489,18 @@ struct XrGeneratedDispatchTable {
     PFN_xrDestroyFaceTracker2FB DestroyFaceTracker2FB;
     PFN_xrGetFaceExpressionWeights2FB GetFaceExpressionWeights2FB;
 
+    // ---- XR_META_environment_depth extension commands
+    PFN_xrCreateEnvironmentDepthProviderMETA CreateEnvironmentDepthProviderMETA;
+    PFN_xrDestroyEnvironmentDepthProviderMETA DestroyEnvironmentDepthProviderMETA;
+    PFN_xrStartEnvironmentDepthProviderMETA StartEnvironmentDepthProviderMETA;
+    PFN_xrStopEnvironmentDepthProviderMETA StopEnvironmentDepthProviderMETA;
+    PFN_xrCreateEnvironmentDepthSwapchainMETA CreateEnvironmentDepthSwapchainMETA;
+    PFN_xrDestroyEnvironmentDepthSwapchainMETA DestroyEnvironmentDepthSwapchainMETA;
+    PFN_xrEnumerateEnvironmentDepthSwapchainImagesMETA EnumerateEnvironmentDepthSwapchainImagesMETA;
+    PFN_xrGetEnvironmentDepthSwapchainStateMETA GetEnvironmentDepthSwapchainStateMETA;
+    PFN_xrAcquireEnvironmentDepthImageMETA AcquireEnvironmentDepthImageMETA;
+    PFN_xrSetEnvironmentDepthHandRemovalMETA SetEnvironmentDepthHandRemovalMETA;
+
     // ---- XR_QCOM_tracking_optimization_settings extension commands
     PFN_xrSetTrackingOptimizationSettingsHintQCOM SetTrackingOptimizationSettingsHintQCOM;
 
@@ -507,6 +525,10 @@ struct XrGeneratedDispatchTable {
     PFN_xrGetPlaneDetectionStateEXT GetPlaneDetectionStateEXT;
     PFN_xrGetPlaneDetectionsEXT GetPlaneDetectionsEXT;
     PFN_xrGetPlanePolygonBufferEXT GetPlanePolygonBufferEXT;
+
+    // ---- XR_EXT_future extension commands
+    PFN_xrPollFutureEXT PollFutureEXT;
+    PFN_xrCancelFutureEXT CancelFutureEXT;
 
     // ---- XR_ML_user_calibration extension commands
     PFN_xrEnableUserCalibrationEventsML EnableUserCalibrationEventsML;

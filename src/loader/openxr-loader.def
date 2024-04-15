@@ -59,3 +59,5 @@ EXPORTS
     xrGetInputSourceLocalizedName
     xrApplyHapticFeedback
     xrStopHapticFeedback
+    ; entry points added in 1.1
+    xrLocateSpaces

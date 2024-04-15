@@ -57,3 +57,5 @@ _xrEnumerateBoundSourcesForAction
 _xrGetInputSourceLocalizedName
 _xrApplyHapticFeedback
 _xrStopHapticFeedback
+# entry points added in 1.1
+_xrLocateSpaces

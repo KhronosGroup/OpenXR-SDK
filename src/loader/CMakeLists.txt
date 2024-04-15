@@ -306,6 +306,7 @@ if(ANDROID)
     target_include_directories(
         openxr_loader PRIVATE ${JNIPP_ROOT} ${JNIWRAPPER_ROOT}
     )
+
     target_compile_definitions(
         openxr_loader PRIVATE XR_KHR_LOADER_INIT_SUPPORT=1
     )

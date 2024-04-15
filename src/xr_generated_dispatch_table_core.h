@@ -97,6 +97,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrApplyHapticFeedback ApplyHapticFeedback;
     PFN_xrStopHapticFeedback StopHapticFeedback;
 
+    // ---- Core 1.1 commands
+    PFN_xrLocateSpaces LocateSpaces;
+
     // ---- XR_EXT_debug_utils extension commands
     PFN_xrSetDebugUtilsObjectNameEXT SetDebugUtilsObjectNameEXT;
     PFN_xrCreateDebugUtilsMessengerEXT CreateDebugUtilsMessengerEXT;

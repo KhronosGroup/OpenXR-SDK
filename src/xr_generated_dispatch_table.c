@@ -96,6 +96,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrApplyHapticFeedback", (PFN_xrVoidFunction*)&table->ApplyHapticFeedback));
     (get_inst_proc_addr(instance, "xrStopHapticFeedback", (PFN_xrVoidFunction*)&table->StopHapticFeedback));
 
+    // ---- Core 1.1 commands
+    (get_inst_proc_addr(instance, "xrLocateSpaces", (PFN_xrVoidFunction*)&table->LocateSpaces));
+
     // ---- XR_KHR_android_thread_settings extension commands
 #if defined(XR_USE_PLATFORM_ANDROID)
     (get_inst_proc_addr(instance, "xrSetAndroidApplicationThreadKHR", (PFN_xrVoidFunction*)&table->SetAndroidApplicationThreadKHR));
@@ -172,6 +175,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
 #if defined(XR_USE_GRAPHICS_API_VULKAN)
     (get_inst_proc_addr(instance, "xrGetVulkanGraphicsRequirements2KHR", (PFN_xrVoidFunction*)&table->GetVulkanGraphicsRequirements2KHR));
 #endif // defined(XR_USE_GRAPHICS_API_VULKAN)
+
+    // ---- XR_KHR_locate_spaces extension commands
+    (get_inst_proc_addr(instance, "xrLocateSpacesKHR", (PFN_xrVoidFunction*)&table->LocateSpacesKHR));
 
     // ---- XR_EXT_performance_settings extension commands
     (get_inst_proc_addr(instance, "xrPerfSettingsSetPerformanceLevelEXT", (PFN_xrVoidFunction*)&table->PerfSettingsSetPerformanceLevelEXT));
@@ -477,6 +483,18 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrDestroyFaceTracker2FB", (PFN_xrVoidFunction*)&table->DestroyFaceTracker2FB));
     (get_inst_proc_addr(instance, "xrGetFaceExpressionWeights2FB", (PFN_xrVoidFunction*)&table->GetFaceExpressionWeights2FB));
 
+    // ---- XR_META_environment_depth extension commands
+    (get_inst_proc_addr(instance, "xrCreateEnvironmentDepthProviderMETA", (PFN_xrVoidFunction*)&table->CreateEnvironmentDepthProviderMETA));
+    (get_inst_proc_addr(instance, "xrDestroyEnvironmentDepthProviderMETA", (PFN_xrVoidFunction*)&table->DestroyEnvironmentDepthProviderMETA));
+    (get_inst_proc_addr(instance, "xrStartEnvironmentDepthProviderMETA", (PFN_xrVoidFunction*)&table->StartEnvironmentDepthProviderMETA));
+    (get_inst_proc_addr(instance, "xrStopEnvironmentDepthProviderMETA", (PFN_xrVoidFunction*)&table->StopEnvironmentDepthProviderMETA));
+    (get_inst_proc_addr(instance, "xrCreateEnvironmentDepthSwapchainMETA", (PFN_xrVoidFunction*)&table->CreateEnvironmentDepthSwapchainMETA));
+    (get_inst_proc_addr(instance, "xrDestroyEnvironmentDepthSwapchainMETA", (PFN_xrVoidFunction*)&table->DestroyEnvironmentDepthSwapchainMETA));
+    (get_inst_proc_addr(instance, "xrEnumerateEnvironmentDepthSwapchainImagesMETA", (PFN_xrVoidFunction*)&table->EnumerateEnvironmentDepthSwapchainImagesMETA));
+    (get_inst_proc_addr(instance, "xrGetEnvironmentDepthSwapchainStateMETA", (PFN_xrVoidFunction*)&table->GetEnvironmentDepthSwapchainStateMETA));
+    (get_inst_proc_addr(instance, "xrAcquireEnvironmentDepthImageMETA", (PFN_xrVoidFunction*)&table->AcquireEnvironmentDepthImageMETA));
+    (get_inst_proc_addr(instance, "xrSetEnvironmentDepthHandRemovalMETA", (PFN_xrVoidFunction*)&table->SetEnvironmentDepthHandRemovalMETA));
+
     // ---- XR_QCOM_tracking_optimization_settings extension commands
     (get_inst_proc_addr(instance, "xrSetTrackingOptimizationSettingsHintQCOM", (PFN_xrVoidFunction*)&table->SetTrackingOptimizationSettingsHintQCOM));
 
@@ -501,6 +519,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrGetPlaneDetectionStateEXT", (PFN_xrVoidFunction*)&table->GetPlaneDetectionStateEXT));
     (get_inst_proc_addr(instance, "xrGetPlaneDetectionsEXT", (PFN_xrVoidFunction*)&table->GetPlaneDetectionsEXT));
     (get_inst_proc_addr(instance, "xrGetPlanePolygonBufferEXT", (PFN_xrVoidFunction*)&table->GetPlanePolygonBufferEXT));
+
+    // ---- XR_EXT_future extension commands
+    (get_inst_proc_addr(instance, "xrPollFutureEXT", (PFN_xrVoidFunction*)&table->PollFutureEXT));
+    (get_inst_proc_addr(instance, "xrCancelFutureEXT", (PFN_xrVoidFunction*)&table->CancelFutureEXT));
 
     // ---- XR_ML_user_calibration extension commands
     (get_inst_proc_addr(instance, "xrEnableUserCalibrationEventsML", (PFN_xrVoidFunction*)&table->EnableUserCalibrationEventsML));

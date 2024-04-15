@@ -4,6 +4,7 @@ Upstream-Contact: Rylie Pavlik <openxr-speceditor AT khronos DOT org>
 Source: https://registry.khronos.org/OpenXR/
 
 Files: changes/conformance/*
+       changes/major/*
        changes/registry/*
        changes/sdk/*
        changes/specification/*
@@ -77,6 +78,11 @@ License: BSD-3-Clause
 Files: external/python/markupsafe/*
   external/python/MarkupSafe-1.1.1.dist-info/*
 Copyright: 2010 Pallets
+License: BSD-3-Clause
+
+Files: external/python/pyparsing/*
+  external/python/pyparsing-3.1.2.dist-info/*
+Copyright: 2003-2022, Paul T. McGuire <ptmcg.gm+pyparsing@gmail.com>
 License: BSD-3-Clause
 
 Files: specification/sources/chapters/extensions/epic/epic_view_configuration_fov.adoc

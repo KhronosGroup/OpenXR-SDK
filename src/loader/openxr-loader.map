@@ -61,6 +61,8 @@ SPDX-License-Identifier: Apache-2.0 OR MIT
         xrGetInputSourceLocalizedName;
         xrApplyHapticFeedback;
         xrStopHapticFeedback;
+        /* entry points added in 1.1 */
+        xrLocateSpaces;
     local:
         *;
 };

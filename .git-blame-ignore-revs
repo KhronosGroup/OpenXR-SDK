@@ -13,6 +13,7 @@
 # git config blame.ignoreRevsFile .git-blame-ignore-revs
 
 ## Old changes
+0c93c42891ad6b95aee81709398ded7416c9f397
 767537d9523253de1615b01450a8b22c8e2cc6a2
 
 ## 1.0.17 - Fix XML indentation

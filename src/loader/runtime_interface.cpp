@@ -126,6 +126,10 @@ XrResult RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_com
     XrResult res = XR_ERROR_RUNTIME_FAILURE;
     if (nullptr != negotiate) {
         res = negotiate(&loader_info, &runtime_info);
+    } else {
+        std::string error_message = "RuntimeInterface::LoadRuntime failed to find negotiate function ";
+        error_message += function_name;
+        LoaderLogger::LogErrorMessage(openxr_command, error_message);
     }
     // If we supposedly succeeded, but got a nullptr for GetInstanceProcAddr
     // then something still went wrong, so return with an error.
