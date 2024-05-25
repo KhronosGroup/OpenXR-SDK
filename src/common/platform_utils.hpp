@@ -325,6 +325,8 @@ static inline std::string PlatformUtilsGetSecureEnv(const char* name) {
 
 #elif defined(XR_OS_ANDROID)
 
+#include <sys/system_properties.h>
+
 static inline bool PlatformUtilsGetEnvSet(const char* /* name */) {
     // Stub func
     return false;
@@ -355,6 +357,37 @@ static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std:
 
     return false;
 }
+
+// Android system properties are sufficiently different from environment variables that we are not re-using
+// PlatformUtilsGetEnv for this purpose
+static inline std::string PlatformUtilsGetAndroidSystemProperty(const char* name) {
+    std::string result;
+    const prop_info* pi = __system_property_find(name);
+    if (pi == nullptr) {
+        return {};
+    }
+
+#if __ANDROID_API__ >= 26
+    // use callback to retrieve > 92 character sys prop values, if available
+    __system_property_read_callback(
+        pi,
+        [](void* cookie, const char*, const char* value, uint32_t) {
+            auto property_value = reinterpret_cast<std::string*>(cookie);
+            *property_value = value;
+        },
+        reinterpret_cast<void*>(&result));
+#endif  // __ANDROID_API__ >= 26
+    // fallback to __system_property_get if no value retrieved via callback
+    if (result.empty()) {
+        char value[PROP_VALUE_MAX] = {};
+        if (__system_property_get(name, value) != 0) {
+            result = value;
+        }
+    }
+
+    return result;
+}
+
 #else  // Not Linux, Apple, nor Windows
 
 static inline bool PlatformUtilsGetEnvSet(const char* /* name */) {

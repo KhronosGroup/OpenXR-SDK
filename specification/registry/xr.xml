@@ -58,6 +58,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="OPPO"       author="OPPO"                  contact="Buyi Xu @fantastxu, Haomiao Jiang @hjiang36"/>
         <tag name="PLUTO"      author="Pluto VR"              contact="Jared Cheshier @Jared, Sophia Baldonado @sophia"/>
         <tag name="QCOM"       author="Qualcomm Technologies" contact="Armelle @alaine_qcom, Martin Renschler @martinr"/>
+        <tag name="RZR"        author="Razer"                 contact="Alexandre Hulsken @ahulsken, Eric Vezzoli @EricVezzoli"/>
         <tag name="STARBREEZE" author="Starbreeze"            contact="David Srour @dsrour"/>
         <tag name="TOBII"      author="Tobii"                 contact="Denny Rönngren @denron"/>
         <tag name="ULTRALEAP"  author="Ultraleap"             contact="Robert Blenkinsopp @rblenkinsopp"/>
@@ -133,7 +134,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 36)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 37)</type>
+
+        <!--
+        Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
+        -->
+        <type category="define">// OpenXR 1.0 version number
+#define <name>XR_API_VERSION_1_0</name> <type>XR_MAKE_VERSION</type>(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))</type>
+
+        <type category="define">// OpenXR 1.1 version number
+#define <name>XR_API_VERSION_1_1</name> <type>XR_MAKE_VERSION</type>(1, 1, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))</type>
 
         <!--
         NOTE: For avoidance of ambiguity, there should only be 1 <name> tag immediately in
@@ -7658,6 +7668,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require comment="API version">
             <type name="XR_CURRENT_API_VERSION"/>
+            <type name="XR_API_VERSION_1_0"/>
             <type name="XR_VERSION_MAJOR"/>
             <type name="XR_VERSION_MINOR"/>
             <type name="XR_VERSION_PATCH"/>
@@ -7844,6 +7855,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
 
     <feature api="openxr" name="XR_VERSION_1_1" number="1.1">
+        <require comment="API version">
+            <type name="XR_API_VERSION_1_1"/>
+        </require>
+
         <require comment="Promoted from XR_KHR_maintenance1">
 
             <!-- new structs -->
@@ -8627,7 +8642,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_FB_composition_layer_alpha_blend" number="42" type="instance" supported="openxr">
         <require>
-            <enum value="2"                                               name="XR_FB_composition_layer_alpha_blend_SPEC_VERSION"/>
+            <enum value="3"                                               name="XR_FB_composition_layer_alpha_blend_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_composition_layer_alpha_blend&quot;" name="XR_FB_COMPOSITION_LAYER_ALPHA_BLEND_EXTENSION_NAME"/>
             <type name="XrBlendFactorFB"/>
             <type name="XrCompositionLayerAlphaBlendFB"/>
@@ -10610,6 +10625,12 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
                 <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/oculus/touch_controller">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+            <extend interaction_profile_path="/interaction_profiles/facebook/touch_controller_pro">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+            <extend interaction_profile_path="/interaction_profiles/meta/touch_controller_plus">
                 <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/valve/index_controller">
@@ -15211,6 +15232,55 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="1"                                 name="XR_LEIA_extension_738_SPEC_VERSION"/>
             <enum value="&quot;XR_LEIA_extension_738&quot;" name="XR_LEIA_EXTENSION_738_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_anchor" number="739" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EXT_spatial_anchor_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_anchor&quot;" name="XR_EXT_SPATIAL_ANCHOR_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_anchor_persistence" number="740" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                             name="XR_EXT_spatial_anchor_persistence_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_anchor_persistence&quot;" name="XR_EXT_SPATIAL_ANCHOR_PERSISTENCE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_entity" number="741" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EXT_spatial_entity_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_entity&quot;" name="XR_EXT_SPATIAL_ENTITY_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_entity_discovery" number="742" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                           name="XR_EXT_spatial_entity_discovery_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_entity_discovery&quot;" name="XR_EXT_SPATIAL_ENTITY_DISCOVERY_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_743" number="743" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_743_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_743&quot;" name="XR_EXT_EXTENSION_743_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_744" number="744" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_744_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_744&quot;" name="XR_EXT_EXTENSION_744_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_745" number="745" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_745_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_745&quot;" name="XR_EXT_EXTENSION_745_EXTENSION_NAME"/>
         </require>
     </extension>
 

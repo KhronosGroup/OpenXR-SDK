@@ -21,6 +21,7 @@ generated-includes
 cmake_install.cmake
 cmake_uninstall.cmake
 cmake-build-*
+specification/vendor/bundle/
 
 # Marker file for a snapshot build
 SNAPSHOT

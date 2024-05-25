@@ -773,8 +773,7 @@ void ApiLayerManifestFile::AddManifestFilesAndroid(const std::string &openxr_com
         }
         std::istringstream json_stream(std::string{buf, length});
 
-        CreateIfValid(ManifestFileType::MANIFEST_TYPE_EXPLICIT_API_LAYER, filename, json_stream,
-                      &ApiLayerManifestFile::LocateLibraryInAssets, manifest_files);
+        CreateIfValid(type, filename, json_stream, &ApiLayerManifestFile::LocateLibraryInAssets, manifest_files);
     }
 }
 #endif  // defined(XR_USE_PLATFORM_ANDROID) && defined(XR_KHR_LOADER_INIT_SUPPORT)

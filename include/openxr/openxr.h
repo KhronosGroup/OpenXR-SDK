@@ -26,7 +26,10 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 36)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 37)
+
+// OpenXR 1.0 version number
+#define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
 
 #define XR_VERSION_MAJOR(version) (uint16_t)(((uint64_t)(version) >> 48)& 0xffffULL)
 #define XR_VERSION_MINOR(version) (uint16_t)(((uint64_t)(version) >> 32) & 0xffffULL)
@@ -1633,6 +1636,9 @@ XRAPI_ATTR XrResult XRAPI_CALL xrStopHapticFeedback(
 
 // XR_VERSION_1_1 is a preprocessor guard. Do not pass it to API calls.
 #define XR_VERSION_1_1 1
+// OpenXR 1.1 version number
+#define XR_API_VERSION_1_1 XR_MAKE_VERSION(1, 1, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
+
 #define XR_UUID_SIZE                      16
 typedef struct XrColor3f {
     float    r;
@@ -2249,7 +2255,7 @@ typedef struct XrCompositionLayerImageLayoutFB {
 
 // XR_FB_composition_layer_alpha_blend is a preprocessor guard. Do not pass it to API calls.
 #define XR_FB_composition_layer_alpha_blend 1
-#define XR_FB_composition_layer_alpha_blend_SPEC_VERSION 2
+#define XR_FB_composition_layer_alpha_blend_SPEC_VERSION 3
 #define XR_FB_COMPOSITION_LAYER_ALPHA_BLEND_EXTENSION_NAME "XR_FB_composition_layer_alpha_blend"
 
 typedef enum XrBlendFactorFB {

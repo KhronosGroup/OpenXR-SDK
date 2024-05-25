@@ -21,6 +21,56 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.37 (2024-05-23)
+
+This release primarily adds new defines for easier use of both OpenXR 1.0 and
+1.1 with up-to-date headers, some documentation improvements, and improvements
+for Android, including support for using the "API Dump" and "Validation" API
+layers in your own APK during the development process.
+
+- Registry
+  - Addition: New `XR_API_VERSION_1_0` and `XR_API_VERSION_1_1` defines to allow
+    applications to easily specify OpenXR "major" and "minor" version while passing
+    through the "patch" version.
+    ([internal MR 3329](https://gitlab.khronos.org/openxr/openxr/merge_requests/3329),
+    [internal MR 3354](https://gitlab.khronos.org/openxr/openxr/merge_requests/3354),
+    [internal issue 2254](https://gitlab.khronos.org/openxr/openxr/issues/2254))
+  - Addition: Register Razer vendor ID.
+    ([internal MR 3340](https://gitlab.khronos.org/openxr/openxr/merge_requests/3340))
+  - Fix: Add "palm_pose" to "touch_controller_pro" and "touch_controller_plus" in
+    XML.
+    ([internal MR 3363](https://gitlab.khronos.org/openxr/openxr/merge_requests/3363))
+  - Improvement: Add Schematron rule to avoid triggering edge cases of vendor tags
+    ending with X.
+    ([internal MR 3341](https://gitlab.khronos.org/openxr/openxr/merge_requests/3341))
+  - Reservation: Reserve extension numbers for a few new EXT extensions.
+    ([internal MR 3285](https://gitlab.khronos.org/openxr/openxr/merge_requests/3285),
+    [internal MR 3292](https://gitlab.khronos.org/openxr/openxr/merge_requests/3292))
+  - Update: Bump version of `XR_FB_composition_layer_alpha_blend` due to spec text
+    clarification.
+    ([internal MR 3317](https://gitlab.khronos.org/openxr/openxr/merge_requests/3317))
+- SDK
+  - Addition: Ship `open-in-docker.sh` script for use building the loader design
+    doc.
+    ([internal MR 3352](https://gitlab.khronos.org/openxr/openxr/merge_requests/3352),
+    [internal issue 2283](https://gitlab.khronos.org/openxr/openxr/issues/2283),
+    [OpenXR-SDK-Source issue 476](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/476))
+  - Fix: Fix references to Docker container in spec build instructions and clarify
+    that most parts do not apply to the SDK-Source repo.
+    ([internal MR 3352](https://gitlab.khronos.org/openxr/openxr/merge_requests/3352),
+    [internal issue 2283](https://gitlab.khronos.org/openxr/openxr/issues/2283),
+    [OpenXR-SDK-Source issue 476](https://github.com/KhronosGroup/OpenXR-SDK-Source/issues/476))
+  - Fix: Do not load all Android app-supplied layers as explicit, but rather as
+    their actual type.
+    ([OpenXR-SDK-Source PR 475](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/475),
+    [internal issue 2284](https://gitlab.khronos.org/openxr/openxr/issues/2284))
+  - Improvement: Use new `XR_API_VERSION_1_0` and `XR_API_VERSION_1_1` defines.
+    ([internal MR 3329](https://gitlab.khronos.org/openxr/openxr/merge_requests/3329),
+    [internal issue 2254](https://gitlab.khronos.org/openxr/openxr/issues/2254))
+  - Improvement: Add Android support to "api_dump" and "core_validation" API
+    layers.
+    ([internal MR 3330](https://gitlab.khronos.org/openxr/openxr/merge_requests/3330))
+
 ## OpenXR SDK 1.1.36 (2024-04-15)
 
 This is a substantial update to the OpenXR specification. The OpenXR loader in
