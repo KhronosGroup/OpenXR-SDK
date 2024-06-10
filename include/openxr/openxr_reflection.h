@@ -1451,6 +1451,7 @@ XR_ENUM_STR(XrResult);
     _(XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT, 0x00000001) \
     _(XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT, 0x00000002) \
     _(XR_COMPOSITION_LAYER_UNPREMULTIPLIED_ALPHA_BIT, 0x00000004) \
+    _(XR_COMPOSITION_LAYER_INVERTED_ALPHA_BIT_EXT, 0x00000008) \
 
 #define XR_LIST_BITS_XrViewStateFlags(_) \
     _(XR_VIEW_STATE_ORIENTATION_VALID_BIT, 0x00000001) \
@@ -5401,6 +5402,7 @@ XR_ENUM_STR(XrResult);
     _(XR_KHR_locate_spaces, 472) \
     _(XR_ML_user_calibration, 473) \
     _(XR_YVR_controller_interaction, 498) \
+    _(XR_EXT_composition_layer_inverted_alpha, 555) \
     _(XR_KHR_maintenance1, 711) \
 
 

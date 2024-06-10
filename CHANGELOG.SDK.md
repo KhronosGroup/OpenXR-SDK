@@ -21,6 +21,31 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.38 (2024-06-09)
+
+This is a fairly small release, with one new extension and a handful of fixes.
+
+- Registry
+  - Addition: New multi-vendor extension: `XR_EXT_composition_layer_inverted_alpha`
+    ([internal MR 3085](https://gitlab.khronos.org/openxr/openxr/merge_requests/3085),
+    [internal MR 3385](https://gitlab.khronos.org/openxr/openxr/merge_requests/3385))
+  - Chore: Reserve an extension for Logitech.
+    ([internal MR 3384](https://gitlab.khronos.org/openxr/openxr/merge_requests/3384))
+  - Chore: Register author tag for Deep Mirror.
+    ([OpenXR-Docs PR 171](https://github.com/KhronosGroup/OpenXR-Docs/pull/171))
+  - Fix: `XrCompositionLayerPassthroughFB` has a "parentstruct" of
+    `XrCompositionLayerBaseHeader` (it is based on this type), rather than
+    "structextends" (in the next chain). Bump extension revision.
+    ([internal MR 3305](https://gitlab.khronos.org/openxr/openxr/merge_requests/3305))
+  - Fix: `XR_EXT_plane_detection`: Fix extents description and plane axis to match
+    CTS and implementations.
+    ([internal MR 3374](https://gitlab.khronos.org/openxr/openxr/merge_requests/3374),
+    [internal issue 2281](https://gitlab.khronos.org/openxr/openxr/issues/2281))
+  - Fix: Correct typo in `XR_FB_keyboard_tracking` flag description.
+    ([internal MR 3393](https://gitlab.khronos.org/openxr/openxr/merge_requests/3393))
+- SDK
+  - No significant changes
+
 ## OpenXR SDK 1.1.37 (2024-05-23)
 
 This release primarily adds new defines for easier use of both OpenXR 1.0 and

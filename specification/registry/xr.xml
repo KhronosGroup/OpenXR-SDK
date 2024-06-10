@@ -36,6 +36,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="BD"         author="Bytedance"             contact="Will Fu @willfu, Bangsen Han @Hansenn"/>
         <tag name="COLLABORA"  author="Collabora"             contact="Rylie Pavlik @rpavlik"/>
         <tag name="DANWILLM"   author="Daniel Willmott"       contact="Daniel Willmott @danwillm"/>
+        <tag name="DEEPMIRROR" author="Deep Mirror"           contact="Yuhui Lun @lyh-dm"/>
         <tag name="EPIC"       author="Epic"                  contact="Nick Whiting @whitingn"/>
         <tag name="EXT"        author="Multivendor"           contact="Rylie Pavlik @rpavlik"/>
         <tag name="FB"         author="Facebook"              contact="Cass Everitt @casseveritt, Jonathan Wright @Nelno"/>
@@ -134,7 +135,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 37)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 38)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -2839,7 +2840,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrPassthroughFlagsFB</type>        <name>flags</name></member>
             <member><type>XrPassthroughLayerPurposeFB</type> <name>purpose</name></member>
         </type>
-        <type category="struct" name="XrCompositionLayerPassthroughFB" structextends="XrCompositionLayerBaseHeader">
+        <type category="struct" name="XrCompositionLayerPassthroughFB" parentstruct="XrCompositionLayerBaseHeader">
             <member values="XR_TYPE_COMPOSITION_LAYER_PASSTHROUGH_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*             <name>next</name></member>
             <member><type>XrCompositionLayerFlags</type> <name>flags</name></member>
@@ -4742,15 +4743,15 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- flags for XR_FB_keyboard_tracking query state -->
     <enums name="XrKeyboardTrackingFlagBitsFB" type="bitmask">
         <enum bitpos="0" name="XR_KEYBOARD_TRACKING_EXISTS_BIT_FB"    comment="indicates that the system has a physically tracked keyboard to report.  If not set then no other bits should be considered to be valid or meaningful.  If set either XR_KEYBOARD_TRACKING_LOCAL_BIT_FB or XR_KEYBOARD_TRACKING_REMOTE_BIT_FB must also be set."/>
-        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_LOCAL_BIT_FB"     comment="indicates that the physically tracked keyboard is intended to be used in a local pairing with the system.  Mutally exclusive with XR_KEYBOARD_TRACKING_REMOTE_BIT_FB."/>
-        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_REMOTE_BIT_FB"    comment="indicates that the physically tracked keyboard is intended to be used while paired to a separate remote computing device. Mutally exclusive with XR_KEYBOARD_TRACKING_LOCAL_BIT_FB."/>
+        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_LOCAL_BIT_FB"     comment="indicates that the physically tracked keyboard is intended to be used in a local pairing with the system.  Mutually exclusive with XR_KEYBOARD_TRACKING_REMOTE_BIT_FB."/>
+        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_REMOTE_BIT_FB"    comment="indicates that the physically tracked keyboard is intended to be used while paired to a separate remote computing device. Mutually exclusive with XR_KEYBOARD_TRACKING_LOCAL_BIT_FB."/>
         <enum bitpos="3" name="XR_KEYBOARD_TRACKING_CONNECTED_BIT_FB" comment="indicates that the physically tracked keyboard is actively connected to the headset and capable of sending key data"/>
     </enums>
 
     <!-- flags for XR_FB_keyboard_tracking query -->
     <enums name="XrKeyboardTrackingQueryFlagBitsFB" type="bitmask">
-        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB"  comment="indicates the query is for the physically tracked keyboard that is intended to be used in a local pairing with the System. Mutally exclusive with XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB."/>
-        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB" comment="indicates the query is for the physically tracked keyboard that may be connected to a separate remote computing device. Mutally exclusive with XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB."/>
+        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB"  comment="indicates the query is for the physically tracked keyboard that is intended to be used in a local pairing with the System. Mutually exclusive with XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB."/>
+        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB" comment="indicates the query is for the physically tracked keyboard that may be connected to a separate remote computing device. Mutually exclusive with XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB."/>
     </enums>
 
     <!-- flags for XR_FB_space_warp -->
@@ -9800,7 +9801,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_FB_passthrough" number="119" type="instance" supported="openxr">
         <require>
-            <enum value="3"                                     name="XR_FB_passthrough_SPEC_VERSION"/>
+            <enum value="4"                                     name="XR_FB_passthrough_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_passthrough&quot;"         name="XR_FB_PASSTHROUGH_EXTENSION_NAME"/>
 
             <enum offset="0"          extends="XrStructureType" name="XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES_FB"/>
@@ -12866,7 +12867,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_EXT_plane_detection" number="430" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                  name="XR_EXT_plane_detection_SPEC_VERSION"/>
+            <enum value="2"                                  name="XR_EXT_plane_detection_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_plane_detection&quot;" name="XR_EXT_PLANE_DETECTION_EXTENSION_NAME"/>
 
             <enum offset="0" dir="-" extends="XrResult"      name="XR_ERROR_SPACE_NOT_LOCATABLE_EXT"               comment="The space passed to the function was not locatable."/>
@@ -13833,10 +13834,12 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_META_extension_555" number="555" type="instance" supported="disabled">
+    <extension name="XR_EXT_composition_layer_inverted_alpha" number="555" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                 name="XR_META_extension_555_SPEC_VERSION"/>
-            <enum value="&quot;XR_META_extension_555&quot;" name="XR_META_extension_555_EXTENSION_NAME"/>
+            <enum value="1"                                                   name="XR_EXT_composition_layer_inverted_alpha_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_composition_layer_inverted_alpha&quot;" name="XR_EXT_COMPOSITION_LAYER_INVERTED_ALPHA_EXTENSION_NAME"/>
+            <enum bitpos="3" extends="XrCompositionLayerFlagBits"             name="XR_COMPOSITION_LAYER_INVERTED_ALPHA_BIT_EXT"            comment="Indicates that the texture alpha channel stores transparency instead of opacity, and is to be inverted before layer blending."/>
+            <!-- Addition to core bitmask from EXT approved by WG 14-March-2024 -->
         </require>
     </extension>
 
@@ -15281,6 +15284,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="1"                                name="XR_EXT_extension_745_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_extension_745&quot;" name="XR_EXT_EXTENSION_745_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_LOGITECH_extension_746" number="746" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                     name="XR_LOGITECH_extension_746_SPEC_VERSION"/>
+            <enum value="&quot;XR_LOGITECH_extension_746&quot;" name="XR_LOGITECH_EXTENSION_746_EXTENSION_NAME"/>
         </require>
     </extension>
 
