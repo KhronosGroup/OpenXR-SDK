@@ -21,6 +21,52 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.40 (2024-08-22)
+
+This release features a new ratified graphics API binding extension,
+`XR_KHR_metal_enable`, including support in hello_xr. The loader test has had
+substantial improvements as well. There are also an assortment of smaller fixes
+and improvements.
+
+- Registry
+  - Add: New ratified Khronos extension: `XR_KHR_metal_enable`.
+    ([internal MR 2721](https://gitlab.khronos.org/openxr/openxr/merge_requests/2721))
+  - Chore: Reserve 15 extension id numbers for ByteDance.
+    ([internal MR 3409](https://gitlab.khronos.org/openxr/openxr/merge_requests/3409))
+  - Fix: Clarified that views in `XR_VARJO_quad_views` needs to have identical
+    poses for each eye.
+    ([internal MR 3396](https://gitlab.khronos.org/openxr/openxr/merge_requests/3396))
+  - Fix: Add missing interaction profile extensions for OpenXR 1.1 promoted Meta
+    interaction profiles.
+    ([internal MR 3398](https://gitlab.khronos.org/openxr/openxr/merge_requests/3398))
+  - Fix: Correctly mark the Magic Leap home button as a system button in the XML.
+    ([internal MR 3405](https://gitlab.khronos.org/openxr/openxr/merge_requests/3405))
+  - Fix: Add `XR_ERROR_VALIDATION_FAILURE` to all functions from
+    `XR_EXT_conformance_automation`.
+    ([internal MR 3417](https://gitlab.khronos.org/openxr/openxr/merge_requests/3417))
+- SDK
+  - API dump layer: Improvement: Move a non-generated function out of the Python-
+    generated source file.
+    ([internal MR 3336](https://gitlab.khronos.org/openxr/openxr/merge_requests/3336))
+  - API dump layer: Improvement: Clean up usage of RAII mutex lock guards.
+    ([internal MR 3336](https://gitlab.khronos.org/openxr/openxr/merge_requests/3336))
+  - Layers and loader: Improvement: Disambiguate `XrGeneratedDispatchTable` between
+    loader and API layers.
+    ([internal MR 3406](https://gitlab.khronos.org/openxr/openxr/merge_requests/3406))
+  - Loader test: Improvement: Migrate to use Catch2 (matching the CTS) instead of
+    an ad-hoc test framework.
+    ([internal MR 3337](https://gitlab.khronos.org/openxr/openxr/merge_requests/3337))
+  - hello_xr: Add: Metal graphics plugin (use `-g Metal`) for running it on macOS
+    with `XR_KHR_metal_enable` extension.
+    ([internal MR 3009](https://gitlab.khronos.org/openxr/openxr/merge_requests/3009),
+    [internal MR 3456](https://gitlab.khronos.org/openxr/openxr/merge_requests/3456))
+  - hello_xr: Improvement: Use `XrMatrix4x4f_CreateFromRigidTransform` in place of
+    `XrMatrix4x4f_CreateTranslationRotationScale` for known rigid transforms.
+    ([internal MR 3349](https://gitlab.khronos.org/openxr/openxr/merge_requests/3349))
+
+**Note**: There is no 1.1.39 release: it was skipped to keep the monthly patch
+version increment cadence given the lack of a release in July.
+
 ## OpenXR SDK 1.1.38 (2024-06-09)
 
 This is a fairly small release, with one new extension and a handful of fixes.

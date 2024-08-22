@@ -41,6 +41,7 @@ specification/scripts/.cache
 
 # VS 2019 CMake artifacts
 out/build/
+out/install/
 
 # VS misc
 *.sln

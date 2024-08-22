@@ -34,7 +34,7 @@ jobs:
           lfs: true
 
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.29.5
+        uses: lukka/get-cmake@v3.30.1
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2

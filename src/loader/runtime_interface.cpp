@@ -274,8 +274,8 @@ XrResult RuntimeInterface::GetInstanceProcAddr(XrInstance instance, const char* 
     return GetInstance()->_get_instance_proc_addr(instance, name, function);
 }
 
-const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance instance) {
-    XrGeneratedDispatchTable* table = nullptr;
+const XrGeneratedDispatchTableCore* RuntimeInterface::GetDispatchTable(XrInstance instance) {
+    XrGeneratedDispatchTableCore* table = nullptr;
     std::lock_guard<std::mutex> mlock(GetInstance()->_dispatch_table_mutex);
     auto it = GetInstance()->_dispatch_table_map.find(instance);
     if (it != GetInstance()->_dispatch_table_map.end()) {
@@ -284,7 +284,7 @@ const XrGeneratedDispatchTable* RuntimeInterface::GetDispatchTable(XrInstance in
     return table;
 }
 
-const XrGeneratedDispatchTable* RuntimeInterface::GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger) {
+const XrGeneratedDispatchTableCore* RuntimeInterface::GetDebugUtilsMessengerDispatchTable(XrDebugUtilsMessengerEXT messenger) {
     XrInstance runtime_instance = XR_NULL_HANDLE;
     {
         std::lock_guard<std::mutex> mlock(GetInstance()->_messenger_to_instance_mutex);
@@ -353,8 +353,8 @@ XrResult RuntimeInterface::CreateInstance(const XrInstanceCreateInfo* info, XrIn
     res = rt_xrCreateInstance(info, instance);
     if (XR_SUCCEEDED(res)) {
         create_succeeded = true;
-        std::unique_ptr<XrGeneratedDispatchTable> dispatch_table(new XrGeneratedDispatchTable());
-        GeneratedXrPopulateDispatchTable(dispatch_table.get(), *instance, _get_instance_proc_addr);
+        std::unique_ptr<XrGeneratedDispatchTableCore> dispatch_table(new XrGeneratedDispatchTableCore());
+        GeneratedXrPopulateDispatchTableCore(dispatch_table.get(), *instance, _get_instance_proc_addr);
         std::lock_guard<std::mutex> mlock(_dispatch_table_mutex);
         _dispatch_table_map[*instance] = std::move(dispatch_table);
     }

@@ -229,6 +229,9 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_GRAPHICS_BINDING_D3D12_KHR, 1000028000) \
     _(XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR, 1000028001) \
     _(XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR, 1000028002) \
+    _(XR_TYPE_GRAPHICS_BINDING_METAL_KHR, 1000029000) \
+    _(XR_TYPE_SWAPCHAIN_IMAGE_METAL_KHR, 1000029001) \
+    _(XR_TYPE_GRAPHICS_REQUIREMENTS_METAL_KHR, 1000029002) \
     _(XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT, 1000030000) \
     _(XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT, 1000030001) \
     _(XR_TYPE_VISIBILITY_MASK_KHR, 1000031000) \
@@ -2441,6 +2444,24 @@ XR_ENUM_STR(XrResult);
     _(next) \
     _(adapterLuid) \
     _(minFeatureLevel) \
+
+/// Calls your macro with the name of each member of XrGraphicsBindingMetalKHR, in order.
+#define XR_LIST_STRUCT_XrGraphicsBindingMetalKHR(_) \
+    _(type) \
+    _(next) \
+    _(commandQueue) \
+
+/// Calls your macro with the name of each member of XrSwapchainImageMetalKHR, in order.
+#define XR_LIST_STRUCT_XrSwapchainImageMetalKHR(_) \
+    _(type) \
+    _(next) \
+    _(texture) \
+
+/// Calls your macro with the name of each member of XrGraphicsRequirementsMetalKHR, in order.
+#define XR_LIST_STRUCT_XrGraphicsRequirementsMetalKHR(_) \
+    _(type) \
+    _(next) \
+    _(metalDevice) \
 
 /// Calls your macro with the name of each member of XrVisibilityMaskKHR, in order.
 #define XR_LIST_STRUCT_XrVisibilityMaskKHR(_) \
@@ -4747,6 +4768,7 @@ XR_ENUM_STR(XrResult);
     XR_LIST_STRUCTURE_TYPES_CORE(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_D3D11(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_D3D12(_) \
+    XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_METAL(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_WAYLAND(_) \
     XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_OPENGL_XR_USE_PLATFORM_WIN32(_) \
@@ -5108,6 +5130,18 @@ XR_ENUM_STR(XrResult);
 #define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_D3D12(_)
 #endif
 
+#if defined(XR_USE_GRAPHICS_API_METAL)
+/// Implementation detail of XR_LIST_STRUCTURE_TYPES()
+/// Structure types available only when XR_USE_GRAPHICS_API_METAL is defined
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_METAL(_) \
+    _(XrGraphicsBindingMetalKHR, XR_TYPE_GRAPHICS_BINDING_METAL_KHR) \
+    _(XrSwapchainImageMetalKHR, XR_TYPE_SWAPCHAIN_IMAGE_METAL_KHR) \
+    _(XrGraphicsRequirementsMetalKHR, XR_TYPE_GRAPHICS_REQUIREMENTS_METAL_KHR) \
+
+#else
+#define XR_LIST_STRUCTURE_TYPES_XR_USE_GRAPHICS_API_METAL(_)
+#endif
+
 #if defined(XR_USE_GRAPHICS_API_OPENGL)
 /// Implementation detail of XR_LIST_STRUCTURE_TYPES()
 /// Structure types available only when XR_USE_GRAPHICS_API_OPENGL is defined
@@ -5264,6 +5298,7 @@ XR_ENUM_STR(XrResult);
     _(XR_KHR_vulkan_enable, 26) \
     _(XR_KHR_D3D11_enable, 28) \
     _(XR_KHR_D3D12_enable, 29) \
+    _(XR_KHR_metal_enable, 30) \
     _(XR_EXT_eye_gaze_interaction, 31) \
     _(XR_KHR_visibility_mask, 32) \
     _(XR_EXTX_overlay, 34) \
@@ -5544,6 +5579,14 @@ XR_ENUM_STR(XrResult);
 /// because it is easy to add back but impossible to remove with the preprocessor.
 #define XR_LIST_FUNCTIONS_XR_KHR_D3D12_enable(_) \
     _(GetD3D12GraphicsRequirementsKHR, KHR_D3D12_enable) \
+
+
+/// For every function defined by XR_KHR_metal_enable in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_KHR_metal_enable(_) \
+    _(GetMetalGraphicsRequirementsKHR, KHR_metal_enable) \
 
 
 /// For every function defined by XR_KHR_visibility_mask in this version of the spec,

@@ -37,7 +37,7 @@
 extern "C" { 
 #endif
 // Helper function to populate an instance dispatch table
-void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
+void GeneratedXrPopulateDispatchTableCore(struct XrGeneratedDispatchTableCore *table,
                                       XrInstance instance,
                                       PFN_xrGetInstanceProcAddr get_inst_proc_addr) {
 

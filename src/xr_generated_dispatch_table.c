@@ -143,6 +143,11 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrGetD3D12GraphicsRequirementsKHR", (PFN_xrVoidFunction*)&table->GetD3D12GraphicsRequirementsKHR));
 #endif // defined(XR_USE_GRAPHICS_API_D3D12)
 
+    // ---- XR_KHR_metal_enable extension commands
+#if defined(XR_USE_GRAPHICS_API_METAL)
+    (get_inst_proc_addr(instance, "xrGetMetalGraphicsRequirementsKHR", (PFN_xrVoidFunction*)&table->GetMetalGraphicsRequirementsKHR));
+#endif // defined(XR_USE_GRAPHICS_API_METAL)
+
     // ---- XR_KHR_visibility_mask extension commands
     (get_inst_proc_addr(instance, "xrGetVisibilityMaskKHR", (PFN_xrVoidFunction*)&table->GetVisibilityMaskKHR));
 

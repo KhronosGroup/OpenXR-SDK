@@ -69,6 +69,11 @@ Copyright: 2016-2020, Mitchell Dowd
 License: MIT
 Comment: Unmodified, vendored copy of commit e6c415837c5a487809fdbb2f71f1080d454eb99a
 
+Files: src/external/metal-cpp/*
+Copyright: Copyright 2020-2022 Apple Inc.
+License: Apache-2.0
+Comment: Unmodified, vendored copy of metal-cpp_macOS13_iOS16.zip
+
 Files: external/python/jinja2/*
   external/python/Jinja2-2.11.3.dist-info/*
 Copyright: 2013-2019 by the Jinja team

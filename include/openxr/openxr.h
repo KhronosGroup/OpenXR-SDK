@@ -26,7 +26,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 38)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 40)
 
 // OpenXR 1.0 version number
 #define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
@@ -346,6 +346,9 @@ typedef enum XrStructureType {
     XR_TYPE_GRAPHICS_BINDING_D3D12_KHR = 1000028000,
     XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR = 1000028001,
     XR_TYPE_GRAPHICS_REQUIREMENTS_D3D12_KHR = 1000028002,
+    XR_TYPE_GRAPHICS_BINDING_METAL_KHR = 1000029000,
+    XR_TYPE_SWAPCHAIN_IMAGE_METAL_KHR = 1000029001,
+    XR_TYPE_GRAPHICS_REQUIREMENTS_METAL_KHR = 1000029002,
     XR_TYPE_SYSTEM_EYE_GAZE_INTERACTION_PROPERTIES_EXT = 1000030000,
     XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT = 1000030001,
     XR_TYPE_VISIBILITY_MASK_KHR = 1000031000,
@@ -2184,7 +2187,7 @@ typedef struct XrEventDataMainSessionVisibilityChangedEXTX {
 
 // XR_VARJO_quad_views is a preprocessor guard. Do not pass it to API calls.
 #define XR_VARJO_quad_views 1
-#define XR_VARJO_quad_views_SPEC_VERSION  1
+#define XR_VARJO_quad_views_SPEC_VERSION  2
 #define XR_VARJO_QUAD_VIEWS_EXTENSION_NAME "XR_VARJO_quad_views"
 
 

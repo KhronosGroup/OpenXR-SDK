@@ -38,7 +38,7 @@
 extern "C" { 
 #endif
 // Generated dispatch table
-struct XrGeneratedDispatchTable {
+struct XrGeneratedDispatchTableCore {
 
     // ---- Core 1.0 commands
     PFN_xrGetInstanceProcAddr GetInstanceProcAddr;
@@ -112,7 +112,7 @@ struct XrGeneratedDispatchTable {
 
 
 // Prototype for dispatch table helper function
-void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
+void GeneratedXrPopulateDispatchTableCore(struct XrGeneratedDispatchTableCore *table,
                                       XrInstance instance,
                                       PFN_xrGetInstanceProcAddr get_inst_proc_addr);
 

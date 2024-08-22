@@ -146,6 +146,11 @@ struct XrGeneratedDispatchTable {
     PFN_xrGetD3D12GraphicsRequirementsKHR GetD3D12GraphicsRequirementsKHR;
 #endif // defined(XR_USE_GRAPHICS_API_D3D12)
 
+    // ---- XR_KHR_metal_enable extension commands
+#if defined(XR_USE_GRAPHICS_API_METAL)
+    PFN_xrGetMetalGraphicsRequirementsKHR GetMetalGraphicsRequirementsKHR;
+#endif // defined(XR_USE_GRAPHICS_API_METAL)
+
     // ---- XR_KHR_visibility_mask extension commands
     PFN_xrGetVisibilityMaskKHR GetVisibilityMaskKHR;
 
