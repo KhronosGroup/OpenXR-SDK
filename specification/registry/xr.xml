@@ -135,7 +135,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 40)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 41)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -284,6 +284,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="define">
 #define <name>XR_MAX_HAPTIC_PCM_BUFFER_SIZE_FB</name> 4000</type>
 
+        <!-- XR_HTC_body_tracking -->
+        <type category="define">
+#define <name>XR_BODY_JOINT_COUNT_HTC</name> 26</type>
+
         <!-- Value types -->
         <type category="basetype">typedef <type>uint32_t</type> <name>XrBool32</name>;</type>
         <type category="basetype">typedef <type>uint64_t</type> <name>XrFlags64</name>;</type>
@@ -427,6 +431,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type bitvalues="XrEnvironmentDepthProviderCreateFlagBitsMETA"  category="bitmask">typedef <type>XrFlags64</type> <name>XrEnvironmentDepthProviderCreateFlagsMETA</name>;</type>
         <type bitvalues="XrEnvironmentDepthSwapchainCreateFlagBitsMETA" category="bitmask">typedef <type>XrFlags64</type> <name>XrEnvironmentDepthSwapchainCreateFlagsMETA</name>;</type>
 
+        <!-- XR_ML_world_mesh_detection -->
+        <type bitvalues="XrWorldMeshDetectorFlagBitsML" category="bitmask">typedef <type>XrFlags64</type> <name>XrWorldMeshDetectorFlagsML</name>;</type>
+
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
         <type category="handle"><type>XR_DEFINE_HANDLE</type>(<name>XrInstance</name>)</type>
@@ -482,6 +489,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_META_virtual_keyboard -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrVirtualKeyboardMETA</name>)</type>
 
+        <!-- XR_ML_spatial_anchors_storage -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSpatialAnchorsStorageML</name>)</type>
+
         <!-- XR_ML_localization_map -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrExportedLocalizationMapML</name>)</type>
 
@@ -494,6 +504,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_META_environment_depth -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrEnvironmentDepthProviderMETA</name>)</type>
         <type category="handle" parent="XrEnvironmentDepthProviderMETA"><type>XR_DEFINE_HANDLE</type>(<name>XrEnvironmentDepthSwapchainMETA</name>)</type>
+
+        <!-- XR_HTC_body_tracking -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrBodyTrackerHTC</name>)</type>
+
+        <!-- XR_ML_world_mesh_detection -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrWorldMeshDetectorML</name>)</type>
 
         <!-- enums and flag bits generated from corresponding <enums> tags below -->
         <type name="XrLoaderInterfaceStructs" category="enum"/>
@@ -702,6 +718,20 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_META_environment_depth -->
         <type name="XrEnvironmentDepthProviderCreateFlagBitsMETA" category="enum"/>
         <type name="XrEnvironmentDepthSwapchainCreateFlagBitsMETA" category="enum"/>
+
+        <!-- XR_HTC_body_tracking -->
+        <type name="XrBodyJointHTC" category="enum"/>
+        <type name="XrBodyJointSetHTC" category="enum"/>
+        <type name="XrBodyJointConfidenceHTC" category="enum"/>
+
+        <!-- XR_ML_spatial_anchors -->
+        <type name="XrSpatialAnchorConfidenceML" category="enum"/>
+
+        <!-- XR_ML_world_mesh_detection -->
+        <type name="XrWorldMeshBlockStatusML" category="enum"/>
+        <type name="XrWorldMeshDetectorFlagBitsML" category="enum"/>
+        <type name="XrWorldMeshDetectorLodML" category="enum"/>
+        <type name="XrWorldMeshBlockResultML" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -3025,6 +3055,45 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrViveTrackerPathsHTCX</type>*       <name>paths</name></member>
         </type>
 
+        <!-- XR_HTC_body_tracking -->
+        <type category="struct" name="XrSystemBodyTrackingPropertiesHTC" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_BODY_TRACKING_PROPERTIES_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsBodyTracking</name></member>
+        </type>
+        <type category="struct" name="XrBodyTrackerCreateInfoHTC">
+            <member values="XR_TYPE_BODY_TRACKER_CREATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*       <name>next</name></member>
+            <member><type>XrBodyJointSetHTC</type> <name>bodyJointSet</name></member>
+        </type>
+        <type category="struct" name="XrBodySkeletonJointHTC">
+            <member><type>XrPosef</type> <name>pose</name></member>
+        </type>
+        <type category="struct" name="XrBodySkeletonHTC">
+            <member values="XR_TYPE_BODY_SKELETON_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                    <name>next</name></member>
+            <member><type>uint32_t</type>                                 <name>jointCount</name></member>
+            <member len="jointCount"><type>XrBodySkeletonJointHTC</type>* <name>joints</name></member>
+        </type>
+        <type category="struct" name="XrBodyJointsLocateInfoHTC">
+            <member values="XR_TYPE_BODY_JOINTS_LOCATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>baseSpace</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+        </type>
+        <type category="struct" name="XrBodyJointLocationHTC" returnedonly="true">
+            <member optional="true"><type>XrSpaceLocationFlags</type> <name>locationFlags</name></member>
+            <member><type>XrPosef</type>                              <name>pose</name></member>
+        </type>
+        <type category="struct" name="XrBodyJointLocationsHTC">
+            <member values="XR_TYPE_BODY_JOINT_LOCATIONS_HTC"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                            <name>next</name></member>
+            <member optional="true"><type>XrSpaceLocationFlags</type>             <name>combinedLocationFlags</name></member>
+            <member><type>XrBodyJointConfidenceHTC</type>                         <name>confidenceLevel</name></member>
+            <member><type>uint32_t</type>                                         <name>jointLocationCount</name></member>
+            <member len="jointLocationCount"><type>XrBodyJointLocationHTC</type>* <name>jointLocations</name></member>
+            <member><type>uint32_t</type>                                         <name>skeletonGenerationId</name></member>
+        </type>
 
         <!-- XR_FB_space_warp -->
         <type category="struct" name="XrCompositionLayerSpaceWarpInfoFB" structextends="XrCompositionLayerProjectionView">
@@ -3799,6 +3868,250 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrSpaceVelocityFlags</type> <name>velocityFlags</name></member>
             <member><type>XrVector3f</type>           <name>linearVelocity</name></member>
             <member><type>XrVector3f</type>           <name>angularVelocity</name></member>
+        </type>
+
+        <!-- XR_ML_system_notifications -->
+        <type category="struct" name="XrSystemNotificationsSetInfoML">
+            <member values="XR_TYPE_SYSTEM_NOTIFICATIONS_SET_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type>    <name>suppressNotifications</name></member>
+        </type>
+
+        <!-- XR_ML_spatial_anchors -->
+        <type category="struct" name="XrSpatialAnchorsCreateInfoBaseHeaderML">
+            <member><type>XrStructureType</type>                        <name>type</name></member>
+            <member>const <type>void</type>*                            <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsCreateInfoFromPoseML" parentstruct="XrSpatialAnchorsCreateInfoBaseHeaderML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_CREATE_INFO_FROM_POSE_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>baseSpace</name></member>
+            <member><type>XrPosef</type>     <name>poseInBaseSpace</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+        </type>
+
+        <type category="struct" name="XrCreateSpatialAnchorsCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_CREATE_SPATIAL_ANCHORS_COMPLETION_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                     <name>next</name></member>
+            <member optional="true"><type>XrResult</type>                  <name>futureResult</name></member>
+            <member optional="true"><type>uint32_t</type>                  <name>spaceCount</name></member>
+            <member optional="true" len="spaceCount"><type>XrSpace</type>* <name>spaces</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorStateML">
+            <member values="XR_TYPE_SPATIAL_ANCHOR_STATE_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                       <name>next</name></member>
+            <member optional="true"><type>XrSpatialAnchorConfidenceML</type> <name>confidence</name></member>
+        </type>
+
+        <!-- XR_ML_spatial_anchors_storage -->
+        <type category="struct" name="XrSpatialAnchorsCreateStorageInfoML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_CREATE_STORAGE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsQueryInfoBaseHeaderML">
+            <member><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*     <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsQueryInfoRadiusML" parentstruct="XrSpatialAnchorsQueryInfoBaseHeaderML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_QUERY_INFO_RADIUS_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>baseSpace</name></member>
+            <member><type>XrVector3f</type>  <name>center</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+            <member><type>float</type>       <name>radius</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsQueryCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_QUERY_COMPLETION_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                              <name>next</name></member>
+            <member optional="true"><type>XrResult</type>                           <name>futureResult</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>uuidCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                           <name>uuidCountOutput</name></member>
+            <member optional="true" len="uuidCapacityInput"><type>XrUuidEXT</type>* <name>uuids</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsCreateInfoFromUuidsML" parentstruct="XrSpatialAnchorsCreateInfoBaseHeaderML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_CREATE_INFO_FROM_UUIDS_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                      <name>next</name></member>
+            <member><type>XrSpatialAnchorsStorageML</type>        <name>storage</name></member>
+            <member><type>uint32_t</type>                         <name>uuidCount</name></member>
+            <member len="uuidCount">const <type>XrUuidEXT</type>* <name>uuids</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsPublishInfoML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_PUBLISH_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                      <name>next</name></member>
+            <member><type>uint32_t</type>                         <name>anchorCount</name></member>
+            <member len="anchorCount">const <type>XrSpace</type>* <name>anchors</name></member>
+            <member><type>uint64_t</type>                         <name>expiration</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsPublishCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_PUBLISH_COMPLETION_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                      <name>next</name></member>
+            <member><type>XrResult</type>                   <name>futureResult</name></member>
+            <member><type>uint32_t</type>                   <name>uuidCount</name></member>
+            <member len="uuidCount"><type>XrUuidEXT</type>* <name>uuids</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsDeleteInfoML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_DELETE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                      <name>next</name></member>
+            <member><type>uint32_t</type>                         <name>uuidCount</name></member>
+            <member len="uuidCount">const <type>XrUuidEXT</type>* <name>uuids</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsDeleteCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_DELETE_COMPLETION_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrResult</type> <name>futureResult</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsUpdateExpirationInfoML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_UPDATE_EXPIRATION_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                      <name>next</name></member>
+            <member><type>uint32_t</type>                         <name>uuidCount</name></member>
+            <member len="uuidCount">const <type>XrUuidEXT</type>* <name>uuids</name></member>
+            <member><type>uint64_t</type>                         <name>expiration</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsUpdateExpirationCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_UPDATE_EXPIRATION_COMPLETION_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrResult</type> <name>futureResult</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorCompletionResultML">
+            <member><type>XrUuidEXT</type> <name>uuid</name></member>
+            <member><type>XrResult</type>  <name>result</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsPublishCompletionDetailsML" structextends="XrSpatialAnchorsPublishCompletionML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_PUBLISH_COMPLETION_DETAILS_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                <name>next</name></member>
+            <member><type>uint32_t</type>                                             <name>resultCount</name></member>
+            <member len="resultCount"><type>XrSpatialAnchorCompletionResultML</type>* <name>results</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsDeleteCompletionDetailsML" structextends="XrSpatialAnchorsDeleteCompletionML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_DELETE_COMPLETION_DETAILS_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                <name>next</name></member>
+            <member><type>uint32_t</type>                                             <name>resultCount</name></member>
+            <member len="resultCount"><type>XrSpatialAnchorCompletionResultML</type>* <name>results</name></member>
+        </type>
+
+        <type category="struct" name="XrSpatialAnchorsUpdateExpirationCompletionDetailsML" structextends="XrSpatialAnchorsUpdateExpirationCompletionML">
+            <member values="XR_TYPE_SPATIAL_ANCHORS_UPDATE_EXPIRATION_COMPLETION_DETAILS_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                <name>next</name></member>
+            <member><type>uint32_t</type>                                             <name>resultCount</name></member>
+            <member len="resultCount"><type>XrSpatialAnchorCompletionResultML</type>* <name>results</name></member>
+        </type>
+
+        <!-- XR_ML_world_mesh_detection -->
+        <type category="struct" name="XrWorldMeshDetectorCreateInfoML">
+            <member values="XR_TYPE_WORLD_MESH_DETECTOR_CREATE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshStateRequestInfoML">
+            <member values="XR_TYPE_WORLD_MESH_STATE_REQUEST_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*    <name>next</name></member>
+            <member><type>XrSpace</type>        <name>baseSpace</name></member>
+            <member><type>XrTime</type>         <name>time</name></member>
+            <member><type>XrPosef</type>        <name>boundingBoxCenter</name></member>
+            <member><type>XrExtent3DfEXT</type> <name>boundingBoxExtents</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshBlockStateML">
+            <member values="XR_TYPE_WORLD_MESH_BLOCK_STATE_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                    <name>next</name></member>
+            <member><type>XrUuidEXT</type>                <name>uuid</name></member>
+            <member><type>XrPosef</type>                  <name>meshBoundingBoxCenter</name></member>
+            <member><type>XrExtent3DfEXT</type>           <name>meshBoundingBoxExtents</name></member>
+            <member><type>XrTime</type>                   <name>lastUpdateTime</name></member>
+            <member><type>XrWorldMeshBlockStatusML</type> <name>status</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshStateRequestCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_WORLD_MESH_STATE_REQUEST_COMPLETION_ML"><type>XrStructureType</type>    <name>type</name></member>
+            <member><type>void</type>*                                                                      <name>next</name></member>
+            <member><type>XrResult</type>                                                                   <name>futureResult</name></member>
+            <member optional="true"><type>XrTime</type>                                                     <name>timestamp</name></member>
+            <member optional="true"><type>uint32_t</type>                                                   <name>meshBlockStateCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                                   <name>meshBlockStateCountOutput</name></member>
+            <member optional="true" len="meshBlockStateCapacityInput"><type>XrWorldMeshBlockStateML</type>* <name>meshBlockStates</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshBufferRecommendedSizeInfoML">
+            <member values="XR_TYPE_WORLD_MESH_BUFFER_RECOMMENDED_SIZE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>uint32_t</type>    <name>maxBlockCount</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshBufferSizeML">
+            <member values="XR_TYPE_WORLD_MESH_BUFFER_SIZE_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>uint32_t</type> <name>size</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshBufferML">
+            <member values="XR_TYPE_WORLD_MESH_BUFFER_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                  <name>next</name></member>
+            <member><type>uint32_t</type>               <name>bufferSize</name></member>
+            <member len="bufferSize"><type>void</type>* <name>buffer</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshBlockRequestML">
+            <member values="XR_TYPE_WORLD_MESH_BLOCK_REQUEST_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                    <name>next</name></member>
+            <member><type>XrUuidEXT</type>                <name>uuid</name></member>
+            <member><type>XrWorldMeshDetectorLodML</type> <name>lod</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshGetInfoML">
+            <member values="XR_TYPE_WORLD_MESH_GET_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                 <name>next</name></member>
+            <member optional="true"><type>XrWorldMeshDetectorFlagsML</type>  <name>flags</name></member>
+            <member><type>float</type>                                       <name>fillHoleLength</name></member>
+            <member><type>float</type>                                       <name>disconnectedComponentArea</name></member>
+            <member><type>uint32_t</type>                                    <name>blockCount</name></member>
+            <member len="blockCount"><type>XrWorldMeshBlockRequestML</type>* <name>blocks</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshBlockML">
+            <member values="XR_TYPE_WORLD_MESH_BLOCK_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                         <name>next</name></member>
+            <member><type>XrUuidEXT</type>                     <name>uuid</name></member>
+            <member><type>XrWorldMeshBlockResultML</type>      <name>blockResult</name></member>
+            <member><type>XrWorldMeshDetectorLodML</type>      <name>lod</name></member>
+            <member><type>XrWorldMeshDetectorFlagsML</type>    <name>flags</name></member>
+            <member><type>uint32_t</type>                      <name>indexCount</name></member>
+            <member len="indexCount"><type>uint16_t</type>*    <name>indexBuffer</name></member>
+            <member><type>uint32_t</type>                      <name>vertexCount</name></member>
+            <member len="vertexCount"><type>XrVector3f</type>* <name>vertexBuffer</name></member>
+            <member><type>uint32_t</type>                      <name>normalCount</name></member>
+            <member len="normalCount"><type>XrVector3f</type>* <name>normalBuffer</name></member>
+            <member><type>uint32_t</type>                      <name>confidenceCount</name></member>
+            <member len="confidenceCount"><type>float</type>*  <name>confidenceBuffer</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshRequestCompletionInfoML">
+            <member values="XR_TYPE_WORLD_MESH_REQUEST_COMPLETION_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>meshSpace</name></member>
+            <member><type>XrTime</type>      <name>meshSpaceLocateTime</name></member>
+        </type>
+
+        <type category="struct" name="XrWorldMeshRequestCompletionML" parentstruct="XrFutureCompletionBaseHeaderEXT">
+            <member values="XR_TYPE_WORLD_MESH_REQUEST_COMPLETION_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                <name>next</name></member>
+            <member><type>XrResult</type>                             <name>futureResult</name></member>
+            <member><type>uint32_t</type>                             <name>blockCount</name></member>
+            <member len="blockCount"><type>XrWorldMeshBlockML</type>* <name>blocks</name></member>
         </type>
 
     </types>
@@ -4923,6 +5236,45 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="3"   name="XR_FOVEATION_LEVEL_HIGH_HTC"   comment="Heavy periphery pixel density drop and higher performance gain"/>
     </enums>
 
+    <!-- XR_HTC_body_tracking -->
+    <enums name="XrBodyJointHTC" type="enum">
+        <enum value="0"    name="XR_BODY_JOINT_PELVIS_HTC"/>
+        <enum value="1"    name="XR_BODY_JOINT_LEFT_HIP_HTC"/>
+        <enum value="2"    name="XR_BODY_JOINT_LEFT_KNEE_HTC"/>
+        <enum value="3"    name="XR_BODY_JOINT_LEFT_ANKLE_HTC"/>
+        <enum value="4"    name="XR_BODY_JOINT_LEFT_FEET_HTC"/>
+        <enum value="5"    name="XR_BODY_JOINT_RIGHT_HIP_HTC"/>
+        <enum value="6"    name="XR_BODY_JOINT_RIGHT_KNEE_HTC"/>
+        <enum value="7"    name="XR_BODY_JOINT_RIGHT_ANKLE_HTC"/>
+        <enum value="8"    name="XR_BODY_JOINT_RIGHT_FEET_HTC"/>
+        <enum value="9"    name="XR_BODY_JOINT_WAIST_HTC"/>
+        <enum value="10"   name="XR_BODY_JOINT_SPINE_LOWER_HTC"/>
+        <enum value="11"   name="XR_BODY_JOINT_SPINE_MIDDLE_HTC"/>
+        <enum value="12"   name="XR_BODY_JOINT_SPINE_HIGH_HTC"/>
+        <enum value="13"   name="XR_BODY_JOINT_CHEST_HTC"/>
+        <enum value="14"   name="XR_BODY_JOINT_NECK_HTC"/>
+        <enum value="15"   name="XR_BODY_JOINT_HEAD_HTC"/>
+        <enum value="16"   name="XR_BODY_JOINT_LEFT_CLAVICLE_HTC"/>
+        <enum value="17"   name="XR_BODY_JOINT_LEFT_SCAPULA_HTC"/>
+        <enum value="18"   name="XR_BODY_JOINT_LEFT_ARM_HTC"/>
+        <enum value="19"   name="XR_BODY_JOINT_LEFT_ELBOW_HTC"/>
+        <enum value="20"   name="XR_BODY_JOINT_LEFT_WRIST_HTC"/>
+        <enum value="21"   name="XR_BODY_JOINT_RIGHT_CLAVICLE_HTC"/>
+        <enum value="22"   name="XR_BODY_JOINT_RIGHT_SCAPULA_HTC"/>
+        <enum value="23"   name="XR_BODY_JOINT_RIGHT_ARM_HTC"/>
+        <enum value="24"   name="XR_BODY_JOINT_RIGHT_ELBOW_HTC"/>
+        <enum value="25"   name="XR_BODY_JOINT_RIGHT_WRIST_HTC"/>
+    </enums>
+    <enums name="XrBodyJointSetHTC" type="enum">
+        <enum value="0"   name="XR_BODY_JOINT_SET_FULL_HTC"/>
+    </enums>
+
+    <enums name="XrBodyJointConfidenceHTC" type="enum">
+        <enum value="0"   name="XR_BODY_JOINT_CONFIDENCE_NONE_HTC"/>
+        <enum value="1"   name="XR_BODY_JOINT_CONFIDENCE_LOW_HTC"/>
+        <enum value="2"   name="XR_BODY_JOINT_CONFIDENCE_HIGH_HTC"/>
+    </enums>
+
     <!-- enums for XR_FB_composition_layer_depth_test -->
     <enums name="XrCompareOpFB" type="enum">
         <enum value="0"   name="XR_COMPARE_OP_NEVER_FB"            comment="Comparison is never true."/>
@@ -5086,6 +5438,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <!-- This is currently empty, awaiting future flags. -->
     </enums>
 
+    <!-- XR_ML_spatial_anchors -->
+    <enums name="XrSpatialAnchorConfidenceML" type="enum">
+        <enum value="0"   name="XR_SPATIAL_ANCHOR_CONFIDENCE_LOW_ML"    comment="Low quality, this anchor can be expected to move significantly."/>
+        <enum value="1"   name="XR_SPATIAL_ANCHOR_CONFIDENCE_MEDIUM_ML" comment="Medium quality, this anchor may move slightly."/>
+        <enum value="2"   name="XR_SPATIAL_ANCHOR_CONFIDENCE_HIGH_ML"   comment="High quality, this anchor is stable and suitable for digital content attachment."/>
+    </enums>
+
 
     <!-- SECTION: OpenXR loader command definitions -->
     <!-- openxr_loader_negotiation.h -->
@@ -5109,6 +5468,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </command>
     </commands>
 
+
+    <!-- XR_ML_world_mesh_detection -->
+    <enums name="XrWorldMeshDetectorFlagBitsML" type="bitmask">
+        <enum bitpos="0" name="XR_WORLD_MESH_DETECTOR_POINT_CLOUD_BIT_ML"        comment="If set, will return a point cloud instead of a triangle mesh."/>
+        <enum bitpos="1" name="XR_WORLD_MESH_DETECTOR_COMPUTE_NORMALS_BIT_ML"    comment="If set, the system will compute the normals for the triangle vertices."/>
+        <enum bitpos="2" name="XR_WORLD_MESH_DETECTOR_COMPUTE_CONFIDENCE_BIT_ML" comment="If set, the system will compute the confidence values."/>
+        <enum bitpos="3" name="XR_WORLD_MESH_DETECTOR_PLANARIZE_BIT_ML"          comment="If set, the system will planarize the returned mesh (planar regions will be smoothed out)."/>
+        <enum bitpos="4" name="XR_WORLD_MESH_DETECTOR_REMOVE_MESH_SKIRT_BIT_ML"  comment="If set, the mesh skirt (overlapping area between two mesh blocks) will be removed."/>
+        <enum bitpos="5" name="XR_WORLD_MESH_DETECTOR_INDEX_ORDER_CW_BIT_ML"     comment="If set, winding order of indices will be be changed from counter clockwise to clockwise."/>
+    </enums>
+
+    <enums name="XrWorldMeshDetectorLodML" type="enum">
+        <enum value="0"   name="XR_WORLD_MESH_DETECTOR_LOD_MINIMUM_ML" comment="Minimum Level of Detail (LOD) for the mesh."/>
+        <enum value="1"   name="XR_WORLD_MESH_DETECTOR_LOD_MEDIUM_ML"  comment="Medium Level of Detail (LOD) for the mesh."/>
+        <enum value="2"   name="XR_WORLD_MESH_DETECTOR_LOD_MAXIMUM_ML" comment="Maximum Level of Detail (LOD) for the mesh."/>
+    </enums>
+
+    <enums name="XrWorldMeshBlockStatusML" type="enum">
+        <enum value="0"   name="XR_WORLD_MESH_BLOCK_STATUS_NEW_ML"       comment="The mesh block has been created."/>
+        <enum value="1"   name="XR_WORLD_MESH_BLOCK_STATUS_UPDATED_ML"   comment="The mesh block has been updated."/>
+        <enum value="2"   name="XR_WORLD_MESH_BLOCK_STATUS_DELETED_ML"   comment="The mesh block has been deleted."/>
+        <enum value="3"   name="XR_WORLD_MESH_BLOCK_STATUS_UNCHANGED_ML" comment="The mesh block is unchanged."/>
+    </enums>
+
+    <enums name="XrWorldMeshBlockResultML" type="enum">
+        <enum value="0"   name="XR_WORLD_MESH_BLOCK_RESULT_SUCCESS_ML"        comment="Mesh request has succeeded."/>
+        <enum value="1"   name="XR_WORLD_MESH_BLOCK_RESULT_FAILED_ML"         comment="Mesh request has failed."/>
+        <enum value="2"   name="XR_WORLD_MESH_BLOCK_RESULT_PENDING_ML"        comment="Mesh request is pending."/>
+        <enum value="3"   name="XR_WORLD_MESH_BLOCK_RESULT_PARTIAL_UPDATE_ML" comment="There are partial updates on the mesh request."/>
+    </enums>
 
     <!-- SECTION: OpenXR command definitions -->
     <commands>
@@ -6429,6 +6818,31 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param optional="true" len="pathCapacityInput"><type>XrViveTrackerPathsHTCX</type>* <name>paths</name></param>
         </command>
 
+        <!-- XR_HTC_body_tracking -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateBodyTrackerHTC</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrBodyTrackerCreateInfoHTC</type>* <name>createInfo</name></param>
+            <param><type>XrBodyTrackerHTC</type>* <name>bodyTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyBodyTrackerHTC</name></proto>
+            <param externsync="true_with_children"><type>XrBodyTrackerHTC</type> <name>bodyTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID">
+            <proto><type>XrResult</type> <name>xrLocateBodyJointsHTC</name></proto>
+            <param><type>XrBodyTrackerHTC</type> <name>bodyTracker</name></param>
+            <param>const <type>XrBodyJointsLocateInfoHTC</type>* <name>locateInfo</name></param>
+            <param><type>XrBodyJointLocationsHTC</type>* <name>locations</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrGetBodySkeletonHTC</name></proto>
+            <param><type>XrBodyTrackerHTC</type> <name>bodyTracker</name></param>
+            <param><type>XrSpace</type> <name>baseSpace</name></param>
+            <param><type>uint32_t</type> <name>skeletonGenerationId</name></param>
+            <param><type>XrBodySkeletonHTC</type>* <name>skeleton</name></param>
+        </command>
+
         <!-- commands for XR_VARJO_marker_tracking -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
             <proto><type>XrResult</type>  <name>xrSetMarkerTrackingVARJO</name></proto>
@@ -6911,6 +7325,166 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrSpacesLocateInfo</type>* <name>locateInfo</name></param>
             <param><type>XrSpaceLocations</type>* <name>spaceLocations</name></param>
+        </command>
+
+        <!-- XR_ML_system_notifications -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SYSTEM_NOTIFICATION_PERMISSION_DENIED_ML,XR_ERROR_SYSTEM_NOTIFICATION_INCOMPATIBLE_SKU_ML">
+            <proto><type>XrResult</type> <name>xrSetSystemNotificationsML</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param>const <type>XrSystemNotificationsSetInfoML</type>* <name>info</name></param>
+        </command>
+
+        <!-- XR_ML_spatial_anchors -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_TIME_INVALID,XR_ERROR_SPATIAL_ANCHORS_SPACE_NOT_LOCATABLE_ML,XR_ERROR_SPATIAL_ANCHORS_PERMISSION_DENIED_ML,XR_ERROR_POSE_INVALID">
+            <proto><type>XrResult</type> <name>xrCreateSpatialAnchorsAsyncML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpatialAnchorsCreateInfoBaseHeaderML</type>* <name>createInfo</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrCreateSpatialAnchorsCompleteML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrCreateSpatialAnchorsCompletionML</type>* <name>completion</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrGetSpatialAnchorStateML</name></proto>
+            <param><type>XrSpace</type> <name>anchor</name></param>
+            <param><type>XrSpatialAnchorStateML</type>* <name>state</name></param>
+        </command>
+
+        <!-- XR_ML_spatial_anchors_storage -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_SPATIAL_ANCHORS_PERMISSION_DENIED_ML">
+            <proto><type>XrResult</type> <name>xrCreateSpatialAnchorsStorageML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpatialAnchorsCreateStorageInfoML</type>* <name>createInfo</name></param>
+            <param><type>XrSpatialAnchorsStorageML</type>* <name>storage</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrDestroySpatialAnchorsStorageML</name></proto>
+            <param externsync="true_with_children"><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_TIME_INVALID,XR_ERROR_SPATIAL_ANCHORS_SPACE_NOT_LOCATABLE_ML">
+            <proto><type>XrResult</type> <name>xrQuerySpatialAnchorsAsyncML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param>const <type>XrSpatialAnchorsQueryInfoBaseHeaderML</type>* <name>queryInfo</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrQuerySpatialAnchorsCompleteML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrSpatialAnchorsQueryCompletionML</type>* <name>completion</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrPublishSpatialAnchorsAsyncML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param>const <type>XrSpatialAnchorsPublishInfoML</type>* <name>publishInfo</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrPublishSpatialAnchorsCompleteML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrSpatialAnchorsPublishCompletionML</type>* <name>completion</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrDeleteSpatialAnchorsAsyncML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param>const <type>XrSpatialAnchorsDeleteInfoML</type>* <name>deleteInfo</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrDeleteSpatialAnchorsCompleteML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrSpatialAnchorsDeleteCompletionML</type>* <name>completion</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
+            <proto><type>XrResult</type> <name>xrUpdateSpatialAnchorsExpirationAsyncML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param>const <type>XrSpatialAnchorsUpdateExpirationInfoML</type>* <name>updateInfo</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrUpdateSpatialAnchorsExpirationCompleteML</name></proto>
+            <param><type>XrSpatialAnchorsStorageML</type> <name>storage</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrSpatialAnchorsUpdateExpirationCompletionML</type>* <name>completion</name></param>
+        </command>
+
+        <!-- XR_ML_world_mesh_detection -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_WORLD_MESH_DETECTOR_PERMISSION_DENIED_ML">
+            <proto><type>XrResult</type> <name>xrCreateWorldMeshDetectorML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrWorldMeshDetectorCreateInfoML</type>* <name>createInfo</name></param>
+            <param><type>XrWorldMeshDetectorML</type>* <name>detector</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyWorldMeshDetectorML</name></proto>
+            <param externsync="true_with_children"><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_WORLD_MESH_DETECTOR_SPACE_NOT_LOCATABLE_ML,XR_ERROR_TIME_INVALID,XR_ERROR_POSE_INVALID">
+            <proto><type>XrResult</type> <name>xrRequestWorldMeshStateAsyncML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param>const <type>XrWorldMeshStateRequestInfoML</type>* <name>stateRequest</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrRequestWorldMeshStateCompleteML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrWorldMeshStateRequestCompletionML</type>* <name>completion</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrGetWorldMeshBufferRecommendSizeML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param>const <type>XrWorldMeshBufferRecommendedSizeInfoML</type>* <name>sizeInfo</name></param>
+            <param><type>XrWorldMeshBufferSizeML</type>* <name>size</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
+            <proto><type>XrResult</type> <name>xrAllocateWorldMeshBufferML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param>const <type>XrWorldMeshBufferSizeML</type>* <name>size</name></param>
+            <param><type>XrWorldMeshBufferML</type>* <name>buffer</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrFreeWorldMeshBufferML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param>const <type>XrWorldMeshBufferML</type>* <name>buffer</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrRequestWorldMeshAsyncML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param>const <type>XrWorldMeshGetInfoML</type>* <name>getInfo</name></param>
+            <param><type>XrWorldMeshBufferML</type>* <name>buffer</name></param>
+            <param><type>XrFutureEXT</type>* <name>future</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_WORLD_MESH_DETECTOR_SPACE_NOT_LOCATABLE_ML,XR_ERROR_TIME_INVALID,XR_ERROR_FUTURE_PENDING_EXT,XR_ERROR_FUTURE_INVALID_EXT">
+            <proto><type>XrResult</type> <name>xrRequestWorldMeshCompleteML</name></proto>
+            <param><type>XrWorldMeshDetectorML</type> <name>detector</name></param>
+            <param>const <type>XrWorldMeshRequestCompletionInfoML</type>* <name>completionInfo</name></param>
+            <param><type>XrFutureEXT</type> <name>future</name></param>
+            <param><type>XrWorldMeshRequestCompletionML</type>* <name>completion</name></param>
         </command>
 
     </commands>
@@ -10278,17 +10852,85 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_141" number="141" type="instance" supported="disabled">
+    <extension name="XR_ML_spatial_anchors" number="141" type="instance" depends="XR_EXT_future" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_141_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_141&quot;" name="XR_ML_extension_141_EXTENSION_NAME"/>
+            <enum value="1"                                    name="XR_ML_spatial_anchors_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_spatial_anchors&quot;"    name="XR_ML_SPATIAL_ANCHORS_EXTENSION_NAME"/>
+
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHORS_CREATE_INFO_FROM_POSE_ML"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_CREATE_SPATIAL_ANCHORS_COMPLETION_ML"/>
+            <enum offset="2"         extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_STATE_ML"/>
+
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_SPATIAL_ANCHORS_PERMISSION_DENIED_ML"    comment="The com.magicleap.permission.SPATIAL_ANCHOR permission was not granted."/>
+            <enum offset="1" dir="-" extends="XrResult"        name="XR_ERROR_SPATIAL_ANCHORS_NOT_LOCALIZED_ML"        comment="Operation failed because the system is not localized into a localization map."/>
+            <enum offset="2" dir="-" extends="XrResult"        name="XR_ERROR_SPATIAL_ANCHORS_OUT_OF_MAP_BOUNDS_ML"    comment="Operation failed because it is performed outside of the localization map."/>
+            <enum offset="3" dir="-" extends="XrResult"        name="XR_ERROR_SPATIAL_ANCHORS_SPACE_NOT_LOCATABLE_ML"  comment="Operation failed because the space referenced cannot be located."/>
+
+
+            <type name="XrSpatialAnchorsCreateInfoBaseHeaderML"/>
+            <type name="XrSpatialAnchorsCreateInfoFromPoseML"/>
+            <type name="XrCreateSpatialAnchorsCompletionML"/>
+            <type name="XrSpatialAnchorStateML"/>
+            <type name="XrSpatialAnchorConfidenceML"/>
+
+            <command name="xrCreateSpatialAnchorsAsyncML"/>
+            <command name="xrCreateSpatialAnchorsCompleteML"/>
+            <command name="xrGetSpatialAnchorStateML"/>
+
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_142" number="142" type="instance" supported="disabled">
+    <extension name="XR_ML_spatial_anchors_storage" number="142" type="instance" depends="XR_EXT_future+XR_ML_spatial_anchors" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_142_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_142&quot;" name="XR_ML_extension_142_EXTENSION_NAME"/>
+            <enum value="1"                                         name="XR_ML_spatial_anchors_storage_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_spatial_anchors_storage&quot;" name="XR_ML_SPATIAL_ANCHORS_STORAGE_EXTENSION_NAME"/>
+
+            <enum offset="0"          extends="XrObjectType"        name="XR_OBJECT_TYPE_SPATIAL_ANCHORS_STORAGE_ML"                       comment="XrSpatialAnchorsStorageML"/>
+
+            <enum offset="0"  dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHORS_ANCHOR_NOT_FOUND_ML"                    comment="The anchor references was not found."/>
+
+            <enum offset="0"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_CREATE_STORAGE_INFO_ML"/>
+            <enum offset="1"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_QUERY_INFO_RADIUS_ML"/>
+            <enum offset="2"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_QUERY_COMPLETION_ML"/>
+            <enum offset="3"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_CREATE_INFO_FROM_UUIDS_ML"/>
+            <enum offset="4"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_PUBLISH_INFO_ML"/>
+            <enum offset="5"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_PUBLISH_COMPLETION_ML"/>
+            <enum offset="6"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_DELETE_INFO_ML"/>
+            <enum offset="7"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_DELETE_COMPLETION_ML"/>
+            <enum offset="8"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_UPDATE_EXPIRATION_INFO_ML"/>
+            <enum offset="9"          extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_UPDATE_EXPIRATION_COMPLETION_ML"/>
+            <enum offset="10"         extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_PUBLISH_COMPLETION_DETAILS_ML"/>
+            <enum offset="11"         extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_DELETE_COMPLETION_DETAILS_ML"/>
+            <enum offset="12"         extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHORS_UPDATE_EXPIRATION_COMPLETION_DETAILS_ML"/>
+
+            <type name="XrSpatialAnchorsStorageML"/>
+            <type name="XrSpatialAnchorsCreateStorageInfoML"/>
+            <type name="XrSpatialAnchorsQueryInfoBaseHeaderML"/>
+            <type name="XrSpatialAnchorsQueryInfoRadiusML"/>
+            <type name="XrSpatialAnchorsQueryCompletionML"/>
+            <type name="XrSpatialAnchorsCreateInfoFromUuidsML"/>
+            <type name="XrSpatialAnchorsPublishInfoML"/>
+            <type name="XrSpatialAnchorsPublishCompletionML"/>
+            <type name="XrSpatialAnchorsDeleteInfoML"/>
+            <type name="XrSpatialAnchorsDeleteCompletionML"/>
+            <type name="XrSpatialAnchorsUpdateExpirationInfoML"/>
+            <type name="XrSpatialAnchorsUpdateExpirationCompletionML"/>
+            <type name="XrSpatialAnchorsPublishCompletionDetailsML"/>
+            <type name="XrSpatialAnchorsDeleteCompletionDetailsML"/>
+            <type name="XrSpatialAnchorsUpdateExpirationCompletionDetailsML"/>
+            <type name="XrSpatialAnchorCompletionResultML"/>
+
+            <command name="xrCreateSpatialAnchorsStorageML"/>
+            <command name="xrDestroySpatialAnchorsStorageML"/>
+            <command name="xrQuerySpatialAnchorsAsyncML"/>
+            <command name="xrQuerySpatialAnchorsCompleteML"/>
+            <command name="xrPublishSpatialAnchorsAsyncML"/>
+            <command name="xrPublishSpatialAnchorsCompleteML"/>
+            <command name="xrDeleteSpatialAnchorsAsyncML"/>
+            <command name="xrDeleteSpatialAnchorsCompleteML"/>
+            <command name="xrUpdateSpatialAnchorsExpirationAsyncML"/>
+            <command name="xrUpdateSpatialAnchorsExpirationCompleteML"/>
+
         </require>
     </extension>
 
@@ -12121,10 +12763,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_HTC_extension_321" number="321" type="instance" supported="disabled">
+    <extension name="XR_HTC_body_tracking" number="321" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_HTC_extension_321_SPEC_VERSION"/>
-            <enum value="&quot;XR_HTC_extension_321&quot;" name="XR_HTC_extension_321_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_HTC_body_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_HTC_body_tracking&quot;" name="XR_HTC_BODY_TRACKING_EXTENSION_NAME"/>
+
+            <command name="xrCreateBodyTrackerHTC"/>
+            <command name="xrDestroyBodyTrackerHTC"/>
+            <command name="xrLocateBodyJointsHTC"/>
+            <command name="xrGetBodySkeletonHTC"/>
+
+            <type name="XrBodyJointHTC"/>
+            <type name="XrBodyJointSetHTC"/>
+            <type name="XrBodyJointConfidenceHTC"/>
+
+            <type name="XrSystemBodyTrackingPropertiesHTC"/>
+            <type name="XrBodyTrackerCreateInfoHTC"/>
+            <type name="XrBodyJointsLocateInfoHTC"/>
+            <type name="XrBodyJointLocationsHTC"/>
+            <type name="XrBodyJointLocationHTC"/>
+            <type name="XrBodySkeletonHTC"/>
+
+            <type name="XR_BODY_JOINT_COUNT_HTC"/>
+
+            <enum offset="0" extends="XrObjectType"    name="XR_OBJECT_TYPE_BODY_TRACKER_HTC"             comment="XrBodyTrackerHTC"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_BODY_TRACKING_PROPERTIES_HTC"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_BODY_TRACKER_CREATE_INFO_HTC"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_BODY_JOINTS_LOCATE_INFO_HTC"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_BODY_JOINT_LOCATIONS_HTC"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_BODY_SKELETON_HTC"/>
         </require>
     </extension>
 
@@ -13337,17 +14005,78 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_474" number="474" type="instance" supported="disabled">
+    <extension name="XR_ML_system_notifications" number="474" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_474_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_474&quot;" name="XR_ML_extension_474_EXTENSION_NAME"/>
+            <enum value="1"                                      name="XR_ML_system_notifications_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_system_notifications&quot;" name="XR_ML_SYSTEM_NOTIFICATIONS_EXTENSION_NAME"/>
+
+            <enum offset="0"         extends="XrStructureType"   name="XR_TYPE_SYSTEM_NOTIFICATIONS_SET_INFO_ML"/>
+
+            <enum offset="0" dir="-" extends="XrResult"          name="XR_ERROR_SYSTEM_NOTIFICATION_PERMISSION_DENIED_ML" comment="The com.magicleap.permission.SYSTEM_NOTIFICATION permission was not granted."/>
+            <enum offset="1" dir="-" extends="XrResult"          name="XR_ERROR_SYSTEM_NOTIFICATION_INCOMPATIBLE_SKU_ML"  comment="Incompatible SKU detected."/>
+
+            <type name="XrSystemNotificationsSetInfoML"/>
+
+            <command name="xrSetSystemNotificationsML"/>
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_475" number="475" type="instance" supported="disabled">
+    <extension name="XR_ML_world_mesh_detection" number="475" type="instance" depends="XR_EXT_future" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_475_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_475&quot;" name="XR_ML_extension_475_EXTENSION_NAME"/>
+            <enum value="1"                                      name="XR_ML_world_mesh_detection_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_world_mesh_detection&quot;" name="XR_ML_WORLD_MESH_DETECTION_EXTENSION_NAME"/>
+
+            <enum offset="0"          extends="XrObjectType"     name="XR_OBJECT_TYPE_WORLD_MESH_DETECTOR_ML"               comment="XrWorldMeshDetectorML"/>
+            <enum offset="0"  dir="-" extends="XrResult"         name="XR_ERROR_WORLD_MESH_DETECTOR_PERMISSION_DENIED_ML"   comment="The world mesh detector permission was not granted."/>
+            <enum offset="1"  dir="-" extends="XrResult"         name="XR_ERROR_WORLD_MESH_DETECTOR_SPACE_NOT_LOCATABLE_ML" comment="At the time of the call the runtime was unable to locate the space and cannot fulfill your request."/>
+
+            <enum offset="1"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_DETECTOR_CREATE_INFO_ML"/>
+            <enum offset="2"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_STATE_REQUEST_INFO_ML"/>
+            <enum offset="3"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_BLOCK_STATE_ML"/>
+            <enum offset="4"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_STATE_REQUEST_COMPLETION_ML"/>
+
+            <enum offset="5"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_BUFFER_RECOMMENDED_SIZE_INFO_ML"/>
+            <enum offset="6"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_BUFFER_SIZE_ML"/>
+            <enum offset="7"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_BUFFER_ML"/>
+            <enum offset="8"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_BLOCK_REQUEST_ML"/>
+            <enum offset="9"          extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_GET_INFO_ML"/>
+            <enum offset="10"         extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_BLOCK_ML"/>
+            <enum offset="11"         extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_REQUEST_COMPLETION_ML"/>
+            <enum offset="12"         extends="XrStructureType"  name="XR_TYPE_WORLD_MESH_REQUEST_COMPLETION_INFO_ML"/>
+
+
+            <type name="XrWorldMeshDetectorML"/>
+
+            <type name="XrWorldMeshDetectorFlagsML"/>
+            <type name="XrWorldMeshDetectorFlagBitsML"/>
+            <type name="XrWorldMeshDetectorLodML"/>
+            <type name="XrWorldMeshBlockStatusML"/>
+            <type name="XrWorldMeshBlockResultML"/>
+
+            <type name="XrWorldMeshDetectorCreateInfoML"/>
+            <type name="XrWorldMeshBlockStateML"/>
+            <type name="XrWorldMeshStateRequestInfoML"/>
+            <type name="XrWorldMeshStateRequestCompletionML"/>
+
+            <type name="XrWorldMeshBufferRecommendedSizeInfoML"/>
+            <type name="XrWorldMeshBufferSizeML"/>
+            <type name="XrWorldMeshBufferML"/>
+            <type name="XrWorldMeshBlockRequestML"/>
+            <type name="XrWorldMeshGetInfoML"/>
+            <type name="XrWorldMeshBlockML"/>
+            <type name="XrWorldMeshRequestCompletionInfoML"/>
+            <type name="XrWorldMeshRequestCompletionML"/>
+
+            <command name="xrCreateWorldMeshDetectorML"/>
+            <command name="xrDestroyWorldMeshDetectorML"/>
+            <command name="xrRequestWorldMeshStateAsyncML"/>
+            <command name="xrRequestWorldMeshStateCompleteML"/>
+            <command name="xrGetWorldMeshBufferRecommendSizeML"/>
+            <command name="xrAllocateWorldMeshBufferML"/>
+            <command name="xrFreeWorldMeshBufferML"/>
+            <command name="xrRequestWorldMeshAsyncML"/>
+            <command name="xrRequestWorldMeshCompleteML"/>
+
         </require>
     </extension>
 
@@ -13407,10 +14136,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_484" number="484" type="instance" supported="disabled">
+    <extension name="XR_ML_view_configuration_depth_range_change" number="484" depends="XR_EXT_view_configuration_depth_range" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_484_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_484&quot;" name="XR_ML_extension_484_EXTENSION_NAME"/>
+            <enum value="1"                                                       name="XR_ML_view_configuration_depth_range_change_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_view_configuration_depth_range_change&quot;" name="XR_ML_VIEW_CONFIGURATION_DEPTH_RANGE_CHANGE_EXTENSION_NAME"/>
         </require>
     </extension>
 

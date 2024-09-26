@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Get modern CMake and Ninja
-        uses: "lukka/get-cmake@v3.30.1"
+        uses: "lukka/get-cmake@v3.30.3"
 
       # Do this before building aar since it affects the version
       - name: Touch SNAPSHOT marker file
@@ -36,7 +36,7 @@ jobs:
         run: "./maintainer-scripts/build-aar.sh"
 
       - name: Upload bare AAR
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@v4"
         with:
           name: AAR and POM
           path: openxr_loader_for_android*
@@ -47,12 +47,13 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
       - name: "Get modern CMake and Ninja"
-        uses: "lukka/get-cmake@v3.30.1"
+        uses: "lukka/get-cmake@v3.30.3"
       - name: "set up JDK 11"
         uses: "actions/setup-java@v4"
         with:
           java-version: "11"
           distribution: "temurin"
+      # Also performs Gradle wrapper validation
       - uses: "gradle/actions/setup-gradle@v4"
 
       # HelloXR OpenGLES version
@@ -61,7 +62,7 @@ jobs:
 
       - name: Upload HelloXR OpenGLES (debug) for Android
         if: "!inputs.release"
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@v4"
         with:
           name: HelloXR OpenGLES Android
           path: "src/tests/hello_xr/build/outputs/apk/OpenGLES/debug/*.apk"

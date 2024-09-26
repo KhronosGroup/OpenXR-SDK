@@ -372,6 +372,23 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrDestroyExportedLocalizationMapML", (PFN_xrVoidFunction*)&table->DestroyExportedLocalizationMapML));
     (get_inst_proc_addr(instance, "xrGetExportedLocalizationMapDataML", (PFN_xrVoidFunction*)&table->GetExportedLocalizationMapDataML));
 
+    // ---- XR_ML_spatial_anchors extension commands
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorsAsyncML", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorsAsyncML));
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorsCompleteML", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorsCompleteML));
+    (get_inst_proc_addr(instance, "xrGetSpatialAnchorStateML", (PFN_xrVoidFunction*)&table->GetSpatialAnchorStateML));
+
+    // ---- XR_ML_spatial_anchors_storage extension commands
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorsStorageML", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorsStorageML));
+    (get_inst_proc_addr(instance, "xrDestroySpatialAnchorsStorageML", (PFN_xrVoidFunction*)&table->DestroySpatialAnchorsStorageML));
+    (get_inst_proc_addr(instance, "xrQuerySpatialAnchorsAsyncML", (PFN_xrVoidFunction*)&table->QuerySpatialAnchorsAsyncML));
+    (get_inst_proc_addr(instance, "xrQuerySpatialAnchorsCompleteML", (PFN_xrVoidFunction*)&table->QuerySpatialAnchorsCompleteML));
+    (get_inst_proc_addr(instance, "xrPublishSpatialAnchorsAsyncML", (PFN_xrVoidFunction*)&table->PublishSpatialAnchorsAsyncML));
+    (get_inst_proc_addr(instance, "xrPublishSpatialAnchorsCompleteML", (PFN_xrVoidFunction*)&table->PublishSpatialAnchorsCompleteML));
+    (get_inst_proc_addr(instance, "xrDeleteSpatialAnchorsAsyncML", (PFN_xrVoidFunction*)&table->DeleteSpatialAnchorsAsyncML));
+    (get_inst_proc_addr(instance, "xrDeleteSpatialAnchorsCompleteML", (PFN_xrVoidFunction*)&table->DeleteSpatialAnchorsCompleteML));
+    (get_inst_proc_addr(instance, "xrUpdateSpatialAnchorsExpirationAsyncML", (PFN_xrVoidFunction*)&table->UpdateSpatialAnchorsExpirationAsyncML));
+    (get_inst_proc_addr(instance, "xrUpdateSpatialAnchorsExpirationCompleteML", (PFN_xrVoidFunction*)&table->UpdateSpatialAnchorsExpirationCompleteML));
+
     // ---- XR_MSFT_spatial_anchor_persistence extension commands
     (get_inst_proc_addr(instance, "xrCreateSpatialAnchorStoreConnectionMSFT", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorStoreConnectionMSFT));
     (get_inst_proc_addr(instance, "xrDestroySpatialAnchorStoreConnectionMSFT", (PFN_xrVoidFunction*)&table->DestroySpatialAnchorStoreConnectionMSFT));
@@ -514,6 +531,12 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrCreateSpatialAnchorHTC", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorHTC));
     (get_inst_proc_addr(instance, "xrGetSpatialAnchorNameHTC", (PFN_xrVoidFunction*)&table->GetSpatialAnchorNameHTC));
 
+    // ---- XR_HTC_body_tracking extension commands
+    (get_inst_proc_addr(instance, "xrCreateBodyTrackerHTC", (PFN_xrVoidFunction*)&table->CreateBodyTrackerHTC));
+    (get_inst_proc_addr(instance, "xrDestroyBodyTrackerHTC", (PFN_xrVoidFunction*)&table->DestroyBodyTrackerHTC));
+    (get_inst_proc_addr(instance, "xrLocateBodyJointsHTC", (PFN_xrVoidFunction*)&table->LocateBodyJointsHTC));
+    (get_inst_proc_addr(instance, "xrGetBodySkeletonHTC", (PFN_xrVoidFunction*)&table->GetBodySkeletonHTC));
+
     // ---- XR_MNDX_force_feedback_curl extension commands
     (get_inst_proc_addr(instance, "xrApplyForceFeedbackCurlMNDX", (PFN_xrVoidFunction*)&table->ApplyForceFeedbackCurlMNDX));
 
@@ -531,6 +554,20 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
 
     // ---- XR_ML_user_calibration extension commands
     (get_inst_proc_addr(instance, "xrEnableUserCalibrationEventsML", (PFN_xrVoidFunction*)&table->EnableUserCalibrationEventsML));
+
+    // ---- XR_ML_system_notifications extension commands
+    (get_inst_proc_addr(instance, "xrSetSystemNotificationsML", (PFN_xrVoidFunction*)&table->SetSystemNotificationsML));
+
+    // ---- XR_ML_world_mesh_detection extension commands
+    (get_inst_proc_addr(instance, "xrCreateWorldMeshDetectorML", (PFN_xrVoidFunction*)&table->CreateWorldMeshDetectorML));
+    (get_inst_proc_addr(instance, "xrDestroyWorldMeshDetectorML", (PFN_xrVoidFunction*)&table->DestroyWorldMeshDetectorML));
+    (get_inst_proc_addr(instance, "xrRequestWorldMeshStateAsyncML", (PFN_xrVoidFunction*)&table->RequestWorldMeshStateAsyncML));
+    (get_inst_proc_addr(instance, "xrRequestWorldMeshStateCompleteML", (PFN_xrVoidFunction*)&table->RequestWorldMeshStateCompleteML));
+    (get_inst_proc_addr(instance, "xrGetWorldMeshBufferRecommendSizeML", (PFN_xrVoidFunction*)&table->GetWorldMeshBufferRecommendSizeML));
+    (get_inst_proc_addr(instance, "xrAllocateWorldMeshBufferML", (PFN_xrVoidFunction*)&table->AllocateWorldMeshBufferML));
+    (get_inst_proc_addr(instance, "xrFreeWorldMeshBufferML", (PFN_xrVoidFunction*)&table->FreeWorldMeshBufferML));
+    (get_inst_proc_addr(instance, "xrRequestWorldMeshAsyncML", (PFN_xrVoidFunction*)&table->RequestWorldMeshAsyncML));
+    (get_inst_proc_addr(instance, "xrRequestWorldMeshCompleteML", (PFN_xrVoidFunction*)&table->RequestWorldMeshCompleteML));
 }
 
 

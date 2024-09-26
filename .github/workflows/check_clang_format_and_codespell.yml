@@ -28,7 +28,7 @@ jobs:
         if: ${{ failure() }}
       - name: Publish diff
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ${{ runner.temp }}/clang-format.patch
           name: clang-format-changes

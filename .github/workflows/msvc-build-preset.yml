@@ -1,4 +1,4 @@
-# Copyright 2021-2023, Collabora, Ltd.
+# Copyright 2021-2024, Collabora, Ltd.
 # SPDX-License-Identifier: CC0-1.0
 
 on:
@@ -34,7 +34,7 @@ jobs:
           lfs: true
 
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.30.1
+        uses: lukka/get-cmake@v3.30.3
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -57,7 +57,7 @@ jobs:
         run: "cmake --build $env:RUNNER_TEMP --parallel --config ${{ inputs.buildType }} --target install"
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: inputs.artifactName
         with:
           name: "${{ inputs.artifactName }}"

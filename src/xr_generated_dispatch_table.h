@@ -378,6 +378,23 @@ struct XrGeneratedDispatchTable {
     PFN_xrDestroyExportedLocalizationMapML DestroyExportedLocalizationMapML;
     PFN_xrGetExportedLocalizationMapDataML GetExportedLocalizationMapDataML;
 
+    // ---- XR_ML_spatial_anchors extension commands
+    PFN_xrCreateSpatialAnchorsAsyncML CreateSpatialAnchorsAsyncML;
+    PFN_xrCreateSpatialAnchorsCompleteML CreateSpatialAnchorsCompleteML;
+    PFN_xrGetSpatialAnchorStateML GetSpatialAnchorStateML;
+
+    // ---- XR_ML_spatial_anchors_storage extension commands
+    PFN_xrCreateSpatialAnchorsStorageML CreateSpatialAnchorsStorageML;
+    PFN_xrDestroySpatialAnchorsStorageML DestroySpatialAnchorsStorageML;
+    PFN_xrQuerySpatialAnchorsAsyncML QuerySpatialAnchorsAsyncML;
+    PFN_xrQuerySpatialAnchorsCompleteML QuerySpatialAnchorsCompleteML;
+    PFN_xrPublishSpatialAnchorsAsyncML PublishSpatialAnchorsAsyncML;
+    PFN_xrPublishSpatialAnchorsCompleteML PublishSpatialAnchorsCompleteML;
+    PFN_xrDeleteSpatialAnchorsAsyncML DeleteSpatialAnchorsAsyncML;
+    PFN_xrDeleteSpatialAnchorsCompleteML DeleteSpatialAnchorsCompleteML;
+    PFN_xrUpdateSpatialAnchorsExpirationAsyncML UpdateSpatialAnchorsExpirationAsyncML;
+    PFN_xrUpdateSpatialAnchorsExpirationCompleteML UpdateSpatialAnchorsExpirationCompleteML;
+
     // ---- XR_MSFT_spatial_anchor_persistence extension commands
     PFN_xrCreateSpatialAnchorStoreConnectionMSFT CreateSpatialAnchorStoreConnectionMSFT;
     PFN_xrDestroySpatialAnchorStoreConnectionMSFT DestroySpatialAnchorStoreConnectionMSFT;
@@ -520,6 +537,12 @@ struct XrGeneratedDispatchTable {
     PFN_xrCreateSpatialAnchorHTC CreateSpatialAnchorHTC;
     PFN_xrGetSpatialAnchorNameHTC GetSpatialAnchorNameHTC;
 
+    // ---- XR_HTC_body_tracking extension commands
+    PFN_xrCreateBodyTrackerHTC CreateBodyTrackerHTC;
+    PFN_xrDestroyBodyTrackerHTC DestroyBodyTrackerHTC;
+    PFN_xrLocateBodyJointsHTC LocateBodyJointsHTC;
+    PFN_xrGetBodySkeletonHTC GetBodySkeletonHTC;
+
     // ---- XR_MNDX_force_feedback_curl extension commands
     PFN_xrApplyForceFeedbackCurlMNDX ApplyForceFeedbackCurlMNDX;
 
@@ -537,6 +560,20 @@ struct XrGeneratedDispatchTable {
 
     // ---- XR_ML_user_calibration extension commands
     PFN_xrEnableUserCalibrationEventsML EnableUserCalibrationEventsML;
+
+    // ---- XR_ML_system_notifications extension commands
+    PFN_xrSetSystemNotificationsML SetSystemNotificationsML;
+
+    // ---- XR_ML_world_mesh_detection extension commands
+    PFN_xrCreateWorldMeshDetectorML CreateWorldMeshDetectorML;
+    PFN_xrDestroyWorldMeshDetectorML DestroyWorldMeshDetectorML;
+    PFN_xrRequestWorldMeshStateAsyncML RequestWorldMeshStateAsyncML;
+    PFN_xrRequestWorldMeshStateCompleteML RequestWorldMeshStateCompleteML;
+    PFN_xrGetWorldMeshBufferRecommendSizeML GetWorldMeshBufferRecommendSizeML;
+    PFN_xrAllocateWorldMeshBufferML AllocateWorldMeshBufferML;
+    PFN_xrFreeWorldMeshBufferML FreeWorldMeshBufferML;
+    PFN_xrRequestWorldMeshAsyncML RequestWorldMeshAsyncML;
+    PFN_xrRequestWorldMeshCompleteML RequestWorldMeshCompleteML;
 };
 
 

@@ -21,7 +21,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(OPENXR)
 
-find_package(PythonInterp 3)
+find_package(Python3 COMPONENTS Interpreter)
 include(CTest)
 
 # Enable IDE GUI folders.  "Helper targets" that don't have interesting source code should set their FOLDER property to this
@@ -44,7 +44,7 @@ option(
     OFF
 )
 
-if(BUILD_FORCE_GENERATION AND NOT PYTHON_EXECUTABLE)
+if(BUILD_FORCE_GENERATION AND NOT Python3_EXECUTABLE)
     message(FATAL_ERROR "BUILD_FORCE_GENERATION requires Python")
 endif()
 

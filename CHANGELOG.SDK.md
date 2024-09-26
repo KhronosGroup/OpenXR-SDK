@@ -21,6 +21,50 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.41 (2024-09-25)
+
+This release features several new vendor extensions, as well as some small
+improvements and fixes to the software.
+
+- Registry
+  - Change: Allow structs that can extend multiple other structs in the RelaxNG
+    schema, as already permitted by the Vulkan schema.
+    ([internal MR 2869](https://gitlab.khronos.org/openxr/openxr/merge_requests/2869))
+  - New vendor extension: `XR_HTC_body_tracking`
+    ([internal MR 2549](https://gitlab.khronos.org/openxr/openxr/merge_requests/2549))
+  - New vendor extension: `XR_ML_spatial_anchors`
+    ([internal MR 2803](https://gitlab.khronos.org/openxr/openxr/merge_requests/2803))
+  - New vendor extension: `XR_ML_spatial_anchors_storage`
+    ([internal MR 2804](https://gitlab.khronos.org/openxr/openxr/merge_requests/2804))
+  - New vendor extension: `XR_ML_system_notifications`
+    ([internal MR 2946](https://gitlab.khronos.org/openxr/openxr/merge_requests/2946))
+  - New vendor extension: `XR_ML_world_mesh_detection`
+    ([internal MR 2950](https://gitlab.khronos.org/openxr/openxr/merge_requests/2950))
+  - New vendor extension: `XR_ML_view_configuration_depth_range_change`
+    ([internal MR 3036](https://gitlab.khronos.org/openxr/openxr/merge_requests/3036))
+- SDK
+  - Fix: Do not enforce overly-strict requirements on structs using `*BaseHeader`
+    types in the code generation scripts, fixing a build-time warning for the
+    layers.
+    ([internal MR 3434](https://gitlab.khronos.org/openxr/openxr/merge_requests/3434))
+  - Improvement: Migrate CMake build system away from using
+    `find_package(PythonInterpreter)`, deprecated since CMake 3.12. Use
+    `find_package(Python3 COMPONENTS Interpreter)` instead.
+    ([OpenXR-SDK-Source PR 486](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/486),
+    [internal MR 3472](https://gitlab.khronos.org/openxr/openxr/merge_requests/3472))
+  - Validation layer: Improvement: Clean up `generate_vuid_database` script, used
+    to analyze the validation layer.
+    ([internal MR 2895](https://gitlab.khronos.org/openxr/openxr/merge_requests/2895))
+  - ci: Remove now-redundant gradle-wrapper-validation job from GitHub Actions
+    ([OpenXR-SDK-Source PR 500](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/500))
+  - ci: Add GitHub Action for macOS building
+    ([OpenXR-SDK-Source PR 501](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/501))
+  - doc: Add command to build OpenXR targets on macOS
+    ([OpenXR-SDK-Source PR 501](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/501))
+  - hello_xr: Addition: Log Vulkan extensions requested by runtime and by app,
+    visible when running with `--verbose`.
+    ([OpenXR-SDK-Source PR 403](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/403))
+
 ## OpenXR SDK 1.1.40 (2024-08-22)
 
 This release features a new ratified graphics API binding extension,

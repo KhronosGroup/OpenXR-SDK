@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-version: 1.1.40.{build}
+version: 1.1.41.{build}
 image: Visual Studio 2017
 
 
@@ -45,9 +45,9 @@ install:
 build_script:
 - cmd: >-
     call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\%VCVARS%.bat" &&
-    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPYTHON_EXECUTABLE=C:/Python37-x64/python.exe -DBUILD_ALL_EXTENSIONS=ON &&
+    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPython3_EXECUTABLE=C:/Python37-x64/python.exe -DBUILD_ALL_EXTENSIONS=ON &&
     ninja -C build
 - cmd: >-
     call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\%VCVARS%.bat" &&
-    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DDYNAMIC_LOADER=ON -DPYTHON_EXECUTABLE=C:/Python37-x64/python.exe -DBUILD_ALL_EXTENSIONS=ON &&
+    cmake -GNinja -Bbuild -H. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DDYNAMIC_LOADER=ON -DPython3_EXECUTABLE=C:/Python37-x64/python.exe -DBUILD_ALL_EXTENSIONS=ON &&
     ninja -C build

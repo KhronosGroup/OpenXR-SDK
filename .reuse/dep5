@@ -63,6 +63,16 @@ Copyright: 2011 by Morten S. Mikkelsen
 License: Zlib
 Comment: Unmodified, vendored copy of MikkTSpace commit 3e895b4
 
+Files: src/external/basis_universal/*
+Copyright: 2019-2021 Binomial LLC
+License: Apache-2.0
+Comment: Unmodified, vendored subset of basis_universal commit 1.16.4
+
+Files: src/external/basis_universal/zstd/*
+Copyright: 2016-2021, Yann Collet, Facebook, Inc.
+License: BSD-3-Clause
+Comment: Vendored copy of single-file libraries included in the basis_universal repo.
+
 Files: src/external/jnipp/*
 Copyright: 2016-2020, Mitchell Dowd
   2020, Collabora, Ltd.
