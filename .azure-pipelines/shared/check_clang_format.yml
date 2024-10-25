@@ -6,7 +6,7 @@ jobs:
     displayName: "clang-format"
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr.20240805@sha256:05e900737234daf09d29a1c525a017ea8cc54a0d1f808569488e9ae6018053f2
+    container: khronosgroup/docker-images:openxr.20240924@sha256:3d595e68d21b2bba12cb7bbfa8cb135f66a2d9b97efeda6de3c6c8412163c4b7
 
     steps:
       - checkout: self

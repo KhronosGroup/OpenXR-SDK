@@ -6,7 +6,7 @@ jobs:
     displayName: "codespell"
     pool:
       vmImage: "ubuntu-latest"
-    container: khronosgroup/docker-images:openxr-sdk.20240805@sha256:bbc790ccdc56f291d72877c6fdb825edbb9c3222efb63dc4d3ac34e3bf13dd7a
+    container: khronosgroup/docker-images:openxr-sdk.20240924@sha256:5e6a6f5d72dc4a20d5c33f12550fdd9b6a1206e94d6cf1382e0697a5726c424c
 
     steps:
       - checkout: self

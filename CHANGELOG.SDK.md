@@ -21,6 +21,56 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.42 (2024-10-25)
+
+This release updates a vendor extension with renamed enumerants, adds
+architecture support for `loong64`, and delivers substantial improvements and
+fixes to the XML registry, particularly the description of interaction profile
+
+- Registry
+  - Fix: Update schema to reflect that `XrPathString_t` should allow dash in
+    interaction profile paths.
+    ([internal MR 3493](https://gitlab.khronos.org/openxr/openxr/merge_requests/3493))
+  - Fix: `XR_VARJO_xr4_controller_interaction` did not properly define its
+    interaction profile in XML.
+    ([internal MR 3493](https://gitlab.khronos.org/openxr/openxr/merge_requests/3493),
+    [internal MR 3548](https://gitlab.khronos.org/openxr/openxr/merge_requests/3548))
+  - Fix: Correct XML description of OpenXR 1.1 related additions to the promoted
+    Meta Touch Plus, Touch Pro, and Touch (Rift CV1) controller interaction
+    profiles.
+    ([internal MR 3513](https://gitlab.khronos.org/openxr/openxr/merge_requests/3513),
+    [internal issue 2350](https://gitlab.khronos.org/openxr/openxr/issues/2350),
+    [internal issue 2375](https://gitlab.khronos.org/openxr/openxr/issues/2375))
+  - Fix: Add missing XML description of `EXT_hand_interaction` additions to several
+    interaction profiles, and add comments to clarify where profile additions
+    should be located.
+    ([internal MR 3517](https://gitlab.khronos.org/openxr/openxr/merge_requests/3517),
+    [internal MR 3541](https://gitlab.khronos.org/openxr/openxr/merge_requests/3541),
+    [internal MR 3552](https://gitlab.khronos.org/openxr/openxr/merge_requests/3552))
+  - Fix: Corrections to the Schema chapter of the style guide.
+    ([internal MR 3521](https://gitlab.khronos.org/openxr/openxr/merge_requests/3521))
+  - Improvement: Small consistency clean-up.
+    ([internal MR 3512](https://gitlab.khronos.org/openxr/openxr/merge_requests/3512))
+  - Improvement: Clean up `.rnc` schema to improve readability.
+    ([internal MR 3521](https://gitlab.khronos.org/openxr/openxr/merge_requests/3521))
+  - Scripts: Improve `update_version.py` used in release process.
+    ([internal MR 3543](https://gitlab.khronos.org/openxr/openxr/merge_requests/3543))
+  - Update: Change naming convention in `XR_HTC_facial_expression`: rename
+    `XR_LIP_EXPRESSION_MOUTH_SMILE_RIGHT_HTC` to
+    `XR_LIP_EXPRESSION_MOUTH_RAISER_RIGHT_HTC`,
+    `XR_LIP_EXPRESSION_MOUTH_SMILE_LEFT_HTC` to
+    `XR_LIP_EXPRESSION_MOUTH_RAISER_LEFT_HTC`,
+    `XR_LIP_EXPRESSION_MOUTH_SAD_RIGHT_HTC` to
+    `XR_LIP_EXPRESSION_MOUTH_STRETCHER_RIGHT_HTC` and
+    `XR_LIP_EXPRESSION_MOUTH_SAD_LEFT_HTC` to
+    `XR_LIP_EXPRESSION_MOUTH_STRETCHER_LEFT_HTC`, providing the old names as
+    compatibility aliases.
+    ([internal MR 3408](https://gitlab.khronos.org/openxr/openxr/merge_requests/3408))
+- SDK
+  - Loader: Fix build error on `loong64`, and add `loong64` in the architecture
+    table in the loader documentation.
+    ([OpenXR-SDK-Source PR 479](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/479))
+
 ## OpenXR SDK 1.1.41 (2024-09-25)
 
 This release features several new vendor extensions, as well as some small

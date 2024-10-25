@@ -50,7 +50,7 @@ Files: src/external/tinygltf/README.md
   src/external/tinygltf/tiny_gltf.h
 Copyright: 2015-Present, Syoyo Fujita, Aurélien Chatelain and many contributors
 License: MIT
-Comment: Unmodified, vendored copy of a subset of the tiny-gltf repo v2.8.9
+Comment: Unmodified, vendored copy of a subset of the tiny-gltf repo v2.9.3
 
 Files: src/external/d3dx12/*
 Copyright: Copyright (c) Microsoft Corporation.

@@ -32,9 +32,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+          fetch-tags: "${{ !github.event.release }}"
+          fetch-depth: "${{ github.event.release && '0' || '1'}}"
 
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.30.3
+        uses: lukka/get-cmake@v3.30.5
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
