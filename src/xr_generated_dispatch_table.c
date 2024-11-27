@@ -505,6 +505,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrDestroyFaceTracker2FB", (PFN_xrVoidFunction*)&table->DestroyFaceTracker2FB));
     (get_inst_proc_addr(instance, "xrGetFaceExpressionWeights2FB", (PFN_xrVoidFunction*)&table->GetFaceExpressionWeights2FB));
 
+    // ---- XR_META_spatial_entity_sharing extension commands
+    (get_inst_proc_addr(instance, "xrShareSpacesMETA", (PFN_xrVoidFunction*)&table->ShareSpacesMETA));
+
     // ---- XR_META_environment_depth extension commands
     (get_inst_proc_addr(instance, "xrCreateEnvironmentDepthProviderMETA", (PFN_xrVoidFunction*)&table->CreateEnvironmentDepthProviderMETA));
     (get_inst_proc_addr(instance, "xrDestroyEnvironmentDepthProviderMETA", (PFN_xrVoidFunction*)&table->DestroyEnvironmentDepthProviderMETA));
@@ -568,6 +571,17 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrFreeWorldMeshBufferML", (PFN_xrVoidFunction*)&table->FreeWorldMeshBufferML));
     (get_inst_proc_addr(instance, "xrRequestWorldMeshAsyncML", (PFN_xrVoidFunction*)&table->RequestWorldMeshAsyncML));
     (get_inst_proc_addr(instance, "xrRequestWorldMeshCompleteML", (PFN_xrVoidFunction*)&table->RequestWorldMeshCompleteML));
+
+    // ---- XR_ML_facial_expression extension commands
+    (get_inst_proc_addr(instance, "xrCreateFacialExpressionClientML", (PFN_xrVoidFunction*)&table->CreateFacialExpressionClientML));
+    (get_inst_proc_addr(instance, "xrDestroyFacialExpressionClientML", (PFN_xrVoidFunction*)&table->DestroyFacialExpressionClientML));
+    (get_inst_proc_addr(instance, "xrGetFacialExpressionBlendShapePropertiesML", (PFN_xrVoidFunction*)&table->GetFacialExpressionBlendShapePropertiesML));
+
+    // ---- XR_META_colocation_discovery extension commands
+    (get_inst_proc_addr(instance, "xrStartColocationDiscoveryMETA", (PFN_xrVoidFunction*)&table->StartColocationDiscoveryMETA));
+    (get_inst_proc_addr(instance, "xrStopColocationDiscoveryMETA", (PFN_xrVoidFunction*)&table->StopColocationDiscoveryMETA));
+    (get_inst_proc_addr(instance, "xrStartColocationAdvertisementMETA", (PFN_xrVoidFunction*)&table->StartColocationAdvertisementMETA));
+    (get_inst_proc_addr(instance, "xrStopColocationAdvertisementMETA", (PFN_xrVoidFunction*)&table->StopColocationAdvertisementMETA));
 }
 
 

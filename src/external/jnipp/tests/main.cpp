@@ -203,6 +203,11 @@ TEST(Class_call_staticMethod_byName)
     jni::Object Tests
  */
 
+// Must run before loading JVM
+TEST(Object_noDestructorException)
+{
+    jni::Object o;
+}
 
 TEST(Object_defaultConstructor_isNull)
 {
@@ -574,6 +579,9 @@ TEST(Arg_ObjectPtr)
 
 int main()
 {
+    // Tests that depend on having no JVM
+    RUN_TEST(Object_noDestructorException);
+
     // jni::Vm Tests
     RUN_TEST(Vm_detectsJreInstall);
     RUN_TEST(Vm_notAllowedMultipleVms);

@@ -511,6 +511,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrDestroyFaceTracker2FB DestroyFaceTracker2FB;
     PFN_xrGetFaceExpressionWeights2FB GetFaceExpressionWeights2FB;
 
+    // ---- XR_META_spatial_entity_sharing extension commands
+    PFN_xrShareSpacesMETA ShareSpacesMETA;
+
     // ---- XR_META_environment_depth extension commands
     PFN_xrCreateEnvironmentDepthProviderMETA CreateEnvironmentDepthProviderMETA;
     PFN_xrDestroyEnvironmentDepthProviderMETA DestroyEnvironmentDepthProviderMETA;
@@ -574,6 +577,17 @@ struct XrGeneratedDispatchTable {
     PFN_xrFreeWorldMeshBufferML FreeWorldMeshBufferML;
     PFN_xrRequestWorldMeshAsyncML RequestWorldMeshAsyncML;
     PFN_xrRequestWorldMeshCompleteML RequestWorldMeshCompleteML;
+
+    // ---- XR_ML_facial_expression extension commands
+    PFN_xrCreateFacialExpressionClientML CreateFacialExpressionClientML;
+    PFN_xrDestroyFacialExpressionClientML DestroyFacialExpressionClientML;
+    PFN_xrGetFacialExpressionBlendShapePropertiesML GetFacialExpressionBlendShapePropertiesML;
+
+    // ---- XR_META_colocation_discovery extension commands
+    PFN_xrStartColocationDiscoveryMETA StartColocationDiscoveryMETA;
+    PFN_xrStopColocationDiscoveryMETA StopColocationDiscoveryMETA;
+    PFN_xrStartColocationAdvertisementMETA StartColocationAdvertisementMETA;
+    PFN_xrStopColocationAdvertisementMETA StopColocationAdvertisementMETA;
 };
 
 

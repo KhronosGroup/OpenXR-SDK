@@ -135,7 +135,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 42)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 43)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -434,6 +434,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_ML_world_mesh_detection -->
         <type bitvalues="XrWorldMeshDetectorFlagBitsML" category="bitmask">typedef <type>XrFlags64</type> <name>XrWorldMeshDetectorFlagsML</name>;</type>
 
+        <!-- Bitmask types for XR_ML_facial_expression -->
+        <type bitvalues="XrFacialExpressionBlendShapePropertiesFlagBitsML" category="bitmask">typedef <type>XrFlags64</type> <name>XrFacialExpressionBlendShapePropertiesFlagsML</name>;</type>
+
         <!-- Handles referring to internally-maintained objects. -->
         <!-- These types which can be 64-bit integers or opaque pointers, selected at compile time based on pointer size -->
         <type category="handle"><type>XR_DEFINE_HANDLE</type>(<name>XrInstance</name>)</type>
@@ -498,8 +501,8 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_ML_marker_understanding -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrMarkerDetectorML</name>)</type>
 
-        <!-- XR_EXT_future -->
-        <type category="basetype"><type>XR_DEFINE_OPAQUE_64</type>(<name>XrFutureEXT</name>)</type>
+        <!-- XR_ML_facial_expression -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrFacialExpressionClientML</name>)</type>
 
         <!-- XR_META_environment_depth -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrEnvironmentDepthProviderMETA</name>)</type>
@@ -510,6 +513,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- XR_ML_world_mesh_detection -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrWorldMeshDetectorML</name>)</type>
+
+
+        <!-- Non-handle 64-bit opaque type from XR_EXT_future -->
+        <type category="basetype"><type>XR_DEFINE_OPAQUE_64</type>(<name>XrFutureEXT</name>)</type>
+
 
         <!-- enums and flag bits generated from corresponding <enums> tags below -->
         <type name="XrLoaderInterfaceStructs" category="enum"/>
@@ -665,13 +673,14 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- enum for XR_ML_frame_end_info -->
         <type name="XrFrameEndInfoFlagBitsML" category="enum"/>
+
         <!-- enums for XR_FB_eye_tracking_social -->
-        <type category="enum" name="XrEyePositionFB"/>
+        <type name="XrEyePositionFB" category="enum"/>
 
         <!-- enums for XR_ML_global_dimmer -->
         <type name="XrGlobalDimmerFrameEndInfoFlagBitsML" category="enum"/>
 
-        <!-- enums for XR_QCOM_tracking_optimization_settings extension -->
+        <!-- enums for XR_QCOM_tracking_optimization_settings -->
         <type name="XrTrackingOptimizationSettingsDomainQCOM" category="enum"/>
         <type name="XrTrackingOptimizationSettingsHintQCOM" category="enum"/>
 
@@ -711,6 +720,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrMarkerDetectorCornerRefineMethodML" category="enum"/>
         <type name="XrMarkerDetectorFullAnalysisIntervalML" category="enum"/>
         <type name="XrMarkerDetectorStatusML" category="enum"/>
+
+        <!-- enums for XR_ML_facial_expression -->
+        <type name="XrFacialBlendShapeML" category="enum"/>
+        <type name="XrFacialExpressionBlendShapePropertiesFlagBitsML" category="enum"/>
 
         <!-- XR_EXT_future -->
         <type name="XrFutureStateEXT" category="enum"/>
@@ -2808,6 +2821,118 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrKeyboardTrackingQueryFlagsFB</type>   <name>flags</name></member>
         </type>
 
+        <!-- XR_META_colocation_discovery -->
+        <type category="struct" name="XrSystemColocationDiscoveryPropertiesMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_COLOCATION_DISCOVERY_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsColocationDiscovery</name></member>
+        </type>
+        <type category="struct" name="XrColocationAdvertisementStartInfoMETA">
+            <member values="XR_TYPE_COLOCATION_ADVERTISEMENT_START_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*               <name>next</name></member>
+            <member><type>uint32_t</type>                  <name>bufferSize</name></member>
+            <member len="bufferSize"><type>uint8_t</type>* <name>buffer</name></member>
+        </type>
+        <type category="struct" name="XrColocationAdvertisementStopInfoMETA">
+            <member values="XR_TYPE_COLOCATION_ADVERTISEMENT_STOP_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrColocationDiscoveryStartInfoMETA">
+            <member values="XR_TYPE_COLOCATION_DISCOVERY_START_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrColocationDiscoveryStopInfoMETA">
+            <member values="XR_TYPE_COLOCATION_DISCOVERY_STOP_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrEventDataStartColocationAdvertisementCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_START_COLOCATION_ADVERTISEMENT_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>advertisementRequestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+            <member><type>XrUuid</type>             <name>advertisementUuid</name></member>
+        </type>
+        <type category="struct" name="XrEventDataColocationAdvertisementCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_COLOCATION_ADVERTISEMENT_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>advertisementRequestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+        <type category="struct" name="XrEventDataStopColocationAdvertisementCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_STOP_COLOCATION_ADVERTISEMENT_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+        <type category="struct" name="XrEventDataStartColocationDiscoveryCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_START_COLOCATION_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>discoveryRequestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+        <type category="struct" name="XrEventDataColocationDiscoveryResultMETA">
+            <member values="XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_RESULT_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*              <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type>       <name>discoveryRequestId</name></member>
+            <member><type>XrUuid</type>                   <name>advertisementUuid</name></member>
+            <member><type>uint32_t</type>                 <name>bufferSize</name></member>
+            <member len="bufferSize"><type>uint8_t</type> <name>buffer</name>[<enum>XR_MAX_COLOCATION_DISCOVERY_BUFFER_SIZE_META</enum>]</member>
+        </type>
+        <type category="struct" name="XrEventDataColocationDiscoveryCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>discoveryRequestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+        <type category="struct" name="XrEventDataStopColocationDiscoveryCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_STOP_COLOCATION_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+
+        <!-- XR_META_spatial_entity_sharing -->
+        <type category="struct" name="XrSystemSpatialEntitySharingPropertiesMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_SPATIAL_ENTITY_SHARING_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsSpatialEntitySharing</name></member>
+        </type>
+        <type category="struct" name="XrShareSpacesRecipientBaseHeaderMETA">
+            <member><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrShareSpacesInfoMETA">
+            <member values="XR_TYPE_SHARE_SPACES_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                 <name>next</name></member>
+            <member><type>uint32_t</type>                                    <name>spaceCount</name></member>
+            <member len="spaceCount"><type>XrSpace</type>*                   <name>spaces</name></member>
+            <member>const <type>XrShareSpacesRecipientBaseHeaderMETA</type>* <name>recipientInfo</name></member>
+        </type>
+        <type category="struct" name="XrEventDataShareSpacesCompleteMETA">
+            <member values="XR_TYPE_EVENT_DATA_SHARE_SPACES_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+
+        <!-- XR_META_spatial_entity_group_sharing -->
+        <type category="struct" name="XrShareSpacesRecipientGroupsMETA" parentstruct="XrShareSpacesRecipientBaseHeaderMETA">
+            <member values="XR_TYPE_SHARE_SPACES_RECIPIENT_GROUPS_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*              <name>next</name></member>
+            <member><type>uint32_t</type>                 <name>groupCount</name></member>
+            <member len="groupCount"><type>XrUuid</type>* <name>groups</name></member>
+        </type>
+        <type category="struct" name="XrSpaceGroupUuidFilterInfoMETA">
+            <member values="XR_TYPE_SPACE_GROUP_UUID_FILTER_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrUuid</type> <name>groupUuid</name></member>
+        </type>
+        <type category="struct" name="XrSystemSpatialEntityGroupSharingPropertiesMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_SPATIAL_ENTITY_GROUP_SHARING_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsSpatialEntityGroupSharing</name></member>
+        </type>
+
         <!-- XR_VARJO_composition_layer_depth_test -->
         <type category="struct" name="XrCompositionLayerDepthTestVARJO" structextends="XrCompositionLayerProjection">
             <member values="XR_TYPE_COMPOSITION_LAYER_DEPTH_TEST_VARJO"><type>XrStructureType</type> <name>type</name></member>
@@ -3674,6 +3799,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrMarkerML</type>         <name>marker</name></member>
             <member><type>XrPosef</type>            <name>poseInMarkerSpace</name></member>
         </type>
+
         <type category="struct" name="XrColor3f">
             <member><type>float</type> <name>r</name></member>
             <member><type>float</type> <name>g</name></member>
@@ -3717,6 +3843,31 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <type category="struct" name="XrBoxfKHR" alias="XrBoxf"/>
 
         <type category="struct" name="XrFrustumfKHR" alias="XrFrustumf"/>
+
+        <!-- XR_ML_facial_expression -->
+        <type category="struct" name="XrSystemFacialExpressionPropertiesML" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_FACIAL_EXPRESSION_PROPERTIES_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsFacialExpression</name></member>
+        </type>
+        <type category="struct" name="XrFacialExpressionClientCreateInfoML">
+            <member values="XR_TYPE_FACIAL_EXPRESSION_CLIENT_CREATE_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                      <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                         <name>requestedCount</name></member>
+            <member optional="true" len="requestedCount">const <type>XrFacialBlendShapeML</type>* <name>requestedFacialBlendShapes</name></member>
+        </type>
+        <type category="struct" name="XrFacialExpressionBlendShapePropertiesML">
+            <member values="XR_TYPE_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                               <name>next</name></member>
+            <member><type>XrFacialBlendShapeML</type>                                                <name>requestedFacialBlendShape</name></member>
+            <member noautovalidity="true"><type>float</type>                                         <name>weight</name></member>
+            <member noautovalidity="true"><type>XrFacialExpressionBlendShapePropertiesFlagsML</type> <name>flags</name></member>
+            <member noautovalidity="true"><type>XrTime</type>                                        <name>time</name></member>
+        </type>
+        <type category="struct" name="XrFacialExpressionBlendShapeGetInfoML">
+            <member values="XR_TYPE_FACIAL_EXPRESSION_BLEND_SHAPE_GET_INFO_ML"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
 
         <!-- XR_META_recommended_layer_resolution types -->
         <type category="struct" name="XrRecommendedLayerResolutionMETA" returnedonly="true">
@@ -4112,6 +4263,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrResult</type>                             <name>futureResult</name></member>
             <member><type>uint32_t</type>                             <name>blockCount</name></member>
             <member len="blockCount"><type>XrWorldMeshBlockML</type>* <name>blocks</name></member>
+        </type>
+
+        <!-- XR_META_passthrough_layer_resumed_event -->
+        <type category="struct" name="XrEventDataPassthroughLayerResumedMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
+            <member values="XR_TYPE_EVENT_DATA_PASSTHROUGH_LAYER_RESUMED_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*          <name>next</name></member>
+            <member><type>XrPassthroughLayerFB</type> <name>layer</name></member>
         </type>
 
     </types>
@@ -5424,6 +5582,61 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum bitpos="5" name="XR_LOCALIZATION_MAP_ERROR_HEADPOSE_BIT_ML"           comment="A headpose failure caused localization to be unsuccessful."/>
     </enums>
 
+    <!-- XR_ML_facial_expression -->
+    <enums name="XrFacialBlendShapeML" type="enum" comment="Each facial blend shape describes an area/region of a face.">
+        <enum value="0"    name="XR_FACIAL_BLEND_SHAPE_BROW_LOWERER_L_ML"/>
+        <enum value="1"    name="XR_FACIAL_BLEND_SHAPE_BROW_LOWERER_R_ML"/>
+        <enum value="2"    name="XR_FACIAL_BLEND_SHAPE_CHEEK_RAISER_L_ML"/>
+        <enum value="3"    name="XR_FACIAL_BLEND_SHAPE_CHEEK_RAISER_R_ML"/>
+        <enum value="4"    name="XR_FACIAL_BLEND_SHAPE_CHIN_RAISER_ML"/>
+        <enum value="5"    name="XR_FACIAL_BLEND_SHAPE_DIMPLER_L_ML"/>
+        <enum value="6"    name="XR_FACIAL_BLEND_SHAPE_DIMPLER_R_ML"/>
+        <enum value="7"    name="XR_FACIAL_BLEND_SHAPE_EYES_CLOSED_L_ML"/>
+        <enum value="8"    name="XR_FACIAL_BLEND_SHAPE_EYES_CLOSED_R_ML"/>
+        <enum value="9"    name="XR_FACIAL_BLEND_SHAPE_INNER_BROW_RAISER_L_ML"/>
+        <enum value="10"   name="XR_FACIAL_BLEND_SHAPE_INNER_BROW_RAISER_R_ML"/>
+        <enum value="11"   name="XR_FACIAL_BLEND_SHAPE_JAW_DROP_ML"/>
+        <enum value="12"   name="XR_FACIAL_BLEND_SHAPE_LID_TIGHTENER_L_ML"/>
+        <enum value="13"   name="XR_FACIAL_BLEND_SHAPE_LID_TIGHTENER_R_ML"/>
+        <enum value="14"   name="XR_FACIAL_BLEND_SHAPE_LIP_CORNER_DEPRESSOR_L_ML"/>
+        <enum value="15"   name="XR_FACIAL_BLEND_SHAPE_LIP_CORNER_DEPRESSOR_R_ML"/>
+        <enum value="16"   name="XR_FACIAL_BLEND_SHAPE_LIP_CORNER_PULLER_L_ML"/>
+        <enum value="17"   name="XR_FACIAL_BLEND_SHAPE_LIP_CORNER_PULLER_R_ML"/>
+        <enum value="18"   name="XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_LB_ML"/>
+        <enum value="19"   name="XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_LT_ML"/>
+        <enum value="20"   name="XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_RB_ML"/>
+        <enum value="21"   name="XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_RT_ML"/>
+        <enum value="22"   name="XR_FACIAL_BLEND_SHAPE_LIP_PRESSOR_L_ML"/>
+        <enum value="23"   name="XR_FACIAL_BLEND_SHAPE_LIP_PRESSOR_R_ML"/>
+        <enum value="24"   name="XR_FACIAL_BLEND_SHAPE_LIP_PUCKER_L_ML"/>
+        <enum value="25"   name="XR_FACIAL_BLEND_SHAPE_LIP_PUCKER_R_ML"/>
+        <enum value="26"   name="XR_FACIAL_BLEND_SHAPE_LIP_STRETCHER_L_ML"/>
+        <enum value="27"   name="XR_FACIAL_BLEND_SHAPE_LIP_STRETCHER_R_ML"/>
+        <enum value="28"   name="XR_FACIAL_BLEND_SHAPE_LIP_SUCK_LB_ML"/>
+        <enum value="29"   name="XR_FACIAL_BLEND_SHAPE_LIP_SUCK_LT_ML"/>
+        <enum value="30"   name="XR_FACIAL_BLEND_SHAPE_LIP_SUCK_RB_ML"/>
+        <enum value="31"   name="XR_FACIAL_BLEND_SHAPE_LIP_SUCK_RT_ML"/>
+        <enum value="32"   name="XR_FACIAL_BLEND_SHAPE_LIP_TIGHTENER_L_ML"/>
+        <enum value="33"   name="XR_FACIAL_BLEND_SHAPE_LIP_TIGHTENER_R_ML"/>
+        <enum value="34"   name="XR_FACIAL_BLEND_SHAPE_LIPS_TOWARD_ML"/>
+        <enum value="35"   name="XR_FACIAL_BLEND_SHAPE_LOWER_LIP_DEPRESSOR_L_ML"/>
+        <enum value="36"   name="XR_FACIAL_BLEND_SHAPE_LOWER_LIP_DEPRESSOR_R_ML"/>
+        <enum value="37"   name="XR_FACIAL_BLEND_SHAPE_NOSE_WRINKLER_L_ML"/>
+        <enum value="38"   name="XR_FACIAL_BLEND_SHAPE_NOSE_WRINKLER_R_ML"/>
+        <enum value="39"   name="XR_FACIAL_BLEND_SHAPE_OUTER_BROW_RAISER_L_ML"/>
+        <enum value="40"   name="XR_FACIAL_BLEND_SHAPE_OUTER_BROW_RAISER_R_ML"/>
+        <enum value="41"   name="XR_FACIAL_BLEND_SHAPE_UPPER_LID_RAISER_L_ML"/>
+        <enum value="42"   name="XR_FACIAL_BLEND_SHAPE_UPPER_LID_RAISER_R_ML"/>
+        <enum value="43"   name="XR_FACIAL_BLEND_SHAPE_UPPER_LIP_RAISER_L_ML"/>
+        <enum value="44"   name="XR_FACIAL_BLEND_SHAPE_UPPER_LIP_RAISER_R_ML"/>
+        <enum value="45"   name="XR_FACIAL_BLEND_SHAPE_TONGUE_OUT_ML"/>
+    </enums>
+
+    <enums name="XrFacialExpressionBlendShapePropertiesFlagBitsML" type="bitmask">
+        <enum bitpos="0" name="XR_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_VALID_BIT_ML"   comment="Indicates whether the blend shape is valid."/>
+        <enum bitpos="1" name="XR_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_TRACKED_BIT_ML" comment="Indicates whether the blend shape is being tracked by the runtime."/>
+    </enums>
+
     <!-- XR_EXT_future -->
     <enums name="XrFutureStateEXT" type="enum">
         <enum value="1"   name="XR_FUTURE_STATE_PENDING_EXT"/>
@@ -6729,6 +6942,40 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param>const <type>XrPassthroughKeyboardHandsIntensityFB</type>* <name>intensity</name></param>
         </command>
 
+        <!-- XR_META_colocation_discovery -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_UNAVAILABLE,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_EXTENSION_NOT_PRESENT">
+            <proto><type>XrResult</type> <name>xrStartColocationDiscoveryMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrColocationDiscoveryStartInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>discoveryRequestId</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_UNAVAILABLE,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_EXTENSION_NOT_PRESENT">
+            <proto><type>XrResult</type> <name>xrStopColocationDiscoveryMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrColocationDiscoveryStopInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_UNAVAILABLE,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_EXTENSION_NOT_PRESENT">
+            <proto><type>XrResult</type> <name>xrStartColocationAdvertisementMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrColocationAdvertisementStartInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>advertisementRequestId</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_RUNTIME_UNAVAILABLE,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_EXTENSION_NOT_PRESENT">
+            <proto><type>XrResult</type> <name>xrStopColocationAdvertisementMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrColocationAdvertisementStopInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
+        </command>
+
+        <!-- XR_META_spatial_entity_sharing -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrShareSpacesMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrShareSpacesInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
+        </command>
+
         <!-- XR_MSFT_spatial_anchor_persistence -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
             <proto><type>XrResult</type> <name>xrCreateSpatialAnchorStoreConnectionMSFT</name></proto>
@@ -7317,6 +7564,24 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param>const <type>XrEnvironmentDepthHandRemovalSetInfoMETA</type>* <name>setInfo</name></param>
         </command>
 
+        <!-- XR_ML_facial_expression -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED,XR_ERROR_FACIAL_EXPRESSION_PERMISSION_DENIED_ML">
+            <proto><type>XrResult</type> <name>xrCreateFacialExpressionClientML</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrFacialExpressionClientCreateInfoML</type>* <name>createInfo</name></param>
+            <param><type>XrFacialExpressionClientML</type>* <name>facialExpressionClient</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyFacialExpressionClientML</name></proto>
+            <param externsync="true_with_children"><type>XrFacialExpressionClientML</type> <name>facialExpressionClient</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID">
+            <proto><type>XrResult</type> <name>xrGetFacialExpressionBlendShapePropertiesML</name></proto>
+            <param><type>XrFacialExpressionClientML</type> <name>facialExpressionClient</name></param>
+            <param>const <type>XrFacialExpressionBlendShapeGetInfoML</type>* <name>blendShapeGetInfo</name></param>
+            <param><type>uint32_t</type> <name>blendShapeCount</name></param>
+            <param len="blendShapeCount"><type>XrFacialExpressionBlendShapePropertiesML</type>* <name>blendShapes</name></param>
+        </command>
 
         <!-- XR_KHR_locate_spaces -->
         <command name="xrLocateSpacesKHR" alias="xrLocateSpaces"/>
@@ -7878,6 +8143,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component subpath="/output/haptic"          type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- XR_FB_touch_pro_controller -->
         <interaction_profile name="/interaction_profiles/facebook/touch_controller_pro" title="Meta Quest Touch Pro Controller">
             <user_path path="/user/hand/left"/>
             <user_path path="/user/hand/right"/>
@@ -7947,6 +8213,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </interaction_profile>
 
         <!-- 1.1 Meta Interaction Profiles -->
+        <!-- Promoted and renamed -->
         <interaction_profile name="/interaction_profiles/meta/touch_pro_controller" title="Meta Quest Touch Pro Controller">
             <user_path path="/user/hand/left"/>
             <user_path path="/user/hand/right"/>
@@ -7983,6 +8250,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component                                subpath="/output/haptic_thumb"                      type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- Promoted and renamed -->
         <interaction_profile name="/interaction_profiles/meta/touch_plus_controller" title="Meta Quest Touch Plus Controller">
             <user_path path="/user/hand/left"/>
             <user_path path="/user/hand/right"/>
@@ -8016,6 +8284,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component                                subpath="/input/trigger/force"                      type="XR_ACTION_TYPE_FLOAT_INPUT"/>
         </interaction_profile>
 
+        <!-- New legacy profile -->
         <interaction_profile name="/interaction_profiles/meta/touch_controller_rift_cv1" title="Rift CV1 Controller">
             <user_path path="/user/hand/left"/>
             <user_path path="/user/hand/right"/>
@@ -8046,6 +8315,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component                                subpath="/output/haptic"                            type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- New legacy profile -->
         <interaction_profile name="/interaction_profiles/meta/touch_controller_quest_1_rift_s" title="Quest / Rift S Controller">
             <user_path path="/user/hand/left"/>
             <user_path path="/user/hand/right"/>
@@ -8075,6 +8345,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component                                subpath="/output/haptic"                            type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- New legacy profile -->
         <interaction_profile name="/interaction_profiles/meta/touch_controller_quest_2" title="Quest 2 Controller">
             <user_path path="/user/hand/left"/>
             <user_path path="/user/hand/right"/>
@@ -9007,9 +9278,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
 
     <!-- Vulkan image format list extension -->
-    <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" depends="XR_VERSION_1_0+XR_KHR_vulkan_enable" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN">
+    <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" depends="XR_VERSION_1_0+XR_KHR_vulkan_enable,XR_VERSION_1_0+XR_KHR_vulkan_enable2" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN">
         <require>
-            <enum value="4"                                               name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
+            <enum value="5"                                               name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_swapchain_format_list&quot;" name="XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"                    name="XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR"/>
             <type name="XrVulkanSwapchainFormatListCreateInfoKHR"/>
@@ -11275,7 +11546,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_touch_controller_pro" number="168" type="instance" supported="openxr">
+    <extension name="XR_FB_touch_controller_pro" number="168" type="instance" supported="openxr" promotedto="XR_VERSION_1_1">
         <require>
             <enum value="1"                                      name="XR_FB_touch_controller_pro_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_touch_controller_pro&quot;" name="XR_FB_TOUCH_CONTROLLER_PRO_EXTENSION_NAME"/>
@@ -12410,7 +12681,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_META_touch_controller_plus" number="280" type="instance" supported="openxr">
+    <extension name="XR_META_touch_controller_plus" number="280" type="instance" supported="openxr" promotedto="XR_VERSION_1_1">
         <require>
             <enum value="1"                                         name="XR_META_touch_controller_plus_SPEC_VERSION"/>
             <enum value="&quot;XR_META_touch_controller_plus&quot;" name="XR_META_TOUCH_CONTROLLER_PLUS_EXTENSION_NAME"/>
@@ -12443,10 +12714,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_283" number="283" type="instance" supported="disabled">
+    <extension name="XR_META_passthrough_layer_resumed_event" number="283" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_FB_passthrough">
         <require>
-            <enum value="1"                               name="XR_FB_extension_283_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_283&quot;" name="XR_FB_EXTENSION_283_EXTENSION_NAME"/>
+            <enum value="1"                                                   name="XR_META_passthrough_layer_resumed_event_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_passthrough_layer_resumed_event&quot;" name="XR_META_PASSTHROUGH_LAYER_RESUMED_EVENT_EXTENSION_NAME"/>
+
+            <type name="XrEventDataPassthroughLayerResumedMETA"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_PASSTHROUGH_LAYER_RESUMED_META"/>
         </require>
     </extension>
 
@@ -12523,12 +12798,27 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_291" number="291" type="instance" supported="disabled">
+    <extension name="XR_META_spatial_entity_sharing" number="291" type="instance" supported="openxr" depends="XR_FB_spatial_entity">
         <require>
-            <enum value="1"                               name="XR_FB_extension_291_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_291&quot;" name="XR_FB_EXTENSION_291_EXTENSION_NAME"/>
+            <enum value="1"                                          name="XR_META_spatial_entity_sharing_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_spatial_entity_sharing&quot;" name="XR_META_SPATIAL_ENTITY_SHARING_EXTENSION_NAME"/>
+
+            <enum value="32"                                         name="XR_MAX_SPACES_PER_SHARE_REQUEST_META"/>
+
+            <type name="XrSystemSpatialEntitySharingPropertiesMETA"/>
+
+            <type name="XrShareSpacesRecipientBaseHeaderMETA"/>
+            <type name="XrShareSpacesInfoMETA"/>
+            <type name="XrEventDataShareSpacesCompleteMETA"/>
+
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_SPATIAL_ENTITY_SHARING_PROPERTIES_META"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SHARE_SPACES_INFO_META"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_SHARE_SPACES_COMPLETE_META"/>
+
+            <command name="xrShareSpacesMETA"/>
         </require>
     </extension>
+
 
     <extension name="XR_META_environment_depth" number="292" type="instance" supported="openxr">
         <require>
@@ -14229,10 +14519,30 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ML_extension_483" number="483" type="instance" supported="disabled">
+    <extension name="XR_ML_facial_expression" number="483" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_ML_extension_483_SPEC_VERSION"/>
-            <enum value="&quot;XR_ML_extension_483&quot;" name="XR_ML_extension_483_EXTENSION_NAME"/>
+            <enum value="1"                                   name="XR_ML_facial_expression_SPEC_VERSION"/>
+            <enum value="&quot;XR_ML_facial_expression&quot;" name="XR_ML_FACIAL_EXPRESSION_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrResult"               name="XR_ERROR_FACIAL_EXPRESSION_PERMISSION_DENIED_ML"     comment="Permission to track facial expressions was not granted"/>
+            <enum offset="0" extends="XrObjectType"           name="XR_OBJECT_TYPE_FACIAL_EXPRESSION_CLIENT_ML"          comment="XrFacialExpressionClientML"/>
+
+            <enum offset="4" extends="XrStructureType"        name="XR_TYPE_SYSTEM_FACIAL_EXPRESSION_PROPERTIES_ML"/>
+            <enum offset="5" extends="XrStructureType"        name="XR_TYPE_FACIAL_EXPRESSION_CLIENT_CREATE_INFO_ML"/>
+            <enum offset="6" extends="XrStructureType"        name="XR_TYPE_FACIAL_EXPRESSION_BLEND_SHAPE_GET_INFO_ML"/>
+            <enum offset="7" extends="XrStructureType"        name="XR_TYPE_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_ML"/>
+
+            <type name="XrFacialExpressionClientML"/>
+
+            <type name="XrFacialBlendShapeML"/>
+            <type name="XrSystemFacialExpressionPropertiesML"/>
+            <type name="XrFacialExpressionClientCreateInfoML"/>
+            <type name="XrFacialExpressionBlendShapeGetInfoML"/>
+            <type name="XrFacialExpressionBlendShapePropertiesML"/>
+
+            <command name="xrCreateFacialExpressionClientML"/>
+            <command name="xrDestroyFacialExpressionClientML"/>
+            <command name="xrGetFacialExpressionBlendShapePropertiesML"/>
         </require>
     </extension>
 
@@ -14875,17 +15185,71 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_META_extension_572" number="572" type="instance" supported="disabled">
+    <extension name="XR_META_colocation_discovery" number="572" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                 name="XR_META_extension_572_SPEC_VERSION"/>
-            <enum value="&quot;XR_META_extension_572&quot;" name="XR_META_extension_572_EXTENSION_NAME"/>
+            <enum value="1"                                        name="XR_META_colocation_discovery_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_colocation_discovery&quot;" name="XR_META_COLOCATION_DISCOVERY_EXTENSION_NAME"/>
+
+            <enum value="1024"                                     name="XR_MAX_COLOCATION_DISCOVERY_BUFFER_SIZE_META"/>
+
+            <enum offset="1"  dir="-" extends="XrResult"           name="XR_ERROR_COLOCATION_DISCOVERY_NETWORK_FAILED_META"               comment="The network request failed."/>
+            <enum offset="2"  dir="-" extends="XrResult"           name="XR_ERROR_COLOCATION_DISCOVERY_NO_DISCOVERY_METHOD_META"          comment="The runtime does not have any methods available to perform discovery."/>
+            <enum offset="3"          extends="XrResult"           name="XR_COLOCATION_DISCOVERY_ALREADY_ADVERTISING_META"                comment="Colocation advertisement has already been enabled"/>
+            <enum offset="4"          extends="XrResult"           name="XR_COLOCATION_DISCOVERY_ALREADY_DISCOVERING_META"                comment="Colocation discovery has already been enabled"/>
+
+            <enum offset="10"         extends="XrStructureType"    name="XR_TYPE_COLOCATION_DISCOVERY_START_INFO_META"/>
+            <enum offset="11"         extends="XrStructureType"    name="XR_TYPE_COLOCATION_DISCOVERY_STOP_INFO_META"/>
+            <enum offset="12"         extends="XrStructureType"    name="XR_TYPE_COLOCATION_ADVERTISEMENT_START_INFO_META"/>
+            <enum offset="13"         extends="XrStructureType"    name="XR_TYPE_COLOCATION_ADVERTISEMENT_STOP_INFO_META"/>
+            <enum offset="20"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_START_COLOCATION_ADVERTISEMENT_COMPLETE_META"/>
+            <enum offset="21"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_STOP_COLOCATION_ADVERTISEMENT_COMPLETE_META"/>
+            <enum offset="22"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_COLOCATION_ADVERTISEMENT_COMPLETE_META"/>
+            <enum offset="23"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_START_COLOCATION_DISCOVERY_COMPLETE_META"/>
+            <enum offset="24"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_RESULT_META"/>
+            <enum offset="25"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_COMPLETE_META"/>
+            <enum offset="26"         extends="XrStructureType"    name="XR_TYPE_EVENT_DATA_STOP_COLOCATION_DISCOVERY_COMPLETE_META"/>
+            <enum offset="30"         extends="XrStructureType"    name="XR_TYPE_SYSTEM_COLOCATION_DISCOVERY_PROPERTIES_META"/>
+
+            <type name="XrColocationDiscoveryStartInfoMETA"/>
+            <type name="XrColocationDiscoveryStopInfoMETA"/>
+            <type name="XrColocationAdvertisementStartInfoMETA"/>
+            <type name="XrColocationAdvertisementStopInfoMETA"/>
+
+            <type name="XrEventDataStartColocationAdvertisementCompleteMETA"/>
+            <type name="XrEventDataStopColocationAdvertisementCompleteMETA"/>
+            <type name="XrEventDataColocationAdvertisementCompleteMETA"/>
+            <type name="XrEventDataStartColocationDiscoveryCompleteMETA"/>
+            <type name="XrEventDataColocationDiscoveryResultMETA"/>
+            <type name="XrEventDataColocationDiscoveryCompleteMETA"/>
+            <type name="XrEventDataStopColocationDiscoveryCompleteMETA"/>
+
+            <type name="XrSystemColocationDiscoveryPropertiesMETA"/>
+
+            <command name="xrStartColocationDiscoveryMETA"/>
+            <command name="xrStopColocationDiscoveryMETA"/>
+            <command name="xrStartColocationAdvertisementMETA"/>
+            <command name="xrStopColocationAdvertisementMETA"/>
         </require>
     </extension>
 
-    <extension name="XR_META_extension_573" number="573" type="instance" supported="disabled">
+    <extension name="XR_META_spatial_entity_group_sharing" number="573" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                 name="XR_META_extension_573_SPEC_VERSION"/>
-            <enum value="&quot;XR_META_extension_573&quot;" name="XR_META_extension_573_EXTENSION_NAME"/>
+            <enum value="1"                                                name="XR_META_spatial_entity_group_sharing_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_spatial_entity_group_sharing&quot;" name="XR_META_SPATIAL_ENTITY_GROUP_SHARING_EXTENSION_NAME"/>
+
+            <enum offset="2"   dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_GROUP_NOT_FOUND_META"                         comment="The group UUID was not be found within the runtime"/>
+
+            <enum offset="0"           extends="XrStructureType"           name="XR_TYPE_SHARE_SPACES_RECIPIENT_GROUPS_META"/>
+            <enum offset="1"           extends="XrStructureType"           name="XR_TYPE_SPACE_GROUP_UUID_FILTER_INFO_META"/>
+            <enum offset="100"         extends="XrStructureType"           name="XR_TYPE_SYSTEM_SPATIAL_ENTITY_GROUP_SHARING_PROPERTIES_META"/>
+
+            <type name="XrSystemSpatialEntityGroupSharingPropertiesMETA"/>
+        </require>
+        <require depends="XR_META_spatial_entity_sharing">
+            <type name="XrShareSpacesRecipientGroupsMETA"/>
+        </require>
+        <require depends="XR_FB_spatial_entity_query">
+            <type name="XrSpaceGroupUuidFilterInfoMETA"/>
         </require>
     </extension>
 
@@ -16163,17 +16527,17 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_spatial_anchor" number="739" type="instance" supported="disabled">
+    <extension name="XR_EXT_extension_739" number="739" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                 name="XR_EXT_spatial_anchor_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_spatial_anchor&quot;" name="XR_EXT_SPATIAL_ANCHOR_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_EXT_extension_739_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_739&quot;" name="XR_EXT_EXTENSION_739_EXTENSION_NAME"/>
         </require>
     </extension>
 
-    <extension name="XR_EXT_spatial_anchor_persistence" number="740" type="instance" supported="disabled">
+    <extension name="XR_EXT_extension_740" number="740" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                             name="XR_EXT_spatial_anchor_persistence_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_spatial_anchor_persistence&quot;" name="XR_EXT_SPATIAL_ANCHOR_PERSISTENCE_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_EXT_extension_740_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_740&quot;" name="XR_EXT_EXTENSION_740_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -16184,10 +16548,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_spatial_entity_discovery" number="742" type="instance" supported="disabled">
+    <extension name="XR_EXT_spatial_plane_tracking" number="742" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                           name="XR_EXT_spatial_entity_discovery_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_spatial_entity_discovery&quot;" name="XR_EXT_SPATIAL_ENTITY_DISCOVERY_EXTENSION_NAME"/>
+            <enum value="1"                                         name="XR_EXT_spatial_plane_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_plane_tracking&quot;" name="XR_EXT_SPATIAL_PLANE_TRACKING_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -16198,17 +16562,17 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_744" number="744" type="instance" supported="disabled">
+    <extension name="XR_EXT_spatial_marker_tracking" number="744" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                name="XR_EXT_extension_744_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_744&quot;" name="XR_EXT_EXTENSION_744_EXTENSION_NAME"/>
+            <enum value="1"                                          name="XR_EXT_spatial_marker_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_marker_tracking&quot;" name="XR_EXT_SPATIAL_MARKER_TRACKING_EXTENSION_NAME"/>
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_745" number="745" type="instance" supported="disabled">
+    <extension name="XR_EXT_spatial_discovery_raycast" number="745" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                name="XR_EXT_extension_745_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_745&quot;" name="XR_EXT_EXTENSION_745_EXTENSION_NAME"/>
+            <enum value="1"                                            name="XR_EXT_spatial_discovery_raycast_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_discovery_raycast&quot;" name="XR_EXT_SPATIAL_DISCOVERY_RAYCAST_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -16321,6 +16685,27 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="1"                               name="XR_BD_extension_761_SPEC_VERSION"/>
             <enum value="&quot;XR_BD_extension_761&quot;" name="XR_BD_EXTENSION_761_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_discovery_bounds" number="762" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                           name="XR_EXT_spatial_discovery_bounds_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_discovery_bounds&quot;" name="XR_EXT_SPATIAL_DISCOVERY_BOUNDS_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_anchor" number="763" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EXT_spatial_anchor_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_anchor&quot;" name="XR_EXT_SPATIAL_ANCHOR_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_spatial_persistence" number="764" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                      name="XR_EXT_spatial_persistence_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_spatial_persistence&quot;" name="XR_EXT_SPATIAL_PERSISTENCE_EXTENSION_NAME"/>
         </require>
     </extension>
 

@@ -84,7 +84,7 @@ typedef struct XrInstanceCreateInfoAndroidKHR {
 
 // XR_KHR_vulkan_swapchain_format_list is a preprocessor guard. Do not pass it to API calls.
 #define XR_KHR_vulkan_swapchain_format_list 1
-#define XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION 4
+#define XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION 5
 #define XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME "XR_KHR_vulkan_swapchain_format_list"
 typedef struct XrVulkanSwapchainFormatListCreateInfoKHR {
     XrStructureType             type;

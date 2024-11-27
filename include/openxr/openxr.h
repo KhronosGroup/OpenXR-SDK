@@ -26,7 +26,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 42)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 43)
 
 // OpenXR 1.0 version number
 #define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
@@ -267,6 +267,12 @@ typedef enum XrResult {
     XR_ERROR_SYSTEM_NOTIFICATION_INCOMPATIBLE_SKU_ML = -1000473001,
     XR_ERROR_WORLD_MESH_DETECTOR_PERMISSION_DENIED_ML = -1000474000,
     XR_ERROR_WORLD_MESH_DETECTOR_SPACE_NOT_LOCATABLE_ML = -1000474001,
+    XR_ERROR_FACIAL_EXPRESSION_PERMISSION_DENIED_ML = 1000482000,
+    XR_ERROR_COLOCATION_DISCOVERY_NETWORK_FAILED_META = -1000571001,
+    XR_ERROR_COLOCATION_DISCOVERY_NO_DISCOVERY_METHOD_META = -1000571002,
+    XR_COLOCATION_DISCOVERY_ALREADY_ADVERTISING_META = 1000571003,
+    XR_COLOCATION_DISCOVERY_ALREADY_DISCOVERING_META = 1000571004,
+    XR_ERROR_SPACE_GROUP_NOT_FOUND_META = -1000572002,
     XR_ERROR_EXTENSION_DEPENDENCY_NOT_ENABLED_KHR = XR_ERROR_EXTENSION_DEPENDENCY_NOT_ENABLED,
     XR_ERROR_PERMISSION_INSUFFICIENT_KHR = XR_ERROR_PERMISSION_INSUFFICIENT,
     XR_RESULT_MAX_ENUM = 0x7FFFFFFF
@@ -606,10 +612,14 @@ typedef enum XrStructureType {
     XR_TYPE_PASSTHROUGH_COLOR_MAP_INTERPOLATED_LUT_META = 1000266101,
     XR_TYPE_SPACE_TRIANGLE_MESH_GET_INFO_META = 1000269001,
     XR_TYPE_SPACE_TRIANGLE_MESH_META = 1000269002,
+    XR_TYPE_EVENT_DATA_PASSTHROUGH_LAYER_RESUMED_META = 1000282000,
     XR_TYPE_SYSTEM_FACE_TRACKING_PROPERTIES2_FB = 1000287013,
     XR_TYPE_FACE_TRACKER_CREATE_INFO2_FB = 1000287014,
     XR_TYPE_FACE_EXPRESSION_INFO2_FB = 1000287015,
     XR_TYPE_FACE_EXPRESSION_WEIGHTS2_FB = 1000287016,
+    XR_TYPE_SYSTEM_SPATIAL_ENTITY_SHARING_PROPERTIES_META = 1000290000,
+    XR_TYPE_SHARE_SPACES_INFO_META = 1000290001,
+    XR_TYPE_EVENT_DATA_SHARE_SPACES_COMPLETE_META = 1000290002,
     XR_TYPE_ENVIRONMENT_DEPTH_PROVIDER_CREATE_INFO_META = 1000291000,
     XR_TYPE_ENVIRONMENT_DEPTH_SWAPCHAIN_CREATE_INFO_META = 1000291001,
     XR_TYPE_ENVIRONMENT_DEPTH_SWAPCHAIN_STATE_META = 1000291002,
@@ -663,6 +673,25 @@ typedef enum XrStructureType {
     XR_TYPE_WORLD_MESH_BLOCK_ML = 1000474010,
     XR_TYPE_WORLD_MESH_REQUEST_COMPLETION_ML = 1000474011,
     XR_TYPE_WORLD_MESH_REQUEST_COMPLETION_INFO_ML = 1000474012,
+    XR_TYPE_SYSTEM_FACIAL_EXPRESSION_PROPERTIES_ML = 1000482004,
+    XR_TYPE_FACIAL_EXPRESSION_CLIENT_CREATE_INFO_ML = 1000482005,
+    XR_TYPE_FACIAL_EXPRESSION_BLEND_SHAPE_GET_INFO_ML = 1000482006,
+    XR_TYPE_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_ML = 1000482007,
+    XR_TYPE_COLOCATION_DISCOVERY_START_INFO_META = 1000571010,
+    XR_TYPE_COLOCATION_DISCOVERY_STOP_INFO_META = 1000571011,
+    XR_TYPE_COLOCATION_ADVERTISEMENT_START_INFO_META = 1000571012,
+    XR_TYPE_COLOCATION_ADVERTISEMENT_STOP_INFO_META = 1000571013,
+    XR_TYPE_EVENT_DATA_START_COLOCATION_ADVERTISEMENT_COMPLETE_META = 1000571020,
+    XR_TYPE_EVENT_DATA_STOP_COLOCATION_ADVERTISEMENT_COMPLETE_META = 1000571021,
+    XR_TYPE_EVENT_DATA_COLOCATION_ADVERTISEMENT_COMPLETE_META = 1000571022,
+    XR_TYPE_EVENT_DATA_START_COLOCATION_DISCOVERY_COMPLETE_META = 1000571023,
+    XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_RESULT_META = 1000571024,
+    XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_COMPLETE_META = 1000571025,
+    XR_TYPE_EVENT_DATA_STOP_COLOCATION_DISCOVERY_COMPLETE_META = 1000571026,
+    XR_TYPE_SYSTEM_COLOCATION_DISCOVERY_PROPERTIES_META = 1000571030,
+    XR_TYPE_SHARE_SPACES_RECIPIENT_GROUPS_META = 1000572000,
+    XR_TYPE_SPACE_GROUP_UUID_FILTER_INFO_META = 1000572001,
+    XR_TYPE_SYSTEM_SPATIAL_ENTITY_GROUP_SHARING_PROPERTIES_META = 1000572100,
     XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR = XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR,
     XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR = XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR,
     XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR,
@@ -773,6 +802,7 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_BODY_TRACKER_HTC = 1000320000,
     XR_OBJECT_TYPE_PLANE_DETECTOR_EXT = 1000429000,
     XR_OBJECT_TYPE_WORLD_MESH_DETECTOR_ML = 1000474000,
+    XR_OBJECT_TYPE_FACIAL_EXPRESSION_CLIENT_ML = 1000482000,
     XR_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF
 } XrObjectType;
 typedef XrFlags64 XrInstanceCreateFlags;
@@ -6849,6 +6879,18 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetSpaceTriangleMeshMETA(
 #define XR_META_TOUCH_CONTROLLER_PLUS_EXTENSION_NAME "XR_META_touch_controller_plus"
 
 
+// XR_META_passthrough_layer_resumed_event is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_passthrough_layer_resumed_event 1
+#define XR_META_passthrough_layer_resumed_event_SPEC_VERSION 1
+#define XR_META_PASSTHROUGH_LAYER_RESUMED_EVENT_EXTENSION_NAME "XR_META_passthrough_layer_resumed_event"
+typedef struct XrEventDataPassthroughLayerResumedMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrPassthroughLayerFB        layer;
+} XrEventDataPassthroughLayerResumedMETA;
+
+
+
 // XR_FB_face_tracking2 is a preprocessor guard. Do not pass it to API calls.
 #define XR_FB_face_tracking2 1
 XR_DEFINE_HANDLE(XrFaceTracker2FB)
@@ -7000,6 +7042,50 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetFaceExpressionWeights2FB(
     XrFaceTracker2FB                            faceTracker,
     const XrFaceExpressionInfo2FB*              expressionInfo,
     XrFaceExpressionWeights2FB*                 expressionWeights);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_META_spatial_entity_sharing is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_spatial_entity_sharing 1
+#define XR_META_spatial_entity_sharing_SPEC_VERSION 1
+#define XR_META_SPATIAL_ENTITY_SHARING_EXTENSION_NAME "XR_META_spatial_entity_sharing"
+#define XR_MAX_SPACES_PER_SHARE_REQUEST_META 32
+// XrSystemSpatialEntitySharingPropertiesMETA extends XrSystemProperties
+typedef struct XrSystemSpatialEntitySharingPropertiesMETA {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialEntitySharing;
+} XrSystemSpatialEntitySharingPropertiesMETA;
+
+typedef struct XR_MAY_ALIAS XrShareSpacesRecipientBaseHeaderMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrShareSpacesRecipientBaseHeaderMETA;
+
+typedef struct XrShareSpacesInfoMETA {
+    XrStructureType                                type;
+    const void* XR_MAY_ALIAS                       next;
+    uint32_t                                       spaceCount;
+    XrSpace*                                       spaces;
+    const XrShareSpacesRecipientBaseHeaderMETA*    recipientInfo;
+} XrShareSpacesInfoMETA;
+
+typedef struct XrEventDataShareSpacesCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          requestId;
+    XrResult                    result;
+} XrEventDataShareSpacesCompleteMETA;
+
+typedef XrResult (XRAPI_PTR *PFN_xrShareSpacesMETA)(XrSession session, const XrShareSpacesInfoMETA* info, XrAsyncRequestIdFB* requestId);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrShareSpacesMETA(
+    XrSession                                   session,
+    const XrShareSpacesInfoMETA*                info,
+    XrAsyncRequestIdFB*                         requestId);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
 
@@ -8076,6 +8162,118 @@ XRAPI_ATTR XrResult XRAPI_CALL xrRequestWorldMeshCompleteML(
 #endif /* !XR_NO_PROTOTYPES */
 
 
+// XR_ML_facial_expression is a preprocessor guard. Do not pass it to API calls.
+#define XR_ML_facial_expression 1
+XR_DEFINE_HANDLE(XrFacialExpressionClientML)
+#define XR_ML_facial_expression_SPEC_VERSION 1
+#define XR_ML_FACIAL_EXPRESSION_EXTENSION_NAME "XR_ML_facial_expression"
+
+typedef enum XrFacialBlendShapeML {
+    XR_FACIAL_BLEND_SHAPE_BROW_LOWERER_L_ML = 0,
+    XR_FACIAL_BLEND_SHAPE_BROW_LOWERER_R_ML = 1,
+    XR_FACIAL_BLEND_SHAPE_CHEEK_RAISER_L_ML = 2,
+    XR_FACIAL_BLEND_SHAPE_CHEEK_RAISER_R_ML = 3,
+    XR_FACIAL_BLEND_SHAPE_CHIN_RAISER_ML = 4,
+    XR_FACIAL_BLEND_SHAPE_DIMPLER_L_ML = 5,
+    XR_FACIAL_BLEND_SHAPE_DIMPLER_R_ML = 6,
+    XR_FACIAL_BLEND_SHAPE_EYES_CLOSED_L_ML = 7,
+    XR_FACIAL_BLEND_SHAPE_EYES_CLOSED_R_ML = 8,
+    XR_FACIAL_BLEND_SHAPE_INNER_BROW_RAISER_L_ML = 9,
+    XR_FACIAL_BLEND_SHAPE_INNER_BROW_RAISER_R_ML = 10,
+    XR_FACIAL_BLEND_SHAPE_JAW_DROP_ML = 11,
+    XR_FACIAL_BLEND_SHAPE_LID_TIGHTENER_L_ML = 12,
+    XR_FACIAL_BLEND_SHAPE_LID_TIGHTENER_R_ML = 13,
+    XR_FACIAL_BLEND_SHAPE_LIP_CORNER_DEPRESSOR_L_ML = 14,
+    XR_FACIAL_BLEND_SHAPE_LIP_CORNER_DEPRESSOR_R_ML = 15,
+    XR_FACIAL_BLEND_SHAPE_LIP_CORNER_PULLER_L_ML = 16,
+    XR_FACIAL_BLEND_SHAPE_LIP_CORNER_PULLER_R_ML = 17,
+    XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_LB_ML = 18,
+    XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_LT_ML = 19,
+    XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_RB_ML = 20,
+    XR_FACIAL_BLEND_SHAPE_LIP_FUNNELER_RT_ML = 21,
+    XR_FACIAL_BLEND_SHAPE_LIP_PRESSOR_L_ML = 22,
+    XR_FACIAL_BLEND_SHAPE_LIP_PRESSOR_R_ML = 23,
+    XR_FACIAL_BLEND_SHAPE_LIP_PUCKER_L_ML = 24,
+    XR_FACIAL_BLEND_SHAPE_LIP_PUCKER_R_ML = 25,
+    XR_FACIAL_BLEND_SHAPE_LIP_STRETCHER_L_ML = 26,
+    XR_FACIAL_BLEND_SHAPE_LIP_STRETCHER_R_ML = 27,
+    XR_FACIAL_BLEND_SHAPE_LIP_SUCK_LB_ML = 28,
+    XR_FACIAL_BLEND_SHAPE_LIP_SUCK_LT_ML = 29,
+    XR_FACIAL_BLEND_SHAPE_LIP_SUCK_RB_ML = 30,
+    XR_FACIAL_BLEND_SHAPE_LIP_SUCK_RT_ML = 31,
+    XR_FACIAL_BLEND_SHAPE_LIP_TIGHTENER_L_ML = 32,
+    XR_FACIAL_BLEND_SHAPE_LIP_TIGHTENER_R_ML = 33,
+    XR_FACIAL_BLEND_SHAPE_LIPS_TOWARD_ML = 34,
+    XR_FACIAL_BLEND_SHAPE_LOWER_LIP_DEPRESSOR_L_ML = 35,
+    XR_FACIAL_BLEND_SHAPE_LOWER_LIP_DEPRESSOR_R_ML = 36,
+    XR_FACIAL_BLEND_SHAPE_NOSE_WRINKLER_L_ML = 37,
+    XR_FACIAL_BLEND_SHAPE_NOSE_WRINKLER_R_ML = 38,
+    XR_FACIAL_BLEND_SHAPE_OUTER_BROW_RAISER_L_ML = 39,
+    XR_FACIAL_BLEND_SHAPE_OUTER_BROW_RAISER_R_ML = 40,
+    XR_FACIAL_BLEND_SHAPE_UPPER_LID_RAISER_L_ML = 41,
+    XR_FACIAL_BLEND_SHAPE_UPPER_LID_RAISER_R_ML = 42,
+    XR_FACIAL_BLEND_SHAPE_UPPER_LIP_RAISER_L_ML = 43,
+    XR_FACIAL_BLEND_SHAPE_UPPER_LIP_RAISER_R_ML = 44,
+    XR_FACIAL_BLEND_SHAPE_TONGUE_OUT_ML = 45,
+    XR_FACIAL_BLEND_SHAPE_MAX_ENUM_ML = 0x7FFFFFFF
+} XrFacialBlendShapeML;
+typedef XrFlags64 XrFacialExpressionBlendShapePropertiesFlagsML;
+
+// Flag bits for XrFacialExpressionBlendShapePropertiesFlagsML
+static const XrFacialExpressionBlendShapePropertiesFlagsML XR_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_VALID_BIT_ML = 0x00000001;
+static const XrFacialExpressionBlendShapePropertiesFlagsML XR_FACIAL_EXPRESSION_BLEND_SHAPE_PROPERTIES_TRACKED_BIT_ML = 0x00000002;
+
+// XrSystemFacialExpressionPropertiesML extends XrSystemProperties
+typedef struct XrSystemFacialExpressionPropertiesML {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsFacialExpression;
+} XrSystemFacialExpressionPropertiesML;
+
+typedef struct XrFacialExpressionClientCreateInfoML {
+    XrStructureType                type;
+    const void* XR_MAY_ALIAS       next;
+    uint32_t                       requestedCount;
+    const XrFacialBlendShapeML*    requestedFacialBlendShapes;
+} XrFacialExpressionClientCreateInfoML;
+
+typedef struct XrFacialExpressionBlendShapeGetInfoML {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrFacialExpressionBlendShapeGetInfoML;
+
+typedef struct XrFacialExpressionBlendShapePropertiesML {
+    XrStructureType                                  type;
+    void* XR_MAY_ALIAS                               next;
+    XrFacialBlendShapeML                             requestedFacialBlendShape;
+    float                                            weight;
+    XrFacialExpressionBlendShapePropertiesFlagsML    flags;
+    XrTime                                           time;
+} XrFacialExpressionBlendShapePropertiesML;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateFacialExpressionClientML)(XrSession session, const XrFacialExpressionClientCreateInfoML* createInfo, XrFacialExpressionClientML* facialExpressionClient);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyFacialExpressionClientML)(XrFacialExpressionClientML facialExpressionClient);
+typedef XrResult (XRAPI_PTR *PFN_xrGetFacialExpressionBlendShapePropertiesML)(XrFacialExpressionClientML facialExpressionClient, const XrFacialExpressionBlendShapeGetInfoML* blendShapeGetInfo, uint32_t blendShapeCount, XrFacialExpressionBlendShapePropertiesML* blendShapes);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateFacialExpressionClientML(
+    XrSession                                   session,
+    const XrFacialExpressionClientCreateInfoML* createInfo,
+    XrFacialExpressionClientML*                 facialExpressionClient);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyFacialExpressionClientML(
+    XrFacialExpressionClientML                  facialExpressionClient);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetFacialExpressionBlendShapePropertiesML(
+    XrFacialExpressionClientML                  facialExpressionClient,
+    const XrFacialExpressionBlendShapeGetInfoML* blendShapeGetInfo,
+    uint32_t                                    blendShapeCount,
+    XrFacialExpressionBlendShapePropertiesML*   blendShapes);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 // XR_ML_view_configuration_depth_range_change is a preprocessor guard. Do not pass it to API calls.
 #define XR_ML_view_configuration_depth_range_change 1
 #define XR_ML_view_configuration_depth_range_change_SPEC_VERSION 1
@@ -8092,6 +8290,148 @@ XRAPI_ATTR XrResult XRAPI_CALL xrRequestWorldMeshCompleteML(
 #define XR_EXT_composition_layer_inverted_alpha 1
 #define XR_EXT_composition_layer_inverted_alpha_SPEC_VERSION 1
 #define XR_EXT_COMPOSITION_LAYER_INVERTED_ALPHA_EXTENSION_NAME "XR_EXT_composition_layer_inverted_alpha"
+
+
+// XR_META_colocation_discovery is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_colocation_discovery 1
+#define XR_MAX_COLOCATION_DISCOVERY_BUFFER_SIZE_META 1024
+#define XR_META_colocation_discovery_SPEC_VERSION 1
+#define XR_META_COLOCATION_DISCOVERY_EXTENSION_NAME "XR_META_colocation_discovery"
+typedef struct XrColocationDiscoveryStartInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrColocationDiscoveryStartInfoMETA;
+
+typedef struct XrColocationDiscoveryStopInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrColocationDiscoveryStopInfoMETA;
+
+typedef struct XrColocationAdvertisementStartInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    bufferSize;
+    uint8_t*                    buffer;
+} XrColocationAdvertisementStartInfoMETA;
+
+typedef struct XrColocationAdvertisementStopInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrColocationAdvertisementStopInfoMETA;
+
+typedef struct XrEventDataStartColocationAdvertisementCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          advertisementRequestId;
+    XrResult                    result;
+    XrUuid                      advertisementUuid;
+} XrEventDataStartColocationAdvertisementCompleteMETA;
+
+typedef struct XrEventDataStopColocationAdvertisementCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          requestId;
+    XrResult                    result;
+} XrEventDataStopColocationAdvertisementCompleteMETA;
+
+typedef struct XrEventDataColocationAdvertisementCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          advertisementRequestId;
+    XrResult                    result;
+} XrEventDataColocationAdvertisementCompleteMETA;
+
+typedef struct XrEventDataStartColocationDiscoveryCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          discoveryRequestId;
+    XrResult                    result;
+} XrEventDataStartColocationDiscoveryCompleteMETA;
+
+typedef struct XrEventDataColocationDiscoveryResultMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          discoveryRequestId;
+    XrUuid                      advertisementUuid;
+    uint32_t                    bufferSize;
+    uint8_t                     buffer[XR_MAX_COLOCATION_DISCOVERY_BUFFER_SIZE_META];
+} XrEventDataColocationDiscoveryResultMETA;
+
+typedef struct XrEventDataColocationDiscoveryCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          discoveryRequestId;
+    XrResult                    result;
+} XrEventDataColocationDiscoveryCompleteMETA;
+
+typedef struct XrEventDataStopColocationDiscoveryCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          requestId;
+    XrResult                    result;
+} XrEventDataStopColocationDiscoveryCompleteMETA;
+
+// XrSystemColocationDiscoveryPropertiesMETA extends XrSystemProperties
+typedef struct XrSystemColocationDiscoveryPropertiesMETA {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsColocationDiscovery;
+} XrSystemColocationDiscoveryPropertiesMETA;
+
+typedef XrResult (XRAPI_PTR *PFN_xrStartColocationDiscoveryMETA)(XrSession session, const XrColocationDiscoveryStartInfoMETA* info, XrAsyncRequestIdFB* discoveryRequestId);
+typedef XrResult (XRAPI_PTR *PFN_xrStopColocationDiscoveryMETA)(XrSession session, const XrColocationDiscoveryStopInfoMETA* info, XrAsyncRequestIdFB* requestId);
+typedef XrResult (XRAPI_PTR *PFN_xrStartColocationAdvertisementMETA)(XrSession session, const XrColocationAdvertisementStartInfoMETA* info, XrAsyncRequestIdFB* advertisementRequestId);
+typedef XrResult (XRAPI_PTR *PFN_xrStopColocationAdvertisementMETA)(XrSession session, const XrColocationAdvertisementStopInfoMETA* info, XrAsyncRequestIdFB* requestId);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrStartColocationDiscoveryMETA(
+    XrSession                                   session,
+    const XrColocationDiscoveryStartInfoMETA*   info,
+    XrAsyncRequestIdFB*                         discoveryRequestId);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrStopColocationDiscoveryMETA(
+    XrSession                                   session,
+    const XrColocationDiscoveryStopInfoMETA*    info,
+    XrAsyncRequestIdFB*                         requestId);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrStartColocationAdvertisementMETA(
+    XrSession                                   session,
+    const XrColocationAdvertisementStartInfoMETA* info,
+    XrAsyncRequestIdFB*                         advertisementRequestId);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrStopColocationAdvertisementMETA(
+    XrSession                                   session,
+    const XrColocationAdvertisementStopInfoMETA* info,
+    XrAsyncRequestIdFB*                         requestId);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_META_spatial_entity_group_sharing is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_spatial_entity_group_sharing 1
+#define XR_META_spatial_entity_group_sharing_SPEC_VERSION 1
+#define XR_META_SPATIAL_ENTITY_GROUP_SHARING_EXTENSION_NAME "XR_META_spatial_entity_group_sharing"
+// XrSystemSpatialEntityGroupSharingPropertiesMETA extends XrSystemProperties
+typedef struct XrSystemSpatialEntityGroupSharingPropertiesMETA {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialEntityGroupSharing;
+} XrSystemSpatialEntityGroupSharingPropertiesMETA;
+
+typedef struct XrShareSpacesRecipientGroupsMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    groupCount;
+    XrUuid*                     groups;
+} XrShareSpacesRecipientGroupsMETA;
+
+typedef struct XrSpaceGroupUuidFilterInfoMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrUuid                      groupUuid;
+} XrSpaceGroupUuidFilterInfoMETA;
+
 
 #ifdef __cplusplus
 }
