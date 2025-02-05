@@ -21,6 +21,43 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.45 (2025-02-05)
+
+This release includes a new multi-vendor extension, a new vendor extension,
+improvements to Android builds and artifacts, and a revision to a new
+architecture added in 1.1.42.
+
+Note that SDK release 1.1.44 was skipped to keep up with a monthly cadence for
+patch releases.
+
+- Registry
+  - Extension reservation: Reserve 15 extensions for EpicGames.
+    ([internal MR 3649](https://gitlab.khronos.org/openxr/openxr/merge_requests/3649))
+  - Improvement: Clean up spacing in some functions, improving specification and
+    header output appearance.
+    ([internal MR 3660](https://gitlab.khronos.org/openxr/openxr/merge_requests/3660))
+  - New multi-vendor extension: `XR_EXT_frame_synthesis`
+    ([internal MR 2200](https://gitlab.khronos.org/openxr/openxr/merge_requests/2200),
+    [OpenXR-Docs PR 122](https://github.com/KhronosGroup/OpenXR-Docs/pull/122))
+  - New vendor extension: `XR_BD_body_tracking`
+    ([internal MR 2867](https://gitlab.khronos.org/openxr/openxr/merge_requests/2867))
+- SDK
+  - Change: Update the ABI identifier of LoongArch64 in
+    `specification/loader/runtime.adoc` and the loader. This introduces a small
+    incompatibility on this platform, but only if you were already decorating your
+    manifests with ABI/architecture, which is unlikely.
+    ([OpenXR-SDK-Source PR 523](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/523))
+  - Improvement: Update Gradle (for hello_xr and other tests) from 7.5/7.5.1 to to
+    8.5, and Android Gradle Plugin to 8.1.4.
+    ([internal MR 3640](https://gitlab.khronos.org/openxr/openxr/merge_requests/3640))
+  - Improvement: Adjust build so that it is possible to build a new binary `.aar`
+    file from an unzipped sources.jar file, by calling something like `bash
+    org/khronos/openxr/openxr_loader_for_android/maintainer-scripts/build-aar.sh`.
+    ([internal MR 3642](https://gitlab.khronos.org/openxr/openxr/merge_requests/3642))
+  - Improvement: In `build-aar.sh`, skip making a sources.jar automatically if we
+    lack the requirements (such as when we are already building from one.)
+    ([internal MR 3642](https://gitlab.khronos.org/openxr/openxr/merge_requests/3642))
+
 ## OpenXR SDK 1.1.43 (2024-11-27)
 
 This release has a few fixes and minor improvements, as well as support for

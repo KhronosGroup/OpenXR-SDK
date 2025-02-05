@@ -135,7 +135,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 43)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 45)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -254,6 +254,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="define">
 #define <name>XR_HAND_JOINT_COUNT_EXT</name> 26</type>
 
+        <!-- XR_BD_body_tracking -->
+        <type category="define">
+#define <name>XR_BODY_JOINT_COUNT_BD</name> 24</type>
+        <type category="define">
+#define <name>XR_BODY_JOINT_WITHOUT_ARM_COUNT_BD</name> 16</type>
+
         <!-- XR_MSFT_controller_model -->
         <type category="define">
 #define <name>XR_NULL_CONTROLLER_MODEL_KEY_MSFT</name> 0</type>
@@ -347,6 +353,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_EXT_debug_utils -->
         <type bitvalues="XrDebugUtilsMessageSeverityFlagBitsEXT" category="bitmask">typedef <type>XrFlags64</type> <name>XrDebugUtilsMessageSeverityFlagsEXT</name>;</type>
         <type bitvalues="XrDebugUtilsMessageTypeFlagBitsEXT"     category="bitmask">typedef <type>XrFlags64</type> <name>XrDebugUtilsMessageTypeFlagsEXT</name>;</type>
+
+        <!-- Bitmask types for XR_EXT_frame_synthesis -->
+        <type bitvalues="XrFrameSynthesisInfoFlagBitsEXT" category="bitmask">typedef <type>XrFlags64</type> <name>XrFrameSynthesisInfoFlagsEXT</name>;</type>
 
         <!-- Bitmask types for XR_EXTX_overlay -->
         <type bitvalues="XrOverlayMainSessionFlagBitsEXTX"   category="bitmask">typedef <type>XrFlags64</type> <name>XrOverlayMainSessionFlagsEXTX</name>;</type>
@@ -514,6 +523,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_ML_world_mesh_detection -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrWorldMeshDetectorML</name>)</type>
 
+        <!-- XR_BD_body_tracking -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrBodyTrackerBD</name>)</type>
+
 
         <!-- Non-handle 64-bit opaque type from XR_EXT_future -->
         <type category="basetype"><type>XR_DEFINE_OPAQUE_64</type>(<name>XrFutureEXT</name>)</type>
@@ -553,6 +565,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- flag bits for XR_EXT_debug_utils -->
         <type name="XrDebugUtilsMessageSeverityFlagBitsEXT" category="enum"/>
         <type name="XrDebugUtilsMessageTypeFlagBitsEXT" category="enum"/>
+
+        <!-- flag bits for XR_EXT_frame_synthesis -->
+        <type name="XrFrameSynthesisInfoFlagBitsEXT" category="enum"/>
 
         <!-- flag bits for XR_EXTX_overlay -->
         <type name="XrOverlayMainSessionFlagBitsEXTX" category="enum"/>
@@ -745,6 +760,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrWorldMeshDetectorFlagBitsML" category="enum"/>
         <type name="XrWorldMeshDetectorLodML" category="enum"/>
         <type name="XrWorldMeshBlockResultML" category="enum"/>
+
+        <!-- XR_BD_body_tracking -->
+        <type name="XrBodyJointBD" category="enum"/>
+        <type name="XrBodyJointSetBD" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -1654,6 +1673,29 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member values="XR_TYPE_EYE_GAZE_SAMPLE_TIME_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*   <name>next</name></member>
             <member><type>XrTime</type>  <name>time</name></member>
+        </type>
+
+        <!-- XR_EXT_frame_synthesis -->
+        <type category="struct" name="XrFrameSynthesisInfoEXT" structextends="XrCompositionLayerProjectionView">
+            <member values="XR_TYPE_FRAME_SYNTHESIS_INFO_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                  <name>next</name></member>
+            <member optional="true"><type>XrFrameSynthesisInfoFlagsEXT</type> <name>layerFlags</name></member>
+            <member><type>XrSwapchainSubImage</type>                          <name>motionVectorSubImage</name></member>
+            <member><type>XrVector4f</type>                                   <name>motionVectorScale</name></member>
+            <member><type>XrVector4f</type>                                   <name>motionVectorOffset</name></member>
+            <member><type>XrPosef</type>                                      <name>appSpaceDeltaPose</name></member>
+            <member><type>XrSwapchainSubImage</type>                          <name>depthSubImage</name></member>
+            <member><type>float</type>                                        <name>minDepth</name></member>
+            <member><type>float</type>                                        <name>maxDepth</name></member>
+            <member><type>float</type>                                        <name>nearZ</name></member>
+            <member><type>float</type>                                        <name>farZ</name></member>
+        </type>
+
+        <type category="struct" name="XrFrameSynthesisConfigViewEXT" structextends="XrViewConfigurationView">
+            <member values="XR_TYPE_FRAME_SYNTHESIS_CONFIG_VIEW_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>uint32_t</type> <name>recommendedMotionVectorImageRectWidth</name></member>
+            <member><type>uint32_t</type> <name>recommendedMotionVectorImageRectHeight</name></member>
         </type>
 
         <!-- types for XR_MSFT_spatial_anchor -->
@@ -3095,6 +3137,35 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member>const <type>void</type>*                            <name>next</name></member>
             <member><type>XrSpatialAnchorStoreConnectionMSFT</type>     <name>spatialAnchorStore</name></member>
             <member><type>XrSpatialAnchorPersistenceNameMSFT</type>     <name>spatialAnchorPersistenceName</name></member>
+        </type>
+
+        <!-- XR_BD_body_tracking -->
+        <type category="struct" name="XrSystemBodyTrackingPropertiesBD" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_BODY_TRACKING_PROPERTIES_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsBodyTracking</name></member>
+        </type>
+        <type category="struct" name="XrBodyTrackerCreateInfoBD">
+            <member values="XR_TYPE_BODY_TRACKER_CREATE_INFO_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*      <name>next</name></member>
+            <member><type>XrBodyJointSetBD</type> <name>jointSet</name></member>
+        </type>
+        <type category="struct" name="XrBodyJointsLocateInfoBD">
+            <member values="XR_TYPE_BODY_JOINTS_LOCATE_INFO_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>baseSpace</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+        </type>
+        <type category="struct" name="XrBodyJointLocationBD">
+            <member optional="true"><type>XrSpaceLocationFlags</type> <name>locationFlags</name></member>
+            <member><type>XrPosef</type>                              <name>pose</name></member>
+        </type>
+        <type category="struct" name="XrBodyJointLocationsBD">
+            <member values="XR_TYPE_BODY_JOINT_LOCATIONS_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                           <name>next</name></member>
+            <member><type>XrBool32</type>                                        <name>allJointPosesTracked</name></member>
+            <member><type>uint32_t</type>                                        <name>jointLocationCount</name></member>
+            <member len="jointLocationCount"><type>XrBodyJointLocationBD</type>* <name>jointLocations</name></member>
         </type>
 
         <!-- XR_HTC_facial_tracking -->
@@ -4553,6 +4624,12 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="2"   name="XR_HAND_TRACKING_DATA_SOURCE_CONTROLLER_EXT"   comment="This data source value indicates hand joints are inferred based on motion controller state."/>
     </enums>
 
+    <!-- flags for XR_EXT_frame_synthesis -->
+    <enums name="XrFrameSynthesisInfoFlagBitsEXT" type="bitmask">
+        <enum bitpos="0" name="XR_FRAME_SYNTHESIS_INFO_USE_2D_MOTION_VECTOR_BIT_EXT"           comment="2D motion vector will be used"/>
+        <enum bitpos="1" name="XR_FRAME_SYNTHESIS_INFO_REQUEST_RELAXED_FRAME_INTERVAL_BIT_EXT" comment="Request the runtime to relax the application's frame interval to allow additional render time"/>
+    </enums>
+
     <!-- XR_MSFT_hand_tracking_mesh -->
     <enums name="XrHandPoseTypeMSFT" type="enum">
         <enum value="0"   name="XR_HAND_POSE_TYPE_TRACKED_MSFT"/>
@@ -4839,6 +4916,39 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="2"   name="XR_REPROJECTION_MODE_PLANAR_FROM_DEPTH_MSFT"/>
         <enum value="3"   name="XR_REPROJECTION_MODE_PLANAR_MANUAL_MSFT"/>
         <enum value="4"   name="XR_REPROJECTION_MODE_ORIENTATION_ONLY_MSFT"/>
+    </enums>
+
+    <!-- XR_BD_body_tracking -->
+    <enums name="XrBodyJointBD" type="enum">
+        <enum value="0"    name="XR_BODY_JOINT_PELVIS_BD"/>
+        <enum value="1"    name="XR_BODY_JOINT_LEFT_HIP_BD"/>
+        <enum value="2"    name="XR_BODY_JOINT_RIGHT_HIP_BD"/>
+        <enum value="3"    name="XR_BODY_JOINT_SPINE1_BD"/>
+        <enum value="4"    name="XR_BODY_JOINT_LEFT_KNEE_BD"/>
+        <enum value="5"    name="XR_BODY_JOINT_RIGHT_KNEE_BD"/>
+        <enum value="6"    name="XR_BODY_JOINT_SPINE2_BD"/>
+        <enum value="7"    name="XR_BODY_JOINT_LEFT_ANKLE_BD"/>
+        <enum value="8"    name="XR_BODY_JOINT_RIGHT_ANKLE_BD"/>
+        <enum value="9"    name="XR_BODY_JOINT_SPINE3_BD"/>
+        <enum value="10"   name="XR_BODY_JOINT_LEFT_FOOT_BD"/>
+        <enum value="11"   name="XR_BODY_JOINT_RIGHT_FOOT_BD"/>
+        <enum value="12"   name="XR_BODY_JOINT_NECK_BD"/>
+        <enum value="13"   name="XR_BODY_JOINT_LEFT_COLLAR_BD"/>
+        <enum value="14"   name="XR_BODY_JOINT_RIGHT_COLLAR_BD"/>
+        <enum value="15"   name="XR_BODY_JOINT_HEAD_BD"/>
+        <enum value="16"   name="XR_BODY_JOINT_LEFT_SHOULDER_BD"/>
+        <enum value="17"   name="XR_BODY_JOINT_RIGHT_SHOULDER_BD"/>
+        <enum value="18"   name="XR_BODY_JOINT_LEFT_ELBOW_BD"/>
+        <enum value="19"   name="XR_BODY_JOINT_RIGHT_ELBOW_BD"/>
+        <enum value="20"   name="XR_BODY_JOINT_LEFT_WRIST_BD"/>
+        <enum value="21"   name="XR_BODY_JOINT_RIGHT_WRIST_BD"/>
+        <enum value="22"   name="XR_BODY_JOINT_LEFT_HAND_BD"/>
+        <enum value="23"   name="XR_BODY_JOINT_RIGHT_HAND_BD"/>
+    </enums>
+
+    <enums name="XrBodyJointSetBD" type="enum" comment="Describes the set of body joints to track when creating an slink:XrBodyTrackerBD.">
+        <enum value="1"   name="XR_BODY_JOINT_SET_BODY_WITHOUT_ARM_BD" comment="Contains joints in elink:XrBodyJointBD in the range ename:XR_BODY_JOINT_PELVIS_BD through ename:XR_BODY_JOINT_HEAD_BD inclusive, a total of dlink:XR_BODY_JOINT_WITHOUT_ARM_COUNT_BD joints."/>
+        <enum value="2"   name="XR_BODY_JOINT_SET_FULL_BODY_JOINTS_BD" comment="Contains joints in elink:XrBodyJointBD in the range ename:XR_BODY_JOINT_PELVIS_BD through ename:XR_BODY_JOINT_RIGHT_HAND_BD inclusive, a total of dlink:XR_BODY_JOINT_COUNT_BD joints."/>
     </enums>
 
     <!-- XR_ULTRALEAP_hand_tracking_forearm -->
@@ -5811,7 +5921,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_CALL_ORDER_INVALID">
             <proto><type>XrResult</type> <name>xrAcquireSwapchainImage</name></proto>
-            <param><type>XrSwapchain</type>         <name>swapchain</name></param>
+            <param><type>XrSwapchain</type> <name>swapchain</name></param>
             <param optional="true">const <type>XrSwapchainImageAcquireInfo</type>* <name>acquireInfo</name></param>
             <param><type>uint32_t</type>* <name>index</name></param>
         </command>
@@ -5822,7 +5932,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_CALL_ORDER_INVALID">
             <proto><type>XrResult</type> <name>xrReleaseSwapchainImage</name></proto>
-            <param><type>XrSwapchain</type>         <name>swapchain</name></param>
+            <param><type>XrSwapchain</type> <name>swapchain</name></param>
             <param optional="true">const <type>XrSwapchainImageReleaseInfo</type>* <name>releaseInfo</name></param>
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_VIEW_CONFIGURATION_TYPE_UNSUPPORTED,XR_ERROR_SESSION_RUNNING,XR_ERROR_SESSION_NOT_READY">
@@ -5861,7 +5971,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <proto><type>XrResult</type> <name>xrLocateSpace</name></proto>
             <param><type>XrSpace</type> <name>space</name></param>
             <param><type>XrSpace</type> <name>baseSpace</name></param>
-            <param><type>XrTime</type>   <name>time</name></param>
+            <param><type>XrTime</type> <name>time</name></param>
             <param><type>XrSpaceLocation</type>* <name>location</name></param>
         </command>
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SYSTEM_INVALID">
@@ -6153,10 +6263,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             </implicitexternsyncparams>
         </command>
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST">
-            <proto><type>XrResult</type>                                    <name>xrSubmitDebugUtilsMessageEXT</name></proto>
-            <param><type>XrInstance</type>                                  <name>instance</name></param>
-            <param><type>XrDebugUtilsMessageSeverityFlagsEXT</type>         <name>messageSeverity</name></param>
-            <param><type>XrDebugUtilsMessageTypeFlagsEXT</type>             <name>messageTypes</name></param>
+            <proto><type>XrResult</type> <name>xrSubmitDebugUtilsMessageEXT</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param><type>XrDebugUtilsMessageSeverityFlagsEXT</type> <name>messageSeverity</name></param>
+            <param><type>XrDebugUtilsMessageTypeFlagsEXT</type> <name>messageTypes</name></param>
             <param>const <type>XrDebugUtilsMessengerCallbackDataEXT</type>* <name>callbackData</name></param>
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
@@ -6178,7 +6288,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_TIME_INVALID">
             <proto><type>XrResult</type> <name>xrConvertTimeToWin32PerformanceCounterKHR</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
-            <param><type>XrTime</type>   <name>time</name></param>
+            <param><type>XrTime</type> <name>time</name></param>
             <param><type>LARGE_INTEGER</type>* <name>performanceCounter</name></param>
         </command>
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_TIME_INVALID">
@@ -6215,7 +6325,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_TIME_INVALID">
             <proto><type>XrResult</type> <name>xrConvertTimeToTimespecTimeKHR</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
-            <param><type>XrTime</type>   <name>time</name></param>
+            <param><type>XrTime</type> <name>time</name></param>
             <param>struct <type>timespec</type>* <name>timespecTime</name></param>
         </command>
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_TIME_INVALID">
@@ -7006,12 +7116,30 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SPATIAL_ANCHOR_NAME_NOT_FOUND_MSFT,XR_ERROR_SPATIAL_ANCHOR_NAME_INVALID_MSFT">
             <proto><type>XrResult</type> <name>xrUnpersistSpatialAnchorMSFT</name></proto>
-            <param><type>XrSpatialAnchorStoreConnectionMSFT</type>        <name>spatialAnchorStore</name></param>
+            <param><type>XrSpatialAnchorStoreConnectionMSFT</type> <name>spatialAnchorStore</name></param>
             <param>const <type>XrSpatialAnchorPersistenceNameMSFT</type>* <name>spatialAnchorPersistenceName</name></param>
         </command>
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
             <proto><type>XrResult</type> <name>xrClearSpatialAnchorStoreMSFT</name></proto>
             <param><type>XrSpatialAnchorStoreConnectionMSFT</type> <name>spatialAnchorStore</name></param>
+        </command>
+
+        <!-- XR_BD_body_tracking -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateBodyTrackerBD</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrBodyTrackerCreateInfoBD</type>* <name>createInfo</name></param>
+            <param><type>XrBodyTrackerBD</type>* <name>bodyTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyBodyTrackerBD</name></proto>
+            <param externsync="true_with_children"><type>XrBodyTrackerBD</type> <name>bodyTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID">
+            <proto><type>XrResult</type> <name>xrLocateBodyJointsBD</name></proto>
+            <param><type>XrBodyTrackerBD</type> <name>bodyTracker</name></param>
+            <param>const <type>XrBodyJointsLocateInfoBD</type>* <name>locateInfo</name></param>
+            <param><type>XrBodyJointLocationsBD</type>* <name>locations</name></param>
         </command>
 
         <!-- XR_HTC_facial_tracking -->
@@ -7092,9 +7220,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
         <!-- commands for XR_VARJO_marker_tracking -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
-            <proto><type>XrResult</type>  <name>xrSetMarkerTrackingVARJO</name></proto>
+            <proto><type>XrResult</type> <name>xrSetMarkerTrackingVARJO</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
-            <param><type>XrBool32</type>  <name>enabled</name></param>
+            <param><type>XrBool32</type> <name>enabled</name></param>
         </command>
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_MARKER_ID_INVALID_VARJO,XR_ERROR_FEATURE_UNSUPPORTED">
@@ -7134,7 +7262,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
         <!-- commands for XR_VARJO_view_offset -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
-            <proto><type>XrResult</type>  <name>xrSetViewOffsetVARJO</name></proto>
+            <proto><type>XrResult</type> <name>xrSetViewOffsetVARJO</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param><type>float</type> <name>offset</name></param>
         </command>
@@ -7269,9 +7397,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <!-- XR_EXT_plane_detection -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_PLANE_DETECTION_PERMISSION_DENIED_EXT,XR_ERROR_FEATURE_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrCreatePlaneDetectorEXT</name></proto>
-            <param><type>XrSession</type>                            <name>session</name></param>
+            <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrPlaneDetectorCreateInfoEXT</type>*  <name>createInfo</name></param>
-            <param><type>XrPlaneDetectorEXT</type>*                  <name>planeDetector</name></param>
+            <param><type>XrPlaneDetectorEXT</type>* <name>planeDetector</name></param>
         </command>
 
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
@@ -7281,28 +7409,28 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID,XR_ERROR_SPACE_NOT_LOCATABLE_EXT,XR_ERROR_POSE_INVALID">
             <proto><type>XrResult</type> <name>xrBeginPlaneDetectionEXT</name></proto>
-            <param><type>XrPlaneDetectorEXT</type>                 <name>planeDetector</name></param>
+            <param><type>XrPlaneDetectorEXT</type> <name>planeDetector</name></param>
             <param>const <type>XrPlaneDetectorBeginInfoEXT</type>* <name>beginInfo</name></param>
         </command>
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
             <proto><type>XrResult</type> <name>xrGetPlaneDetectionStateEXT</name></proto>
-            <param><type>XrPlaneDetectorEXT</type>               <name>planeDetector</name></param>
-            <param><type>XrPlaneDetectionStateEXT</type>*        <name>state</name></param>
+            <param><type>XrPlaneDetectorEXT</type> <name>planeDetector</name></param>
+            <param><type>XrPlaneDetectionStateEXT</type>* <name>state</name></param>
         </command>
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID,XR_ERROR_SPACE_NOT_LOCATABLE_EXT,XR_ERROR_CALL_ORDER_INVALID">
             <proto><type>XrResult</type> <name>xrGetPlaneDetectionsEXT</name></proto>
-            <param><type>XrPlaneDetectorEXT</type>               <name>planeDetector</name></param>
+            <param><type>XrPlaneDetectorEXT</type> <name>planeDetector</name></param>
             <param>const <type>XrPlaneDetectorGetInfoEXT</type>* <name>info</name></param>
-            <param><type>XrPlaneDetectorLocationsEXT</type>*     <name>locations</name></param>
+            <param><type>XrPlaneDetectorLocationsEXT</type>* <name>locations</name></param>
         </command>
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
             <proto><type>XrResult</type> <name>xrGetPlanePolygonBufferEXT</name></proto>
-            <param><type>XrPlaneDetectorEXT</type>               <name>planeDetector</name></param>
-            <param><type>uint64_t</type>                         <name>planeId</name></param>
-            <param><type>uint32_t</type>                         <name>polygonBufferIndex</name></param>
+            <param><type>XrPlaneDetectorEXT</type> <name>planeDetector</name></param>
+            <param><type>uint64_t</type> <name>planeId</name></param>
+            <param><type>uint32_t</type> <name>polygonBufferIndex</name></param>
             <param><type>XrPlaneDetectorPolygonBufferEXT</type>* <name>polygonBuffer</name></param>
         </command>
 
@@ -7429,9 +7557,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
             <proto><type>XrResult</type> <name>xrGetExportedLocalizationMapDataML</name></proto>
-            <param><type>XrExportedLocalizationMapML</type>                     <name>map</name></param>
-            <param optional="true"><type>uint32_t</type>                        <name>bufferCapacityInput</name></param>
-            <param><type>uint32_t</type>*                                       <name>bufferCountOutput</name></param>
+            <param><type>XrExportedLocalizationMapML</type> <name>map</name></param>
+            <param optional="true"><type>uint32_t</type> <name>bufferCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>bufferCountOutput</name></param>
             <param optional="true" len="bufferCapacityInput"><type>char</type>* <name>buffer</name></param>
         </command>
 
@@ -12047,10 +12175,15 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_212" number="212" type="instance" supported="disabled">
+    <extension name="XR_EXT_frame_synthesis" number="212" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_212_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_212&quot;" name="XR_FB_EXTENSION_212_EXTENSION_NAME"/>
+            <enum value="1"                                  name="XR_EXT_frame_synthesis_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_frame_synthesis&quot;" name="XR_EXT_FRAME_SYNTHESIS_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"       name="XR_TYPE_FRAME_SYNTHESIS_INFO_EXT"/>
+            <enum offset="1" extends="XrStructureType"       name="XR_TYPE_FRAME_SYNTHESIS_CONFIG_VIEW_EXT"/>
+            <type name="XrFrameSynthesisInfoEXT"/>
+            <type name="XrFrameSynthesisConfigViewEXT"/>
         </require>
     </extension>
 
@@ -13698,10 +13831,35 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_BD_extension_386" number="386" type="instance" supported="disabled">
+    <extension name="XR_BD_body_tracking" number="386" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_BD_extension_386_SPEC_VERSION"/>
-            <enum value="&quot;XR_BD_extension_386&quot;" name="XR_BD_extension_386_EXTENSION_NAME"/>
+            <enum value="1"                               name="XR_BD_body_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_BD_body_tracking&quot;" name="XR_BD_BODY_TRACKING_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrObjectType"       name="XR_OBJECT_TYPE_BODY_TRACKER_BD"     comment="XrBodyTrackerBD"/>
+            <type name="XrBodyTrackerBD"/>
+
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_BODY_TRACKER_CREATE_INFO_BD"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_BODY_JOINTS_LOCATE_INFO_BD"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_BODY_JOINT_LOCATIONS_BD"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_SYSTEM_BODY_TRACKING_PROPERTIES_BD"/>
+
+            <type name="XrBodyJointBD"/>
+            <type name="XrBodyJointSetBD"/>
+
+            <type name="XrSystemBodyTrackingPropertiesBD"/>
+            <type name="XrBodyTrackerCreateInfoBD"/>
+            <type name="XrBodyJointsLocateInfoBD"/>
+            <type name="XrBodyJointLocationsBD"/>
+            <type name="XrBodyJointLocationBD"/>
+            <type name="XR_BODY_JOINT_COUNT_BD"/>
+            <type name="XR_BODY_JOINT_WITHOUT_ARM_COUNT_BD"/>
+
+
+            <command name="xrCreateBodyTrackerBD"/>
+            <command name="xrDestroyBodyTrackerBD"/>
+            <command name="xrLocateBodyJointsBD"/>
+
         </require>
     </extension>
 
@@ -16706,6 +16864,76 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="1"                                      name="XR_EXT_spatial_persistence_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_spatial_persistence&quot;" name="XR_EXT_SPATIAL_PERSISTENCE_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_765" number="765" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_765_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_765&quot;" name="XR_EPIC_extension_765_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_766" number="766" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_766_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_766&quot;" name="XR_EPIC_extension_766_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_767" number="767" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_767_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_767&quot;" name="XR_EPIC_extension_767_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_768" number="768" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_768_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_768&quot;" name="XR_EPIC_extension_768_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_769" number="769" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_769_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_769&quot;" name="XR_EPIC_extension_769_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_770" number="770" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_770_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_770&quot;" name="XR_EPIC_extension_770_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_771" number="771" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_771_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_771&quot;" name="XR_EPIC_extension_771_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_772" number="772" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_772_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_772&quot;" name="XR_EPIC_extension_772_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_773" number="773" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_773_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_773&quot;" name="XR_EPIC_extension_773_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EPIC_extension_774" number="774" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_EPIC_extension_774_SPEC_VERSION"/>
+            <enum value="&quot;XR_EPIC_extension_774&quot;" name="XR_EPIC_extension_774_EXTENSION_NAME"/>
         </require>
     </extension>
 

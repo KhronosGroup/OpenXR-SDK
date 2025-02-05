@@ -33,7 +33,7 @@ jobs:
           - win32_uwp
           - x64_uwp
           - arm64_uwp
-          - arm_uwp
+          # - arm_uwp
 
     uses: "./.github/workflows/msvc-build-preset.yml"
     with:

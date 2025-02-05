@@ -549,6 +549,11 @@ struct XrGeneratedDispatchTable {
     // ---- XR_MNDX_force_feedback_curl extension commands
     PFN_xrApplyForceFeedbackCurlMNDX ApplyForceFeedbackCurlMNDX;
 
+    // ---- XR_BD_body_tracking extension commands
+    PFN_xrCreateBodyTrackerBD CreateBodyTrackerBD;
+    PFN_xrDestroyBodyTrackerBD DestroyBodyTrackerBD;
+    PFN_xrLocateBodyJointsBD LocateBodyJointsBD;
+
     // ---- XR_EXT_plane_detection extension commands
     PFN_xrCreatePlaneDetectorEXT CreatePlaneDetectorEXT;
     PFN_xrDestroyPlaneDetectorEXT DestroyPlaneDetectorEXT;

@@ -32,7 +32,7 @@
             "inherits": "win32",
             "cacheVariables": {
                 "CMAKE_SYSTEM_NAME": "WindowsStore",
-                "CMAKE_SYSTEM_VERSION": "10.0"
+                "CMAKE_SYSTEM_VERSION": "10.0.22000.0"
             }
         },
         {
@@ -45,7 +45,7 @@
             "inherits": "x64",
             "cacheVariables": {
                 "CMAKE_SYSTEM_NAME": "WindowsStore",
-                "CMAKE_SYSTEM_VERSION": "10.0"
+                "CMAKE_SYSTEM_VERSION": "10.0.22000.0"
             }
         },
         {
@@ -54,7 +54,7 @@
             "architecture": "ARM",
             "cacheVariables": {
                 "CMAKE_SYSTEM_NAME": "WindowsStore",
-                "CMAKE_SYSTEM_VERSION": "10.0"
+                "CMAKE_SYSTEM_VERSION": "10.0.22000.0"
             }
         },
         {
@@ -63,7 +63,7 @@
             "architecture": "ARM64",
             "cacheVariables": {
                 "CMAKE_SYSTEM_NAME": "WindowsStore",
-                "CMAKE_SYSTEM_VERSION": "10.0"
+                "CMAKE_SYSTEM_VERSION": "10.0.22000.0"
             }
         },
         {

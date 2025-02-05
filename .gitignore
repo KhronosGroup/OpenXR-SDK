@@ -84,6 +84,9 @@ local.properties
 *.pom
 clang-format-patches/
 /*.jar
+/*.diff
+/*.log
+/*.pdf
 
 # Key stores
 *.jks

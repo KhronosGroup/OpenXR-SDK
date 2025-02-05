@@ -176,16 +176,25 @@ if(BASH_COMMAND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/specification/Makefile")
 endif()
 
 if(ANDROID AND INSTALL_TO_ARCHITECTURE_PREFIXES)
+    set(LICENSE_DEST META-INF)
+else()
+    set(LICENSE_DEST share/doc/openxr)
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
     install(
         FILES "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
-        DESTINATION META-INF
+        DESTINATION ${LICENSE_DEST}
         COMPONENT License
     )
-
-else()
+elseif(EXISTS "${CMAKE_SOURCE_DIR}/../../../../LICENSES/Apache-2.0.txt")
+    # Building from a sources jar, where we omit that single file
+    # to avoid confusion regarding the combination of licenses in the sources.
+    # But for consistency, we will put it in the binaries.
     install(
-        FILES "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
-        DESTINATION share/doc/openxr
+        FILES "${CMAKE_SOURCE_DIR}/../../../../LICENSES/Apache-2.0.txt"
+        RENAME LICENSE
+        DESTINATION ${LICENSE_DEST}
         COMPONENT License
     )
 endif()
