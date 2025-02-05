@@ -11,11 +11,11 @@ Files: changes/conformance/*
        changes/README.md
        changes/template.md
        HOTFIX
-Copyright: 2019-2024, The Khronos Group Inc.
+Copyright: 2019-2025 The Khronos Group Inc.
 License: CC-BY-4.0
 
 Files: specification/config/copyright-spec.adoc
-Copyright: 2014-2024, The Khronos Group Inc
+Copyright: 2014-2025 The Khronos Group Inc
 License: LicenseRef-KhronosSpecCopyright-WithNormativeWording-v10
 
 Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_launcher.png
@@ -28,7 +28,7 @@ Files: src/tests/hello_xr/android_resources/vulkan/mipmap-xxhdpi/ic_helloxr_laun
        src/tests/hello_xr/android_resources/opengles/mipmap-xhdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/opengles/mipmap-hdpi/ic_helloxr_launcher.png
        src/tests/hello_xr/android_resources/opengles/mipmap-xxxhdpi/ic_helloxr_launcher.png
-Copyright: Copyright (c) 2020-2024, The Khronos Group Inc.
+Copyright: Copyright (c) 2020-2025 The Khronos Group Inc.
   Copyright (c) 2020, Google
 License: Apache-2.0
 Comment: Based on a Material Icons asset ("emoji-people") with added text
@@ -107,7 +107,7 @@ Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/o
 
 Files: specification/sources/chapters/extensions/ext/ext_performance_settings.adoc
   specification/sources/chapters/extensions/ext/ext_thermal_query.adoc
-Copyright: 2017-2024, The Khronos Group Inc.
+Copyright: 2017-2025 The Khronos Group Inc.
 License: CC-BY-4.0
 Comment: In-line license comments requested, https://gitlab.khronos.org/openxr/openxr/-/issues/1419
 
@@ -116,13 +116,13 @@ Files: src/conformance/platform_specific/android_resources/mipmap-hdpi/*
   src/conformance/platform_specific/android_resources/mipmap-xhdpi/*
   src/conformance/platform_specific/android_resources/mipmap-xxhdpi/*
   src/conformance/platform_specific/android_resources/mipmap-xxxhdpi/*
-Copyright: 2020-2024, The Khronos Group Inc.
+Copyright: 2020-2025 The Khronos Group Inc.
   2020, Google
 License: Apache-2.0
 Comment: Generated .png versions of an icon, created in Android Studio
   based on a Material Icons asset.
 
 Files: specification/scripts/vuidCounts.py
-Copyright: 2022-2024, The Khronos Group Inc.
+Copyright: 2022-2025 The Khronos Group Inc.
 License: Apache-2.0
 Comment: File automatically rewritten by VUID assignment.

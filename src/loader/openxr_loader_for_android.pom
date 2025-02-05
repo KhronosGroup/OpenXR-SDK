@@ -3,7 +3,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <!--
-  Copyright (c) 2020-2024, The Khronos Group Inc.
+  Copyright (c) 2020-2025 The Khronos Group Inc.
   SPDX-License-Identifier: Apache-2.0 OR MIT
   -->
   <groupId>org.khronos.openxr</groupId>

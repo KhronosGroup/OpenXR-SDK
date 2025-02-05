@@ -4,7 +4,7 @@
 <?xml-model href="registry.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <registry>
     <comment>
-Copyright (c) 2017-2024, The Khronos Group Inc.
+Copyright (c) 2017-2025 The Khronos Group Inc.
 
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
