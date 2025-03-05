@@ -26,7 +26,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 45)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 46)
 
 // OpenXR 1.0 version number
 #define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
@@ -856,6 +856,7 @@ static const XrSwapchainUsageFlags XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_KHR =
 typedef XrFlags64 XrCompositionLayerFlags;
 
 // Flag bits for XrCompositionLayerFlags
+// XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT is deprecated and should not be used
 static const XrCompositionLayerFlags XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT = 0x00000001;
 static const XrCompositionLayerFlags XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT = 0x00000002;
 static const XrCompositionLayerFlags XR_COMPOSITION_LAYER_UNPREMULTIPLIED_ALPHA_BIT = 0x00000004;
@@ -1991,6 +1992,23 @@ typedef struct XrBindingModificationsKHR {
     const XrBindingModificationBaseHeaderKHR* const*    bindingModifications;
 } XrBindingModificationsKHR;
 
+
+
+// XR_KHR_extended_struct_name_lengths is a preprocessor guard. Do not pass it to API calls.
+#define XR_KHR_extended_struct_name_lengths 1
+#define XR_KHR_extended_struct_name_lengths_SPEC_VERSION 1
+#define XR_KHR_EXTENDED_STRUCT_NAME_LENGTHS_EXTENSION_NAME "XR_KHR_extended_struct_name_lengths"
+#define XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR 256
+typedef XrResult (XRAPI_PTR *PFN_xrStructureTypeToString2KHR)(XrInstance instance, XrStructureType value, char buffer[XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR]);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrStructureTypeToString2KHR(
+    XrInstance                                  instance,
+    XrStructureType                             value,
+    char                                        buffer[XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR]);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
 
 
 // XR_KHR_swapchain_usage_input_attachment_bit is a preprocessor guard. Do not pass it to API calls.
@@ -6773,6 +6791,12 @@ typedef struct XrSystemHeadsetIdPropertiesMETA {
 
 
 
+// XR_META_hand_tracking_microgestures is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_hand_tracking_microgestures 1
+#define XR_META_hand_tracking_microgestures_SPEC_VERSION 1
+#define XR_META_HAND_TRACKING_MICROGESTURES_EXTENSION_NAME "XR_META_hand_tracking_microgestures"
+
+
 // XR_META_recommended_layer_resolution is a preprocessor guard. Do not pass it to API calls.
 #define XR_META_recommended_layer_resolution 1
 #define XR_META_recommended_layer_resolution_SPEC_VERSION 1
@@ -8575,6 +8599,12 @@ typedef struct XrSpaceGroupUuidFilterInfoMETA {
     XrUuid                      groupUuid;
 } XrSpaceGroupUuidFilterInfoMETA;
 
+
+
+// XR_LOGITECH_mx_ink_stylus_interaction is a preprocessor guard. Do not pass it to API calls.
+#define XR_LOGITECH_mx_ink_stylus_interaction 1
+#define XR_LOGITECH_mx_ink_stylus_interaction_SPEC_VERSION 1
+#define XR_LOGITECH_MX_INK_STYLUS_INTERACTION_EXTENSION_NAME "XR_LOGITECH_mx_ink_stylus_interaction"
 
 #ifdef __cplusplus
 }

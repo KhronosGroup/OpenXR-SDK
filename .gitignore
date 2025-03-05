@@ -78,6 +78,7 @@ local.properties
 !.proclamation.json
 !.reuse
 !/.env
+!.java-version
 
 # Output artifact
 *.aar

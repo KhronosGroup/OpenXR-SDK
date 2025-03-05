@@ -43,7 +43,7 @@ Comment: Unmodified, vendored copy of Catch2 v3.7.1
 Files: src/external/jsoncpp/*
 Copyright: 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
 License: MIT OR LicenseRef-jsoncpp-public-domain
-Comment: Unmodified, vendored copy of jsoncpp 1.9.5
+Comment: Unmodified, vendored copy of jsoncpp 1.9.6
 
 Files: src/external/tinygltf/README.md
   src/external/tinygltf/tiny_gltf.cc

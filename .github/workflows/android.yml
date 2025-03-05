@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Get modern CMake and Ninja
-        uses: "lukka/get-cmake@v3.30.5"
+        uses: "lukka/get-cmake@v3.31.6"
 
       # Do this before building aar since it affects the version
       - name: Touch SNAPSHOT marker file
@@ -47,11 +47,11 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
       - name: "Get modern CMake and Ninja"
-        uses: "lukka/get-cmake@v3.30.5"
-      - name: "set up JDK 11"
+        uses: "lukka/get-cmake@v3.31.6"
+      - name: "set up JDK"
         uses: "actions/setup-java@v4"
         with:
-          java-version: "11"
+          java-version-file: ".github/.java-version"
           distribution: "temurin"
       # Also performs Gradle wrapper validation
       - uses: "gradle/actions/setup-gradle@v4"

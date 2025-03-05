@@ -21,6 +21,63 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.46 (2025-03-04)
+
+This release includes a new ratified Khronos extension, new vendor extensions,
+and the ratification of several existing multi-vendor extensions. In the SDK
+specifically, Android AAR packages for the loader are now easier to use with a
+copy of the loader library in a path supported by older-style build systems, as
+well as inclusion of a top-level architecture-independent CMake config/version
+file when unpacked for easier use with pure-CMake build systems.
+
+- Registry
+  - Chore: Reserve extension numbers.
+    ([internal MR 3701](https://gitlab.khronos.org/openxr/openxr/merge_requests/3701),
+    [internal MR 3711](https://gitlab.khronos.org/openxr/openxr/merge_requests/3711),
+    [internal MR 3722](https://gitlab.khronos.org/openxr/openxr/merge_requests/3722))
+  - Chore: Register Sony author ID.
+    ([internal MR 3709](https://gitlab.khronos.org/openxr/openxr/merge_requests/3709))
+  - Fix: XML contained incorrect paths for dpad emulation bindings for
+    `.../bytedance/pico_neo3_controller`, `.../bytedance/pico4_controller`,
+    `.../bytedance/pico_g3_controller`, `.../yvr/touch_controller_yvr`, and
+    `.../microsoft/xbox_controller`.
+    ([internal MR 3674](https://gitlab.khronos.org/openxr/openxr/merge_requests/3674))
+  - Improvement: Ratify a list of shared vendor extensions as well as add support
+    for the 'ratified' attribute in XML and html generation. See
+    <https://registry.khronos.org/OpenXR/specs/1.1/extprocess.html> for more
+    information.
+    ([internal MR 3494](https://gitlab.khronos.org/openxr/openxr/merge_requests/3494),
+    [internal issue 2404](https://gitlab.khronos.org/openxr/openxr/issues/2404),
+    [internal MR 3677](https://gitlab.khronos.org/openxr/openxr/merge_requests/3677))
+  - New ratified Khronos extension: `XR_KHR_extended_struct_name_lengths`
+    ([internal MR 3254](https://gitlab.khronos.org/openxr/openxr/merge_requests/3254),
+    [internal issue 1664](https://gitlab.khronos.org/openxr/openxr/issues/1664))
+  - New vendor extension: `XR_LOGITECH_mx_ink_stylus_interaction`
+    ([internal MR 3242](https://gitlab.khronos.org/openxr/openxr/merge_requests/3242),
+    [internal MR 3583](https://gitlab.khronos.org/openxr/openxr/merge_requests/3583),
+    [internal MR 3584](https://gitlab.khronos.org/openxr/openxr/merge_requests/3584),
+    [internal MR 3585](https://gitlab.khronos.org/openxr/openxr/merge_requests/3585))
+  - New vendor extension: `XR_META_hand_tracking_microgestures`
+    ([internal MR 3433](https://gitlab.khronos.org/openxr/openxr/merge_requests/3433),
+    [internal MR 3725](https://gitlab.khronos.org/openxr/openxr/merge_requests/3725))
+- SDK
+  - Fix: Require both "xcb" and "xcb-glx" modules correctly in order to configure
+    build for use of xcb headers.
+    ([internal MR 3703](https://gitlab.khronos.org/openxr/openxr/merge_requests/3703),
+    [internal issue 2467](https://gitlab.khronos.org/openxr/openxr/issues/2467))
+  - Improvement: Refactored usage of Android logging to be more consistent.
+    ([internal MR 2909](https://gitlab.khronos.org/openxr/openxr/merge_requests/2909))
+  - Improvement: In the Android loader AAR, place a copy of the loader library in
+    the `/jni/ARCH/` directory for older build systems.
+    ([internal MR 3261](https://gitlab.khronos.org/openxr/openxr/merge_requests/3261),
+    [internal issue 2285](https://gitlab.khronos.org/openxr/openxr/issues/2285))
+  - Improvement: Include cross-architecture CMake config/version files in the root
+    of the Android `.aar` artifact, allowing it to be unpacked and used easily by
+    software not using the Android Gradle Plugin and Prefab.
+    ([internal MR 3658](https://gitlab.khronos.org/openxr/openxr/merge_requests/3658))
+  - Update: Upgrade bundled jsoncpp to 1.9.6.
+    ([internal MR 3502](https://gitlab.khronos.org/openxr/openxr/merge_requests/3502))
+
 ## OpenXR SDK 1.1.45 (2025-02-05)
 
 This release includes a new multi-vendor extension, a new vendor extension,

@@ -45,7 +45,7 @@ jobs:
     if: inputs.organizeAndRelease
     needs:
       - msvc-build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: "actions/checkout@v4"
 
@@ -66,7 +66,7 @@ jobs:
       # NuGet stuff now
 
       - name: Setup NuGet
-        uses: "NuGet/setup-nuget@a21f25cd3998bf370fde17e3f1b4c12c175172f9"
+        uses: "NuGet/setup-nuget@323ab0502cd38fdc493335025a96c8fdb0edc71f"
         with:
           nuget-version: "5.x"
 

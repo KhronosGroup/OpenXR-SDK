@@ -181,6 +181,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrGetVulkanGraphicsRequirements2KHR", (PFN_xrVoidFunction*)&table->GetVulkanGraphicsRequirements2KHR));
 #endif // defined(XR_USE_GRAPHICS_API_VULKAN)
 
+    // ---- XR_KHR_extended_struct_name_lengths extension commands
+    (get_inst_proc_addr(instance, "xrStructureTypeToString2KHR", (PFN_xrVoidFunction*)&table->StructureTypeToString2KHR));
+
     // ---- XR_KHR_locate_spaces extension commands
     (get_inst_proc_addr(instance, "xrLocateSpacesKHR", (PFN_xrVoidFunction*)&table->LocateSpacesKHR));
 

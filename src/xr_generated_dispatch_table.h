@@ -187,6 +187,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrGetVulkanGraphicsRequirements2KHR GetVulkanGraphicsRequirements2KHR;
 #endif // defined(XR_USE_GRAPHICS_API_VULKAN)
 
+    // ---- XR_KHR_extended_struct_name_lengths extension commands
+    PFN_xrStructureTypeToString2KHR StructureTypeToString2KHR;
+
     // ---- XR_KHR_locate_spaces extension commands
     PFN_xrLocateSpacesKHR LocateSpacesKHR;
 

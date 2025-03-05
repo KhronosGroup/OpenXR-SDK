@@ -6184,6 +6184,7 @@ XR_ENUM_STR(XrResult);
     _(XR_ML_spatial_anchors_storage, 142) \
     _(XR_MSFT_spatial_anchor_persistence, 143) \
     _(XR_MSFT_scene_marker, 148) \
+    _(XR_KHR_extended_struct_name_lengths, 149) \
     _(XR_ULTRALEAP_hand_tracking_forearm, 150) \
     _(XR_FB_spatial_entity_query, 157) \
     _(XR_FB_spatial_entity_storage, 159) \
@@ -6220,6 +6221,7 @@ XR_ENUM_STR(XrResult);
     _(XR_FB_spatial_entity_storage_batch, 239) \
     _(XR_FB_spatial_entity_user, 242) \
     _(XR_META_headset_id, 246) \
+    _(XR_META_hand_tracking_microgestures, 253) \
     _(XR_META_recommended_layer_resolution, 255) \
     _(XR_META_passthrough_color_lut, 267) \
     _(XR_META_spatial_entity_mesh, 270) \
@@ -6257,6 +6259,7 @@ XR_ENUM_STR(XrResult);
     _(XR_META_colocation_discovery, 572) \
     _(XR_META_spatial_entity_group_sharing, 573) \
     _(XR_KHR_maintenance1, 711) \
+    _(XR_LOGITECH_mx_ink_stylus_interaction, 746) \
 
 
 
@@ -6449,6 +6452,14 @@ XR_ENUM_STR(XrResult);
     _(CreateVulkanInstanceKHR, KHR_vulkan_enable2) \
     _(CreateVulkanDeviceKHR, KHR_vulkan_enable2) \
     _(GetVulkanGraphicsDevice2KHR, KHR_vulkan_enable2) \
+
+
+/// For every function defined by XR_KHR_extended_struct_name_lengths in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_KHR_extended_struct_name_lengths(_) \
+    _(StructureTypeToString2KHR, KHR_extended_struct_name_lengths) \
 
 
 /// For every function defined by XR_EXT_performance_settings in this version of the spec,

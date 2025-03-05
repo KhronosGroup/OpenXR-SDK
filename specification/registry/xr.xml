@@ -49,7 +49,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="LEIA"       author="Leia"                  contact="Cristina Scheibler @cscheibler"/>
         <tag name="LUNARG"     author="LunarG"                contact="Brad Grantham @bradgrantham-lunarg"/>
         <tag name="LIV"        author="LIV"                   contact="Arthur Brainville @Ybalrid, Steffan Donal @liv_ruu"/>
-        <tag name="LOGITECH"   author="Logitech"              contact="Fabien Zellweger @fzellweger"/>
+        <tag name="LOGITECH"   author="Logitech"              contact="Mario Gutierrez @mgutierrez1, Fabien Zellweger @fzellweger"/>
         <tag name="META"       author="Meta Platforms"        contact="Cass Everitt @casseveritt, Jonathan Wright @Nelno"/>
         <tag name="ML"         author="Magic Leap"            contact="Ron Bessems @rbessems"/>
         <tag name="MND"        author="Monado Project"        contact="Jakob Bornecrantz @wallbraker, Rylie Pavlik @rpavlik"/>
@@ -60,6 +60,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <tag name="PLUTO"      author="Pluto VR"              contact="Jared Cheshier @Jared, Sophia Baldonado @sophia"/>
         <tag name="QCOM"       author="Qualcomm Technologies" contact="Armelle @alaine_qcom, Martin Renschler @martinr"/>
         <tag name="RZR"        author="Razer"                 contact="Alexandre Hulsken @ahulsken, Eric Vezzoli @EricVezzoli"/>
+        <tag name="SONY"       author="Sony Corporation"      contact="Kota Suzuki @kotasuzuki"/>
         <tag name="STARBREEZE" author="Starbreeze"            contact="David Srour @dsrour"/>
         <tag name="TOBII"      author="Tobii"                 contact="Denny Rönngren @denron"/>
         <tag name="ULTRALEAP"  author="Ultraleap"             contact="Robert Blenkinsopp @rblenkinsopp"/>
@@ -135,7 +136,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 45)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 46)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -5864,6 +5865,12 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrStructureType</type> <name>value</name></param>
             <param><type>char</type> <name>buffer</name>[<enum>XR_MAX_STRUCTURE_NAME_SIZE</enum>]</param>
         </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST">
+            <proto><type>XrResult</type> <name>xrStructureTypeToString2KHR</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param><type>XrStructureType</type> <name>value</name></param>
+            <param><type>char</type> <name>buffer</name>[<enum>XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR</enum>]</param>
+        </command>
         <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST">
             <proto><type>XrResult</type> <name>xrGetInstanceProperties</name></proto>
             <param><type>XrInstance</type> <name>instance</name></param>
@@ -8671,6 +8678,24 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component                                subpath="/output/haptic"            type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- XR_LOGITECH_mx_ink_stylus_interaction -->
+        <interaction_profile name="/interaction_profiles/logitech/mx_ink_stylus_logitech" title="Logitech MX Ink Stylus">
+            <user_path path="/user/hand/left"/>
+            <user_path path="/user/hand/right"/>
+            <component subpath="/input/tip_logitech/force"                           type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/cluster_middle_logitech/force"                type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/cluster_front_logitech/click"                 type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/cluster_front_logitech/double_tap_logitech"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/cluster_back_logitech/click"                  type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/cluster_back_logitech/double_tap_logitech"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/system/click"                                 type="XR_ACTION_TYPE_BOOLEAN_INPUT"    system="true"/>
+            <component subpath="/input/dock_logitech/docked_logitech"                type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/grip/pose"                                    type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/input/aim/pose"                                     type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/input/tip_logitech/pose"                            type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/output/haptic"                                      type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
+        </interaction_profile>
+
     </interaction_profiles>
 
     <!-- SECTION: OpenXR 1.0 API interface definitions -->
@@ -9067,25 +9092,22 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_neo3_controller">
-                <component subpath="/input/trackpad/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico4_controller">
-                <component subpath="/input/trackpad/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_g3_controller">
-                <component subpath="/input/trackpad/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
@@ -9346,7 +9368,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- SECTION: OpenXR extension interface definitions -->
     <extensions>
     <!-- Android Thread Settings extension -->
-    <extension name="XR_KHR_android_thread_settings" number="4" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
+    <extension name="XR_KHR_android_thread_settings" number="4" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" ratified="openxr">
         <require>
             <enum value="6"                                          name="XR_KHR_android_thread_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_thread_settings&quot;" name="XR_KHR_ANDROID_THREAD_SETTINGS_EXTENSION_NAME"/>
@@ -9358,7 +9380,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Android Surface Swapchain extension -->
-    <extension name="XR_KHR_android_surface_swapchain" number="5" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
+    <extension name="XR_KHR_android_surface_swapchain" number="5" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" ratified="openxr">
         <require>
             <enum value="4"                                            name="XR_KHR_android_surface_swapchain_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_surface_swapchain&quot;" name="XR_KHR_ANDROID_SURFACE_SWAPCHAIN_EXTENSION_NAME"/>
@@ -9367,7 +9389,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Non-core composition cube layer -->
-    <extension name="XR_KHR_composition_layer_cube" number="7" type="instance" supported="openxr">
+    <extension name="XR_KHR_composition_layer_cube" number="7" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="8"                                         name="XR_KHR_composition_layer_cube_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_cube&quot;" name="XR_KHR_COMPOSITION_LAYER_CUBE_EXTENSION_NAME"/>
@@ -9377,7 +9399,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Android Create Instance extension -->
-    <extension name="XR_KHR_android_create_instance" number="9" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
+    <extension name="XR_KHR_android_create_instance" number="9" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" ratified="openxr">
         <require>
             <enum value="3"                                          name="XR_KHR_android_create_instance_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_create_instance&quot;" name="XR_KHR_ANDROID_CREATE_INSTANCE_EXTENSION_NAME"/>
@@ -9387,7 +9409,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Runtime support for additional per-layer depth info -->
-    <extension name="XR_KHR_composition_layer_depth" number="11" type="instance" supported="openxr">
+    <extension name="XR_KHR_composition_layer_depth" number="11" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="6"                                          name="XR_KHR_composition_layer_depth_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_depth&quot;" name="XR_KHR_COMPOSITION_LAYER_DEPTH_EXTENSION_NAME"/>
@@ -9406,7 +9428,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
 
     <!-- Vulkan image format list extension -->
-    <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" depends="XR_VERSION_1_0+XR_KHR_vulkan_enable,XR_VERSION_1_0+XR_KHR_vulkan_enable2" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN">
+    <extension name="XR_KHR_vulkan_swapchain_format_list" number="15" type="instance" depends="XR_VERSION_1_0+XR_KHR_vulkan_enable,XR_VERSION_1_0+XR_KHR_vulkan_enable2" supported="openxr" protect="XR_USE_GRAPHICS_API_VULKAN" ratified="openxr">
         <require>
             <enum value="5"                                               name="XR_KHR_vulkan_swapchain_format_list_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_swapchain_format_list&quot;" name="XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME"/>
@@ -9416,7 +9438,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Performance Settings extension -->
-    <extension name="XR_EXT_performance_settings" number="16" type="instance" supported="openxr">
+    <extension name="XR_EXT_performance_settings" number="16" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="4"                                       name="XR_EXT_performance_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_performance_settings&quot;" name="XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME"/>
@@ -9442,7 +9464,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Non-core composition cylinder layer -->
-    <extension name="XR_KHR_composition_layer_cylinder" number="18" type="instance" supported="openxr">
+    <extension name="XR_KHR_composition_layer_cylinder" number="18" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="4"                                             name="XR_KHR_composition_layer_cylinder_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_cylinder&quot;" name="XR_KHR_COMPOSITION_LAYER_CYLINDER_EXTENSION_NAME"/>
@@ -9452,7 +9474,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Non-core composition equilateral rect layer -->
-    <extension name="XR_KHR_composition_layer_equirect" number="19" type="instance" supported="openxr">
+    <extension name="XR_KHR_composition_layer_equirect" number="19" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="3"                                             name="XR_KHR_composition_layer_equirect_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_equirect&quot;" name="XR_KHR_COMPOSITION_LAYER_EQUIRECT_EXTENSION_NAME"/>
@@ -9503,7 +9525,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- OpenGL graphics binding extension -->
-    <extension name="XR_KHR_opengl_enable" number="24" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL" supported="openxr">
+    <extension name="XR_KHR_opengl_enable" number="24" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL" supported="openxr" ratified="openxr">
         <require>
             <enum value="10"                               name="XR_KHR_opengl_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_enable&quot;" name="XR_KHR_OPENGL_ENABLE_EXTENSION_NAME"/>
@@ -9524,7 +9546,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- OpenGL ES graphics binding extension -->
-    <extension name="XR_KHR_opengl_es_enable" number="25" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL_ES" supported="openxr">
+    <extension name="XR_KHR_opengl_es_enable" number="25" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL_ES" supported="openxr" ratified="openxr">
         <require>
             <enum value="8"                                   name="XR_KHR_opengl_es_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_es_enable&quot;" name="XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME"/>
@@ -9539,7 +9561,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Vulkan graphics binding extension -->
-    <extension name="XR_KHR_vulkan_enable" number="26" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr">
+    <extension name="XR_KHR_vulkan_enable" number="26" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr" ratified="openxr">
         <require>
             <enum value="8"                                name="XR_KHR_vulkan_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_enable&quot;" name="XR_KHR_VULKAN_ENABLE_EXTENSION_NAME"/>
@@ -9565,7 +9587,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- D3D11 graphics binding extension -->
-    <extension name="XR_KHR_D3D11_enable" number="28" type="instance" protect="XR_USE_GRAPHICS_API_D3D11" supported="openxr">
+    <extension name="XR_KHR_D3D11_enable" number="28" type="instance" protect="XR_USE_GRAPHICS_API_D3D11" supported="openxr" ratified="openxr">
         <require>
             <enum value="9"                               name="XR_KHR_D3D11_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D11_enable&quot;" name="XR_KHR_D3D11_ENABLE_EXTENSION_NAME"/>
@@ -9580,7 +9602,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- D3D12 graphics binding extension -->
-    <extension name="XR_KHR_D3D12_enable" number="29" type="instance" protect="XR_USE_GRAPHICS_API_D3D12" supported="openxr">
+    <extension name="XR_KHR_D3D12_enable" number="29" type="instance" protect="XR_USE_GRAPHICS_API_D3D12" supported="openxr" ratified="openxr">
         <require>
             <enum value="9"                               name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D12_enable&quot;" name="XR_KHR_D3D12_ENABLE_EXTENSION_NAME"/>
@@ -9595,7 +9617,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Metal graphics binding extension -->
-    <extension name="XR_KHR_metal_enable" number="30" type="instance" protect="XR_USE_GRAPHICS_API_METAL" supported="openxr">
+    <extension name="XR_KHR_metal_enable" number="30" type="instance" protect="XR_USE_GRAPHICS_API_METAL" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                               name="XR_KHR_metal_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_metal_enable&quot;" name="XR_KHR_METAL_ENABLE_EXTENSION_NAME"/>
@@ -9610,7 +9632,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Eye gaze interaction extension -->
-    <extension name="XR_EXT_eye_gaze_interaction" number="31" type="instance" supported="openxr">
+    <extension name="XR_EXT_eye_gaze_interaction" number="31" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="2"                                       name="XR_EXT_eye_gaze_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_eye_gaze_interaction&quot;" name="XR_EXT_EYE_GAZE_INTERACTION_EXTENSION_NAME"/>
@@ -9624,7 +9646,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Visibility mask extension -->
-    <extension name="XR_KHR_visibility_mask" number="32" type="instance" supported="openxr">
+    <extension name="XR_KHR_visibility_mask" number="32" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="2"                                  name="XR_KHR_visibility_mask_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_visibility_mask&quot;" name="XR_KHR_VISIBILITY_MASK_EXTENSION_NAME"/>
@@ -9659,7 +9681,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
 
     <!-- per-layer color scale and bias -->
-    <extension name="XR_KHR_composition_layer_color_scale_bias" number="35" type="instance" supported="openxr">
+    <extension name="XR_KHR_composition_layer_color_scale_bias" number="35" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="5"                                                     name="XR_KHR_composition_layer_color_scale_bias_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_color_scale_bias&quot;" name="XR_KHR_COMPOSITION_LAYER_COLOR_SCALE_BIAS_EXTENSION_NAME"/>
@@ -9668,7 +9690,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_win32_convert_performance_counter_time" number="36" type="instance" supported="openxr" protect="XR_USE_PLATFORM_WIN32">
+    <extension name="XR_KHR_win32_convert_performance_counter_time" number="36" type="instance" supported="openxr" protect="XR_USE_PLATFORM_WIN32" ratified="openxr">
         <require>
             <enum value="1"                                                         name="XR_KHR_win32_convert_performance_counter_time_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_win32_convert_performance_counter_time&quot;" name="XR_KHR_WIN32_CONVERT_PERFORMANCE_COUNTER_TIME_EXTENSION_NAME"/>
@@ -9677,7 +9699,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_convert_timespec_time" number="37" type="instance" supported="openxr" protect="XR_USE_TIMESPEC">
+    <extension name="XR_KHR_convert_timespec_time" number="37" type="instance" supported="openxr" protect="XR_USE_TIMESPEC" ratified="openxr">
         <require>
             <enum value="1"                                        name="XR_KHR_convert_timespec_time_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_convert_timespec_time&quot;" name="XR_KHR_CONVERT_TIMESPEC_TIME_EXTENSION_NAME"/>
@@ -9765,7 +9787,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_view_configuration_depth_range" number="47" type="instance" supported="openxr">
+    <extension name="XR_EXT_view_configuration_depth_range" number="47" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                                                 name="XR_EXT_view_configuration_depth_range_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_view_configuration_depth_range&quot;" name="XR_EXT_VIEW_CONFIGURATION_DEPTH_RANGE_EXTENSION_NAME"/>
@@ -9774,7 +9796,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_conformance_automation" number="48" type="instance" supported="openxr">
+    <extension name="XR_EXT_conformance_automation" number="48" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="3"                                         name="XR_EXT_conformance_automation_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_conformance_automation&quot;" name="XR_EXT_CONFORMANCE_AUTOMATION_EXTENSION_NAME"/>
@@ -9838,7 +9860,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_hand_tracking" number="52" type="instance" supported="openxr">
+    <extension name="XR_EXT_hand_tracking" number="52" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="4"                                name="XR_EXT_hand_tracking_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_tracking&quot;" name="XR_EXT_HAND_TRACKING_EXTENSION_NAME"/>
@@ -10171,7 +10193,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_dpad_binding" number="79" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_KHR_binding_modification">
+    <extension name="XR_EXT_dpad_binding" number="79" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_KHR_binding_modification" ratified="openxr">
         <require>
             <enum value="1"                               name="XR_EXT_dpad_binding_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_dpad_binding&quot;" name="XR_EXT_DPAD_BINDING_EXTENSION_NAME"/>
@@ -10222,10 +10244,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
                 <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/microsoft/xbox_controller">
-                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_left/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_left/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_left/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_left/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_right/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_right/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_right/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick_right/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/valve/index_controller">
                 <component subpath="/input/trackpad/dpad_up"        type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
@@ -10250,7 +10276,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_hand_joints_motion_range" number="81" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_EXT_hand_tracking">
+    <extension name="XR_EXT_hand_joints_motion_range" number="81" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_EXT_hand_tracking" ratified="openxr">
         <require>
             <enum value="1"                                           name="XR_EXT_hand_joints_motion_range_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_joints_motion_range&quot;" name="XR_EXT_HAND_JOINTS_MOTION_RANGE_EXTENSION_NAME"/>
@@ -10311,7 +10337,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_loader_init" number="89" type="instance" supported="openxr">
+    <extension name="XR_KHR_loader_init" number="89" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="2"                              name="XR_KHR_loader_init_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_loader_init&quot;" name="XR_KHR_LOADER_INIT_EXTENSION_NAME"/>
@@ -10320,7 +10346,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_loader_init_android" number="90" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" depends="XR_VERSION_1_0+XR_KHR_loader_init">
+    <extension name="XR_KHR_loader_init_android" number="90" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID" depends="XR_VERSION_1_0+XR_KHR_loader_init" ratified="openxr">
         <require>
             <enum value="1"                                      name="XR_KHR_loader_init_android_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_loader_init_android&quot;" name="XR_KHR_LOADER_INIT_ANDROID_EXTENSION_NAME"/>
@@ -10329,7 +10355,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_vulkan_enable2" number="91" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr">
+    <extension name="XR_KHR_vulkan_enable2" number="91" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr" ratified="openxr">
         <require>
             <enum value="2"                                 name="XR_KHR_vulkan_enable2_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_enable2&quot;" name="XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME"/>
@@ -10352,7 +10378,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_composition_layer_equirect2" number="92" type="instance" supported="openxr">
+    <extension name="XR_KHR_composition_layer_equirect2" number="92" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                                              name="XR_KHR_composition_layer_equirect2_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_composition_layer_equirect2&quot;" name="XR_KHR_COMPOSITION_LAYER_EQUIRECT2_EXTENSION_NAME"/>
@@ -10986,7 +11012,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_binding_modification" number="121" type="instance" supported="openxr">
+    <extension name="XR_KHR_binding_modification" number="121" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                                       name="XR_KHR_binding_modification_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_binding_modification&quot;" name="XR_KHR_BINDING_MODIFICATION_EXTENSION_NAME"/>
@@ -11480,10 +11506,12 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_extension_149" number="149" type="instance" supported="disabled">
+    <extension name="XR_KHR_extended_struct_name_lengths" number="149" type="instance" supported="openxr" ratified="openxr">
         <require>
-            <enum value="1"                                name="XR_KHR_extension_149_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_extension_149&quot;" name="XR_KHR_extension_149_EXTENSION_NAME"/>
+            <enum value="1"                                               name="XR_KHR_extended_struct_name_lengths_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extended_struct_name_lengths&quot;" name="XR_KHR_EXTENDED_STRUCT_NAME_LENGTHS_EXTENSION_NAME"/>
+            <command name="xrStructureTypeToString2KHR"/>
+            <enum value="256" name="XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR"/>
         </require>
     </extension>
 
@@ -11659,7 +11687,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_swapchain_usage_input_attachment_bit" number="166" type="instance" supported="openxr">
+    <extension name="XR_KHR_swapchain_usage_input_attachment_bit" number="166" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="3"                                                       name="XR_KHR_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_swapchain_usage_input_attachment_bit&quot;" name="XR_KHR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME"/>
@@ -12586,10 +12614,20 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_253" number="253" type="instance" supported="disabled">
+    <extension name="XR_META_hand_tracking_microgestures" number="253" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_253_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_253&quot;" name="XR_FB_EXTENSION_253_EXTENSION_NAME"/>
+            <enum value="1"                                               name="XR_META_hand_tracking_microgestures_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_hand_tracking_microgestures&quot;" name="XR_META_HAND_TRACKING_MICROGESTURES_EXTENSION_NAME"/>
+        </require>
+
+        <require depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/ext/hand_interaction_ext">
+                <component subpath="/input/swipe_left_meta/click"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/swipe_right_meta/click"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/swipe_forward_meta/click"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/swipe_backward_meta/click"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/tap_thumb_meta/click"        type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
         </require>
     </extension>
 
@@ -13072,7 +13110,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_hand_interaction" number="303" type="instance" supported="openxr">
+    <extension name="XR_EXT_hand_interaction" number="303" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                                   name="XR_EXT_hand_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_interaction&quot;" name="XR_EXT_HAND_INTERACTION_EXTENSION_NAME"/>
@@ -13783,25 +13821,22 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_neo3_controller">
-                <component subpath="/input/trackpad/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico4_controller">
-                <component subpath="/input/trackpad/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
             <extend interaction_profile_path="/interaction_profiles/bytedance/pico_g3_controller">
-                <component subpath="/input/trackpad/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
@@ -14158,7 +14193,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_hand_tracking_data_source" number="429" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_EXT_hand_tracking">
+    <extension name="XR_EXT_hand_tracking_data_source" number="429" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_EXT_hand_tracking" ratified="openxr">
         <require>
             <enum value="1"                                            name="XR_EXT_hand_tracking_data_source_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_tracking_data_source&quot;" name="XR_EXT_HAND_TRACKING_DATA_SOURCE_EXTENSION_NAME"/>
@@ -14489,7 +14524,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_future" number="470" type="instance" supported="openxr">
+    <extension name="XR_EXT_future" number="470" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                             name="XR_EXT_future_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_future&quot;"     name="XR_EXT_FUTURE_EXTENSION_NAME"/>
@@ -14535,7 +14570,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_locate_spaces" number="472" type="instance" supported="openxr" promotedto="XR_VERSION_1_1">
+    <extension name="XR_KHR_locate_spaces" number="472" type="instance" supported="openxr" promotedto="XR_VERSION_1_1" ratified="openxr">
         <require>
             <enum value="1"                                name="XR_KHR_locate_spaces_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_locate_spaces&quot;" name="XR_KHR_LOCATE_SPACES_EXTENSION_NAME"/>
@@ -14810,11 +14845,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/yvr/touch_controller_yvr">
-                <component subpath="/input/trackpad/dpad_up"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_down"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_left"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_right"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
@@ -16370,7 +16404,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_maintenance1" number="711" type="instance" supported="openxr" promotedto="XR_VERSION_1_1">
+    <extension name="XR_KHR_maintenance1" number="711" type="instance" supported="openxr" promotedto="XR_VERSION_1_1" ratified="openxr">
         <require>
             <enum value="1"                               name="XR_KHR_maintenance1_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_maintenance1&quot;" name="XR_KHR_MAINTENANCE1_EXTENSION_NAME"/>
@@ -16734,10 +16768,17 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_LOGITECH_extension_746" number="746" type="instance" supported="disabled">
+    <extension name="XR_LOGITECH_mx_ink_stylus_interaction" number="746" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                     name="XR_LOGITECH_extension_746_SPEC_VERSION"/>
-            <enum value="&quot;XR_LOGITECH_extension_746&quot;" name="XR_LOGITECH_EXTENSION_746_EXTENSION_NAME"/>
+            <enum value="1"                                                 name="XR_LOGITECH_mx_ink_stylus_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_LOGITECH_mx_ink_stylus_interaction&quot;" name="XR_LOGITECH_MX_INK_STYLUS_INTERACTION_EXTENSION_NAME"/>
+            <interaction_profile name="/interaction_profiles/logitech/mx_ink_stylus_logitech"/>
+        </require>
+        <require depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/logitech/mx_ink_stylus_logitech">
+                <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
         </require>
     </extension>
 
@@ -16937,6 +16978,54 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
+    <extension name="XR_KHR_hand_tracking" number="775" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_KHR_hand_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_hand_tracking&quot;" name="XR_KHR_HAND_TRACKING_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_haptic_parametric" number="776" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                    name="XR_EXT_haptic_parametric_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_haptic_parametric&quot;" name="XR_EXT_HAPTIC_PARAMETRIC_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_SONY_extension_777" number="777" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_SONY_extension_777_SPEC_VERSION"/>
+            <enum value="&quot;XR_SONY_extension_777&quot;" name="XR_SONY_EXTENSION_777_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_SONY_extension_778" number="778" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_SONY_extension_778_SPEC_VERSION"/>
+            <enum value="&quot;XR_SONY_extension_778&quot;" name="XR_SONY_EXTENSION_778_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_SONY_extension_779" number="779" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_SONY_extension_779_SPEC_VERSION"/>
+            <enum value="&quot;XR_SONY_extension_779&quot;" name="XR_SONY_EXTENSION_779_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_SONY_extension_780" number="780" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_SONY_extension_780_SPEC_VERSION"/>
+            <enum value="&quot;XR_SONY_extension_780&quot;" name="XR_SONY_EXTENSION_780_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_SONY_extension_781" number="781" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                 name="XR_SONY_extension_781_SPEC_VERSION"/>
+            <enum value="&quot;XR_SONY_extension_781&quot;" name="XR_SONY_EXTENSION_781_EXTENSION_NAME"/>
+        </require>
+    </extension>
     </extensions>
 
 </registry>

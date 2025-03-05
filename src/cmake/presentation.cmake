@@ -21,7 +21,8 @@ find_package(X11)
 find_package(PkgConfig)
 
 if(PKG_CONFIG_FOUND)
-    pkg_search_module(XCB xcb xcb-glx)
+    pkg_search_module(XCB xcb)
+    pkg_search_module(XCB_GLX xcb-glx)
 
     pkg_search_module(WAYLAND_CLIENT wayland-client)
 endif()
@@ -31,7 +32,7 @@ cmake_dependent_option(
     BUILD_WITH_XLIB_HEADERS "Build with support for X11/Xlib-related features." ON "X11_FOUND" OFF
 )
 cmake_dependent_option(
-    BUILD_WITH_XCB_HEADERS "Build with support for XCB-related features." ON "X11_FOUND AND XCB_FOUND" OFF
+    BUILD_WITH_XCB_HEADERS "Build with support for XCB-related features." ON "X11_FOUND AND XCB_FOUND AND XCB_GLX_FOUND" OFF
 )
 cmake_dependent_option(
     BUILD_WITH_WAYLAND_HEADERS "Build with support for Wayland-related features." ON "WAYLAND_CLIENT_FOUND"

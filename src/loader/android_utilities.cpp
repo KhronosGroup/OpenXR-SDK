@@ -20,10 +20,8 @@
 #include <vector>
 #include <android/log.h>
 
-#define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR, "OpenXR-Loader", __VA_ARGS__)
-#define ALOGW(...) __android_log_print(ANDROID_LOG_WARN, "OpenXR-Loader", __VA_ARGS__)
-#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, "OpenXR-Loader", __VA_ARGS__)
-#define ALOGI(...) __android_log_print(ANDROID_LOG_INFO, "OpenXR-Loader", __VA_ARGS__)
+#define LOG_TAG "OpenXR-Loader"
+#include "android_logging.h"
 
 namespace openxr_android {
 using wrap::android::content::ContentUris;
