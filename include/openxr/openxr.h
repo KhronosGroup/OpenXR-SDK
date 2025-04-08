@@ -26,7 +26,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 46)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 47)
 
 // OpenXR 1.0 version number
 #define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
@@ -259,6 +259,16 @@ typedef enum XrResult {
     XR_ENVIRONMENT_DEPTH_NOT_AVAILABLE_META = 1000291000,
     XR_ERROR_HINT_ALREADY_SET_QCOM = -1000306000,
     XR_ERROR_NOT_AN_ANCHOR_HTC = -1000319000,
+    XR_ERROR_SPATIAL_ENTITY_ID_INVALID_BD = -1000389000,
+    XR_ERROR_SPATIAL_SENSING_SERVICE_UNAVAILABLE_BD = -1000389001,
+    XR_ERROR_ANCHOR_NOT_SUPPORTED_FOR_ENTITY_BD = -1000389002,
+    XR_ERROR_SPATIAL_ANCHOR_NOT_FOUND_BD = -1000390000,
+    XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_TIMEOUT_BD = -1000391000,
+    XR_ERROR_SPATIAL_ANCHOR_SHARING_AUTHENTICATION_FAILURE_BD = -1000391001,
+    XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_FAILURE_BD = -1000391002,
+    XR_ERROR_SPATIAL_ANCHOR_SHARING_LOCALIZATION_FAIL_BD = -1000391003,
+    XR_ERROR_SPATIAL_ANCHOR_SHARING_MAP_INSUFFICIENT_BD = -1000391004,
+    XR_ERROR_SCENE_CAPTURE_FAILURE_BD = -1000392000,
     XR_ERROR_SPACE_NOT_LOCATABLE_EXT = -1000429000,
     XR_ERROR_PLANE_DETECTION_PERMISSION_DENIED_EXT = -1000429001,
     XR_ERROR_FUTURE_PENDING_EXT = -1000469001,
@@ -651,6 +661,40 @@ typedef enum XrStructureType {
     XR_TYPE_BODY_JOINTS_LOCATE_INFO_BD = 1000385002,
     XR_TYPE_BODY_JOINT_LOCATIONS_BD = 1000385003,
     XR_TYPE_SYSTEM_BODY_TRACKING_PROPERTIES_BD = 1000385004,
+    XR_TYPE_SYSTEM_SPATIAL_SENSING_PROPERTIES_BD = 1000389000,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_GET_INFO_BD = 1000389001,
+    XR_TYPE_SPATIAL_ENTITY_LOCATION_GET_INFO_BD = 1000389002,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_LOCATION_BD = 1000389003,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_SEMANTIC_BD = 1000389004,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_BOUNDING_BOX_2D_BD = 1000389005,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_POLYGON_BD = 1000389006,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_BOUNDING_BOX_3D_BD = 1000389007,
+    XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_TRIANGLE_MESH_BD = 1000389008,
+    XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_BD = 1000389009,
+    XR_TYPE_SENSE_DATA_PROVIDER_START_INFO_BD = 1000389010,
+    XR_TYPE_EVENT_DATA_SENSE_DATA_PROVIDER_STATE_CHANGED_BD = 1000389011,
+    XR_TYPE_EVENT_DATA_SENSE_DATA_UPDATED_BD = 1000389012,
+    XR_TYPE_SENSE_DATA_QUERY_INFO_BD = 1000389013,
+    XR_TYPE_SENSE_DATA_QUERY_COMPLETION_BD = 1000389014,
+    XR_TYPE_SENSE_DATA_FILTER_UUID_BD = 1000389015,
+    XR_TYPE_SENSE_DATA_FILTER_SEMANTIC_BD = 1000389016,
+    XR_TYPE_QUERIED_SENSE_DATA_GET_INFO_BD = 1000389017,
+    XR_TYPE_QUERIED_SENSE_DATA_BD = 1000389018,
+    XR_TYPE_SPATIAL_ENTITY_STATE_BD = 1000389019,
+    XR_TYPE_SPATIAL_ENTITY_ANCHOR_CREATE_INFO_BD = 1000389020,
+    XR_TYPE_ANCHOR_SPACE_CREATE_INFO_BD = 1000389021,
+    XR_TYPE_SYSTEM_SPATIAL_ANCHOR_PROPERTIES_BD = 1000390000,
+    XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_BD = 1000390001,
+    XR_TYPE_SPATIAL_ANCHOR_CREATE_COMPLETION_BD = 1000390002,
+    XR_TYPE_SPATIAL_ANCHOR_PERSIST_INFO_BD = 1000390003,
+    XR_TYPE_SPATIAL_ANCHOR_UNPERSIST_INFO_BD = 1000390004,
+    XR_TYPE_SYSTEM_SPATIAL_ANCHOR_SHARING_PROPERTIES_BD = 1000391000,
+    XR_TYPE_SPATIAL_ANCHOR_SHARE_INFO_BD = 1000391001,
+    XR_TYPE_SHARED_SPATIAL_ANCHOR_DOWNLOAD_INFO_BD = 1000391002,
+    XR_TYPE_SYSTEM_SPATIAL_SCENE_PROPERTIES_BD = 1000392000,
+    XR_TYPE_SCENE_CAPTURE_INFO_BD = 1000392001,
+    XR_TYPE_SYSTEM_SPATIAL_MESH_PROPERTIES_BD = 1000393000,
+    XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_SPATIAL_MESH_BD = 1000393001,
     XR_TYPE_HAND_TRACKING_DATA_SOURCE_INFO_EXT = 1000428000,
     XR_TYPE_HAND_TRACKING_DATA_SOURCE_STATE_EXT = 1000428001,
     XR_TYPE_PLANE_DETECTOR_CREATE_INFO_EXT = 1000429001,
@@ -807,6 +851,9 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_PASSTHROUGH_HTC = 1000317000,
     XR_OBJECT_TYPE_BODY_TRACKER_HTC = 1000320000,
     XR_OBJECT_TYPE_BODY_TRACKER_BD = 1000385000,
+    XR_OBJECT_TYPE_SENSE_DATA_PROVIDER_BD = 1000389000,
+    XR_OBJECT_TYPE_SENSE_DATA_SNAPSHOT_BD = 1000389001,
+    XR_OBJECT_TYPE_ANCHOR_BD = 1000389002,
     XR_OBJECT_TYPE_PLANE_DETECTOR_EXT = 1000429000,
     XR_OBJECT_TYPE_WORLD_MESH_DETECTOR_ML = 1000474000,
     XR_OBJECT_TYPE_FACIAL_EXPRESSION_CLIENT_ML = 1000482000,
@@ -6746,6 +6793,12 @@ XRAPI_ATTR XrResult XRAPI_CALL xrSaveSpaceListFB(
 #endif /* !XR_NO_PROTOTYPES */
 
 
+// XR_META_detached_controllers is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_detached_controllers 1
+#define XR_META_detached_controllers_SPEC_VERSION 1
+#define XR_META_DETACHED_CONTROLLERS_EXTENSION_NAME "XR_META_detached_controllers"
+
+
 // XR_FB_spatial_entity_user is a preprocessor guard. Do not pass it to API calls.
 #define XR_FB_spatial_entity_user 1
 typedef uint64_t XrSpaceUserIdFB;
@@ -7790,6 +7843,545 @@ XRAPI_ATTR XrResult XRAPI_CALL xrLocateBodyJointsBD(
 #endif /* !XR_NO_PROTOTYPES */
 
 
+// XR_BD_spatial_sensing is a preprocessor guard. Do not pass it to API calls.
+#define XR_BD_spatial_sensing 1
+XR_DEFINE_ATOM(XrSpatialEntityIdBD)
+XR_DEFINE_HANDLE(XrSenseDataProviderBD)
+XR_DEFINE_HANDLE(XrSenseDataSnapshotBD)
+XR_DEFINE_HANDLE(XrAnchorBD)
+#define XR_BD_spatial_sensing_SPEC_VERSION 1
+#define XR_BD_SPATIAL_SENSING_EXTENSION_NAME "XR_BD_spatial_sensing"
+
+typedef enum XrSpatialEntityComponentTypeBD {
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_LOCATION_BD = 0,
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_SEMANTIC_BD = 1,
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_BOUNDING_BOX_2D_BD = 2,
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_POLYGON_BD = 3,
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_BOUNDING_BOX_3D_BD = 4,
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_TRIANGLE_MESH_BD = 5,
+    XR_SPATIAL_ENTITY_COMPONENT_TYPE_MAX_ENUM_BD = 0x7FFFFFFF
+} XrSpatialEntityComponentTypeBD;
+
+typedef enum XrSemanticLabelBD {
+    XR_SEMANTIC_LABEL_UNKNOWN_BD = 0,
+    XR_SEMANTIC_LABEL_FLOOR_BD = 1,
+    XR_SEMANTIC_LABEL_CEILING_BD = 2,
+    XR_SEMANTIC_LABEL_WALL_BD = 3,
+    XR_SEMANTIC_LABEL_DOOR_BD = 4,
+    XR_SEMANTIC_LABEL_WINDOW_BD = 5,
+    XR_SEMANTIC_LABEL_OPENING_BD = 6,
+    XR_SEMANTIC_LABEL_TABLE_BD = 7,
+    XR_SEMANTIC_LABEL_SOFA_BD = 8,
+    XR_SEMANTIC_LABEL_CHAIR_BD = 9,
+    XR_SEMANTIC_LABEL_HUMAN_BD = 10,
+    XR_SEMANTIC_LABEL_BEAM_BD = 11,
+    XR_SEMANTIC_LABEL_COLUMN_BD = 12,
+    XR_SEMANTIC_LABEL_CURTAIN_BD = 13,
+    XR_SEMANTIC_LABEL_CABINET_BD = 14,
+    XR_SEMANTIC_LABEL_BED_BD = 15,
+    XR_SEMANTIC_LABEL_PLANT_BD = 16,
+    XR_SEMANTIC_LABEL_SCREEN_BD = 17,
+    XR_SEMANTIC_LABEL_VIRTUAL_WALL_BD = 18,
+    XR_SEMANTIC_LABEL_REFRIGERATOR_BD = 19,
+    XR_SEMANTIC_LABEL_WASHING_MACHINE_BD = 20,
+    XR_SEMANTIC_LABEL_AIR_CONDITIONER_BD = 21,
+    XR_SEMANTIC_LABEL_LAMP_BD = 22,
+    XR_SEMANTIC_LABEL_WALL_ART_BD = 23,
+    XR_SEMANTIC_LABEL_STAIRWAY_BD = 24,
+    XR_SEMANTIC_LABEL_MAX_ENUM_BD = 0x7FFFFFFF
+} XrSemanticLabelBD;
+
+typedef enum XrSenseDataProviderTypeBD {
+    XR_SENSE_DATA_PROVIDER_TYPE_ANCHOR_BD = 1000390000,
+    XR_SENSE_DATA_PROVIDER_TYPE_SCENE_BD = 1000392000,
+    XR_SENSE_DATA_PROVIDER_TYPE_MESH_BD = 1000393000,
+    XR_SENSE_DATA_PROVIDER_TYPE_MAX_ENUM_BD = 0x7FFFFFFF
+} XrSenseDataProviderTypeBD;
+
+typedef enum XrSenseDataProviderStateBD {
+    XR_SENSE_DATA_PROVIDER_STATE_INITIALIZED_BD = 0,
+    XR_SENSE_DATA_PROVIDER_STATE_RUNNING_BD = 1,
+    XR_SENSE_DATA_PROVIDER_STATE_STOPPED_BD = 2,
+    XR_SENSE_DATA_PROVIDER_STATE_MAX_ENUM_BD = 0x7FFFFFFF
+} XrSenseDataProviderStateBD;
+// XrSystemSpatialSensingPropertiesBD extends XrSystemProperties
+typedef struct XrSystemSpatialSensingPropertiesBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialSensing;
+} XrSystemSpatialSensingPropertiesBD;
+
+typedef struct XrSpatialEntityComponentGetInfoBD {
+    XrStructureType                   type;
+    const void* XR_MAY_ALIAS          next;
+    XrSpatialEntityIdBD               entityId;
+    XrSpatialEntityComponentTypeBD    componentType;
+} XrSpatialEntityComponentGetInfoBD;
+
+typedef struct XrSpatialEntityComponentDataBaseHeaderBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+} XrSpatialEntityComponentDataBaseHeaderBD;
+
+typedef struct XrSpatialEntityLocationGetInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpace                     baseSpace;
+} XrSpatialEntityLocationGetInfoBD;
+
+// XrSpatialEntityComponentDataLocationBD extends XrSpatialEntityComponentDataBaseHeaderBD
+typedef struct XrSpatialEntityComponentDataLocationBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrSpaceLocation       location;
+} XrSpatialEntityComponentDataLocationBD;
+
+// XrSpatialEntityComponentDataSemanticBD extends XrSpatialEntityComponentDataBaseHeaderBD
+typedef struct XrSpatialEntityComponentDataSemanticBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              labelCapacityInput;
+    uint32_t              labelCountOutput;
+    XrSemanticLabelBD*    labels;
+} XrSpatialEntityComponentDataSemanticBD;
+
+// XrSpatialEntityComponentDataBoundingBox2DBD extends XrSpatialEntityComponentDataBaseHeaderBD
+typedef struct XrSpatialEntityComponentDataBoundingBox2DBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrRect2Df             boundingBox2D;
+} XrSpatialEntityComponentDataBoundingBox2DBD;
+
+// XrSpatialEntityComponentDataPolygonBD extends XrSpatialEntityComponentDataBaseHeaderBD
+typedef struct XrSpatialEntityComponentDataPolygonBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              vertexCapacityInput;
+    uint32_t              vertexCountOutput;
+    XrVector2f*           vertices;
+} XrSpatialEntityComponentDataPolygonBD;
+
+// XrSpatialEntityComponentDataBoundingBox3DBD extends XrSpatialEntityComponentDataBaseHeaderBD
+typedef struct XrSpatialEntityComponentDataBoundingBox3DBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBoxf                boundingBox3D;
+} XrSpatialEntityComponentDataBoundingBox3DBD;
+
+// XrSpatialEntityComponentDataTriangleMeshBD extends XrSpatialEntityComponentDataBaseHeaderBD
+typedef struct XrSpatialEntityComponentDataTriangleMeshBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    uint32_t              vertexCapacityInput;
+    uint32_t              vertexCountOutput;
+    XrVector3f*           vertices;
+    uint32_t              indexCapacityInput;
+    uint32_t              indexCountOutput;
+    uint16_t*             indices;
+} XrSpatialEntityComponentDataTriangleMeshBD;
+
+typedef struct XrSenseDataProviderCreateInfoBD {
+    XrStructureType              type;
+    const void* XR_MAY_ALIAS     next;
+    XrSenseDataProviderTypeBD    providerType;
+} XrSenseDataProviderCreateInfoBD;
+
+typedef struct XrSenseDataProviderStartInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrSenseDataProviderStartInfoBD;
+
+typedef struct XrEventDataSenseDataProviderStateChangedBD {
+    XrStructureType               type;
+    const void* XR_MAY_ALIAS      next;
+    XrSenseDataProviderBD         provider;
+    XrSenseDataProviderStateBD    newState;
+} XrEventDataSenseDataProviderStateChangedBD;
+
+typedef struct XrEventDataSenseDataUpdatedBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSenseDataProviderBD       provider;
+} XrEventDataSenseDataUpdatedBD;
+
+typedef struct XrSenseDataQueryInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrSenseDataQueryInfoBD;
+
+typedef struct XrSenseDataQueryCompletionBD {
+    XrStructureType          type;
+    void* XR_MAY_ALIAS       next;
+    XrResult                 futureResult;
+    XrSenseDataSnapshotBD    snapshot;
+} XrSenseDataQueryCompletionBD;
+
+typedef struct XrQueriedSenseDataGetInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrQueriedSenseDataGetInfoBD;
+
+typedef struct XrSpatialEntityStateBD {
+    XrStructureType        type;
+    void* XR_MAY_ALIAS     next;
+    XrSpatialEntityIdBD    entityId;
+    XrTime                 lastUpdateTime;
+    XrUuidEXT              uuid;
+} XrSpatialEntityStateBD;
+
+typedef struct XrQueriedSenseDataBD {
+    XrStructureType            type;
+    void* XR_MAY_ALIAS         next;
+    uint32_t                   stateCapacityInput;
+    uint32_t                   stateCountOutput;
+    XrSpatialEntityStateBD*    states;
+} XrQueriedSenseDataBD;
+
+// XrSenseDataFilterUuidBD extends XrSenseDataQueryInfoBD
+typedef struct XrSenseDataFilterUuidBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    uuidCount;
+    const XrUuidEXT*            uuids;
+} XrSenseDataFilterUuidBD;
+
+// XrSenseDataFilterSemanticBD extends XrSenseDataQueryInfoBD
+typedef struct XrSenseDataFilterSemanticBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    labelCount;
+    const XrSemanticLabelBD*    labels;
+} XrSenseDataFilterSemanticBD;
+
+typedef struct XrSpatialEntityAnchorCreateInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSenseDataSnapshotBD       snapshot;
+    XrSpatialEntityIdBD         entityId;
+} XrSpatialEntityAnchorCreateInfoBD;
+
+typedef struct XrAnchorSpaceCreateInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAnchorBD                  anchor;
+    XrPosef                     poseInAnchorSpace;
+} XrAnchorSpaceCreateInfoBD;
+
+typedef struct XrFutureCompletionEXT {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrResult              futureResult;
+} XrFutureCompletionEXT;
+
+typedef XrResult (XRAPI_PTR *PFN_xrEnumerateSpatialEntityComponentTypesBD)(XrSenseDataSnapshotBD snapshot, XrSpatialEntityIdBD entityId, uint32_t componentTypeCapacityInput, uint32_t* componentTypeCountOutput, XrSpatialEntityComponentTypeBD* componentTypes);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSpatialEntityUuidBD)(XrSenseDataSnapshotBD snapshot, XrSpatialEntityIdBD entityId, XrUuidEXT* uuid);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSpatialEntityComponentDataBD)(XrSenseDataSnapshotBD snapshot, const XrSpatialEntityComponentGetInfoBD* getInfo, XrSpatialEntityComponentDataBaseHeaderBD* componentData);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSenseDataProviderBD)(XrSession session, const XrSenseDataProviderCreateInfoBD* createInfo, XrSenseDataProviderBD* provider);
+typedef XrResult (XRAPI_PTR *PFN_xrStartSenseDataProviderAsyncBD)(XrSenseDataProviderBD provider, const XrSenseDataProviderStartInfoBD* startInfo, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrStartSenseDataProviderCompleteBD)(XrSession session, XrFutureEXT future, XrFutureCompletionEXT* completion);
+typedef XrResult (XRAPI_PTR *PFN_xrGetSenseDataProviderStateBD)(XrSenseDataProviderBD provider, XrSenseDataProviderStateBD* state);
+typedef XrResult (XRAPI_PTR *PFN_xrQuerySenseDataAsyncBD)(XrSenseDataProviderBD provider, const XrSenseDataQueryInfoBD* queryInfo, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrQuerySenseDataCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrSenseDataQueryCompletionBD* completion);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroySenseDataSnapshotBD)(XrSenseDataSnapshotBD snapshot);
+typedef XrResult (XRAPI_PTR *PFN_xrGetQueriedSenseDataBD)(XrSenseDataSnapshotBD snapshot, XrQueriedSenseDataGetInfoBD* getInfo, XrQueriedSenseDataBD* queriedSenseData);
+typedef XrResult (XRAPI_PTR *PFN_xrStopSenseDataProviderBD)(XrSenseDataProviderBD provider);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroySenseDataProviderBD)(XrSenseDataProviderBD provider);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialEntityAnchorBD)(XrSenseDataProviderBD provider, const XrSpatialEntityAnchorCreateInfoBD* createInfo, XrAnchorBD* anchor);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyAnchorBD)(XrAnchorBD anchor);
+typedef XrResult (XRAPI_PTR *PFN_xrGetAnchorUuidBD)(XrAnchorBD anchor, XrUuidEXT* uuid);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateAnchorSpaceBD)(XrSession session, const XrAnchorSpaceCreateInfoBD* createInfo, XrSpace* space);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrEnumerateSpatialEntityComponentTypesBD(
+    XrSenseDataSnapshotBD                       snapshot,
+    XrSpatialEntityIdBD                         entityId,
+    uint32_t                                    componentTypeCapacityInput,
+    uint32_t*                                   componentTypeCountOutput,
+    XrSpatialEntityComponentTypeBD*             componentTypes);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSpatialEntityUuidBD(
+    XrSenseDataSnapshotBD                       snapshot,
+    XrSpatialEntityIdBD                         entityId,
+    XrUuidEXT*                                  uuid);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSpatialEntityComponentDataBD(
+    XrSenseDataSnapshotBD                       snapshot,
+    const XrSpatialEntityComponentGetInfoBD*    getInfo,
+    XrSpatialEntityComponentDataBaseHeaderBD*   componentData);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSenseDataProviderBD(
+    XrSession                                   session,
+    const XrSenseDataProviderCreateInfoBD*      createInfo,
+    XrSenseDataProviderBD*                      provider);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrStartSenseDataProviderAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSenseDataProviderStartInfoBD*       startInfo,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrStartSenseDataProviderCompleteBD(
+    XrSession                                   session,
+    XrFutureEXT                                 future,
+    XrFutureCompletionEXT*                      completion);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetSenseDataProviderStateBD(
+    XrSenseDataProviderBD                       provider,
+    XrSenseDataProviderStateBD*                 state);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrQuerySenseDataAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSenseDataQueryInfoBD*               queryInfo,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrQuerySenseDataCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrSenseDataQueryCompletionBD*               completion);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySenseDataSnapshotBD(
+    XrSenseDataSnapshotBD                       snapshot);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetQueriedSenseDataBD(
+    XrSenseDataSnapshotBD                       snapshot,
+    XrQueriedSenseDataGetInfoBD*                getInfo,
+    XrQueriedSenseDataBD*                       queriedSenseData);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrStopSenseDataProviderBD(
+    XrSenseDataProviderBD                       provider);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroySenseDataProviderBD(
+    XrSenseDataProviderBD                       provider);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialEntityAnchorBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSpatialEntityAnchorCreateInfoBD*    createInfo,
+    XrAnchorBD*                                 anchor);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyAnchorBD(
+    XrAnchorBD                                  anchor);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetAnchorUuidBD(
+    XrAnchorBD                                  anchor,
+    XrUuidEXT*                                  uuid);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateAnchorSpaceBD(
+    XrSession                                   session,
+    const XrAnchorSpaceCreateInfoBD*            createInfo,
+    XrSpace*                                    space);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_BD_spatial_anchor is a preprocessor guard. Do not pass it to API calls.
+#define XR_BD_spatial_anchor 1
+#define XR_BD_spatial_anchor_SPEC_VERSION 1
+#define XR_BD_SPATIAL_ANCHOR_EXTENSION_NAME "XR_BD_spatial_anchor"
+
+typedef enum XrPersistenceLocationBD {
+    XR_PERSISTENCE_LOCATION_LOCAL_BD = 0,
+    XR_PERSISTENCE_LOCATION_MAX_ENUM_BD = 0x7FFFFFFF
+} XrPersistenceLocationBD;
+// XrSystemSpatialAnchorPropertiesBD extends XrSystemProperties
+typedef struct XrSystemSpatialAnchorPropertiesBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialAnchor;
+} XrSystemSpatialAnchorPropertiesBD;
+
+typedef struct XrSpatialAnchorCreateInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpace                     space;
+    XrPosef                     pose;
+    XrTime                      time;
+} XrSpatialAnchorCreateInfoBD;
+
+typedef struct XrSpatialAnchorCreateCompletionBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrResult              futureResult;
+    XrAnchorBD            anchor;
+    XrUuidEXT             uuid;
+} XrSpatialAnchorCreateCompletionBD;
+
+typedef struct XrSpatialAnchorPersistInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrPersistenceLocationBD     location;
+    XrAnchorBD                  anchor;
+} XrSpatialAnchorPersistInfoBD;
+
+typedef struct XrSpatialAnchorUnpersistInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrPersistenceLocationBD     location;
+    XrAnchorBD                  anchor;
+} XrSpatialAnchorUnpersistInfoBD;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorAsyncBD)(XrSenseDataProviderBD provider, const XrSpatialAnchorCreateInfoBD* info, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateSpatialAnchorCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrSpatialAnchorCreateCompletionBD* completion);
+typedef XrResult (XRAPI_PTR *PFN_xrPersistSpatialAnchorAsyncBD)(XrSenseDataProviderBD provider, const XrSpatialAnchorPersistInfoBD* info, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrPersistSpatialAnchorCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrFutureCompletionEXT* completion);
+typedef XrResult (XRAPI_PTR *PFN_xrUnpersistSpatialAnchorAsyncBD)(XrSenseDataProviderBD provider, const XrSpatialAnchorUnpersistInfoBD* info, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrUnpersistSpatialAnchorCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrFutureCompletionEXT* completion);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSpatialAnchorCreateInfoBD*          info,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateSpatialAnchorCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrSpatialAnchorCreateCompletionBD*          completion);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPersistSpatialAnchorAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSpatialAnchorPersistInfoBD*         info,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrPersistSpatialAnchorCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrFutureCompletionEXT*                      completion);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrUnpersistSpatialAnchorAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSpatialAnchorUnpersistInfoBD*       info,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrUnpersistSpatialAnchorCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrFutureCompletionEXT*                      completion);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_BD_spatial_anchor_sharing is a preprocessor guard. Do not pass it to API calls.
+#define XR_BD_spatial_anchor_sharing 1
+#define XR_BD_spatial_anchor_sharing_SPEC_VERSION 1
+#define XR_BD_SPATIAL_ANCHOR_SHARING_EXTENSION_NAME "XR_BD_spatial_anchor_sharing"
+// XrSystemSpatialAnchorSharingPropertiesBD extends XrSystemProperties
+typedef struct XrSystemSpatialAnchorSharingPropertiesBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialAnchorSharing;
+} XrSystemSpatialAnchorSharingPropertiesBD;
+
+typedef struct XrSpatialAnchorShareInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAnchorBD                  anchor;
+} XrSpatialAnchorShareInfoBD;
+
+typedef struct XrSharedSpatialAnchorDownloadInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrUuidEXT                   uuid;
+} XrSharedSpatialAnchorDownloadInfoBD;
+
+typedef XrResult (XRAPI_PTR *PFN_xrShareSpatialAnchorAsyncBD)(XrSenseDataProviderBD provider, const XrSpatialAnchorShareInfoBD* info, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrShareSpatialAnchorCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrFutureCompletionEXT* completion);
+typedef XrResult (XRAPI_PTR *PFN_xrDownloadSharedSpatialAnchorAsyncBD)(XrSenseDataProviderBD provider, const XrSharedSpatialAnchorDownloadInfoBD* info, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrDownloadSharedSpatialAnchorCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrFutureCompletionEXT*  completion);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrShareSpatialAnchorAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSpatialAnchorShareInfoBD*           info,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrShareSpatialAnchorCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrFutureCompletionEXT*                      completion);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDownloadSharedSpatialAnchorAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSharedSpatialAnchorDownloadInfoBD*  info,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDownloadSharedSpatialAnchorCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrFutureCompletionEXT*                      completion);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_BD_spatial_scene is a preprocessor guard. Do not pass it to API calls.
+#define XR_BD_spatial_scene 1
+#define XR_BD_spatial_scene_SPEC_VERSION  1
+#define XR_BD_SPATIAL_SCENE_EXTENSION_NAME "XR_BD_spatial_scene"
+// XrSystemSpatialScenePropertiesBD extends XrSystemProperties
+typedef struct XrSystemSpatialScenePropertiesBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialScene;
+} XrSystemSpatialScenePropertiesBD;
+
+typedef struct XrSceneCaptureInfoBD {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrSceneCaptureInfoBD;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCaptureSceneAsyncBD)(XrSenseDataProviderBD provider, const XrSceneCaptureInfoBD* info, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrCaptureSceneCompleteBD)(XrSenseDataProviderBD provider, XrFutureEXT future, XrFutureCompletionEXT* completion);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCaptureSceneAsyncBD(
+    XrSenseDataProviderBD                       provider,
+    const XrSceneCaptureInfoBD*                 info,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCaptureSceneCompleteBD(
+    XrSenseDataProviderBD                       provider,
+    XrFutureEXT                                 future,
+    XrFutureCompletionEXT*                      completion);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_BD_spatial_mesh is a preprocessor guard. Do not pass it to API calls.
+#define XR_BD_spatial_mesh 1
+#define XR_BD_spatial_mesh_SPEC_VERSION   1
+#define XR_BD_SPATIAL_MESH_EXTENSION_NAME "XR_BD_spatial_mesh"
+
+typedef enum XrSpatialMeshLodBD {
+    XR_SPATIAL_MESH_LOD_COARSE_BD = 0,
+    XR_SPATIAL_MESH_LOD_MEDIUM_BD = 1,
+    XR_SPATIAL_MESH_LOD_FINE_BD = 2,
+    XR_SPATIAL_MESH_LOD_MAX_ENUM_BD = 0x7FFFFFFF
+} XrSpatialMeshLodBD;
+typedef XrFlags64 XrSpatialMeshConfigFlagsBD;
+
+// Flag bits for XrSpatialMeshConfigFlagsBD
+static const XrSpatialMeshConfigFlagsBD XR_SPATIAL_MESH_CONFIG_SEMANTIC_BIT_BD = 0x00000001;
+static const XrSpatialMeshConfigFlagsBD XR_SPATIAL_MESH_CONFIG_ALIGN_SEMANTIC_WITH_VERTEX_BIT_BD = 0x00000002;
+
+// XrSystemSpatialMeshPropertiesBD extends XrSystemProperties
+typedef struct XrSystemSpatialMeshPropertiesBD {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsSpatialMesh;
+} XrSystemSpatialMeshPropertiesBD;
+
+// XrSenseDataProviderCreateInfoSpatialMeshBD extends XrSenseDataProviderCreateInfoBD
+typedef struct XrSenseDataProviderCreateInfoSpatialMeshBD {
+    XrStructureType               type;
+    const void* XR_MAY_ALIAS      next;
+    XrSpatialMeshConfigFlagsBD    configFlags;
+    XrSpatialMeshLodBD            lod;
+} XrSenseDataProviderCreateInfoSpatialMeshBD;
+
+
+
 // XR_EXT_local_floor is a preprocessor guard. Do not pass it to API calls.
 #define XR_EXT_local_floor 1
 #define XR_EXT_local_floor_SPEC_VERSION   1
@@ -8009,12 +8601,6 @@ typedef struct XR_MAY_ALIAS XrFutureCompletionBaseHeaderEXT {
     void* XR_MAY_ALIAS    next;
     XrResult              futureResult;
 } XrFutureCompletionBaseHeaderEXT;
-
-typedef struct XrFutureCompletionEXT {
-    XrStructureType       type;
-    void* XR_MAY_ALIAS    next;
-    XrResult              futureResult;
-} XrFutureCompletionEXT;
 
 typedef struct XrFuturePollResultEXT {
     XrStructureType       type;

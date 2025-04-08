@@ -145,6 +145,16 @@ XR_ENUM_STR(XrResult);
     _(XR_ENVIRONMENT_DEPTH_NOT_AVAILABLE_META, 1000291000) \
     _(XR_ERROR_HINT_ALREADY_SET_QCOM, -1000306000) \
     _(XR_ERROR_NOT_AN_ANCHOR_HTC, -1000319000) \
+    _(XR_ERROR_SPATIAL_ENTITY_ID_INVALID_BD, -1000389000) \
+    _(XR_ERROR_SPATIAL_SENSING_SERVICE_UNAVAILABLE_BD, -1000389001) \
+    _(XR_ERROR_ANCHOR_NOT_SUPPORTED_FOR_ENTITY_BD, -1000389002) \
+    _(XR_ERROR_SPATIAL_ANCHOR_NOT_FOUND_BD, -1000390000) \
+    _(XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_TIMEOUT_BD, -1000391000) \
+    _(XR_ERROR_SPATIAL_ANCHOR_SHARING_AUTHENTICATION_FAILURE_BD, -1000391001) \
+    _(XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_FAILURE_BD, -1000391002) \
+    _(XR_ERROR_SPATIAL_ANCHOR_SHARING_LOCALIZATION_FAIL_BD, -1000391003) \
+    _(XR_ERROR_SPATIAL_ANCHOR_SHARING_MAP_INSUFFICIENT_BD, -1000391004) \
+    _(XR_ERROR_SCENE_CAPTURE_FAILURE_BD, -1000392000) \
     _(XR_ERROR_SPACE_NOT_LOCATABLE_EXT, -1000429000) \
     _(XR_ERROR_PLANE_DETECTION_PERMISSION_DENIED_EXT, -1000429001) \
     _(XR_ERROR_FUTURE_PENDING_EXT, -1000469001) \
@@ -534,6 +544,40 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_BODY_JOINTS_LOCATE_INFO_BD, 1000385002) \
     _(XR_TYPE_BODY_JOINT_LOCATIONS_BD, 1000385003) \
     _(XR_TYPE_SYSTEM_BODY_TRACKING_PROPERTIES_BD, 1000385004) \
+    _(XR_TYPE_SYSTEM_SPATIAL_SENSING_PROPERTIES_BD, 1000389000) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_GET_INFO_BD, 1000389001) \
+    _(XR_TYPE_SPATIAL_ENTITY_LOCATION_GET_INFO_BD, 1000389002) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_LOCATION_BD, 1000389003) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_SEMANTIC_BD, 1000389004) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_BOUNDING_BOX_2D_BD, 1000389005) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_POLYGON_BD, 1000389006) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_BOUNDING_BOX_3D_BD, 1000389007) \
+    _(XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_TRIANGLE_MESH_BD, 1000389008) \
+    _(XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_BD, 1000389009) \
+    _(XR_TYPE_SENSE_DATA_PROVIDER_START_INFO_BD, 1000389010) \
+    _(XR_TYPE_EVENT_DATA_SENSE_DATA_PROVIDER_STATE_CHANGED_BD, 1000389011) \
+    _(XR_TYPE_EVENT_DATA_SENSE_DATA_UPDATED_BD, 1000389012) \
+    _(XR_TYPE_SENSE_DATA_QUERY_INFO_BD, 1000389013) \
+    _(XR_TYPE_SENSE_DATA_QUERY_COMPLETION_BD, 1000389014) \
+    _(XR_TYPE_SENSE_DATA_FILTER_UUID_BD, 1000389015) \
+    _(XR_TYPE_SENSE_DATA_FILTER_SEMANTIC_BD, 1000389016) \
+    _(XR_TYPE_QUERIED_SENSE_DATA_GET_INFO_BD, 1000389017) \
+    _(XR_TYPE_QUERIED_SENSE_DATA_BD, 1000389018) \
+    _(XR_TYPE_SPATIAL_ENTITY_STATE_BD, 1000389019) \
+    _(XR_TYPE_SPATIAL_ENTITY_ANCHOR_CREATE_INFO_BD, 1000389020) \
+    _(XR_TYPE_ANCHOR_SPACE_CREATE_INFO_BD, 1000389021) \
+    _(XR_TYPE_SYSTEM_SPATIAL_ANCHOR_PROPERTIES_BD, 1000390000) \
+    _(XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_BD, 1000390001) \
+    _(XR_TYPE_SPATIAL_ANCHOR_CREATE_COMPLETION_BD, 1000390002) \
+    _(XR_TYPE_SPATIAL_ANCHOR_PERSIST_INFO_BD, 1000390003) \
+    _(XR_TYPE_SPATIAL_ANCHOR_UNPERSIST_INFO_BD, 1000390004) \
+    _(XR_TYPE_SYSTEM_SPATIAL_ANCHOR_SHARING_PROPERTIES_BD, 1000391000) \
+    _(XR_TYPE_SPATIAL_ANCHOR_SHARE_INFO_BD, 1000391001) \
+    _(XR_TYPE_SHARED_SPATIAL_ANCHOR_DOWNLOAD_INFO_BD, 1000391002) \
+    _(XR_TYPE_SYSTEM_SPATIAL_SCENE_PROPERTIES_BD, 1000392000) \
+    _(XR_TYPE_SCENE_CAPTURE_INFO_BD, 1000392001) \
+    _(XR_TYPE_SYSTEM_SPATIAL_MESH_PROPERTIES_BD, 1000393000) \
+    _(XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_SPATIAL_MESH_BD, 1000393001) \
     _(XR_TYPE_HAND_TRACKING_DATA_SOURCE_INFO_EXT, 1000428000) \
     _(XR_TYPE_HAND_TRACKING_DATA_SOURCE_STATE_EXT, 1000428001) \
     _(XR_TYPE_PLANE_DETECTOR_CREATE_INFO_EXT, 1000429001) \
@@ -673,6 +717,9 @@ XR_ENUM_STR(XrResult);
     _(XR_OBJECT_TYPE_PASSTHROUGH_HTC, 1000317000) \
     _(XR_OBJECT_TYPE_BODY_TRACKER_HTC, 1000320000) \
     _(XR_OBJECT_TYPE_BODY_TRACKER_BD, 1000385000) \
+    _(XR_OBJECT_TYPE_SENSE_DATA_PROVIDER_BD, 1000389000) \
+    _(XR_OBJECT_TYPE_SENSE_DATA_SNAPSHOT_BD, 1000389001) \
+    _(XR_OBJECT_TYPE_ANCHOR_BD, 1000389002) \
     _(XR_OBJECT_TYPE_PLANE_DETECTOR_EXT, 1000429000) \
     _(XR_OBJECT_TYPE_WORLD_MESH_DETECTOR_ML, 1000474000) \
     _(XR_OBJECT_TYPE_FACIAL_EXPRESSION_CLIENT_ML, 1000482000) \
@@ -1534,6 +1581,65 @@ XR_ENUM_STR(XrResult);
     _(XR_BODY_JOINT_SET_FULL_BODY_JOINTS_BD, 2) \
     _(XR_BODY_JOINT_SET_MAX_ENUM_BD, 0x7FFFFFFF)
 
+#define XR_LIST_ENUM_XrSpatialEntityComponentTypeBD(_) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_LOCATION_BD, 0) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_SEMANTIC_BD, 1) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_BOUNDING_BOX_2D_BD, 2) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_POLYGON_BD, 3) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_BOUNDING_BOX_3D_BD, 4) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_TRIANGLE_MESH_BD, 5) \
+    _(XR_SPATIAL_ENTITY_COMPONENT_TYPE_MAX_ENUM_BD, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrSemanticLabelBD(_) \
+    _(XR_SEMANTIC_LABEL_UNKNOWN_BD, 0) \
+    _(XR_SEMANTIC_LABEL_FLOOR_BD, 1) \
+    _(XR_SEMANTIC_LABEL_CEILING_BD, 2) \
+    _(XR_SEMANTIC_LABEL_WALL_BD, 3) \
+    _(XR_SEMANTIC_LABEL_DOOR_BD, 4) \
+    _(XR_SEMANTIC_LABEL_WINDOW_BD, 5) \
+    _(XR_SEMANTIC_LABEL_OPENING_BD, 6) \
+    _(XR_SEMANTIC_LABEL_TABLE_BD, 7) \
+    _(XR_SEMANTIC_LABEL_SOFA_BD, 8) \
+    _(XR_SEMANTIC_LABEL_CHAIR_BD, 9) \
+    _(XR_SEMANTIC_LABEL_HUMAN_BD, 10) \
+    _(XR_SEMANTIC_LABEL_BEAM_BD, 11) \
+    _(XR_SEMANTIC_LABEL_COLUMN_BD, 12) \
+    _(XR_SEMANTIC_LABEL_CURTAIN_BD, 13) \
+    _(XR_SEMANTIC_LABEL_CABINET_BD, 14) \
+    _(XR_SEMANTIC_LABEL_BED_BD, 15) \
+    _(XR_SEMANTIC_LABEL_PLANT_BD, 16) \
+    _(XR_SEMANTIC_LABEL_SCREEN_BD, 17) \
+    _(XR_SEMANTIC_LABEL_VIRTUAL_WALL_BD, 18) \
+    _(XR_SEMANTIC_LABEL_REFRIGERATOR_BD, 19) \
+    _(XR_SEMANTIC_LABEL_WASHING_MACHINE_BD, 20) \
+    _(XR_SEMANTIC_LABEL_AIR_CONDITIONER_BD, 21) \
+    _(XR_SEMANTIC_LABEL_LAMP_BD, 22) \
+    _(XR_SEMANTIC_LABEL_WALL_ART_BD, 23) \
+    _(XR_SEMANTIC_LABEL_STAIRWAY_BD, 24) \
+    _(XR_SEMANTIC_LABEL_MAX_ENUM_BD, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrSenseDataProviderTypeBD(_) \
+    _(XR_SENSE_DATA_PROVIDER_TYPE_ANCHOR_BD, 1000390000) \
+    _(XR_SENSE_DATA_PROVIDER_TYPE_SCENE_BD, 1000392000) \
+    _(XR_SENSE_DATA_PROVIDER_TYPE_MESH_BD, 1000393000) \
+    _(XR_SENSE_DATA_PROVIDER_TYPE_MAX_ENUM_BD, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrSenseDataProviderStateBD(_) \
+    _(XR_SENSE_DATA_PROVIDER_STATE_INITIALIZED_BD, 0) \
+    _(XR_SENSE_DATA_PROVIDER_STATE_RUNNING_BD, 1) \
+    _(XR_SENSE_DATA_PROVIDER_STATE_STOPPED_BD, 2) \
+    _(XR_SENSE_DATA_PROVIDER_STATE_MAX_ENUM_BD, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrPersistenceLocationBD(_) \
+    _(XR_PERSISTENCE_LOCATION_LOCAL_BD, 0) \
+    _(XR_PERSISTENCE_LOCATION_MAX_ENUM_BD, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrSpatialMeshLodBD(_) \
+    _(XR_SPATIAL_MESH_LOD_COARSE_BD, 0) \
+    _(XR_SPATIAL_MESH_LOD_MEDIUM_BD, 1) \
+    _(XR_SPATIAL_MESH_LOD_FINE_BD, 2) \
+    _(XR_SPATIAL_MESH_LOD_MAX_ENUM_BD, 0x7FFFFFFF)
+
 #define XR_LIST_ENUM_XrHandTrackingDataSourceEXT(_) \
     _(XR_HAND_TRACKING_DATA_SOURCE_UNOBSTRUCTED_EXT, 1) \
     _(XR_HAND_TRACKING_DATA_SOURCE_CONTROLLER_EXT, 2) \
@@ -1845,6 +1951,10 @@ XR_ENUM_STR(XrResult);
     _(XR_FOVEATION_DYNAMIC_LEVEL_ENABLED_BIT_HTC, 0x00000001) \
     _(XR_FOVEATION_DYNAMIC_CLEAR_FOV_ENABLED_BIT_HTC, 0x00000002) \
     _(XR_FOVEATION_DYNAMIC_FOCAL_CENTER_OFFSET_ENABLED_BIT_HTC, 0x00000004) \
+
+#define XR_LIST_BITS_XrSpatialMeshConfigFlagsBD(_) \
+    _(XR_SPATIAL_MESH_CONFIG_SEMANTIC_BIT_BD, 0x00000001) \
+    _(XR_SPATIAL_MESH_CONFIG_ALIGN_SEMANTIC_WITH_VERTEX_BIT_BD, 0x00000002) \
 
 #define XR_LIST_BITS_XrPlaneDetectionCapabilityFlagsEXT(_) \
     _(XR_PLANE_DETECTION_CAPABILITY_PLANE_DETECTION_BIT_EXT, 0x00000001) \
@@ -5130,6 +5240,244 @@ XR_ENUM_STR(XrResult);
     _(jointLocationCount) \
     _(jointLocations) \
 
+/// Calls your macro with the name of each member of XrSystemSpatialSensingPropertiesBD, in order.
+#define XR_LIST_STRUCT_XrSystemSpatialSensingPropertiesBD(_) \
+    _(type) \
+    _(next) \
+    _(supportsSpatialSensing) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentGetInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentGetInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(entityId) \
+    _(componentType) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataBaseHeaderBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataBaseHeaderBD(_) \
+    _(type) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityLocationGetInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityLocationGetInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(baseSpace) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataLocationBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataLocationBD(_) \
+    _(type) \
+    _(next) \
+    _(location) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataSemanticBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataSemanticBD(_) \
+    _(type) \
+    _(next) \
+    _(labelCapacityInput) \
+    _(labelCountOutput) \
+    _(labels) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataBoundingBox2DBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataBoundingBox2DBD(_) \
+    _(type) \
+    _(next) \
+    _(boundingBox2D) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataPolygonBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataPolygonBD(_) \
+    _(type) \
+    _(next) \
+    _(vertexCapacityInput) \
+    _(vertexCountOutput) \
+    _(vertices) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataBoundingBox3DBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataBoundingBox3DBD(_) \
+    _(type) \
+    _(next) \
+    _(boundingBox3D) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityComponentDataTriangleMeshBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityComponentDataTriangleMeshBD(_) \
+    _(type) \
+    _(next) \
+    _(vertexCapacityInput) \
+    _(vertexCountOutput) \
+    _(vertices) \
+    _(indexCapacityInput) \
+    _(indexCountOutput) \
+    _(indices) \
+
+/// Calls your macro with the name of each member of XrSenseDataProviderCreateInfoBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataProviderCreateInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(providerType) \
+
+/// Calls your macro with the name of each member of XrSenseDataProviderStartInfoBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataProviderStartInfoBD(_) \
+    _(type) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrEventDataSenseDataProviderStateChangedBD, in order.
+#define XR_LIST_STRUCT_XrEventDataSenseDataProviderStateChangedBD(_) \
+    _(type) \
+    _(next) \
+    _(provider) \
+    _(newState) \
+
+/// Calls your macro with the name of each member of XrEventDataSenseDataUpdatedBD, in order.
+#define XR_LIST_STRUCT_XrEventDataSenseDataUpdatedBD(_) \
+    _(type) \
+    _(next) \
+    _(provider) \
+
+/// Calls your macro with the name of each member of XrSenseDataQueryInfoBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataQueryInfoBD(_) \
+    _(type) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrSenseDataQueryCompletionBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataQueryCompletionBD(_) \
+    _(type) \
+    _(next) \
+    _(futureResult) \
+    _(snapshot) \
+
+/// Calls your macro with the name of each member of XrQueriedSenseDataGetInfoBD, in order.
+#define XR_LIST_STRUCT_XrQueriedSenseDataGetInfoBD(_) \
+    _(type) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityStateBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityStateBD(_) \
+    _(type) \
+    _(next) \
+    _(entityId) \
+    _(lastUpdateTime) \
+    _(uuid) \
+
+/// Calls your macro with the name of each member of XrQueriedSenseDataBD, in order.
+#define XR_LIST_STRUCT_XrQueriedSenseDataBD(_) \
+    _(type) \
+    _(next) \
+    _(stateCapacityInput) \
+    _(stateCountOutput) \
+    _(states) \
+
+/// Calls your macro with the name of each member of XrSenseDataFilterUuidBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataFilterUuidBD(_) \
+    _(type) \
+    _(next) \
+    _(uuidCount) \
+    _(uuids) \
+
+/// Calls your macro with the name of each member of XrSenseDataFilterSemanticBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataFilterSemanticBD(_) \
+    _(type) \
+    _(next) \
+    _(labelCount) \
+    _(labels) \
+
+/// Calls your macro with the name of each member of XrSpatialEntityAnchorCreateInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialEntityAnchorCreateInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(snapshot) \
+    _(entityId) \
+
+/// Calls your macro with the name of each member of XrAnchorSpaceCreateInfoBD, in order.
+#define XR_LIST_STRUCT_XrAnchorSpaceCreateInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(anchor) \
+    _(poseInAnchorSpace) \
+
+/// Calls your macro with the name of each member of XrFutureCompletionEXT, in order.
+#define XR_LIST_STRUCT_XrFutureCompletionEXT(_) \
+    _(type) \
+    _(next) \
+    _(futureResult) \
+
+/// Calls your macro with the name of each member of XrSystemSpatialAnchorPropertiesBD, in order.
+#define XR_LIST_STRUCT_XrSystemSpatialAnchorPropertiesBD(_) \
+    _(type) \
+    _(next) \
+    _(supportsSpatialAnchor) \
+
+/// Calls your macro with the name of each member of XrSpatialAnchorCreateInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialAnchorCreateInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(space) \
+    _(pose) \
+    _(time) \
+
+/// Calls your macro with the name of each member of XrSpatialAnchorCreateCompletionBD, in order.
+#define XR_LIST_STRUCT_XrSpatialAnchorCreateCompletionBD(_) \
+    _(type) \
+    _(next) \
+    _(futureResult) \
+    _(anchor) \
+    _(uuid) \
+
+/// Calls your macro with the name of each member of XrSpatialAnchorPersistInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialAnchorPersistInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(location) \
+    _(anchor) \
+
+/// Calls your macro with the name of each member of XrSpatialAnchorUnpersistInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialAnchorUnpersistInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(location) \
+    _(anchor) \
+
+/// Calls your macro with the name of each member of XrSystemSpatialAnchorSharingPropertiesBD, in order.
+#define XR_LIST_STRUCT_XrSystemSpatialAnchorSharingPropertiesBD(_) \
+    _(type) \
+    _(next) \
+    _(supportsSpatialAnchorSharing) \
+
+/// Calls your macro with the name of each member of XrSpatialAnchorShareInfoBD, in order.
+#define XR_LIST_STRUCT_XrSpatialAnchorShareInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(anchor) \
+
+/// Calls your macro with the name of each member of XrSharedSpatialAnchorDownloadInfoBD, in order.
+#define XR_LIST_STRUCT_XrSharedSpatialAnchorDownloadInfoBD(_) \
+    _(type) \
+    _(next) \
+    _(uuid) \
+
+/// Calls your macro with the name of each member of XrSystemSpatialScenePropertiesBD, in order.
+#define XR_LIST_STRUCT_XrSystemSpatialScenePropertiesBD(_) \
+    _(type) \
+    _(next) \
+    _(supportsSpatialScene) \
+
+/// Calls your macro with the name of each member of XrSceneCaptureInfoBD, in order.
+#define XR_LIST_STRUCT_XrSceneCaptureInfoBD(_) \
+    _(type) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrSystemSpatialMeshPropertiesBD, in order.
+#define XR_LIST_STRUCT_XrSystemSpatialMeshPropertiesBD(_) \
+    _(type) \
+    _(next) \
+    _(supportsSpatialMesh) \
+
+/// Calls your macro with the name of each member of XrSenseDataProviderCreateInfoSpatialMeshBD, in order.
+#define XR_LIST_STRUCT_XrSenseDataProviderCreateInfoSpatialMeshBD(_) \
+    _(type) \
+    _(next) \
+    _(configFlags) \
+    _(lod) \
+
 /// Calls your macro with the name of each member of XrHandTrackingDataSourceInfoEXT, in order.
 #define XR_LIST_STRUCT_XrHandTrackingDataSourceInfoEXT(_) \
     _(type) \
@@ -5220,12 +5568,6 @@ XR_ENUM_STR(XrResult);
 
 /// Calls your macro with the name of each member of XrFutureCompletionBaseHeaderEXT, in order.
 #define XR_LIST_STRUCT_XrFutureCompletionBaseHeaderEXT(_) \
-    _(type) \
-    _(next) \
-    _(futureResult) \
-
-/// Calls your macro with the name of each member of XrFutureCompletionEXT, in order.
-#define XR_LIST_STRUCT_XrFutureCompletionEXT(_) \
     _(type) \
     _(next) \
     _(futureResult) \
@@ -5859,6 +6201,41 @@ XR_ENUM_STR(XrResult);
     _(XrBodyTrackerCreateInfoBD, XR_TYPE_BODY_TRACKER_CREATE_INFO_BD) \
     _(XrBodyJointsLocateInfoBD, XR_TYPE_BODY_JOINTS_LOCATE_INFO_BD) \
     _(XrBodyJointLocationsBD, XR_TYPE_BODY_JOINT_LOCATIONS_BD) \
+    _(XrSystemSpatialSensingPropertiesBD, XR_TYPE_SYSTEM_SPATIAL_SENSING_PROPERTIES_BD) \
+    _(XrSpatialEntityComponentGetInfoBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_GET_INFO_BD) \
+    _(XrSpatialEntityLocationGetInfoBD, XR_TYPE_SPATIAL_ENTITY_LOCATION_GET_INFO_BD) \
+    _(XrSpatialEntityComponentDataLocationBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_LOCATION_BD) \
+    _(XrSpatialEntityComponentDataSemanticBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_SEMANTIC_BD) \
+    _(XrSpatialEntityComponentDataBoundingBox2DBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_BOUNDING_BOX_2D_BD) \
+    _(XrSpatialEntityComponentDataPolygonBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_POLYGON_BD) \
+    _(XrSpatialEntityComponentDataBoundingBox3DBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_BOUNDING_BOX_3D_BD) \
+    _(XrSpatialEntityComponentDataTriangleMeshBD, XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_TRIANGLE_MESH_BD) \
+    _(XrSenseDataProviderCreateInfoBD, XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_BD) \
+    _(XrSenseDataProviderStartInfoBD, XR_TYPE_SENSE_DATA_PROVIDER_START_INFO_BD) \
+    _(XrEventDataSenseDataProviderStateChangedBD, XR_TYPE_EVENT_DATA_SENSE_DATA_PROVIDER_STATE_CHANGED_BD) \
+    _(XrEventDataSenseDataUpdatedBD, XR_TYPE_EVENT_DATA_SENSE_DATA_UPDATED_BD) \
+    _(XrSenseDataQueryInfoBD, XR_TYPE_SENSE_DATA_QUERY_INFO_BD) \
+    _(XrSenseDataQueryCompletionBD, XR_TYPE_SENSE_DATA_QUERY_COMPLETION_BD) \
+    _(XrQueriedSenseDataGetInfoBD, XR_TYPE_QUERIED_SENSE_DATA_GET_INFO_BD) \
+    _(XrSpatialEntityStateBD, XR_TYPE_SPATIAL_ENTITY_STATE_BD) \
+    _(XrQueriedSenseDataBD, XR_TYPE_QUERIED_SENSE_DATA_BD) \
+    _(XrSenseDataFilterUuidBD, XR_TYPE_SENSE_DATA_FILTER_UUID_BD) \
+    _(XrSenseDataFilterSemanticBD, XR_TYPE_SENSE_DATA_FILTER_SEMANTIC_BD) \
+    _(XrSpatialEntityAnchorCreateInfoBD, XR_TYPE_SPATIAL_ENTITY_ANCHOR_CREATE_INFO_BD) \
+    _(XrAnchorSpaceCreateInfoBD, XR_TYPE_ANCHOR_SPACE_CREATE_INFO_BD) \
+    _(XrFutureCompletionEXT, XR_TYPE_FUTURE_COMPLETION_EXT) \
+    _(XrSystemSpatialAnchorPropertiesBD, XR_TYPE_SYSTEM_SPATIAL_ANCHOR_PROPERTIES_BD) \
+    _(XrSpatialAnchorCreateInfoBD, XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_BD) \
+    _(XrSpatialAnchorCreateCompletionBD, XR_TYPE_SPATIAL_ANCHOR_CREATE_COMPLETION_BD) \
+    _(XrSpatialAnchorPersistInfoBD, XR_TYPE_SPATIAL_ANCHOR_PERSIST_INFO_BD) \
+    _(XrSpatialAnchorUnpersistInfoBD, XR_TYPE_SPATIAL_ANCHOR_UNPERSIST_INFO_BD) \
+    _(XrSystemSpatialAnchorSharingPropertiesBD, XR_TYPE_SYSTEM_SPATIAL_ANCHOR_SHARING_PROPERTIES_BD) \
+    _(XrSpatialAnchorShareInfoBD, XR_TYPE_SPATIAL_ANCHOR_SHARE_INFO_BD) \
+    _(XrSharedSpatialAnchorDownloadInfoBD, XR_TYPE_SHARED_SPATIAL_ANCHOR_DOWNLOAD_INFO_BD) \
+    _(XrSystemSpatialScenePropertiesBD, XR_TYPE_SYSTEM_SPATIAL_SCENE_PROPERTIES_BD) \
+    _(XrSceneCaptureInfoBD, XR_TYPE_SCENE_CAPTURE_INFO_BD) \
+    _(XrSystemSpatialMeshPropertiesBD, XR_TYPE_SYSTEM_SPATIAL_MESH_PROPERTIES_BD) \
+    _(XrSenseDataProviderCreateInfoSpatialMeshBD, XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_SPATIAL_MESH_BD) \
     _(XrHandTrackingDataSourceInfoEXT, XR_TYPE_HAND_TRACKING_DATA_SOURCE_INFO_EXT) \
     _(XrHandTrackingDataSourceStateEXT, XR_TYPE_HAND_TRACKING_DATA_SOURCE_STATE_EXT) \
     _(XrSystemPlaneDetectionPropertiesEXT, XR_TYPE_SYSTEM_PLANE_DETECTION_PROPERTIES_EXT) \
@@ -5870,7 +6247,6 @@ XR_ENUM_STR(XrResult);
     _(XrPlaneDetectorPolygonBufferEXT, XR_TYPE_PLANE_DETECTOR_POLYGON_BUFFER_EXT) \
     _(XrFutureCancelInfoEXT, XR_TYPE_FUTURE_CANCEL_INFO_EXT) \
     _(XrFuturePollInfoEXT, XR_TYPE_FUTURE_POLL_INFO_EXT) \
-    _(XrFutureCompletionEXT, XR_TYPE_FUTURE_COMPLETION_EXT) \
     _(XrFuturePollResultEXT, XR_TYPE_FUTURE_POLL_RESULT_EXT) \
     _(XrEventDataUserPresenceChangedEXT, XR_TYPE_EVENT_DATA_USER_PRESENCE_CHANGED_EXT) \
     _(XrSystemUserPresencePropertiesEXT, XR_TYPE_SYSTEM_USER_PRESENCE_PROPERTIES_EXT) \
@@ -6219,6 +6595,7 @@ XR_ENUM_STR(XrResult);
     _(XR_META_vulkan_swapchain_create_info, 228) \
     _(XR_META_performance_metrics, 233) \
     _(XR_FB_spatial_entity_storage_batch, 239) \
+    _(XR_META_detached_controllers, 241) \
     _(XR_FB_spatial_entity_user, 242) \
     _(XR_META_headset_id, 246) \
     _(XR_META_hand_tracking_microgestures, 253) \
@@ -6242,6 +6619,11 @@ XR_ENUM_STR(XrResult);
     _(XR_MNDX_force_feedback_curl, 376) \
     _(XR_BD_controller_interaction, 385) \
     _(XR_BD_body_tracking, 386) \
+    _(XR_BD_spatial_sensing, 390) \
+    _(XR_BD_spatial_anchor, 391) \
+    _(XR_BD_spatial_anchor_sharing, 392) \
+    _(XR_BD_spatial_scene, 393) \
+    _(XR_BD_spatial_mesh, 394) \
     _(XR_EXT_local_floor, 427) \
     _(XR_EXT_hand_tracking_data_source, 429) \
     _(XR_EXT_plane_detection, 430) \
@@ -7154,6 +7536,63 @@ XR_ENUM_STR(XrResult);
     _(CreateBodyTrackerBD, BD_body_tracking) \
     _(DestroyBodyTrackerBD, BD_body_tracking) \
     _(LocateBodyJointsBD, BD_body_tracking) \
+
+
+/// For every function defined by XR_BD_spatial_sensing in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_BD_spatial_sensing(_) \
+    _(EnumerateSpatialEntityComponentTypesBD, BD_spatial_sensing) \
+    _(GetSpatialEntityUuidBD, BD_spatial_sensing) \
+    _(GetSpatialEntityComponentDataBD, BD_spatial_sensing) \
+    _(CreateSenseDataProviderBD, BD_spatial_sensing) \
+    _(StartSenseDataProviderAsyncBD, BD_spatial_sensing) \
+    _(StartSenseDataProviderCompleteBD, BD_spatial_sensing) \
+    _(GetSenseDataProviderStateBD, BD_spatial_sensing) \
+    _(QuerySenseDataAsyncBD, BD_spatial_sensing) \
+    _(QuerySenseDataCompleteBD, BD_spatial_sensing) \
+    _(DestroySenseDataSnapshotBD, BD_spatial_sensing) \
+    _(GetQueriedSenseDataBD, BD_spatial_sensing) \
+    _(StopSenseDataProviderBD, BD_spatial_sensing) \
+    _(DestroySenseDataProviderBD, BD_spatial_sensing) \
+    _(CreateSpatialEntityAnchorBD, BD_spatial_sensing) \
+    _(DestroyAnchorBD, BD_spatial_sensing) \
+    _(GetAnchorUuidBD, BD_spatial_sensing) \
+    _(CreateAnchorSpaceBD, BD_spatial_sensing) \
+
+
+/// For every function defined by XR_BD_spatial_anchor in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_BD_spatial_anchor(_) \
+    _(CreateSpatialAnchorAsyncBD, BD_spatial_anchor) \
+    _(CreateSpatialAnchorCompleteBD, BD_spatial_anchor) \
+    _(PersistSpatialAnchorAsyncBD, BD_spatial_anchor) \
+    _(PersistSpatialAnchorCompleteBD, BD_spatial_anchor) \
+    _(UnpersistSpatialAnchorAsyncBD, BD_spatial_anchor) \
+    _(UnpersistSpatialAnchorCompleteBD, BD_spatial_anchor) \
+
+
+/// For every function defined by XR_BD_spatial_anchor_sharing in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_BD_spatial_anchor_sharing(_) \
+    _(ShareSpatialAnchorAsyncBD, BD_spatial_anchor_sharing) \
+    _(ShareSpatialAnchorCompleteBD, BD_spatial_anchor_sharing) \
+    _(DownloadSharedSpatialAnchorAsyncBD, BD_spatial_anchor_sharing) \
+    _(DownloadSharedSpatialAnchorCompleteBD, BD_spatial_anchor_sharing) \
+
+
+/// For every function defined by XR_BD_spatial_scene in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_BD_spatial_scene(_) \
+    _(CaptureSceneAsyncBD, BD_spatial_scene) \
+    _(CaptureSceneCompleteBD, BD_spatial_scene) \
 
 
 /// For every function defined by XR_EXT_plane_detection in this version of the spec,

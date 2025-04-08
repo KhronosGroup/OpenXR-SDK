@@ -9,7 +9,7 @@ from itertools import product
 
 VS_VERSION = "Visual Studio 17 2022"
 
-PLATFORMS = ("Win32", "x64", "ARM64")  # "ARM",
+PLATFORMS = ("Win32", "x64", "ARM64")
 
 TRUE_FALSE = (True, False)
 

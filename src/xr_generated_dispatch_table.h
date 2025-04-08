@@ -557,6 +557,43 @@ struct XrGeneratedDispatchTable {
     PFN_xrDestroyBodyTrackerBD DestroyBodyTrackerBD;
     PFN_xrLocateBodyJointsBD LocateBodyJointsBD;
 
+    // ---- XR_BD_spatial_sensing extension commands
+    PFN_xrEnumerateSpatialEntityComponentTypesBD EnumerateSpatialEntityComponentTypesBD;
+    PFN_xrGetSpatialEntityUuidBD GetSpatialEntityUuidBD;
+    PFN_xrGetSpatialEntityComponentDataBD GetSpatialEntityComponentDataBD;
+    PFN_xrCreateSenseDataProviderBD CreateSenseDataProviderBD;
+    PFN_xrStartSenseDataProviderAsyncBD StartSenseDataProviderAsyncBD;
+    PFN_xrStartSenseDataProviderCompleteBD StartSenseDataProviderCompleteBD;
+    PFN_xrGetSenseDataProviderStateBD GetSenseDataProviderStateBD;
+    PFN_xrQuerySenseDataAsyncBD QuerySenseDataAsyncBD;
+    PFN_xrQuerySenseDataCompleteBD QuerySenseDataCompleteBD;
+    PFN_xrDestroySenseDataSnapshotBD DestroySenseDataSnapshotBD;
+    PFN_xrGetQueriedSenseDataBD GetQueriedSenseDataBD;
+    PFN_xrStopSenseDataProviderBD StopSenseDataProviderBD;
+    PFN_xrDestroySenseDataProviderBD DestroySenseDataProviderBD;
+    PFN_xrCreateSpatialEntityAnchorBD CreateSpatialEntityAnchorBD;
+    PFN_xrDestroyAnchorBD DestroyAnchorBD;
+    PFN_xrGetAnchorUuidBD GetAnchorUuidBD;
+    PFN_xrCreateAnchorSpaceBD CreateAnchorSpaceBD;
+
+    // ---- XR_BD_spatial_anchor extension commands
+    PFN_xrCreateSpatialAnchorAsyncBD CreateSpatialAnchorAsyncBD;
+    PFN_xrCreateSpatialAnchorCompleteBD CreateSpatialAnchorCompleteBD;
+    PFN_xrPersistSpatialAnchorAsyncBD PersistSpatialAnchorAsyncBD;
+    PFN_xrPersistSpatialAnchorCompleteBD PersistSpatialAnchorCompleteBD;
+    PFN_xrUnpersistSpatialAnchorAsyncBD UnpersistSpatialAnchorAsyncBD;
+    PFN_xrUnpersistSpatialAnchorCompleteBD UnpersistSpatialAnchorCompleteBD;
+
+    // ---- XR_BD_spatial_anchor_sharing extension commands
+    PFN_xrShareSpatialAnchorAsyncBD ShareSpatialAnchorAsyncBD;
+    PFN_xrShareSpatialAnchorCompleteBD ShareSpatialAnchorCompleteBD;
+    PFN_xrDownloadSharedSpatialAnchorAsyncBD DownloadSharedSpatialAnchorAsyncBD;
+    PFN_xrDownloadSharedSpatialAnchorCompleteBD DownloadSharedSpatialAnchorCompleteBD;
+
+    // ---- XR_BD_spatial_scene extension commands
+    PFN_xrCaptureSceneAsyncBD CaptureSceneAsyncBD;
+    PFN_xrCaptureSceneCompleteBD CaptureSceneCompleteBD;
+
     // ---- XR_EXT_plane_detection extension commands
     PFN_xrCreatePlaneDetectorEXT CreatePlaneDetectorEXT;
     PFN_xrDestroyPlaneDetectorEXT DestroyPlaneDetectorEXT;

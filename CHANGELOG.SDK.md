@@ -21,6 +21,79 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.47 (2025-04-08)
+
+This release features several new vendor extensions, one of which required a
+modification to the XML schema for extending interaction profiles to represent
+accurate. It also contains substantial fixes to the `core_validation` layer to
+make it more usable and fix common false-positive validation errors, among other
+improvements.
+
+- Registry
+  - Addition to XML registry schema: Specify interaction profile additions by
+    constructing a predicate, and allow adding new top level /user paths to
+    existing profiles. See SDK changelog and style guide for details.
+    ([internal MR 2467](https://gitlab.khronos.org/openxr/openxr/merge_requests/2467))
+  - Chore: Reserve extension numbers.
+    ([internal MR 3729](https://gitlab.khronos.org/openxr/openxr/merge_requests/3729),
+    [internal MR 3744](https://gitlab.khronos.org/openxr/openxr/merge_requests/3744),
+    [internal MR 3745](https://gitlab.khronos.org/openxr/openxr/merge_requests/3745))
+  - Fix: Reflect requirement of `XR_META_hand_tracking_microgestures` for
+    `XR_EXT_hand_interaction` in `xr.xml`.
+    ([internal MR 3741](https://gitlab.khronos.org/openxr/openxr/merge_requests/3741))
+  - Fix: Added missing comment on `XR_EYE_POSITION_COUNT_FB` to remove warning
+    during build.
+    ([internal MR 3748](https://gitlab.khronos.org/openxr/openxr/merge_requests/3748))
+  - Fix: typo in the documentation of `XR_ERROR_SPACE_GROUP_NOT_FOUND_META`
+    ([internal MR 3749](https://gitlab.khronos.org/openxr/openxr/merge_requests/3749))
+  - Improvement: Fix schematron runner on Mac.
+    ([internal MR 3759](https://gitlab.khronos.org/openxr/openxr/merge_requests/3759))
+  - New vendor extension: `XR_META_detached_controllers`
+    ([internal MR 2467](https://gitlab.khronos.org/openxr/openxr/merge_requests/2467))
+  - New vendor extension: `XR_BD_spatial_sensing`
+    ([internal MR 3429](https://gitlab.khronos.org/openxr/openxr/merge_requests/3429))
+  - New vendor extension: `XR_BD_spatial_anchor`
+    ([internal MR 3435](https://gitlab.khronos.org/openxr/openxr/merge_requests/3435))
+  - New vendor extension: `XR_BD_spatial_anchor_sharing`
+    ([internal MR 3436](https://gitlab.khronos.org/openxr/openxr/merge_requests/3436))
+  - New vendor extension: `XR_BD_spatial_scene`
+    ([internal MR 3438](https://gitlab.khronos.org/openxr/openxr/merge_requests/3438))
+  - New vendor extension: `XR_BD_spatial_mesh`
+    ([internal MR 3439](https://gitlab.khronos.org/openxr/openxr/merge_requests/3439))
+  - schema: Allow aliases of function pointers, primarily for use in extension
+    promotion.
+    ([internal MR 2989](https://gitlab.khronos.org/openxr/openxr/merge_requests/2989))
+- SDK
+  - Validation Layer: Fix: Fixes validation layer check for next chain validation
+    by changing it from recursive to iterative. This allows for subsequent struct
+    to validate off the initial set of valid chained structs.
+    ([internal MR 3684](https://gitlab.khronos.org/openxr/openxr/merge_requests/3684),
+    [internal issue 2434](https://gitlab.khronos.org/openxr/openxr/issues/2434))
+  - Validation Layer: Fix: Fixes validation layer check for structs that inherit
+    off a base struct. Inherited structs also have the same list of valid chained
+    structs as their parent.
+    ([internal MR 3684](https://gitlab.khronos.org/openxr/openxr/merge_requests/3684),
+    [internal issue 2434](https://gitlab.khronos.org/openxr/openxr/issues/2434))
+  - Validation Layer: Fix: Fixes null dereference bugs in generated code in layer.
+    ([internal MR 3684](https://gitlab.khronos.org/openxr/openxr/merge_requests/3684),
+    [internal issue 2434](https://gitlab.khronos.org/openxr/openxr/issues/2434))
+  - Validation Layer: Fix: Adds a validation layer exception to
+    `xrGetRecommendedLayerResolutionMETA` which allows a `XR_NULL_HANDLE` to be
+    valid when checking the `XrSwapchainSubImage` struct.
+    ([internal MR 3689](https://gitlab.khronos.org/openxr/openxr/merge_requests/3689),
+    [internal issue 2425](https://gitlab.khronos.org/openxr/openxr/issues/2425))
+  - Validation Layer: Improvement: Add time stamp to the log messages
+    ([internal MR 3723](https://gitlab.khronos.org/openxr/openxr/merge_requests/3723))
+  - Validation Layer: Improvement: Generate debug messages when `core_validation`
+    layer starts / exits
+    ([internal MR 3723](https://gitlab.khronos.org/openxr/openxr/merge_requests/3723))
+  - hello_xr: Improvement: Update Android target SDK version to 34 to eliminate
+    Play Protect warning on install. (Minimum SDK remains 24.)
+    ([internal MR 3719](https://gitlab.khronos.org/openxr/openxr/merge_requests/3719))
+  - list_json: Improvement: Use `XrInstanceCreateInfoAndroidKHR` on Android for
+    improved compatibility.
+    ([internal MR 3775](https://gitlab.khronos.org/openxr/openxr/merge_requests/3775))
+
 ## OpenXR SDK 1.1.46 (2025-03-04)
 
 This release includes a new ratified Khronos extension, new vendor extensions,

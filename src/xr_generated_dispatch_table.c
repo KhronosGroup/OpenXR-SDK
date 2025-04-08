@@ -551,6 +551,43 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrDestroyBodyTrackerBD", (PFN_xrVoidFunction*)&table->DestroyBodyTrackerBD));
     (get_inst_proc_addr(instance, "xrLocateBodyJointsBD", (PFN_xrVoidFunction*)&table->LocateBodyJointsBD));
 
+    // ---- XR_BD_spatial_sensing extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateSpatialEntityComponentTypesBD", (PFN_xrVoidFunction*)&table->EnumerateSpatialEntityComponentTypesBD));
+    (get_inst_proc_addr(instance, "xrGetSpatialEntityUuidBD", (PFN_xrVoidFunction*)&table->GetSpatialEntityUuidBD));
+    (get_inst_proc_addr(instance, "xrGetSpatialEntityComponentDataBD", (PFN_xrVoidFunction*)&table->GetSpatialEntityComponentDataBD));
+    (get_inst_proc_addr(instance, "xrCreateSenseDataProviderBD", (PFN_xrVoidFunction*)&table->CreateSenseDataProviderBD));
+    (get_inst_proc_addr(instance, "xrStartSenseDataProviderAsyncBD", (PFN_xrVoidFunction*)&table->StartSenseDataProviderAsyncBD));
+    (get_inst_proc_addr(instance, "xrStartSenseDataProviderCompleteBD", (PFN_xrVoidFunction*)&table->StartSenseDataProviderCompleteBD));
+    (get_inst_proc_addr(instance, "xrGetSenseDataProviderStateBD", (PFN_xrVoidFunction*)&table->GetSenseDataProviderStateBD));
+    (get_inst_proc_addr(instance, "xrQuerySenseDataAsyncBD", (PFN_xrVoidFunction*)&table->QuerySenseDataAsyncBD));
+    (get_inst_proc_addr(instance, "xrQuerySenseDataCompleteBD", (PFN_xrVoidFunction*)&table->QuerySenseDataCompleteBD));
+    (get_inst_proc_addr(instance, "xrDestroySenseDataSnapshotBD", (PFN_xrVoidFunction*)&table->DestroySenseDataSnapshotBD));
+    (get_inst_proc_addr(instance, "xrGetQueriedSenseDataBD", (PFN_xrVoidFunction*)&table->GetQueriedSenseDataBD));
+    (get_inst_proc_addr(instance, "xrStopSenseDataProviderBD", (PFN_xrVoidFunction*)&table->StopSenseDataProviderBD));
+    (get_inst_proc_addr(instance, "xrDestroySenseDataProviderBD", (PFN_xrVoidFunction*)&table->DestroySenseDataProviderBD));
+    (get_inst_proc_addr(instance, "xrCreateSpatialEntityAnchorBD", (PFN_xrVoidFunction*)&table->CreateSpatialEntityAnchorBD));
+    (get_inst_proc_addr(instance, "xrDestroyAnchorBD", (PFN_xrVoidFunction*)&table->DestroyAnchorBD));
+    (get_inst_proc_addr(instance, "xrGetAnchorUuidBD", (PFN_xrVoidFunction*)&table->GetAnchorUuidBD));
+    (get_inst_proc_addr(instance, "xrCreateAnchorSpaceBD", (PFN_xrVoidFunction*)&table->CreateAnchorSpaceBD));
+
+    // ---- XR_BD_spatial_anchor extension commands
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorAsyncBD", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorAsyncBD));
+    (get_inst_proc_addr(instance, "xrCreateSpatialAnchorCompleteBD", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorCompleteBD));
+    (get_inst_proc_addr(instance, "xrPersistSpatialAnchorAsyncBD", (PFN_xrVoidFunction*)&table->PersistSpatialAnchorAsyncBD));
+    (get_inst_proc_addr(instance, "xrPersistSpatialAnchorCompleteBD", (PFN_xrVoidFunction*)&table->PersistSpatialAnchorCompleteBD));
+    (get_inst_proc_addr(instance, "xrUnpersistSpatialAnchorAsyncBD", (PFN_xrVoidFunction*)&table->UnpersistSpatialAnchorAsyncBD));
+    (get_inst_proc_addr(instance, "xrUnpersistSpatialAnchorCompleteBD", (PFN_xrVoidFunction*)&table->UnpersistSpatialAnchorCompleteBD));
+
+    // ---- XR_BD_spatial_anchor_sharing extension commands
+    (get_inst_proc_addr(instance, "xrShareSpatialAnchorAsyncBD", (PFN_xrVoidFunction*)&table->ShareSpatialAnchorAsyncBD));
+    (get_inst_proc_addr(instance, "xrShareSpatialAnchorCompleteBD", (PFN_xrVoidFunction*)&table->ShareSpatialAnchorCompleteBD));
+    (get_inst_proc_addr(instance, "xrDownloadSharedSpatialAnchorAsyncBD", (PFN_xrVoidFunction*)&table->DownloadSharedSpatialAnchorAsyncBD));
+    (get_inst_proc_addr(instance, "xrDownloadSharedSpatialAnchorCompleteBD", (PFN_xrVoidFunction*)&table->DownloadSharedSpatialAnchorCompleteBD));
+
+    // ---- XR_BD_spatial_scene extension commands
+    (get_inst_proc_addr(instance, "xrCaptureSceneAsyncBD", (PFN_xrVoidFunction*)&table->CaptureSceneAsyncBD));
+    (get_inst_proc_addr(instance, "xrCaptureSceneCompleteBD", (PFN_xrVoidFunction*)&table->CaptureSceneCompleteBD));
+
     // ---- XR_EXT_plane_detection extension commands
     (get_inst_proc_addr(instance, "xrCreatePlaneDetectorEXT", (PFN_xrVoidFunction*)&table->CreatePlaneDetectorEXT));
     (get_inst_proc_addr(instance, "xrDestroyPlaneDetectorEXT", (PFN_xrVoidFunction*)&table->DestroyPlaneDetectorEXT));
