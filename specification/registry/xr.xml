@@ -136,7 +136,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 47)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 48)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -695,6 +695,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enums for XR_FB_body_tracking -->
         <type name="XrBodyJointFB" category="enum"/>
         <type name="XrBodyJointSetFB" category="enum"/>
+
+        <!-- enums for XR_META_body_tracking_full_body -->
+        <type name="XrFullBodyJointMETA" category="enum"/>
 
         <!-- enum for XR_ML_frame_end_info -->
         <type name="XrFrameEndInfoFlagBitsML" category="enum"/>
@@ -1946,6 +1949,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrTime</type>                                  <name>time</name></member>
         </type>
 
+        <!-- XR_META_body_tracking_full_body structs -->
+        <type category="struct" name="XrSystemPropertiesBodyTrackingFullBodyMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_PROPERTIES_BODY_TRACKING_FULL_BODY_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsFullBodyTracking</name></member>
+        </type>
+
         <!-- XR_FB_eye_tracking_social structs -->
         <type category="struct" name="XrSystemEyeTrackingPropertiesFB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_EYE_TRACKING_PROPERTIES_FB"><type>XrStructureType</type> <name>type</name></member>
@@ -3192,6 +3202,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member len="jointLocationCount"><type>XrBodyJointLocationBD</type>* <name>jointLocations</name></member>
         </type>
 
+        <!-- XR_BD_future_progress -->
+        <type category="struct" name="XrFuturePollResultProgressBD" structextends="XrFuturePollResultEXT" returnedonly="true">
+            <member values="XR_TYPE_FUTURE_POLL_RESULT_PROGRESS_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>isSupported</name></member>
+            <member><type>uint32_t</type> <name>progressPercentage</name></member>
+        </type>
+
         <!-- XR_HTC_facial_tracking -->
         <type category="struct" name="XrFacialTrackerCreateInfoHTC">
             <member values="XR_TYPE_FACIAL_TRACKER_CREATE_INFO_HTC"><type>XrStructureType</type> <name>type</name></member>
@@ -3993,7 +4011,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrBool32</type>    <name>isUserPresent</name></member>
         </type>
 
-
         <!-- XR_EXT_future -->
         <type category="struct" name="XrFutureCompletionBaseHeaderEXT">
             <member><type>XrStructureType</type> <name>type</name></member>
@@ -4606,6 +4623,21 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member>const <type>void</type>* <name>next</name></member>
         </type>
 
+        <!-- XR_META_simultaneous_hands_and_controllers -->
+        <type category="struct" name="XrSystemSimultaneousHandsAndControllersPropertiesMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_SIMULTANEOUS_HANDS_AND_CONTROLLERS_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsSimultaneousHandsAndControllers</name></member>
+        </type>
+        <type category="struct" name="XrSimultaneousHandsAndControllersTrackingResumeInfoMETA">
+            <member values="XR_TYPE_SIMULTANEOUS_HANDS_AND_CONTROLLERS_TRACKING_RESUME_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrSimultaneousHandsAndControllersTrackingPauseInfoMETA">
+            <member values="XR_TYPE_SIMULTANEOUS_HANDS_AND_CONTROLLERS_TRACKING_PAUSE_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
 
     </types>
 
@@ -5142,7 +5174,99 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </enums>
 
     <enums name="XrBodyJointSetFB" type="enum" comment="Describes the set of body joints to track when creating an slink:XrBodyTrackerFB.">
-        <enum value="0"   name="XR_BODY_JOINT_SET_DEFAULT_FB" comment="Indicates that the created slink:XrBodyTrackerFB tracks the set of body joints described by elink:XrBodyJointFB enum, i.e. the flink:xrLocateBodyJointsFB function returns an array of joint locations with the count of ename:XR_BODY_JOINT_COUNT_FB and can be indexed using elink:XrBodyJointFB."/>
+        <enum value="0"   name="XR_BODY_JOINT_SET_DEFAULT_FB" comment="Indicates that the created slink:XrBodyTrackerFB tracks the set of body joints described by elink:XrBodyJointFB enum, i.e. the flink:xrLocateBodyJointsFB function returns an array of joint locations with the count of ename:XR_BODY_JOINT_COUNT_FB and can be indexed using elink:XrBodyJointFB. This includes the upper body, both hands, and torso."/>
+    </enums>
+
+    <!-- XR_META_body_tracking_full_body -->
+    <enums name="XrFullBodyJointMETA" type="enum">
+        <enum value="0"    name="XR_FULL_BODY_JOINT_ROOT_META"/>
+        <enum value="1"    name="XR_FULL_BODY_JOINT_HIPS_META"/>
+        <enum value="2"    name="XR_FULL_BODY_JOINT_SPINE_LOWER_META"/>
+        <enum value="3"    name="XR_FULL_BODY_JOINT_SPINE_MIDDLE_META"/>
+        <enum value="4"    name="XR_FULL_BODY_JOINT_SPINE_UPPER_META"/>
+        <enum value="5"    name="XR_FULL_BODY_JOINT_CHEST_META"/>
+        <enum value="6"    name="XR_FULL_BODY_JOINT_NECK_META"/>
+        <enum value="7"    name="XR_FULL_BODY_JOINT_HEAD_META"/>
+        <enum value="8"    name="XR_FULL_BODY_JOINT_LEFT_SHOULDER_META"/>
+        <enum value="9"    name="XR_FULL_BODY_JOINT_LEFT_SCAPULA_META"/>
+        <enum value="10"   name="XR_FULL_BODY_JOINT_LEFT_ARM_UPPER_META"/>
+        <enum value="11"   name="XR_FULL_BODY_JOINT_LEFT_ARM_LOWER_META"/>
+        <enum value="12"   name="XR_FULL_BODY_JOINT_LEFT_HAND_WRIST_TWIST_META"/>
+        <enum value="13"   name="XR_FULL_BODY_JOINT_RIGHT_SHOULDER_META"/>
+        <enum value="14"   name="XR_FULL_BODY_JOINT_RIGHT_SCAPULA_META"/>
+        <enum value="15"   name="XR_FULL_BODY_JOINT_RIGHT_ARM_UPPER_META"/>
+        <enum value="16"   name="XR_FULL_BODY_JOINT_RIGHT_ARM_LOWER_META"/>
+        <enum value="17"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_WRIST_TWIST_META"/>
+        <enum value="18"   name="XR_FULL_BODY_JOINT_LEFT_HAND_PALM_META"/>
+        <enum value="19"   name="XR_FULL_BODY_JOINT_LEFT_HAND_WRIST_META"/>
+        <enum value="20"   name="XR_FULL_BODY_JOINT_LEFT_HAND_THUMB_METACARPAL_META"/>
+        <enum value="21"   name="XR_FULL_BODY_JOINT_LEFT_HAND_THUMB_PROXIMAL_META"/>
+        <enum value="22"   name="XR_FULL_BODY_JOINT_LEFT_HAND_THUMB_DISTAL_META"/>
+        <enum value="23"   name="XR_FULL_BODY_JOINT_LEFT_HAND_THUMB_TIP_META"/>
+        <enum value="24"   name="XR_FULL_BODY_JOINT_LEFT_HAND_INDEX_METACARPAL_META"/>
+        <enum value="25"   name="XR_FULL_BODY_JOINT_LEFT_HAND_INDEX_PROXIMAL_META"/>
+        <enum value="26"   name="XR_FULL_BODY_JOINT_LEFT_HAND_INDEX_INTERMEDIATE_META"/>
+        <enum value="27"   name="XR_FULL_BODY_JOINT_LEFT_HAND_INDEX_DISTAL_META"/>
+        <enum value="28"   name="XR_FULL_BODY_JOINT_LEFT_HAND_INDEX_TIP_META"/>
+        <enum value="29"   name="XR_FULL_BODY_JOINT_LEFT_HAND_MIDDLE_METACARPAL_META"/>
+        <enum value="30"   name="XR_FULL_BODY_JOINT_LEFT_HAND_MIDDLE_PROXIMAL_META"/>
+        <enum value="31"   name="XR_FULL_BODY_JOINT_LEFT_HAND_MIDDLE_INTERMEDIATE_META"/>
+        <enum value="32"   name="XR_FULL_BODY_JOINT_LEFT_HAND_MIDDLE_DISTAL_META"/>
+        <enum value="33"   name="XR_FULL_BODY_JOINT_LEFT_HAND_MIDDLE_TIP_META"/>
+        <enum value="34"   name="XR_FULL_BODY_JOINT_LEFT_HAND_RING_METACARPAL_META"/>
+        <enum value="35"   name="XR_FULL_BODY_JOINT_LEFT_HAND_RING_PROXIMAL_META"/>
+        <enum value="36"   name="XR_FULL_BODY_JOINT_LEFT_HAND_RING_INTERMEDIATE_META"/>
+        <enum value="37"   name="XR_FULL_BODY_JOINT_LEFT_HAND_RING_DISTAL_META"/>
+        <enum value="38"   name="XR_FULL_BODY_JOINT_LEFT_HAND_RING_TIP_META"/>
+        <enum value="39"   name="XR_FULL_BODY_JOINT_LEFT_HAND_LITTLE_METACARPAL_META"/>
+        <enum value="40"   name="XR_FULL_BODY_JOINT_LEFT_HAND_LITTLE_PROXIMAL_META"/>
+        <enum value="41"   name="XR_FULL_BODY_JOINT_LEFT_HAND_LITTLE_INTERMEDIATE_META"/>
+        <enum value="42"   name="XR_FULL_BODY_JOINT_LEFT_HAND_LITTLE_DISTAL_META"/>
+        <enum value="43"   name="XR_FULL_BODY_JOINT_LEFT_HAND_LITTLE_TIP_META"/>
+        <enum value="44"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_PALM_META"/>
+        <enum value="45"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_WRIST_META"/>
+        <enum value="46"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_THUMB_METACARPAL_META"/>
+        <enum value="47"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_THUMB_PROXIMAL_META"/>
+        <enum value="48"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_THUMB_DISTAL_META"/>
+        <enum value="49"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_THUMB_TIP_META"/>
+        <enum value="50"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_INDEX_METACARPAL_META"/>
+        <enum value="51"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_INDEX_PROXIMAL_META"/>
+        <enum value="52"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_INDEX_INTERMEDIATE_META"/>
+        <enum value="53"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_INDEX_DISTAL_META"/>
+        <enum value="54"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_INDEX_TIP_META"/>
+        <enum value="55"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_MIDDLE_METACARPAL_META"/>
+        <enum value="56"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_MIDDLE_PROXIMAL_META"/>
+        <enum value="57"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_MIDDLE_INTERMEDIATE_META"/>
+        <enum value="58"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_MIDDLE_DISTAL_META"/>
+        <enum value="59"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_MIDDLE_TIP_META"/>
+        <enum value="60"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_RING_METACARPAL_META"/>
+        <enum value="61"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_RING_PROXIMAL_META"/>
+        <enum value="62"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_RING_INTERMEDIATE_META"/>
+        <enum value="63"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_RING_DISTAL_META"/>
+        <enum value="64"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_RING_TIP_META"/>
+        <enum value="65"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_LITTLE_METACARPAL_META"/>
+        <enum value="66"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_LITTLE_PROXIMAL_META"/>
+        <enum value="67"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_LITTLE_INTERMEDIATE_META"/>
+        <enum value="68"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_LITTLE_DISTAL_META"/>
+        <enum value="69"   name="XR_FULL_BODY_JOINT_RIGHT_HAND_LITTLE_TIP_META"/>
+        <enum value="70"   name="XR_FULL_BODY_JOINT_LEFT_UPPER_LEG_META"/>
+        <enum value="71"   name="XR_FULL_BODY_JOINT_LEFT_LOWER_LEG_META"/>
+        <enum value="72"   name="XR_FULL_BODY_JOINT_LEFT_FOOT_ANKLE_TWIST_META"/>
+        <enum value="73"   name="XR_FULL_BODY_JOINT_LEFT_FOOT_ANKLE_META"/>
+        <enum value="74"   name="XR_FULL_BODY_JOINT_LEFT_FOOT_SUBTALAR_META"/>
+        <enum value="75"   name="XR_FULL_BODY_JOINT_LEFT_FOOT_TRANSVERSE_META"/>
+        <enum value="76"   name="XR_FULL_BODY_JOINT_LEFT_FOOT_BALL_META"/>
+        <enum value="77"   name="XR_FULL_BODY_JOINT_RIGHT_UPPER_LEG_META"/>
+        <enum value="78"   name="XR_FULL_BODY_JOINT_RIGHT_LOWER_LEG_META"/>
+        <enum value="79"   name="XR_FULL_BODY_JOINT_RIGHT_FOOT_ANKLE_TWIST_META"/>
+        <enum value="80"   name="XR_FULL_BODY_JOINT_RIGHT_FOOT_ANKLE_META"/>
+        <enum value="81"   name="XR_FULL_BODY_JOINT_RIGHT_FOOT_SUBTALAR_META"/>
+        <enum value="82"   name="XR_FULL_BODY_JOINT_RIGHT_FOOT_TRANSVERSE_META"/>
+        <enum value="83"   name="XR_FULL_BODY_JOINT_RIGHT_FOOT_BALL_META"/>
+        <enum value="84"   name="XR_FULL_BODY_JOINT_COUNT_META"/>
+
+        <!-- used as a sentinel value for root-parent joint -->
+        <enum value="85"   name="XR_FULL_BODY_JOINT_NONE_META"/>
     </enums>
 
     <!-- XR_FB_eye_tracking_social -->
@@ -8412,6 +8536,17 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </command>
 
 
+        <!-- XR_META_simultaneous_hands_and_controllers commands -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrResumeSimultaneousHandsAndControllersTrackingMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSimultaneousHandsAndControllersTrackingResumeInfoMETA</type>* <name>resumeInfo</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrPauseSimultaneousHandsAndControllersTrackingMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSimultaneousHandsAndControllersTrackingPauseInfoMETA</type>* <name>pauseInfo</name></param>
+        </command>
     </commands>
 
     <interaction_profiles>
@@ -9105,6 +9240,8 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component subpath="/input/grip/pose"          type="XR_ACTION_TYPE_POSE_INPUT"/>
             <component subpath="/input/aim/pose"           type="XR_ACTION_TYPE_POSE_INPUT"/>
             <component subpath="/input/thumbstick"         type="XR_ACTION_TYPE_VECTOR2F_INPUT"/>
+            <component subpath="/input/thumbstick/x"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/thumbstick/y"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
             <component subpath="/input/thumbstick/click"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
         </interaction_profile>
 
@@ -10052,7 +10189,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- OpenGL graphics binding extension -->
     <extension name="XR_KHR_opengl_enable" number="24" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL" supported="openxr" ratified="openxr">
         <require>
-            <enum value="10"                               name="XR_KHR_opengl_enable_SPEC_VERSION"/>
+            <enum value="11"                               name="XR_KHR_opengl_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_enable&quot;" name="XR_KHR_OPENGL_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR"/>
             <enum offset="1" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR"/>
@@ -10073,7 +10210,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- OpenGL ES graphics binding extension -->
     <extension name="XR_KHR_opengl_es_enable" number="25" type="instance" protect="XR_USE_GRAPHICS_API_OPENGL_ES" supported="openxr" ratified="openxr">
         <require>
-            <enum value="8"                                   name="XR_KHR_opengl_es_enable_SPEC_VERSION"/>
+            <enum value="9"                                   name="XR_KHR_opengl_es_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_opengl_es_enable&quot;" name="XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME"/>
             <enum offset="1" extends="XrStructureType"        name="XR_TYPE_GRAPHICS_BINDING_OPENGL_ES_ANDROID_KHR"/>
             <enum offset="2" extends="XrStructureType"        name="XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR"/>
@@ -10088,7 +10225,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- Vulkan graphics binding extension -->
     <extension name="XR_KHR_vulkan_enable" number="26" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr" ratified="openxr">
         <require>
-            <enum value="8"                                name="XR_KHR_vulkan_enable_SPEC_VERSION"/>
+            <enum value="9"                                name="XR_KHR_vulkan_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_enable&quot;" name="XR_KHR_VULKAN_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"     name="XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR"/>
             <enum offset="1" extends="XrStructureType"     name="XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR"/>
@@ -10114,7 +10251,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- D3D11 graphics binding extension -->
     <extension name="XR_KHR_D3D11_enable" number="28" type="instance" protect="XR_USE_GRAPHICS_API_D3D11" supported="openxr" ratified="openxr">
         <require>
-            <enum value="9"                               name="XR_KHR_D3D11_enable_SPEC_VERSION"/>
+            <enum value="10"                              name="XR_KHR_D3D11_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D11_enable&quot;" name="XR_KHR_D3D11_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"    name="XR_TYPE_GRAPHICS_BINDING_D3D11_KHR"/>
             <enum offset="1" extends="XrStructureType"    name="XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR"/>
@@ -10129,7 +10266,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- D3D12 graphics binding extension -->
     <extension name="XR_KHR_D3D12_enable" number="29" type="instance" protect="XR_USE_GRAPHICS_API_D3D12" supported="openxr" ratified="openxr">
         <require>
-            <enum value="9"                               name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
+            <enum value="10"                              name="XR_KHR_D3D12_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_D3D12_enable&quot;" name="XR_KHR_D3D12_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"    name="XR_TYPE_GRAPHICS_BINDING_D3D12_KHR"/>
             <enum offset="1" extends="XrStructureType"    name="XR_TYPE_SWAPCHAIN_IMAGE_D3D12_KHR"/>
@@ -10144,7 +10281,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- Metal graphics binding extension -->
     <extension name="XR_KHR_metal_enable" number="30" type="instance" protect="XR_USE_GRAPHICS_API_METAL" supported="openxr" ratified="openxr">
         <require>
-            <enum value="1"                               name="XR_KHR_metal_enable_SPEC_VERSION"/>
+            <enum value="2"                               name="XR_KHR_metal_enable_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_metal_enable&quot;" name="XR_KHR_METAL_ENABLE_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"    name="XR_TYPE_GRAPHICS_BINDING_METAL_KHR"/>
             <enum offset="1" extends="XrStructureType"    name="XR_TYPE_SWAPCHAIN_IMAGE_METAL_KHR"/>
@@ -10882,7 +11019,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_KHR_vulkan_enable2" number="91" type="instance" protect="XR_USE_GRAPHICS_API_VULKAN" supported="openxr" ratified="openxr">
         <require>
-            <enum value="2"                                 name="XR_KHR_vulkan_enable2_SPEC_VERSION"/>
+            <enum value="3"                                 name="XR_KHR_vulkan_enable2_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_vulkan_enable2&quot;" name="XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType"      name="XR_TYPE_VULKAN_INSTANCE_CREATE_INFO_KHR"/>
             <enum offset="1" extends="XrStructureType"      name="XR_TYPE_VULKAN_DEVICE_CREATE_INFO_KHR"/>
@@ -13357,10 +13494,16 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_275" number="275" type="instance" supported="disabled">
+    <extension name="XR_META_body_tracking_full_body" number="275" type="instance" supported="openxr" depends="XR_FB_body_tracking">
         <require>
-            <enum value="1"                               name="XR_FB_extension_275_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_275&quot;" name="XR_FB_EXTENSION_275_EXTENSION_NAME"/>
+            <enum value="1"                                           name="XR_META_body_tracking_full_body_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_body_tracking_full_body&quot;" name="XR_META_BODY_TRACKING_FULL_BODY_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"                name="XR_TYPE_SYSTEM_PROPERTIES_BODY_TRACKING_FULL_BODY_META"/>
+            <enum offset="0" extends="XrBodyJointSetFB"               name="XR_BODY_JOINT_SET_FULL_BODY_META"                       comment="Indicates that the created slink:XrBodyTrackerFB tracks the set of body joints described by elink:XrFullBodyJointMETA enum, i.e. the flink:xrLocateBodyJointsFB function returns an array of joint locations with the count of ename:XR_FULL_BODY_JOINT_COUNT_META and can be indexed using elink:XrFullBodyJointMETA. This extends the joints of ename:XR_BODY_JOINT_SET_DEFAULT_FB by also including the lower body."/>
+
+            <type name="XrFullBodyJointMETA"/>
+            <type name="XrSystemPropertiesBodyTrackingFullBodyMETA"/>
         </require>
     </extension>
 
@@ -14590,7 +14733,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_BD_spatial_anchor_sharing" number="392" depends="XR_BD_spatial_anchor" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                        name="XR_BD_spatial_anchor_sharing_SPEC_VERSION"/>
+            <enum value="2"                                        name="XR_BD_spatial_anchor_sharing_SPEC_VERSION"/>
             <enum value="&quot;XR_BD_spatial_anchor_sharing&quot;" name="XR_BD_SPATIAL_ANCHOR_SHARING_EXTENSION_NAME"/>
 
             <enum offset="0" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_TIMEOUT_BD"/>
@@ -14655,10 +14798,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_BD_extension_395" number="395" type="instance" supported="disabled">
+    <extension name="XR_BD_future_progress" number="395" type="instance" depends="XR_VERSION_1_0+XR_EXT_future" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_BD_extension_395_SPEC_VERSION"/>
-            <enum value="&quot;XR_BD_extension_395&quot;" name="XR_BD_extension_395_EXTENSION_NAME"/>
+            <enum value="1"                                 name="XR_BD_future_progress_SPEC_VERSION"/>
+            <enum value="&quot;XR_BD_future_progress&quot;" name="XR_BD_FUTURE_PROGRESS_EXTENSION_NAME"/>
+
+            <enum offset="1" extends="XrStructureType"      name="XR_TYPE_FUTURE_POLL_RESULT_PROGRESS_BD"/>
+
+            <type name="XrFuturePollResultProgressBD"/>
         </require>
     </extension>
 
@@ -15803,10 +15950,21 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_META_extension_533" number="533" type="instance" supported="disabled">
+    <extension name="XR_META_simultaneous_hands_and_controllers" number="533" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                 name="XR_META_extension_533_SPEC_VERSION"/>
-            <enum value="&quot;XR_META_extension_533&quot;" name="XR_META_extension_533_EXTENSION_NAME"/>
+            <enum value="1"                                                      name="XR_META_simultaneous_hands_and_controllers_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_simultaneous_hands_and_controllers&quot;" name="XR_META_SIMULTANEOUS_HANDS_AND_CONTROLLERS_EXTENSION_NAME"/>
+
+            <type name="XrSystemSimultaneousHandsAndControllersPropertiesMETA"/>
+            <type name="XrSimultaneousHandsAndControllersTrackingResumeInfoMETA"/>
+            <type name="XrSimultaneousHandsAndControllersTrackingPauseInfoMETA"/>
+
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SYSTEM_SIMULTANEOUS_HANDS_AND_CONTROLLERS_PROPERTIES_META"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_SIMULTANEOUS_HANDS_AND_CONTROLLERS_TRACKING_RESUME_INFO_META"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_SIMULTANEOUS_HANDS_AND_CONTROLLERS_TRACKING_PAUSE_INFO_META"/>
+
+            <command name="xrResumeSimultaneousHandsAndControllersTrackingMETA"/>
+            <command name="xrPauseSimultaneousHandsAndControllersTrackingMETA"/>
         </require>
     </extension>
 
@@ -18105,6 +18263,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="&quot;XR_ANDROID_extension_835&quot;" name="XR_ANDROID_EXTENSION_835_EXTENSION_NAME"/>
         </require>
     </extension>
+
+    <extension name="XR_EXT_extension_836" number="836" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_836_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_836&quot;" name="XR_EXT_EXTENSION_836_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_837" number="837" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_837_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_837&quot;" name="XR_EXT_EXTENSION_837_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_KHR_extension_838" number="838" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_KHR_extension_838_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_838&quot;" name="XR_KHR_EXTENSION_838_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_839" number="839" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_839_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_839&quot;" name="XR_EXT_EXTENSION_839_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+
     </extensions>
 
 </registry>

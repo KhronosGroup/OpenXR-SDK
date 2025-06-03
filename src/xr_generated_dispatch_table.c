@@ -622,6 +622,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrDestroyFacialExpressionClientML", (PFN_xrVoidFunction*)&table->DestroyFacialExpressionClientML));
     (get_inst_proc_addr(instance, "xrGetFacialExpressionBlendShapePropertiesML", (PFN_xrVoidFunction*)&table->GetFacialExpressionBlendShapePropertiesML));
 
+    // ---- XR_META_simultaneous_hands_and_controllers extension commands
+    (get_inst_proc_addr(instance, "xrResumeSimultaneousHandsAndControllersTrackingMETA", (PFN_xrVoidFunction*)&table->ResumeSimultaneousHandsAndControllersTrackingMETA));
+    (get_inst_proc_addr(instance, "xrPauseSimultaneousHandsAndControllersTrackingMETA", (PFN_xrVoidFunction*)&table->PauseSimultaneousHandsAndControllersTrackingMETA));
+
     // ---- XR_META_colocation_discovery extension commands
     (get_inst_proc_addr(instance, "xrStartColocationDiscoveryMETA", (PFN_xrVoidFunction*)&table->StartColocationDiscoveryMETA));
     (get_inst_proc_addr(instance, "xrStopColocationDiscoveryMETA", (PFN_xrVoidFunction*)&table->StopColocationDiscoveryMETA));

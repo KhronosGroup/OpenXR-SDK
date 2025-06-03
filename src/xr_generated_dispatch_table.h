@@ -628,6 +628,10 @@ struct XrGeneratedDispatchTable {
     PFN_xrDestroyFacialExpressionClientML DestroyFacialExpressionClientML;
     PFN_xrGetFacialExpressionBlendShapePropertiesML GetFacialExpressionBlendShapePropertiesML;
 
+    // ---- XR_META_simultaneous_hands_and_controllers extension commands
+    PFN_xrResumeSimultaneousHandsAndControllersTrackingMETA ResumeSimultaneousHandsAndControllersTrackingMETA;
+    PFN_xrPauseSimultaneousHandsAndControllersTrackingMETA PauseSimultaneousHandsAndControllersTrackingMETA;
+
     // ---- XR_META_colocation_discovery extension commands
     PFN_xrStartColocationDiscoveryMETA StartColocationDiscoveryMETA;
     PFN_xrStopColocationDiscoveryMETA StopColocationDiscoveryMETA;

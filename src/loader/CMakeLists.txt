@@ -151,6 +151,8 @@ if(ANDROID)
     target_link_libraries(
         openxr_loader PRIVATE ${ANDROID_LOG_LIBRARY} ${ANDROID_LIBRARY}
     )
+    # Force 16KB page sizes for Android 15+ compatibility.
+    target_link_options(openxr_loader PRIVATE "-Wl,-z,max-page-size=16384")
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(FALLBACK_CONFIG_DIRS
@@ -329,8 +331,8 @@ if(DYNAMIC_LOADER AND BUILD_CONFORMANCE_CLI)
         TARGET openxr_loader
         POST_BUILD
         COMMAND
-            ${CMAKE_COMMAND} -E copy $<TARGET_FILE:openxr_loader>
-            $<TARGET_PROPERTY:conformance_cli,BINARY_DIR>
+            ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:openxr_loader>"
+            "$<TARGET_PROPERTY:conformance_cli,BINARY_DIR>"
     )
 endif()
 
