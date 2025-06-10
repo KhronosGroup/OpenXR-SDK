@@ -529,6 +529,22 @@ struct XrGeneratedDispatchTable {
     PFN_xrAcquireEnvironmentDepthImageMETA AcquireEnvironmentDepthImageMETA;
     PFN_xrSetEnvironmentDepthHandRemovalMETA SetEnvironmentDepthHandRemovalMETA;
 
+    // ---- XR_EXT_render_model extension commands
+    PFN_xrCreateRenderModelEXT CreateRenderModelEXT;
+    PFN_xrDestroyRenderModelEXT DestroyRenderModelEXT;
+    PFN_xrGetRenderModelPropertiesEXT GetRenderModelPropertiesEXT;
+    PFN_xrCreateRenderModelSpaceEXT CreateRenderModelSpaceEXT;
+    PFN_xrCreateRenderModelAssetEXT CreateRenderModelAssetEXT;
+    PFN_xrDestroyRenderModelAssetEXT DestroyRenderModelAssetEXT;
+    PFN_xrGetRenderModelAssetDataEXT GetRenderModelAssetDataEXT;
+    PFN_xrGetRenderModelAssetPropertiesEXT GetRenderModelAssetPropertiesEXT;
+    PFN_xrGetRenderModelStateEXT GetRenderModelStateEXT;
+
+    // ---- XR_EXT_interaction_render_model extension commands
+    PFN_xrEnumerateInteractionRenderModelIdsEXT EnumerateInteractionRenderModelIdsEXT;
+    PFN_xrEnumerateRenderModelSubactionPathsEXT EnumerateRenderModelSubactionPathsEXT;
+    PFN_xrGetRenderModelPoseTopLevelUserPathEXT GetRenderModelPoseTopLevelUserPathEXT;
+
     // ---- XR_QCOM_tracking_optimization_settings extension commands
     PFN_xrSetTrackingOptimizationSettingsHintQCOM SetTrackingOptimizationSettingsHintQCOM;
 
@@ -637,6 +653,43 @@ struct XrGeneratedDispatchTable {
     PFN_xrStopColocationDiscoveryMETA StopColocationDiscoveryMETA;
     PFN_xrStartColocationAdvertisementMETA StartColocationAdvertisementMETA;
     PFN_xrStopColocationAdvertisementMETA StopColocationAdvertisementMETA;
+
+    // ---- XR_EXT_spatial_entity extension commands
+    PFN_xrEnumerateSpatialCapabilitiesEXT EnumerateSpatialCapabilitiesEXT;
+    PFN_xrEnumerateSpatialCapabilityComponentTypesEXT EnumerateSpatialCapabilityComponentTypesEXT;
+    PFN_xrEnumerateSpatialCapabilityFeaturesEXT EnumerateSpatialCapabilityFeaturesEXT;
+    PFN_xrCreateSpatialContextAsyncEXT CreateSpatialContextAsyncEXT;
+    PFN_xrCreateSpatialContextCompleteEXT CreateSpatialContextCompleteEXT;
+    PFN_xrDestroySpatialContextEXT DestroySpatialContextEXT;
+    PFN_xrCreateSpatialDiscoverySnapshotAsyncEXT CreateSpatialDiscoverySnapshotAsyncEXT;
+    PFN_xrCreateSpatialDiscoverySnapshotCompleteEXT CreateSpatialDiscoverySnapshotCompleteEXT;
+    PFN_xrQuerySpatialComponentDataEXT QuerySpatialComponentDataEXT;
+    PFN_xrDestroySpatialSnapshotEXT DestroySpatialSnapshotEXT;
+    PFN_xrCreateSpatialEntityFromIdEXT CreateSpatialEntityFromIdEXT;
+    PFN_xrDestroySpatialEntityEXT DestroySpatialEntityEXT;
+    PFN_xrCreateSpatialUpdateSnapshotEXT CreateSpatialUpdateSnapshotEXT;
+    PFN_xrGetSpatialBufferStringEXT GetSpatialBufferStringEXT;
+    PFN_xrGetSpatialBufferUint8EXT GetSpatialBufferUint8EXT;
+    PFN_xrGetSpatialBufferUint16EXT GetSpatialBufferUint16EXT;
+    PFN_xrGetSpatialBufferUint32EXT GetSpatialBufferUint32EXT;
+    PFN_xrGetSpatialBufferFloatEXT GetSpatialBufferFloatEXT;
+    PFN_xrGetSpatialBufferVector2fEXT GetSpatialBufferVector2fEXT;
+    PFN_xrGetSpatialBufferVector3fEXT GetSpatialBufferVector3fEXT;
+
+    // ---- XR_EXT_spatial_anchor extension commands
+    PFN_xrCreateSpatialAnchorEXT CreateSpatialAnchorEXT;
+
+    // ---- XR_EXT_spatial_persistence extension commands
+    PFN_xrEnumerateSpatialPersistenceScopesEXT EnumerateSpatialPersistenceScopesEXT;
+    PFN_xrCreateSpatialPersistenceContextAsyncEXT CreateSpatialPersistenceContextAsyncEXT;
+    PFN_xrCreateSpatialPersistenceContextCompleteEXT CreateSpatialPersistenceContextCompleteEXT;
+    PFN_xrDestroySpatialPersistenceContextEXT DestroySpatialPersistenceContextEXT;
+
+    // ---- XR_EXT_spatial_persistence_operations extension commands
+    PFN_xrPersistSpatialEntityAsyncEXT PersistSpatialEntityAsyncEXT;
+    PFN_xrPersistSpatialEntityCompleteEXT PersistSpatialEntityCompleteEXT;
+    PFN_xrUnpersistSpatialEntityAsyncEXT UnpersistSpatialEntityAsyncEXT;
+    PFN_xrUnpersistSpatialEntityCompleteEXT UnpersistSpatialEntityCompleteEXT;
 };
 
 
