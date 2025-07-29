@@ -74,6 +74,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
     <types>
         <type name="openxr_platform_defines" category="include">#include "openxr_platform_defines.h"</type>
 
+        <type requires="android/binder_ibinder.h" name="AIBinder"/>
         <type requires="android/native_window.h" name="ANativeWindow"/>
         <type requires="jni.h" name="jobject"/>
         <type requires="CL/cl_gl_ext.h" name="CGLContextObj"/>
@@ -136,7 +137,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 49)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 50)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -279,6 +280,10 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="define">
 #define <name>XR_HAND_FOREARM_JOINT_COUNT_ULTRALEAP</name> 27</type>
 
+        <!-- XR_ANDROID_trackables -->
+        <type category="define">
+#define <name>XR_NULL_TRACKABLE_ANDROID</name> 0</type>
+
         <!-- XR_FB_face_tracking -->
         <type category="define">
 #define <name>XR_FACE_EXPRESSSION_SET_DEFAULT_FB</name> XR_FACE_EXPRESSION_SET_DEFAULT_FB</type>
@@ -322,6 +327,8 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrAsyncRequestIdFB</name>)</type>
         <!-- XR_FB_render_model -->
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrRenderModelKeyFB</name>)</type>
+        <!-- XR_ANDROID_trackables -->
+        <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrTrackableANDROID</name>)</type>
         <!-- XR_ML_marker_understanding -->
         <type category="basetype"><type>XR_DEFINE_ATOM</type>(<name>XrMarkerML</name>)</type>
         <!-- XR_EXT_render_model -->
@@ -434,6 +441,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- Bitmask types for XR_HTC_foveation -->
         <type bitvalues="XrFoveationDynamicFlagBitsHTC" category="bitmask">typedef <type>XrFlags64</type> <name>XrFoveationDynamicFlagsHTC</name>;</type>
 
+        <!-- enums for XR_ANDROID_passthrough_camera_state -->
+        <type name="XrPassthroughCameraStateANDROID" category="enum"/>
+
         <!-- Bitmask types for XR_ML_frame_end_info -->
         <type bitvalues="XrFrameEndInfoFlagBitsML" category="bitmask">typedef <type>XrFlags64</type> <name>XrFrameEndInfoFlagsML</name>;</type>
 
@@ -497,6 +507,16 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- XR_HTC_passthrough -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrPassthroughHTC</name>)</type>
+
+        <!-- XR_ANDROID_trackables -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrTrackableTrackerANDROID</name>)</type>
+
+        <!-- XR_ANDROID_trackables_marker -->
+        <type name="XrTrackableMarkerTrackingModeANDROID" category="enum"/>
+        <type name="XrTrackableMarkerDictionaryANDROID" category="enum"/>
+
+        <!-- XR_ANDROID_device_anchor_persistence -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrDeviceAnchorPersistenceANDROID</name>)</type>
 
         <!-- XR_FB_face_tracking -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrFaceTrackerFB</name>)</type>
@@ -707,6 +727,18 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrFoveationDynamicFlagBitsHTC" category="enum"/>
         <type name="XrFoveationLevelHTC" category="enum"/>
 
+        <!-- enums for XR_ANDROID_trackables -->
+        <type name="XrTrackingStateANDROID" category="enum"/>
+        <type name="XrTrackableTypeANDROID" category="enum"/>
+        <type name="XrPlaneTypeANDROID" category="enum"/>
+        <type name="XrPlaneLabelANDROID" category="enum"/>
+
+        <!-- XR_ANDROID_trackables_object -->
+        <type name="XrObjectLabelANDROID" category="enum"/>
+
+        <!-- XR_ANDROID_device_anchor_persistence -->
+        <type name="XrAnchorPersistStateANDROID" category="enum"/>
+
         <!-- XR_META_local_dimming -->
         <type name="XrLocalDimmingModeMETA" category="enum"/>
 
@@ -727,6 +759,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- enums for XR_META_body_tracking_full_body -->
         <type name="XrFullBodyJointMETA" category="enum"/>
+
+        <!-- enums for XR_META_body_tracking_calibration -->
+        <type name="XrBodyTrackingCalibrationStateMETA" category="enum"/>
 
         <!-- enum for XR_ML_frame_end_info -->
         <type name="XrFrameEndInfoFlagBitsML" category="enum"/>
@@ -1989,7 +2024,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrSpaceLocationFlags</type> <name>locationFlags</name></member>
             <member><type>XrPosef</type>              <name>pose</name></member>
         </type>
-        <type category="struct" name="XrBodyJointLocationsFB">
+        <type category="struct" name="XrBodyJointLocationsFB" returnedonly="true">
             <member values="XR_TYPE_BODY_JOINT_LOCATIONS_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*                                   <name>next</name></member>
             <member><type>XrBool32</type>                                <name>isActive</name></member>
@@ -2005,6 +2040,25 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member values="XR_TYPE_SYSTEM_PROPERTIES_BODY_TRACKING_FULL_BODY_META"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*    <name>next</name></member>
             <member><type>XrBool32</type> <name>supportsFullBodyTracking</name></member>
+        </type>
+
+        <!-- XR_META_body_tracking_calibration structs -->
+        <type name="XrBodyTrackingCalibrationInfoMETA" category="struct">
+            <member values="XR_TYPE_BODY_TRACKING_CALIBRATION_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>float</type>       <name>bodyHeight</name></member>
+        </type>
+
+        <type name="XrBodyTrackingCalibrationStatusMETA" category="struct" structextends="XrBodyJointLocationsFB" returnedonly="true">
+            <member values="XR_TYPE_BODY_TRACKING_CALIBRATION_STATUS_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                              <name>next</name></member>
+            <member><type>XrBodyTrackingCalibrationStateMETA</type> <name>status</name></member>
+        </type>
+
+        <type name="XrSystemPropertiesBodyTrackingCalibrationMETA" category="struct" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_PROPERTIES_BODY_TRACKING_CALIBRATION_META"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsHeightOverride</name></member>
         </type>
 
         <!-- XR_FB_eye_tracking_social structs -->
@@ -2918,7 +2972,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member optional="true"><type>uint32_t</type>                           <name>requestByteCount</name></member>
             <member optional="true" len="requestByteCount">const <type>char</type>* <name>request</name></member>
         </type>
-        <type category="struct" name="XrEventDataSceneCaptureCompleteFB">
+        <type category="struct" name="XrEventDataSceneCaptureCompleteFB" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_SCENE_CAPTURE_COMPLETE_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
@@ -2972,32 +3026,32 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member values="XR_TYPE_COLOCATION_DISCOVERY_STOP_INFO_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
         </type>
-        <type category="struct" name="XrEventDataStartColocationAdvertisementCompleteMETA">
+        <type category="struct" name="XrEventDataStartColocationAdvertisementCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_START_COLOCATION_ADVERTISEMENT_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>advertisementRequestId</name></member>
             <member><type>XrResult</type>           <name>result</name></member>
             <member><type>XrUuid</type>             <name>advertisementUuid</name></member>
         </type>
-        <type category="struct" name="XrEventDataColocationAdvertisementCompleteMETA">
+        <type category="struct" name="XrEventDataColocationAdvertisementCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_COLOCATION_ADVERTISEMENT_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>advertisementRequestId</name></member>
             <member><type>XrResult</type>           <name>result</name></member>
         </type>
-        <type category="struct" name="XrEventDataStopColocationAdvertisementCompleteMETA">
+        <type category="struct" name="XrEventDataStopColocationAdvertisementCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_STOP_COLOCATION_ADVERTISEMENT_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
             <member><type>XrResult</type>           <name>result</name></member>
         </type>
-        <type category="struct" name="XrEventDataStartColocationDiscoveryCompleteMETA">
+        <type category="struct" name="XrEventDataStartColocationDiscoveryCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_START_COLOCATION_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>discoveryRequestId</name></member>
             <member><type>XrResult</type>           <name>result</name></member>
         </type>
-        <type category="struct" name="XrEventDataColocationDiscoveryResultMETA">
+        <type category="struct" name="XrEventDataColocationDiscoveryResultMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_RESULT_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*              <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type>       <name>discoveryRequestId</name></member>
@@ -3005,13 +3059,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>uint32_t</type>                 <name>bufferSize</name></member>
             <member len="bufferSize"><type>uint8_t</type> <name>buffer</name>[<enum>XR_MAX_COLOCATION_DISCOVERY_BUFFER_SIZE_META</enum>]</member>
         </type>
-        <type category="struct" name="XrEventDataColocationDiscoveryCompleteMETA">
+        <type category="struct" name="XrEventDataColocationDiscoveryCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_COLOCATION_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>discoveryRequestId</name></member>
             <member><type>XrResult</type>           <name>result</name></member>
         </type>
-        <type category="struct" name="XrEventDataStopColocationDiscoveryCompleteMETA">
+        <type category="struct" name="XrEventDataStopColocationDiscoveryCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_STOP_COLOCATION_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
@@ -3035,7 +3089,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member len="spaceCount"><type>XrSpace</type>*                   <name>spaces</name></member>
             <member>const <type>XrShareSpacesRecipientBaseHeaderMETA</type>* <name>recipientInfo</name></member>
         </type>
-        <type category="struct" name="XrEventDataShareSpacesCompleteMETA">
+        <type category="struct" name="XrEventDataShareSpacesCompleteMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_SHARE_SPACES_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*        <name>next</name></member>
             <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
@@ -3184,7 +3238,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>float</type>       <name>contrast</name></member>
             <member><type>float</type>       <name>saturation</name></member>
         </type>
-        <type category="struct" name="XrEventDataPassthroughStateChangedFB">
+        <type category="struct" name="XrEventDataPassthroughStateChangedFB" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_PASSTHROUGH_STATE_CHANGED_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                      <name>next</name></member>
             <member><type>XrPassthroughStateChangedFlagsFB</type> <name>flags</name></member>
@@ -3338,7 +3392,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrPath</type>                 <name>persistentPath</name></member>
             <member optional="true"><type>XrPath</type> <name>rolePath</name></member>
         </type>
-        <type category="struct" name="XrEventDataViveTrackerConnectedHTCX" returnedonly="true" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataViveTrackerConnectedHTCX" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VIVE_TRACKER_CONNECTED_HTCX"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                   <name>next</name></member>
             <member><type>XrViveTrackerPathsHTCX</type>*       <name>paths</name></member>
@@ -3412,7 +3466,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrBool32</type>                  <name>supportsMarkerTracking</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataMarkerTrackingUpdateVARJO" returnedonly="true" parentstruct="XrEventDataBaseHeader">
+        <type category="struct" name="XrEventDataMarkerTrackingUpdateVARJO" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_MARKER_TRACKING_UPDATE_VARJO"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>uint64_t</type>    <name>markerId</name></member>
@@ -3511,6 +3565,43 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member values="XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*     <name>next</name></member>
             <member><type>XrUuidEXT</type> <name>id</name></member>
+        </type>
+
+        <!-- XR_META_spatial_entity_persistence structs -->
+        <type category="struct" name="XrSystemSpacePersistencePropertiesMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_SPACE_PERSISTENCE_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type>    <name>supportsSpacePersistence</name></member>
+        </type>
+
+        <type category="struct" name="XrSpacesSaveInfoMETA">
+            <member values="XR_TYPE_SPACES_SAVE_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*               <name>next</name></member>
+            <member><type>uint32_t</type>                  <name>spaceCount</name></member>
+            <member len="spaceCount"><type>XrSpace</type>* <name>spaces</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataSpacesSaveResultMETA" returnedonly="true" parentstruct="XrEventDataBaseHeader">
+            <member values="XR_TYPE_EVENT_DATA_SPACES_SAVE_RESULT_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+
+        <type category="struct" name="XrSpacesEraseInfoMETA">
+            <member values="XR_TYPE_SPACES_ERASE_INFO_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                   <name>spaceCount</name></member>
+            <member len="spaceCount" optional="true"><type>XrSpace</type>*  <name>spaces</name></member>
+            <member optional="true"><type>uint32_t</type>                   <name>uuidCount</name></member>
+            <member len="uuidCount" optional="true"><type>XrUuidEXT</type>* <name>uuids</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataSpacesEraseResultMETA" returnedonly="true" parentstruct="XrEventDataBaseHeader">
+            <member values="XR_TYPE_EVENT_DATA_SPACES_ERASE_RESULT_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
         </type>
 
         <!-- XR_META_passthrough_color_lut types -->
@@ -3669,6 +3760,175 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>float</type>                           <name>value</name></member>
         </type>
 
+        <!-- XR_ANDROID_passthrough_camera_state -->
+        <type category="struct" name="XrSystemPassthroughCameraStatePropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_PASSTHROUGH_CAMERA_STATE_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                                    <name>next</name></member>
+            <member><type>XrBool32</type>                                                                 <name>supportsPassthroughCameraState</name></member>
+        </type>
+        <type category="struct" name="XrPassthroughCameraStateGetInfoANDROID">
+            <member values="XR_TYPE_PASSTHROUGH_CAMERA_STATE_GET_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                                <name>next</name></member>
+        </type>
+
+
+        <!-- XR_ANDROID_trackables -->
+        <type category="struct" name="XrTrackableTrackerCreateInfoANDROID">
+            <member values="XR_TYPE_TRACKABLE_TRACKER_CREATE_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*            <name>next</name></member>
+            <member><type>XrTrackableTypeANDROID</type> <name>trackableType</name></member>
+        </type>
+        <type category="struct" name="XrTrackableGetInfoANDROID">
+            <member values="XR_TYPE_TRACKABLE_GET_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrTrackableANDROID</type> <name>trackable</name></member>
+            <member><type>XrSpace</type>            <name>baseSpace</name></member>
+            <member><type>XrTime</type>             <name>time</name></member>
+        </type>
+        <type category="struct" name="XrTrackablePlaneANDROID">
+            <member values="XR_TYPE_TRACKABLE_PLANE_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                    <name>next</name></member>
+            <member><type>XrTrackingStateANDROID</type>                                   <name>trackingState</name></member>
+            <member><type>XrPosef</type>                                                  <name>centerPose</name></member>
+            <member><type>XrExtent2Df</type>                                              <name>extents</name></member>
+            <member><type>XrPlaneTypeANDROID</type>                                       <name>planeType</name></member>
+            <member><type>XrPlaneLabelANDROID</type>                                      <name>planeLabel</name></member>
+            <member><type>XrTrackableANDROID</type>                                       <name>subsumedByPlane</name></member>
+            <member><type>XrTime</type>                                                   <name>lastUpdatedTime</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>vertexCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                 <name>vertexCountOutput</name></member>
+            <member optional="true" len="vertexCapacityInput"><type>XrVector2f</type>*    <name>vertices</name></member>
+        </type>
+        <type category="struct" name="XrAnchorSpaceCreateInfoANDROID">
+            <member values="XR_TYPE_ANCHOR_SPACE_CREATE_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrSpace</type>            <name>space</name></member>
+            <member><type>XrTime</type>             <name>time</name></member>
+            <member><type>XrPosef</type>            <name>pose</name></member>
+            <member><type>XrTrackableANDROID</type> <name>trackable</name></member>
+        </type>
+        <type category="struct" name="XrSystemTrackablesPropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_TRACKABLES_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type>    <name>supportsAnchor</name></member>
+            <member><type>uint32_t</type>    <name>maxAnchors</name></member>
+        </type>
+
+        <!-- XR_ANDROID_trackables_object -->
+        <type category="struct" name="XrTrackableObjectANDROID">
+            <member values="XR_TYPE_TRACKABLE_OBJECT_ANDROID"><type>XrStructureType</type>  <name>type</name></member>
+            <member><type>void</type>*                  <name>next</name></member>
+            <member><type>XrTrackingStateANDROID</type> <name>trackingState</name></member>
+            <member><type>XrPosef</type>                <name>centerPose</name></member>
+            <member><type>XrExtent3DfEXT</type>         <name>extents</name></member>
+            <member><type>XrObjectLabelANDROID</type>   <name>objectLabel</name></member>
+            <member><type>XrTime</type>                 <name>lastUpdatedTime</name></member>
+        </type>
+        <type category="struct" name="XrTrackableObjectConfigurationANDROID" structextends="XrTrackableTrackerCreateInfoANDROID">
+            <member values="XR_TYPE_TRACKABLE_OBJECT_CONFIGURATION_ANDROID"><type>XrStructureType</type>  <name>type</name></member>
+            <member><type>void</type>*                                        <name>next</name></member>
+            <member><type>uint32_t</type>                                     <name>labelCount</name></member>
+            <member len="labelCount">const <type>XrObjectLabelANDROID</type>* <name>activeLabels</name></member>
+        </type>
+
+        <!-- XR_ANDROID_raycast -->
+        <type category="struct" name="XrRaycastInfoANDROID">
+            <member values="XR_TYPE_RAYCAST_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                           <name>next</name></member>
+            <member><type>uint32_t</type>                                              <name>maxResults</name></member>
+            <member><type>uint32_t</type>                                              <name>trackerCount</name></member>
+            <member len="trackerCount">const <type>XrTrackableTrackerANDROID</type>*   <name>trackers</name></member>
+            <member><type>XrVector3f</type>                                            <name>origin</name></member>
+            <member><type>XrVector3f</type>                                            <name>trajectory</name></member>
+            <member><type>XrSpace</type>                                               <name>space</name></member>
+            <member><type>XrTime</type>                                                <name>time</name></member>
+        </type>
+        <type category="struct" name="XrRaycastHitResultANDROID" returnedonly="true">
+            <member noautovalidity="true"><type>XrTrackableTypeANDROID</type> <name>type</name></member>
+            <member><type>XrTrackableANDROID</type>                           <name>trackable</name></member>
+            <member><type>XrPosef</type>                                      <name>pose</name></member>
+        </type>
+        <type category="struct" name="XrRaycastHitResultsANDROID">
+            <member values="XR_TYPE_RAYCAST_HIT_RESULTS_ANDROID"><type>XrStructureType</type>          <name>type</name></member>
+            <member><type>void</type>*                                                                 <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                              <name>resultsCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                              <name>resultsCountOutput</name></member>
+            <member optional="true" len="resultsCapacityInput"><type>XrRaycastHitResultANDROID</type>* <name>results</name></member>
+        </type>
+
+        <!-- XR_ANDROID_trackables_marker -->
+        <type category="struct" name="XrSystemMarkerTrackingPropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsMarkerTracking</name></member>
+            <member><type>XrBool32</type> <name>supportsMarkerSizeEstimation</name></member>
+            <member><type>uint16_t</type> <name>maxMarkerCount</name></member>
+        </type>
+        <type category="struct" name="XrTrackableMarkerConfigurationANDROID" structextends="XrTrackableTrackerCreateInfoANDROID">
+            <member values="XR_TYPE_TRACKABLE_MARKER_CONFIGURATION_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                                       <name>next</name></member>
+            <member><type>XrTrackableMarkerTrackingModeANDROID</type>                        <name>trackingMode</name></member>
+            <member><type>uint32_t</type>                                                    <name>databaseCount</name></member>
+            <member len="databaseCount">const <type>XrTrackableMarkerDatabaseANDROID</type>* <name>databases</name></member>
+        </type>
+        <type category="struct" name="XrTrackableMarkerDatabaseANDROID">
+            <member><type>XrTrackableMarkerDictionaryANDROID</type>                            <name>dictionary</name></member>
+            <member optional="true"><type>uint32_t</type>                                      <name>entryCount</name></member>
+            <member len="entryCount">const <type>XrTrackableMarkerDatabaseEntryANDROID</type>* <name>entries</name></member>
+        </type>
+        <type category="struct" name="XrTrackableMarkerDatabaseEntryANDROID">
+            <member><type>int32_t</type> <name>id</name></member>
+            <member><type>float</type>   <name>edgeSize</name></member>
+        </type>
+        <type category="struct" name="XrTrackableMarkerANDROID">
+            <member values="XR_TYPE_TRACKABLE_MARKER_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                              <name>next</name></member>
+            <member><type>XrTrackingStateANDROID</type>             <name>trackingState</name></member>
+            <member><type>XrTime</type>                             <name>lastUpdatedTime</name></member>
+            <member><type>XrTrackableMarkerDictionaryANDROID</type> <name>dictionary</name></member>
+            <member><type>int32_t</type>                            <name>markerId</name></member>
+            <member><type>XrPosef</type>                            <name>centerPose</name></member>
+            <member><type>XrExtent2Df</type>                        <name>extents</name></member>
+        </type>
+
+        <!-- XR_ANDROID_anchor_sharing_export -->
+        <type category="struct" name="XrSystemAnchorSharingExportPropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_ANCHOR_SHARING_EXPORT_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsAnchorSharingExport</name></member>
+        </type>
+        <type category="struct" name="XrAnchorSharingInfoANDROID">
+            <member values="XR_TYPE_ANCHOR_SHARING_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>anchor</name></member>
+        </type>
+        <type category="struct" name="XrAnchorSharingTokenANDROID" returnedonly="true">
+            <member values="XR_TYPE_ANCHOR_SHARING_TOKEN_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*            <name>next</name></member>
+            <member>struct <type>AIBinder</type>* <name>token</name></member>
+        </type>
+
+        <!-- XR_ANDROID_device_anchor_persistence -->
+        <type category="struct" name="XrDeviceAnchorPersistenceCreateInfoANDROID">
+            <member values="XR_TYPE_DEVICE_ANCHOR_PERSISTENCE_CREATE_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrPersistedAnchorSpaceCreateInfoANDROID">
+            <member values="XR_TYPE_PERSISTED_ANCHOR_SPACE_CREATE_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrUuidEXT</type>   <name>anchorId</name></member>
+        </type>
+        <type category="struct" name="XrPersistedAnchorSpaceInfoANDROID">
+            <member values="XR_TYPE_PERSISTED_ANCHOR_SPACE_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrSpace</type>     <name>anchor</name></member>
+        </type>
+        <type category="struct" name="XrSystemDeviceAnchorPersistencePropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_DEVICE_ANCHOR_PERSISTENCE_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsAnchorPersistence</name></member>
+        </type>
+
         <!-- XR_EXT_plane_detection -->
         <type category="struct" name="XrSystemPlaneDetectionPropertiesEXT" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_PLANE_DETECTION_PROPERTIES_EXT"><type>XrStructureType</type> <name>type</name></member>
@@ -3807,32 +4067,32 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member len="null-terminated">const <type>char</type>* <name>textContext</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataVirtualKeyboardCommitTextMETA">
+        <type category="struct" name="XrEventDataVirtualKeyboardCommitTextMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_COMMIT_TEXT_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></member>
             <member><type>char</type>                  <name>text</name>[<enum>XR_MAX_VIRTUAL_KEYBOARD_COMMIT_TEXT_SIZE_META</enum>]</member>
         </type>
 
-        <type category="struct" name="XrEventDataVirtualKeyboardBackspaceMETA">
+        <type category="struct" name="XrEventDataVirtualKeyboardBackspaceMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_BACKSPACE_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataVirtualKeyboardEnterMETA">
+        <type category="struct" name="XrEventDataVirtualKeyboardEnterMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_ENTER_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataVirtualKeyboardShownMETA">
+        <type category="struct" name="XrEventDataVirtualKeyboardShownMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_SHOWN_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataVirtualKeyboardHiddenMETA">
+        <type category="struct" name="XrEventDataVirtualKeyboardHiddenMETA" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_VIRTUAL_KEYBOARD_HIDDEN_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*           <name>next</name></member>
             <member><type>XrVirtualKeyboardMETA</type> <name>keyboard</name></member>
@@ -4055,7 +4315,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrBool32</type> <name>supportsUserPresence</name></member>
         </type>
 
-        <type category="struct" name="XrEventDataUserPresenceChangedEXT">
+        <type category="struct" name="XrEventDataUserPresenceChangedEXT" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_USER_PRESENCE_CHANGED_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
             <member><type>XrSession</type>   <name>session</name></member>
@@ -4805,7 +5065,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>uint32_t</type>                                  <name>topLevelUserPathCount</name></member>
             <member len="topLevelUserPathCount">const <type>XrPath</type>* <name>topLevelUserPaths</name></member>
         </type>
-        <type category="struct" name="XrEventDataInteractionRenderModelsChangedEXT">
+        <type category="struct" name="XrEventDataInteractionRenderModelsChangedEXT" parentstruct="XrEventDataBaseHeader" returnedonly="true">
             <member values="XR_TYPE_EVENT_DATA_INTERACTION_RENDER_MODELS_CHANGED_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
         </type>
@@ -4985,8 +5245,8 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member values="XR_TYPE_SPATIAL_ANCHOR_CREATE_COMPLETION_BD"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>*      <name>next</name></member>
             <member><type>XrResult</type>   <name>futureResult</name></member>
-            <member><type>XrAnchorBD</type> <name>anchor</name></member>
             <member><type>XrUuidEXT</type>  <name>uuid</name></member>
+            <member><type>XrAnchorBD</type> <name>anchor</name></member>
         </type>
 
         <type category="struct" name="XrSpatialAnchorPersistInfoBD">
@@ -5081,6 +5341,19 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <type category="struct" name="XrSimultaneousHandsAndControllersTrackingPauseInfoMETA">
             <member values="XR_TYPE_SIMULTANEOUS_HANDS_AND_CONTROLLERS_TRACKING_PAUSE_INFO_META"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
+        <!-- XR_KHR_loader_init_properties -->
+        <type category="struct" name="XrLoaderInitInfoPropertiesEXT" parentstruct="XrLoaderInitInfoBaseHeaderKHR" structextends="XrLoaderInitInfoBaseHeaderKHR">
+            <member values="XR_TYPE_LOADER_INIT_INFO_PROPERTIES_EXT"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                                                  <name>next</name></member>
+            <member><type>uint32_t</type>                                                     <name>propertyValueCount</name></member>
+            <member len="propertyValueCount">const <type>XrLoaderInitPropertyValueEXT</type>* <name>propertyValues</name></member>
+        </type>
+
+        <type category="struct" name="XrLoaderInitPropertyValueEXT">
+            <member len="null-terminated">const <type>char</type>* <name>name</name></member>
+            <member len="null-terminated">const <type>char</type>* <name>value</name></member>
         </type>
 
         <!-- XR_EXT_spatial_marker_tracking -->
@@ -5773,6 +6046,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="85"   name="XR_FULL_BODY_JOINT_NONE_META"/>
     </enums>
 
+    <!-- XR_META_body_tracking_calibration -->
+    <enums name="XrBodyTrackingCalibrationStateMETA" type="enum">
+        <enum value="1"   name="XR_BODY_TRACKING_CALIBRATION_STATE_VALID_META"       comment="Valid calibration, body tracking expected to be stable."/>
+        <enum value="2"   name="XR_BODY_TRACKING_CALIBRATION_STATE_CALIBRATING_META" comment="Calibration is in progress, body joint poses from ename:XR_FB_body_tracking are valid to read and internally consistent within a single call, but may: be more variable than normal, shifting dramatically before calibration ends."/>
+        <enum value="3"   name="XR_BODY_TRACKING_CALIBRATION_STATE_INVALID_META"     comment="Calibration is invalid, accessing the body joint poses from ename:XR_FB_body_tracking is defined behavior but their contents are unspecified. Tracking data may: be read but must: not be interpreted as body tracking poses."/>
+    </enums>
+
     <!-- XR_FB_eye_tracking_social -->
     <enums name="XrEyePositionFB" type="enum">
         <enum value="0"   name="XR_EYE_POSITION_LEFT_FB"  comment="Specifies the position of the left eye."/>
@@ -6445,6 +6725,81 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="5"   name="XR_COMPARE_OP_NOT_EQUAL_FB"        comment="Comparison is true if source is not equal to destination."/>
         <enum value="6"   name="XR_COMPARE_OP_GREATER_OR_EQUAL_FB" comment="Comparison is true if source is greater than or equal to destination."/>
         <enum value="7"   name="XR_COMPARE_OP_ALWAYS_FB"           comment="Comparison is always true."/>
+    </enums>
+
+    <!-- enums for XR_ANDROID_passthrough_camera_state-->
+    <enums name="XrPassthroughCameraStateANDROID" type="enum">
+        <enum value="0"   name="XR_PASSTHROUGH_CAMERA_STATE_DISABLED_ANDROID"     comment="The camera has been disabled by an app, the system or the user."/>
+        <enum value="1"   name="XR_PASSTHROUGH_CAMERA_STATE_INITIALIZING_ANDROID" comment="The camera is still coming online and not yet ready to use. The runtime may: render a black background where the passthrough video is supposed to appear."/>
+        <enum value="2"   name="XR_PASSTHROUGH_CAMERA_STATE_READY_ANDROID"        comment="The camera is ready to use."/>
+        <enum value="3"   name="XR_PASSTHROUGH_CAMERA_STATE_ERROR_ANDROID"        comment="The camera is in an unrecoverable error state."/>
+    </enums>
+
+    <!-- enums for XR_ANDROID_trackables -->
+    <enums name="XrTrackingStateANDROID" type="enum">
+        <enum value="0"   name="XR_TRACKING_STATE_PAUSED_ANDROID"   comment="Indicates that the trackable or anchor tracking is paused but may be resumed in the future."/>
+        <enum value="1"   name="XR_TRACKING_STATE_STOPPED_ANDROID"  comment="Tracking has stopped on this Trackable and will never be resumed."/>
+        <enum value="2"   name="XR_TRACKING_STATE_TRACKING_ANDROID" comment="The object is currently tracked and its pose is current."/>
+    </enums>
+    <enums name="XrTrackableTypeANDROID" type="enum">
+        <enum value="0"   name="XR_TRACKABLE_TYPE_NOT_VALID_ANDROID" comment="Indicates that the trackable is not valid."/>
+        <enum value="1"   name="XR_TRACKABLE_TYPE_PLANE_ANDROID"     comment="Indicates that the trackable is a plane."/>
+    </enums>
+    <enums name="XrPlaneTypeANDROID" type="enum">
+        <enum value="0"   name="XR_PLANE_TYPE_HORIZONTAL_DOWNWARD_FACING_ANDROID" comment="A horizontal plane facing downward (for example a ceiling)."/>
+        <enum value="1"   name="XR_PLANE_TYPE_HORIZONTAL_UPWARD_FACING_ANDROID"   comment="A horizontal plane facing upward (for example a floor or tabletop)."/>
+        <enum value="2"   name="XR_PLANE_TYPE_VERTICAL_ANDROID"                   comment="A vertical plane (for example a wall)."/>
+        <enum value="3"   name="XR_PLANE_TYPE_ARBITRARY_ANDROID"                  comment="A plane with an arbitrary orientation."/>
+    </enums>
+    <enums name="XrPlaneLabelANDROID" type="enum">
+        <enum value="0"   name="XR_PLANE_LABEL_UNKNOWN_ANDROID" comment="It was not possible to label the plane"/>
+        <enum value="1"   name="XR_PLANE_LABEL_WALL_ANDROID"    comment="The plane is a wall."/>
+        <enum value="2"   name="XR_PLANE_LABEL_FLOOR_ANDROID"   comment="The plane is a floor."/>
+        <enum value="3"   name="XR_PLANE_LABEL_CEILING_ANDROID" comment="The plane is a ceiling."/>
+        <enum value="4"   name="XR_PLANE_LABEL_TABLE_ANDROID"   comment="The plane is a table."/>
+    </enums>
+
+    <!-- enums for XR_ANDROID_trackables_object -->
+    <enums name="XrObjectLabelANDROID" type="enum">
+        <enum value="0"   name="XR_OBJECT_LABEL_UNKNOWN_ANDROID"  comment="It was not possible to label the object."/>
+        <enum value="1"   name="XR_OBJECT_LABEL_KEYBOARD_ANDROID" comment="The object is a keyboard."/>
+        <enum value="2"   name="XR_OBJECT_LABEL_MOUSE_ANDROID"    comment="The object is a mouse."/>
+        <enum value="3"   name="XR_OBJECT_LABEL_LAPTOP_ANDROID"   comment="The object is a laptop."/>
+    </enums>
+
+    <!-- enums for XR_ANDROID_trackables_marker -->
+    <enums name="XrTrackableMarkerTrackingModeANDROID" type="enum">
+        <enum value="0"   name="XR_TRACKABLE_MARKER_TRACKING_MODE_DYNAMIC_ANDROID" comment="Tracking dynamic markers. This mode has the highest accuracy and works on moving and static markers, but also has the highest power consumption."/>
+        <enum value="1"   name="XR_TRACKABLE_MARKER_TRACKING_MODE_STATIC_ANDROID"  comment="Tracking static markers. This mode is primarily useful for markers that are known to be static, which leads to less power consumption in comparison to the dynamic mode."/>
+    </enums>
+    <enums name="XrTrackableMarkerDictionaryANDROID" type="enum">
+        <enum value="0"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_4X4_50_ANDROID"/>
+        <enum value="1"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_4X4_100_ANDROID"/>
+        <enum value="2"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_4X4_250_ANDROID"/>
+        <enum value="3"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_4X4_1000_ANDROID"/>
+        <enum value="4"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_5X5_50_ANDROID"/>
+        <enum value="5"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_5X5_100_ANDROID"/>
+        <enum value="6"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_5X5_250_ANDROID"/>
+        <enum value="7"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_5X5_1000_ANDROID"/>
+        <enum value="8"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_6X6_50_ANDROID"/>
+        <enum value="9"    name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_6X6_100_ANDROID"/>
+        <enum value="10"   name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_6X6_250_ANDROID"/>
+        <enum value="11"   name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_6X6_1000_ANDROID"/>
+        <enum value="12"   name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_7X7_50_ANDROID"/>
+        <enum value="13"   name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_7X7_100_ANDROID"/>
+        <enum value="14"   name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_7X7_250_ANDROID"/>
+        <enum value="15"   name="XR_TRACKABLE_MARKER_DICTIONARY_ARUCO_7X7_1000_ANDROID"/>
+        <enum value="16"   name="XR_TRACKABLE_MARKER_DICTIONARY_APRILTAG_16H5_ANDROID"/>
+        <enum value="17"   name="XR_TRACKABLE_MARKER_DICTIONARY_APRILTAG_25H9_ANDROID"/>
+        <enum value="18"   name="XR_TRACKABLE_MARKER_DICTIONARY_APRILTAG_36H10_ANDROID"/>
+        <enum value="19"   name="XR_TRACKABLE_MARKER_DICTIONARY_APRILTAG_36H11_ANDROID"/>
+    </enums>
+
+    <!-- enums for XR_ANDROID_device_anchor_persistence -->
+    <enums name="XrAnchorPersistStateANDROID" type="enum">
+        <enum value="0"   name="XR_ANCHOR_PERSIST_STATE_PERSIST_NOT_REQUESTED_ANDROID" comment="Anchor has not been requested to be persisted by the app."/>
+        <enum value="1"   name="XR_ANCHOR_PERSIST_STATE_PERSIST_PENDING_ANDROID"       comment="Anchor has been requested to be persisted but not persisted yet."/>
+        <enum value="2"   name="XR_ANCHOR_PERSIST_STATE_PERSISTED_ANDROID"             comment="Anchor has been successfully persisted by the runtime."/>
     </enums>
 
     <!-- enums for XR_ML_frame_end_info -->
@@ -7568,6 +7923,18 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrBodySkeletonFB</type>* <name>skeleton</name></param>
         </command>
 
+        <!-- XR_META_body_tracking_calibration -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrSuggestBodyTrackingCalibrationOverrideMETA</name></proto>
+            <param><type>XrBodyTrackerFB</type> <name>bodyTracker</name></param>
+            <param>const <type>XrBodyTrackingCalibrationInfoMETA</type>* <name>calibrationInfo</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrResetBodyTrackingCalibrationMETA</name></proto>
+            <param><type>XrBodyTrackerFB</type> <name>bodyTracker</name></param>
+        </command>
+
         <!-- XR_FB_eye_tracking_social -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrCreateEyeTrackerFB</name></proto>
@@ -8447,6 +8814,21 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrRecommendedLayerResolutionMETA</type>* <name>resolution</name></param>
         </command>
 
+        <!-- commands for XR_META_spatial_entity_persistence -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SESSION_NOT_FOCUSED" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_RATE_LIMITED_META,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_INITIALIZATION_FAILED">
+            <proto><type>XrResult</type> <name>xrSaveSpacesMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpacesSaveInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SESSION_NOT_FOCUSED" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_RATE_LIMITED_META,XR_ERROR_SPACE_COMPONENT_NOT_ENABLED_FB,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_INITIALIZATION_FAILED">
+            <proto><type>XrResult</type> <name>xrEraseSpacesMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpacesEraseInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
+        </command>
+
         <!-- commands for XR_MNDX_force_feedback_curl -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SESSION_NOT_FOCUSED" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
             <proto><type>XrResult</type> <name>xrApplyForceFeedbackCurlMNDX</name></proto>
@@ -8454,11 +8836,161 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param>const <type>XrForceFeedbackCurlApplyLocationsMNDX</type>* <name>locations</name></param>
         </command>
 
+        <!-- commands for XR_ANDROID_passthrough_camera_state -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrGetPassthroughCameraStateANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrPassthroughCameraStateGetInfoANDROID</type>* <name>getInfo</name></param>
+            <param><type>XrPassthroughCameraStateANDROID</type>* <name>cameraStateOutput</name></param>
+        </command>
+
+        <!-- commands for XR_ANDROID_trackables -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SYSTEM_INVALID">
+            <proto><type>XrResult</type> <name>xrEnumerateSupportedTrackableTypesANDROID</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param><type>XrSystemId</type> <name>systemId</name></param>
+            <param optional="true"><type>uint32_t</type> <name>trackableTypeCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>trackableTypeCountOutput</name></param>
+            <param optional="true" len="trackableTypeCapacityInput"><type>XrTrackableTypeANDROID</type>* <name>trackableTypes</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SYSTEM_INVALID">
+            <proto><type>XrResult</type> <name>xrEnumerateSupportedAnchorTrackableTypesANDROID</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param><type>XrSystemId</type> <name>systemId</name></param>
+            <param optional="true"><type>uint32_t</type> <name>trackableTypeCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>trackableTypeCountOutput</name></param>
+            <param optional="true" len="trackableTypeCapacityInput"><type>XrTrackableTypeANDROID</type>* <name>trackableTypes</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateTrackableTrackerANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrTrackableTrackerCreateInfoANDROID</type>* <name>createInfo</name></param>
+            <param><type>XrTrackableTrackerANDROID</type>* <name>trackableTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyTrackableTrackerANDROID</name></proto>
+            <param externsync="true_with_children"><type>XrTrackableTrackerANDROID</type> <name>trackableTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SIZE_INSUFFICIENT">
+            <proto><type>XrResult</type> <name>xrGetAllTrackablesANDROID</name></proto>
+            <param><type>XrTrackableTrackerANDROID</type> <name>trackableTracker</name></param>
+            <param optional="true"><type>uint32_t</type> <name>trackableCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>trackableCountOutput</name></param>
+            <param optional="true" len="trackableCapacityInput"><type>XrTrackableANDROID</type>* <name>trackables</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LIMIT_REACHED,XR_ERROR_TIME_INVALID,XR_ERROR_MISMATCHING_TRACKABLE_TYPE_ANDROID">
+            <proto><type>XrResult</type> <name>xrGetTrackablePlaneANDROID</name></proto>
+            <param><type>XrTrackableTrackerANDROID</type> <name>trackableTracker</name></param>
+            <param>const <type>XrTrackableGetInfoANDROID</type>* <name>getInfo</name></param>
+            <param><type>XrTrackablePlaneANDROID</type>* <name>planeOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_TRACKABLE_TYPE_NOT_SUPPORTED_ANDROID,XR_ERROR_TIME_INVALID,XR_ERROR_POSE_INVALID">
+            <proto><type>XrResult</type> <name>xrCreateAnchorSpaceANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrAnchorSpaceCreateInfoANDROID</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>anchorOutput</name></param>
+        </command>
+
+        <!-- XR_ANDROID_anchor_sharing_export -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_ANCHOR_NOT_OWNED_BY_CALLER_ANDROID">
+            <proto><type>XrResult</type> <name>xrShareAnchorANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrAnchorSharingInfoANDROID</type>* <name>sharingInfo</name></param>
+            <param><type>XrAnchorSharingTokenANDROID</type>* <name>anchorToken</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_ANCHOR_NOT_OWNED_BY_CALLER_ANDROID">
+            <proto><type>XrResult</type> <name>xrUnshareAnchorANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrSpace</type> <name>anchor</name></param>
+        </command>
+
+        <!-- XR_ANDROID_trackables_object -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_MISMATCHING_TRACKABLE_TYPE_ANDROID">
+            <proto><type>XrResult</type> <name>xrGetTrackableObjectANDROID</name></proto>
+            <param><type>XrTrackableTrackerANDROID</type> <name>tracker</name></param>
+            <param>const <type>XrTrackableGetInfoANDROID</type>* <name>getInfo</name></param>
+            <param><type>XrTrackableObjectANDROID</type>* <name>objectOutput</name></param>
+        </command>
+
+        <!-- commands for XR_ANDROID_raycast -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SYSTEM_INVALID">
+            <proto><type>XrResult</type> <name>xrEnumerateRaycastSupportedTrackableTypesANDROID</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param><type>XrSystemId</type> <name>systemId</name></param>
+            <param optional="true"><type>uint32_t</type> <name>trackableTypeCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>trackableTypeCountOutput</name></param>
+            <param optional="true" len="trackableTypeCapacityInput"><type>XrTrackableTypeANDROID</type>* <name>trackableTypes</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_TRACKABLE_TYPE_NOT_SUPPORTED_ANDROID,XR_ERROR_TIME_INVALID,XR_ERROR_POSE_INVALID,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrRaycastANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrRaycastInfoANDROID</type>* <name>rayInfo</name></param>
+            <param><type>XrRaycastHitResultsANDROID</type>* <name>results</name></param>
+        </command>
+
+        <!-- XR_ANDROID_trackables_marker -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_LIMIT_REACHED,XR_ERROR_TIME_INVALID,XR_ERROR_MISMATCHING_TRACKABLE_TYPE_ANDROID">
+            <proto><type>XrResult</type> <name>xrGetTrackableMarkerANDROID</name></proto>
+            <param><type>XrTrackableTrackerANDROID</type> <name>tracker</name></param>
+            <param>const <type>XrTrackableGetInfoANDROID</type>* <name>getInfo</name></param>
+            <param><type>XrTrackableMarkerANDROID</type>* <name>markerOutput</name></param>
+        </command>
+
+        <!-- XR_ANDROID_device_anchor_persistence -->
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_SYSTEM_INVALID">
+            <proto><type>XrResult</type> <name>xrEnumerateSupportedPersistenceAnchorTypesANDROID</name></proto>
+            <param><type>XrInstance</type> <name>instance</name></param>
+            <param><type>XrSystemId</type> <name>systemId</name></param>
+            <param optional="true"><type>uint32_t</type> <name>trackableTypeCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>trackableTypeCountOutput</name></param>
+            <param optional="true" len="trackableTypeCapacityInput"><type>XrTrackableTypeANDROID</type>* <name>trackableTypes</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrCreateDeviceAnchorPersistenceANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrDeviceAnchorPersistenceCreateInfoANDROID</type>* <name>createInfo</name></param>
+            <param><type>XrDeviceAnchorPersistenceANDROID</type>* <name>outHandle</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyDeviceAnchorPersistenceANDROID</name></proto>
+            <param externsync="true_with_children"><type>XrDeviceAnchorPersistenceANDROID</type> <name>handle</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID,XR_ERROR_ANCHOR_NOT_TRACKING_ANDROID,XR_ERROR_ANCHOR_NOT_OWNED_BY_CALLER_ANDROID">
+            <proto><type>XrResult</type> <name>xrPersistAnchorANDROID</name></proto>
+            <param><type>XrDeviceAnchorPersistenceANDROID</type> <name>handle</name></param>
+            <param>const <type>XrPersistedAnchorSpaceInfoANDROID</type>* <name>persistedInfo</name></param>
+            <param><type>XrUuidEXT</type>* <name>anchorIdOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID,XR_ERROR_ANCHOR_ID_NOT_FOUND_ANDROID">
+            <proto><type>XrResult</type> <name>xrGetAnchorPersistStateANDROID</name></proto>
+            <param><type>XrDeviceAnchorPersistenceANDROID</type> <name>handle</name></param>
+            <param>const <type>XrUuidEXT</type>* <name>anchorId</name></param>
+            <param><type>XrAnchorPersistStateANDROID</type>* <name>persistState</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID,XR_ERROR_ANCHOR_ID_NOT_FOUND_ANDROID">
+            <proto><type>XrResult</type> <name>xrCreatePersistedAnchorSpaceANDROID</name></proto>
+            <param><type>XrDeviceAnchorPersistenceANDROID</type> <name>handle</name></param>
+            <param>const <type>XrPersistedAnchorSpaceCreateInfoANDROID</type>* <name>createInfo</name></param>
+            <param><type>XrSpace</type>* <name>anchorOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID">
+            <proto><type>XrResult</type> <name>xrEnumeratePersistedAnchorsANDROID</name></proto>
+            <param><type>XrDeviceAnchorPersistenceANDROID</type> <name>handle</name></param>
+            <param optional="true"><type>uint32_t</type> <name>anchorIdCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>anchorIdCountOutput</name></param>
+            <param optional="true" len="anchorIdCapacityInput"><type>XrUuidEXT</type>* <name>anchorIds</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID,XR_ERROR_ANCHOR_ID_NOT_FOUND_ANDROID">
+            <proto><type>XrResult</type> <name>xrUnpersistAnchorANDROID</name></proto>
+            <param><type>XrDeviceAnchorPersistenceANDROID</type> <name>handle</name></param>
+            <param>const <type>XrUuidEXT</type>* <name>anchorId</name></param>
+        </command>
+
         <!-- XR_EXT_plane_detection -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_PLANE_DETECTION_PERMISSION_DENIED_EXT,XR_ERROR_FEATURE_UNSUPPORTED">
             <proto><type>XrResult</type> <name>xrCreatePlaneDetectorEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
-            <param>const <type>XrPlaneDetectorCreateInfoEXT</type>*  <name>createInfo</name></param>
+            <param>const <type>XrPlaneDetectorCreateInfoEXT</type>* <name>createInfo</name></param>
             <param><type>XrPlaneDetectorEXT</type>* <name>planeDetector</name></param>
         </command>
 
@@ -9215,7 +9747,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </command>
 
         <!-- XR_EXT_interaction_render_model -->
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY">
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SESSION_NOT_RUNNING">
             <proto><type>XrResult</type> <name>xrEnumerateInteractionRenderModelIdsEXT</name></proto>
             <param><type>XrSession</type> <name>session</name></param>
             <param>const <type>XrInteractionRenderModelIdsEnumerateInfoEXT</type>* <name>getInfo</name></param>
@@ -9417,7 +9949,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <proto><type>XrResult</type> <name>xrDownloadSharedSpatialAnchorCompleteBD</name></proto>
             <param><type>XrSenseDataProviderBD</type> <name>provider</name></param>
             <param><type>XrFutureEXT</type> <name>future</name></param>
-            <param><type>XrFutureCompletionEXT</type>*  <name>completion</name></param>
+            <param><type>XrFutureCompletionEXT</type>* <name>completion</name></param>
         </command>
 
         <!-- commands for XR_BD_spatial_scene -->
@@ -12207,11 +12739,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
                 <component subpath="/input/trackpad/dpad_center"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
-        <require depends="XR_EXT_palm_pose">
-            <extend interaction_profile_path="/interaction_profiles/htc/vive_tracker_htcx">
-                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
-            </extend>
-        </require>
     </extension>
 
     <extension name="XR_HTC_facial_tracking" number="105" type="instance" supported="openxr">
@@ -12770,6 +13297,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="&quot;XR_ML_compat&quot;"     name="XR_ML_COMPAT_EXTENSION_NAME"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_COORDINATE_SPACE_CREATE_INFO_ML"/>
             <command name="xrCreateSpaceFromCoordinateFrameUIDML"/>
+            <type name="XrCoordinateSpaceCreateInfoML"/>
         </require>
     </extension>
 
@@ -14257,10 +14785,32 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_260" number="260" type="instance" supported="disabled">
+    <extension name="XR_META_spatial_entity_persistence" number="260" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_260_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_260&quot;" name="XR_FB_EXTENSION_260_EXTENSION_NAME"/>
+            <enum value="1"                                              name="XR_META_spatial_entity_persistence_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_spatial_entity_persistence&quot;" name="XR_META_SPATIAL_ENTITY_PERSISTENCE_EXTENSION_NAME"/>
+
+            <enum offset="0" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_INSUFFICIENT_RESOURCES_META"        comment="Resource limitation prevented this operation from executing. Recommend retrying, perhaps after a short delay and/or reducing memory consumption."/>
+            <enum offset="1" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_STORAGE_AT_CAPACITY_META"           comment="Operation could not be completed until resources used are reduced or storage expanded."/>
+            <enum offset="2" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_INSUFFICIENT_VIEW_META"             comment="Look around the environment more for space tracking to function."/>
+            <enum offset="3" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_PERMISSION_INSUFFICIENT_META"       comment="Space operation permission insufficient. Recommend confirming the status of the required permissions needed for using Space APIs."/>
+            <enum offset="4" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_RATE_LIMITED_META"                  comment="Operation cancelled due to rate limiting. Recommend retrying after a short delay."/>
+            <enum offset="5" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_TOO_DARK_META"                      comment="Environment too dark for tracking to complete operation."/>
+            <enum offset="6" dir="-" extends="XrResult"                  name="XR_ERROR_SPACE_TOO_BRIGHT_META"                    comment="Environment too bright for tracking to complete operation."/>
+
+            <type name="XrSystemSpacePersistencePropertiesMETA"/>
+            <type name="XrSpacesSaveInfoMETA"/>
+            <type name="XrEventDataSpacesSaveResultMETA"/>
+            <type name="XrSpacesEraseInfoMETA"/>
+            <type name="XrEventDataSpacesEraseResultMETA"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_SPACE_PERSISTENCE_PROPERTIES_META"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SPACES_SAVE_INFO_META"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_SPACES_SAVE_RESULT_META"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_SPACES_ERASE_INFO_META"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_SPACES_ERASE_RESULT_META"/>
+
+            <command name="xrSaveSpacesMETA"/>
+            <command name="xrEraseSpacesMETA"/>
         </require>
     </extension>
 
@@ -14479,10 +15029,21 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_284" number="284" type="instance" supported="disabled">
+    <extension name="XR_META_body_tracking_calibration" number="284" type="instance" supported="openxr" depends="XR_FB_body_tracking">
         <require>
-            <enum value="1"                               name="XR_FB_extension_284_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_284&quot;" name="XR_FB_EXTENSION_284_EXTENSION_NAME"/>
+            <enum value="1"                                             name="XR_META_body_tracking_calibration_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_body_tracking_calibration&quot;" name="XR_META_BODY_TRACKING_CALIBRATION_EXTENSION_NAME"/>
+
+            <enum offset="2" extends="XrStructureType"                  name="XR_TYPE_BODY_TRACKING_CALIBRATION_INFO_META"/>
+            <enum offset="3" extends="XrStructureType"                  name="XR_TYPE_BODY_TRACKING_CALIBRATION_STATUS_META"/>
+            <enum offset="4" extends="XrStructureType"                  name="XR_TYPE_SYSTEM_PROPERTIES_BODY_TRACKING_CALIBRATION_META"/>
+            <command name="xrSuggestBodyTrackingCalibrationOverrideMETA"/>
+            <command name="xrResetBodyTrackingCalibrationMETA"/>
+
+            <type name="XrBodyTrackingCalibrationStatusMETA"/>
+            <type name="XrBodyTrackingCalibrationStateMETA"/>
+            <type name="XrBodyTrackingCalibrationInfoMETA"/>
+            <type name="XrSystemPropertiesBodyTrackingCalibrationMETA"/>
         </require>
     </extension>
 
@@ -15668,10 +16229,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_BD_spatial_anchor" number="391" depends="XR_BD_spatial_sensing" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                              name="XR_BD_spatial_anchor_SPEC_VERSION"/>
+            <enum value="2"                                              name="XR_BD_spatial_anchor_SPEC_VERSION"/>
             <enum value="&quot;XR_BD_spatial_anchor&quot;"               name="XR_BD_SPATIAL_ANCHOR_EXTENSION_NAME"/>
 
-            <enum offset="0" dir="-" extends="XrResult"                  name="XR_ERROR_SPATIAL_ANCHOR_NOT_FOUND_BD"/>
+            <enum offset="0" dir="-" extends="XrResult"                  name="XR_ERROR_SPATIAL_ANCHOR_NOT_FOUND_BD"        comment="The spatial anchor is not found."/>
 
             <enum offset="0"         extends="XrStructureType"           name="XR_TYPE_SYSTEM_SPATIAL_ANCHOR_PROPERTIES_BD"/>
             <enum offset="1"         extends="XrStructureType"           name="XR_TYPE_SPATIAL_ANCHOR_CREATE_INFO_BD"/>
@@ -15702,11 +16263,11 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="2"                                        name="XR_BD_spatial_anchor_sharing_SPEC_VERSION"/>
             <enum value="&quot;XR_BD_spatial_anchor_sharing&quot;" name="XR_BD_SPATIAL_ANCHOR_SHARING_EXTENSION_NAME"/>
 
-            <enum offset="0" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_TIMEOUT_BD"/>
-            <enum offset="1" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_AUTHENTICATION_FAILURE_BD"/>
-            <enum offset="2" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_FAILURE_BD"/>
-            <enum offset="3" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_LOCALIZATION_FAIL_BD"/>
-            <enum offset="4" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_MAP_INSUFFICIENT_BD"/>
+            <enum offset="0" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_TIMEOUT_BD"        comment="The network transmission timeout."/>
+            <enum offset="1" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_AUTHENTICATION_FAILURE_BD" comment="The authentication for the user account failed."/>
+            <enum offset="2" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_NETWORK_FAILURE_BD"        comment="The network connection failed, e.g. the connection is unstable or disconnected."/>
+            <enum offset="3" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_LOCALIZATION_FAIL_BD"      comment="The spatial anchor localization failed."/>
+            <enum offset="4" dir="-" extends="XrResult"            name="XR_ERROR_SPATIAL_ANCHOR_SHARING_MAP_INSUFFICIENT_BD"       comment="The feature points of spatial anchor map are insufficient."/>
 
             <enum offset="0"         extends="XrStructureType"     name="XR_TYPE_SYSTEM_SPATIAL_ANCHOR_SHARING_PROPERTIES_BD"/>
             <enum offset="1"         extends="XrStructureType"     name="XR_TYPE_SPATIAL_ANCHOR_SHARE_INFO_BD"/>
@@ -16251,10 +16812,42 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_456" number="456" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_trackables" number="456" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_456_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_456&quot;" name="XR_ANDROID_EXTENSION_456_EXTENSION_NAME"/>
+            <enum value="1"                                    name="XR_ANDROID_trackables_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_trackables&quot;"    name="XR_ANDROID_TRACKABLES_EXTENSION_NAME"/>
+
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_TRACKABLE_GET_INFO_ANDROID"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_ANCHOR_SPACE_CREATE_INFO_ANDROID"/>
+            <enum offset="3"         extends="XrStructureType" name="XR_TYPE_TRACKABLE_PLANE_ANDROID"/>
+            <enum offset="4"         extends="XrStructureType" name="XR_TYPE_TRACKABLE_TRACKER_CREATE_INFO_ANDROID"/>
+            <enum offset="5"         extends="XrStructureType" name="XR_TYPE_SYSTEM_TRACKABLES_PROPERTIES_ANDROID"/>
+
+            <enum offset="1"         extends="XrObjectType"    name="XR_OBJECT_TYPE_TRACKABLE_TRACKER_ANDROID"      comment="XrTrackableTrackerANDROID"/>
+
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_MISMATCHING_TRACKABLE_TYPE_ANDROID"   comment="Indicates that the parameters contains multiple trackable types."/>
+            <enum offset="1" dir="-" extends="XrResult"        name="XR_ERROR_TRACKABLE_TYPE_NOT_SUPPORTED_ANDROID" comment="Indicates that the function is not supported by the given trackable type."/>
+
+            <type name="XR_NULL_TRACKABLE_ANDROID"/>
+            <type name="XrTrackableANDROID"/>
+            <type name="XrTrackableTrackerANDROID"/>
+            <type name="XrTrackingStateANDROID"/>
+            <type name="XrTrackableTypeANDROID"/>
+            <type name="XrPlaneTypeANDROID"/>
+            <type name="XrPlaneLabelANDROID"/>
+            <type name="XrTrackableTrackerCreateInfoANDROID"/>
+            <type name="XrTrackableGetInfoANDROID"/>
+            <type name="XrTrackablePlaneANDROID"/>
+            <type name="XrAnchorSpaceCreateInfoANDROID"/>
+            <type name="XrSystemTrackablesPropertiesANDROID"/>
+
+            <command name="xrEnumerateSupportedTrackableTypesANDROID"/>
+            <command name="xrEnumerateSupportedAnchorTrackableTypesANDROID"/>
+            <command name="xrCreateTrackableTrackerANDROID"/>
+            <command name="xrDestroyTrackableTrackerANDROID"/>
+            <command name="xrGetAllTrackablesANDROID"/>
+            <command name="xrGetTrackablePlaneANDROID"/>
+            <command name="xrCreateAnchorSpaceANDROID"/>
         </require>
     </extension>
 
@@ -16265,10 +16858,38 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_458" number="458" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_device_anchor_persistence" number="458" type="instance" depends="XR_EXT_uuid+XR_ANDROID_trackables" supported="openxr">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_458_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_458&quot;" name="XR_ANDROID_extension_458_EXTENSION_NAME"/>
+            <enum value="1"                                                name="XR_ANDROID_device_anchor_persistence_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_device_anchor_persistence&quot;" name="XR_ANDROID_DEVICE_ANCHOR_PERSISTENCE_EXTENSION_NAME"/>
+
+            <enum offset="1"         extends="XrStructureType"             name="XR_TYPE_PERSISTED_ANCHOR_SPACE_CREATE_INFO_ANDROID"/>
+            <enum offset="2"         extends="XrStructureType"             name="XR_TYPE_PERSISTED_ANCHOR_SPACE_INFO_ANDROID"/>
+            <enum offset="3"         extends="XrStructureType"             name="XR_TYPE_DEVICE_ANCHOR_PERSISTENCE_CREATE_INFO_ANDROID"/>
+            <enum offset="4"         extends="XrStructureType"             name="XR_TYPE_SYSTEM_DEVICE_ANCHOR_PERSISTENCE_PROPERTIES_ANDROID"/>
+
+            <enum offset="0" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_ID_NOT_FOUND_ANDROID"                        comment="XrUuidExt passed to the function was not found to be a persisted anchor."/>
+            <enum offset="1" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_ALREADY_PERSISTED_ANDROID"                   comment="XrUuidExt passed to the function was already marked to be persisted."/>
+            <enum offset="2" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_NOT_TRACKING_ANDROID"                        comment="ANchor cannot be persisted because it is not tracking."/>
+            <enum offset="3" dir="-" extends="XrResult"                    name="XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID"                   comment="Persisted data stored by this app has not been loaded yet."/>
+
+            <enum offset="0"         extends="XrObjectType"                name="XR_OBJECT_TYPE_DEVICE_ANCHOR_PERSISTENCE_ANDROID"            comment="XrDeviceAnchorPersistenceANDROID"/>
+
+            <type name="XrDeviceAnchorPersistenceANDROID"/>
+            <type name="XrDeviceAnchorPersistenceCreateInfoANDROID"/>
+            <type name="XrPersistedAnchorSpaceCreateInfoANDROID"/>
+            <type name="XrPersistedAnchorSpaceInfoANDROID"/>
+            <type name="XrAnchorPersistStateANDROID"/>
+            <type name="XrSystemDeviceAnchorPersistencePropertiesANDROID"/>
+
+            <command name="xrEnumerateSupportedPersistenceAnchorTypesANDROID"/>
+            <command name="xrCreateDeviceAnchorPersistenceANDROID"/>
+            <command name="xrDestroyDeviceAnchorPersistenceANDROID"/>
+            <command name="xrPersistAnchorANDROID"/>
+            <command name="xrGetAnchorPersistStateANDROID"/>
+            <command name="xrCreatePersistedAnchorSpaceANDROID"/>
+            <command name="xrEnumeratePersistedAnchorsANDROID"/>
+            <command name="xrUnpersistAnchorANDROID"/>
         </require>
     </extension>
 
@@ -16286,10 +16907,19 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_461" number="461" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_passthrough_camera_state" number="461" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_461_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_461&quot;" name="XR_ANDROID_extension_461_EXTENSION_NAME"/>
+            <enum value="1"                                               name="XR_ANDROID_passthrough_camera_state_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_passthrough_camera_state&quot;" name="XR_ANDROID_PASSTHROUGH_CAMERA_STATE_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"                    name="XR_TYPE_PASSTHROUGH_CAMERA_STATE_GET_INFO_ANDROID"/>
+            <enum offset="1" extends="XrStructureType"                    name="XR_TYPE_SYSTEM_PASSTHROUGH_CAMERA_STATE_PROPERTIES_ANDROID"/>
+
+            <type name="XrSystemPassthroughCameraStatePropertiesANDROID"/>
+            <type name="XrPassthroughCameraStateANDROID"/>
+            <type name="XrPassthroughCameraStateGetInfoANDROID"/>
+
+            <command name="xrGetPassthroughCameraStateANDROID"/>
         </require>
     </extension>
 
@@ -16307,10 +16937,22 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_464" number="464" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_raycast" number="464" type="instance" supported="openxr" depends="XR_ANDROID_trackables">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_464_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_464&quot;" name="XR_ANDROID_extension_464_EXTENSION_NAME"/>
+            <enum value="1"                                   name="XR_ANDROID_raycast_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_raycast&quot;"      name="XR_ANDROID_RAYCAST_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"        name="XR_TYPE_RAYCAST_INFO_ANDROID"/>
+            <enum offset="1" extends="XrStructureType"        name="XR_TYPE_RAYCAST_HIT_RESULTS_ANDROID"/>
+
+            <enum offset="0" extends="XrTrackableTypeANDROID" name="XR_TRACKABLE_TYPE_DEPTH_ANDROID"     comment="Indicates that the trackable is the perception depth buffer."/>
+
+            <type name="XrRaycastInfoANDROID"/>
+            <type name="XrRaycastHitResultANDROID"/>
+            <type name="XrRaycastHitResultsANDROID"/>
+
+            <command name="xrEnumerateRaycastSupportedTrackableTypesANDROID"/>
+            <command name="xrRaycastANDROID"/>
         </require>
     </extension>
 
@@ -16328,10 +16970,20 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_467" number="467" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_trackables_object" number="467" type="instance" supported="openxr" depends="XR_ANDROID_trackables">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_467_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_467&quot;" name="XR_ANDROID_extension_467_EXTENSION_NAME"/>
+            <enum value="1"                                        name="XR_ANDROID_trackables_object_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_trackables_object&quot;" name="XR_ANDROID_TRACKABLES_OBJECT_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"             name="XR_TYPE_TRACKABLE_OBJECT_ANDROID"/>
+            <enum offset="1" extends="XrStructureType"             name="XR_TYPE_TRACKABLE_OBJECT_CONFIGURATION_ANDROID"/>
+            <enum offset="0" extends="XrTrackableTypeANDROID"      name="XR_TRACKABLE_TYPE_OBJECT_ANDROID"               comment="Indicates that the trackable is the object."/>
+
+            <type name="XrObjectLabelANDROID"/>
+            <type name="XrTrackableObjectANDROID"/>
+            <type name="XrTrackableObjectConfigurationANDROID"/>
+
+            <command name="xrGetTrackableObjectANDROID"/>
         </require>
     </extension>
 
@@ -18177,10 +18829,22 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_702" number="702" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_anchor_sharing_export" number="702" type="instance" supported="openxr" protect="XR_USE_PLATFORM_ANDROID">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_702_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_702&quot;" name="XR_ANDROID_EXTENSION_702_EXTENSION_NAME"/>
+            <enum value="1"                                            name="XR_ANDROID_anchor_sharing_export_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_anchor_sharing_export&quot;" name="XR_ANDROID_ANCHOR_SHARING_EXPORT_EXTENSION_NAME"/>
+
+            <enum offset="0"         extends="XrStructureType"         name="XR_TYPE_ANCHOR_SHARING_INFO_ANDROID"/>
+            <enum offset="1"         extends="XrStructureType"         name="XR_TYPE_ANCHOR_SHARING_TOKEN_ANDROID"/>
+            <enum offset="2"         extends="XrStructureType"         name="XR_TYPE_SYSTEM_ANCHOR_SHARING_EXPORT_PROPERTIES_ANDROID"/>
+            <enum offset="0" dir="-" extends="XrResult"                name="XR_ERROR_ANCHOR_NOT_OWNED_BY_CALLER_ANDROID"             comment="Operation not allowed because anchor is not owned by the slink:XrSession in which the function is being called."/>
+
+            <type name="XrAnchorSharingInfoANDROID"/>
+            <type name="XrAnchorSharingTokenANDROID"/>
+            <type name="XrSystemAnchorSharingExportPropertiesANDROID"/>
+
+            <command name="xrShareAnchorANDROID"/>
+            <command name="xrUnshareAnchorANDROID"/>
         </require>
     </extension>
 
@@ -18219,10 +18883,27 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_708" number="708" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_trackables_marker" number="708" type="instance" supported="openxr" depends="XR_ANDROID_trackables">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_708_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_708&quot;" name="XR_ANDROID_EXTENSION_708_EXTENSION_NAME"/>
+            <enum value="1"                                        name="XR_ANDROID_trackables_marker_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_trackables_marker&quot;" name="XR_ANDROID_TRACKABLES_MARKER_EXTENSION_NAME"/>
+
+            <enum offset="0" extends="XrStructureType"             name="XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_ANDROID"/>
+            <enum offset="1" extends="XrStructureType"             name="XR_TYPE_TRACKABLE_MARKER_CONFIGURATION_ANDROID"/>
+            <enum offset="2" extends="XrStructureType"             name="XR_TYPE_TRACKABLE_MARKER_ANDROID"/>
+
+            <enum offset="0" extends="XrTrackableTypeANDROID"      name="XR_TRACKABLE_TYPE_MARKER_ANDROID"                  comment="Indicates that the trackable is a marker."/>
+
+            <type name="XrTrackableMarkerTrackingModeANDROID"/>
+            <type name="XrTrackableMarkerDictionaryANDROID"/>
+
+            <type name="XrSystemMarkerTrackingPropertiesANDROID"/>
+            <type name="XrTrackableMarkerConfigurationANDROID"/>
+            <type name="XrTrackableMarkerDatabaseANDROID"/>
+            <type name="XrTrackableMarkerDatabaseEntryANDROID"/>
+            <type name="XrTrackableMarkerANDROID"/>
+
+            <command name="xrGetTrackableMarkerANDROID"/>
         </require>
     </extension>
 
@@ -19052,7 +19733,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="1"                                                         name="XR_EXT_spatial_persistence_operations_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_spatial_persistence_operations&quot;"         name="XR_EXT_SPATIAL_PERSISTENCE_OPERATIONS_EXTENSION_NAME"/>
 
-            <enum offset="1" dir="-" extends="XrResult"                             name="XR_ERROR_SPATIAL_PERSISTENCE_SCOPE_INCOMPATIBLE_EXT"              comment="THe scope configured for the persistence context is incompatible for the current spatial entity."/>
+            <enum offset="1" dir="-" extends="XrResult"                             name="XR_ERROR_SPATIAL_PERSISTENCE_SCOPE_INCOMPATIBLE_EXT"              comment="The scope configured for the persistence context is incompatible for the current spatial entity."/>
 
             <enum offset="0"         extends="XrSpatialPersistenceScopeEXT"         name="XR_SPATIAL_PERSISTENCE_SCOPE_LOCAL_ANCHORS_EXT"                   comment="Persistence operations and data access is limited to spatial anchors, on the same device, for the same user and same app"/>
 
@@ -19467,10 +20148,12 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_839" number="839" type="instance" supported="disabled">
+    <extension name="XR_EXT_loader_init_properties" number="839" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_EXT_extension_839_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_839&quot;" name="XR_EXT_EXTENSION_839_EXTENSION_NAME"/>
+            <enum value="1"                                         name="XR_EXT_loader_init_properties_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_loader_init_properties&quot;" name="XR_EXT_LOADER_INIT_PROPERTIES_EXTENSION_NAME"/>
+            <type name="XrLoaderInitInfoPropertiesEXT"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_LOADER_INIT_INFO_PROPERTIES_EXT"/>
         </require>
     </extension>
 

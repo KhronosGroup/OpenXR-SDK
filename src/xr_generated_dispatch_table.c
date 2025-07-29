@@ -495,6 +495,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     // ---- XR_META_recommended_layer_resolution extension commands
     (get_inst_proc_addr(instance, "xrGetRecommendedLayerResolutionMETA", (PFN_xrVoidFunction*)&table->GetRecommendedLayerResolutionMETA));
 
+    // ---- XR_META_spatial_entity_persistence extension commands
+    (get_inst_proc_addr(instance, "xrSaveSpacesMETA", (PFN_xrVoidFunction*)&table->SaveSpacesMETA));
+    (get_inst_proc_addr(instance, "xrEraseSpacesMETA", (PFN_xrVoidFunction*)&table->EraseSpacesMETA));
+
     // ---- XR_META_passthrough_color_lut extension commands
     (get_inst_proc_addr(instance, "xrCreatePassthroughColorLutMETA", (PFN_xrVoidFunction*)&table->CreatePassthroughColorLutMETA));
     (get_inst_proc_addr(instance, "xrDestroyPassthroughColorLutMETA", (PFN_xrVoidFunction*)&table->DestroyPassthroughColorLutMETA));
@@ -502,6 +506,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
 
     // ---- XR_META_spatial_entity_mesh extension commands
     (get_inst_proc_addr(instance, "xrGetSpaceTriangleMeshMETA", (PFN_xrVoidFunction*)&table->GetSpaceTriangleMeshMETA));
+
+    // ---- XR_META_body_tracking_calibration extension commands
+    (get_inst_proc_addr(instance, "xrSuggestBodyTrackingCalibrationOverrideMETA", (PFN_xrVoidFunction*)&table->SuggestBodyTrackingCalibrationOverrideMETA));
+    (get_inst_proc_addr(instance, "xrResetBodyTrackingCalibrationMETA", (PFN_xrVoidFunction*)&table->ResetBodyTrackingCalibrationMETA));
 
     // ---- XR_FB_face_tracking2 extension commands
     (get_inst_proc_addr(instance, "xrCreateFaceTracker2FB", (PFN_xrVoidFunction*)&table->CreateFaceTracker2FB));
@@ -612,6 +620,35 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrGetPlaneDetectionsEXT", (PFN_xrVoidFunction*)&table->GetPlaneDetectionsEXT));
     (get_inst_proc_addr(instance, "xrGetPlanePolygonBufferEXT", (PFN_xrVoidFunction*)&table->GetPlanePolygonBufferEXT));
 
+    // ---- XR_ANDROID_trackables extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateSupportedTrackableTypesANDROID", (PFN_xrVoidFunction*)&table->EnumerateSupportedTrackableTypesANDROID));
+    (get_inst_proc_addr(instance, "xrEnumerateSupportedAnchorTrackableTypesANDROID", (PFN_xrVoidFunction*)&table->EnumerateSupportedAnchorTrackableTypesANDROID));
+    (get_inst_proc_addr(instance, "xrCreateTrackableTrackerANDROID", (PFN_xrVoidFunction*)&table->CreateTrackableTrackerANDROID));
+    (get_inst_proc_addr(instance, "xrDestroyTrackableTrackerANDROID", (PFN_xrVoidFunction*)&table->DestroyTrackableTrackerANDROID));
+    (get_inst_proc_addr(instance, "xrGetAllTrackablesANDROID", (PFN_xrVoidFunction*)&table->GetAllTrackablesANDROID));
+    (get_inst_proc_addr(instance, "xrGetTrackablePlaneANDROID", (PFN_xrVoidFunction*)&table->GetTrackablePlaneANDROID));
+    (get_inst_proc_addr(instance, "xrCreateAnchorSpaceANDROID", (PFN_xrVoidFunction*)&table->CreateAnchorSpaceANDROID));
+
+    // ---- XR_ANDROID_device_anchor_persistence extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateSupportedPersistenceAnchorTypesANDROID", (PFN_xrVoidFunction*)&table->EnumerateSupportedPersistenceAnchorTypesANDROID));
+    (get_inst_proc_addr(instance, "xrCreateDeviceAnchorPersistenceANDROID", (PFN_xrVoidFunction*)&table->CreateDeviceAnchorPersistenceANDROID));
+    (get_inst_proc_addr(instance, "xrDestroyDeviceAnchorPersistenceANDROID", (PFN_xrVoidFunction*)&table->DestroyDeviceAnchorPersistenceANDROID));
+    (get_inst_proc_addr(instance, "xrPersistAnchorANDROID", (PFN_xrVoidFunction*)&table->PersistAnchorANDROID));
+    (get_inst_proc_addr(instance, "xrGetAnchorPersistStateANDROID", (PFN_xrVoidFunction*)&table->GetAnchorPersistStateANDROID));
+    (get_inst_proc_addr(instance, "xrCreatePersistedAnchorSpaceANDROID", (PFN_xrVoidFunction*)&table->CreatePersistedAnchorSpaceANDROID));
+    (get_inst_proc_addr(instance, "xrEnumeratePersistedAnchorsANDROID", (PFN_xrVoidFunction*)&table->EnumeratePersistedAnchorsANDROID));
+    (get_inst_proc_addr(instance, "xrUnpersistAnchorANDROID", (PFN_xrVoidFunction*)&table->UnpersistAnchorANDROID));
+
+    // ---- XR_ANDROID_passthrough_camera_state extension commands
+    (get_inst_proc_addr(instance, "xrGetPassthroughCameraStateANDROID", (PFN_xrVoidFunction*)&table->GetPassthroughCameraStateANDROID));
+
+    // ---- XR_ANDROID_raycast extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateRaycastSupportedTrackableTypesANDROID", (PFN_xrVoidFunction*)&table->EnumerateRaycastSupportedTrackableTypesANDROID));
+    (get_inst_proc_addr(instance, "xrRaycastANDROID", (PFN_xrVoidFunction*)&table->RaycastANDROID));
+
+    // ---- XR_ANDROID_trackables_object extension commands
+    (get_inst_proc_addr(instance, "xrGetTrackableObjectANDROID", (PFN_xrVoidFunction*)&table->GetTrackableObjectANDROID));
+
     // ---- XR_EXT_future extension commands
     (get_inst_proc_addr(instance, "xrPollFutureEXT", (PFN_xrVoidFunction*)&table->PollFutureEXT));
     (get_inst_proc_addr(instance, "xrCancelFutureEXT", (PFN_xrVoidFunction*)&table->CancelFutureEXT));
@@ -647,6 +684,17 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrStopColocationDiscoveryMETA", (PFN_xrVoidFunction*)&table->StopColocationDiscoveryMETA));
     (get_inst_proc_addr(instance, "xrStartColocationAdvertisementMETA", (PFN_xrVoidFunction*)&table->StartColocationAdvertisementMETA));
     (get_inst_proc_addr(instance, "xrStopColocationAdvertisementMETA", (PFN_xrVoidFunction*)&table->StopColocationAdvertisementMETA));
+
+    // ---- XR_ANDROID_anchor_sharing_export extension commands
+#if defined(XR_USE_PLATFORM_ANDROID)
+    (get_inst_proc_addr(instance, "xrShareAnchorANDROID", (PFN_xrVoidFunction*)&table->ShareAnchorANDROID));
+#endif // defined(XR_USE_PLATFORM_ANDROID)
+#if defined(XR_USE_PLATFORM_ANDROID)
+    (get_inst_proc_addr(instance, "xrUnshareAnchorANDROID", (PFN_xrVoidFunction*)&table->UnshareAnchorANDROID));
+#endif // defined(XR_USE_PLATFORM_ANDROID)
+
+    // ---- XR_ANDROID_trackables_marker extension commands
+    (get_inst_proc_addr(instance, "xrGetTrackableMarkerANDROID", (PFN_xrVoidFunction*)&table->GetTrackableMarkerANDROID));
 
     // ---- XR_EXT_spatial_entity extension commands
     (get_inst_proc_addr(instance, "xrEnumerateSpatialCapabilitiesEXT", (PFN_xrVoidFunction*)&table->EnumerateSpatialCapabilitiesEXT));

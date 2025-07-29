@@ -126,3 +126,9 @@ Files: specification/scripts/vuidCounts.py
 Copyright: 2022-2025 The Khronos Group Inc.
 License: Apache-2.0
 Comment: File automatically rewritten by VUID assignment.
+
+Files: src/external/sanitizers-cmake/*
+Copyright: 2013 Matt Arsenault
+ 2015-2016 RWTH Aachen University, Federal Republic of Germany
+License: MIT
+Comment: SPDX-License-Identifier missing.

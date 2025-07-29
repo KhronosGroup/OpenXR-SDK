@@ -18,8 +18,6 @@
 #include "android_utilities.h"
 #endif  // XR_USE_PLATFORM_ANDROID
 
-#ifdef XR_KHR_LOADER_INIT_SUPPORT
-
 /*!
  * Stores a copy of the data passed to the xrInitializeLoaderKHR function in a singleton.
  */
@@ -37,28 +35,43 @@ class LoaderInitData {
     /*!
      * Type alias for the platform-specific structure type.
      */
-    using StructType = XrLoaderInitInfoAndroidKHR;
+    using PlatformStructType = XrLoaderInitInfoAndroidKHR;
+    /*!
+     * Later code will assume that if this is defined then a platform-specific struct
+     * must be provided for successful initialization.
+     */
+#define XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+
     /*!
      * Native library path.
      */
-    std::string _native_library_path;
+    std::string _android_native_library_path;
     /*!
      * Android asset manager.
      */
     AAssetManager* _android_asset_manager;
-#else
-#error "Platform specific XR_KHR_loader_init structure is not defined for this platform."
 #endif
 
     /*!
      * Get our copy of the data, casted to pass to the runtime's matching method.
+     * Only some platforms have platform-specific loader init info.
      */
-    const XrLoaderInitInfoBaseHeaderKHR* getParam() const { return reinterpret_cast<const XrLoaderInitInfoBaseHeaderKHR*>(&_data); }
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    const XrLoaderInitInfoBaseHeaderKHR* getPlatformParam() {
+#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+        return reinterpret_cast<const XrLoaderInitInfoBaseHeaderKHR*>(&_platform_info);
+#else
+        return nullptr;
+#endif
+    }
+
+#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
 
     /*!
      * Get the data via its real structure type.
      */
-    const StructType& getData() const { return _data; }
+    const PlatformStructType& getPlatformData() const { return _platform_info; }
+#endif
 
     /*!
      * Has this been correctly initialized?
@@ -67,16 +80,34 @@ class LoaderInitData {
 
     /*!
      * Initialize loader data - called by InitializeLoaderInitData() and thus ultimately by the loader's xrInitializeLoaderKHR
-     * implementation. Each platform that needs this extension will provide an implementation of this.
+     * implementation.
      */
     XrResult initialize(const XrLoaderInitInfoBaseHeaderKHR* info);
 
    private:
     //! Private constructor, forces use of singleton accessor.
     LoaderInitData() = default;
-    //! Platform-specific init data
-    StructType _data = {};
-    //! Flag for indicating whether _data is valid.
+
+    /*!
+     * Initialize non-platform-specific loader data.
+     */
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    XrResult initializeProperties(const XrLoaderInitInfoBaseHeaderKHR* info);
+
+    /*!
+     * Initialize platform-specific loader data - called ultimately by the loader's xrInitializeLoaderKHR
+     * implementation. Each platform that needs this extension will provide an implementation of this.
+     */
+    XrResult initializePlatform(const XrLoaderInitInfoBaseHeaderKHR* info);
+
+#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+    /*!
+     * Only some platforms have platform-specific loader init info.
+     */
+    PlatformStructType _platform_info;
+#endif
+
+    //! Flag for indicating whether _platform_info is valid.
     bool _initialized = false;
 };
 
@@ -86,7 +117,5 @@ XrResult InitializeLoaderInitData(const XrLoaderInitInfoBaseHeaderKHR* loaderIni
 #ifdef XR_USE_PLATFORM_ANDROID
 XrResult GetPlatformRuntimeVirtualManifest(Json::Value& out_manifest);
 std::string GetAndroidNativeLibraryDir();
-void* Android_Get_Asset_Manager();
+void* GetAndroidAssetManager();
 #endif  // XR_USE_PLATFORM_ANDROID
-
-#endif  // XR_KHR_LOADER_INIT_SUPPORT

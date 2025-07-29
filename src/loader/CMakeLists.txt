@@ -51,6 +51,8 @@ add_library(
     loader_logger.hpp
     loader_logger_recorders.cpp
     loader_logger_recorders.hpp
+    loader_properties.cpp
+    loader_properties.hpp
     manifest_file.cpp
     manifest_file.hpp
     runtime_interface.cpp
@@ -94,6 +96,10 @@ openxr_add_filesystem_utils(openxr_loader)
 set_target_properties(
     openxr_loader PROPERTIES DEBUG_POSTFIX "${OPENXR_DEBUG_POSTFIX}"
 )
+
+# All platforms can now do something with the XR_KHR_loader_init extension.
+target_compile_definitions(openxr_loader PRIVATE XR_KHR_LOADER_INIT_SUPPORT=1)
+
 # TODO remove once we get rid of add_definitions()
 if(Vulkan_FOUND)
     target_include_directories(openxr_loader PRIVATE ${Vulkan_INCLUDE_DIR})
@@ -107,13 +113,15 @@ else()
         target_compile_definitions(openxr_loader PRIVATE JSON_USE_EXCEPTION=0)
     endif()
 
-    target_sources(
-        openxr_loader
-        PRIVATE
-            "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp"
-            "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp"
-            "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp"
+    set(jsoncpp_sources
+        "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_reader.cpp"
+        "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_value.cpp"
+        "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/src/lib_json/json_writer.cpp"
     )
+
+    set_source_files_properties(${jsoncpp_sources} PROPERTIES SKIP_LINTING ON)
+
+    target_sources(openxr_loader PRIVATE ${jsoncpp_sources})
     target_include_directories(
         openxr_loader
         PRIVATE "${PROJECT_SOURCE_DIR}/src/external/jsoncpp/include"
@@ -125,9 +133,13 @@ else()
 endif()
 
 if(LOADER_EXTERNAL_GEN_DEPENDS)
-    set_source_files_properties(
-        ${LOADER_EXTERNAL_GEN_DEPENDS} PROPERTIES GENERATED TRUE
+    # cmake-format: off
+    set_source_files_properties(${LOADER_EXTERNAL_GEN_DEPENDS}
+        PROPERTIES
+            GENERATED TRUE
+            SKIP_LINTING ON
     )
+    # cmake-format: on
 endif()
 
 if(NOT BUILD_LOADER_WITH_EXCEPTION_HANDLING)
@@ -307,10 +319,6 @@ if(ANDROID)
     )
     target_include_directories(
         openxr_loader PRIVATE ${JNIPP_ROOT} ${JNIWRAPPER_ROOT}
-    )
-
-    target_compile_definitions(
-        openxr_loader PRIVATE XR_KHR_LOADER_INIT_SUPPORT=1
     )
 endif()
 

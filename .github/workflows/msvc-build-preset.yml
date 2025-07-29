@@ -36,7 +36,7 @@ jobs:
           fetch-depth: "${{ github.event.release && '0' || '1'}}"
 
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v3.31.6
+        uses: lukka/get-cmake@v4.0.3
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
