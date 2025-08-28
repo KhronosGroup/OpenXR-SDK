@@ -21,6 +21,61 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.51 (2025-08-28)
+
+This release adds a new API layer to assist developers in making an OpenXR
+application that follows best practices, along with a number of miscellaneous
+other fixes and improvements.
+
+- SDK
+  - Added: New "best practices validation" API layer to check for application
+    behavior that is valid but contradicts best practices.
+    ([internal MR 3735](https://gitlab.khronos.org/openxr/openxr/merge_requests/3735),
+    [internal MR 3976](https://gitlab.khronos.org/openxr/openxr/merge_requests/3976))
+  - Fix: Include command alias in `XR_LIST_FUNCTION_` macros in
+    `openxr_reflection.h`.
+    ([internal MR 3915](https://gitlab.khronos.org/openxr/openxr/merge_requests/3915),
+    [internal issue 2222](https://gitlab.khronos.org/openxr/openxr/issues/2222))
+  - Fix: Consistent usage of `XR_KHR_LOADER_INIT_SUPPORT` defines.
+    ([internal MR 3936](https://gitlab.khronos.org/openxr/openxr/merge_requests/3936))
+  - Fix: Migrate scripts to publish Android OpenXR loader AAR to Maven Central via
+    new process.
+    ([internal MR 3978](https://gitlab.khronos.org/openxr/openxr/merge_requests/3978),
+    [internal issue 2499](https://gitlab.khronos.org/openxr/openxr/issues/2499),
+    [internal MR 3975](https://gitlab.khronos.org/openxr/openxr/merge_requests/3975))
+  - Improvement: enable clang-tidy bugprone-unused-local-non-trivial-variable
+    check.
+    ([internal MR 3892](https://gitlab.khronos.org/openxr/openxr/merge_requests/3892))
+  - Improvement: Fixed unused parameters in gfxwrapper.
+    ([internal MR 3894](https://gitlab.khronos.org/openxr/openxr/merge_requests/3894))
+  - Improvement: Provide more useful metadata in the Android OpenXR loader AAR POM
+    file.
+    ([internal MR 3978](https://gitlab.khronos.org/openxr/openxr/merge_requests/3978),
+    [internal issue 2499](https://gitlab.khronos.org/openxr/openxr/issues/2499),
+    [internal MR 3975](https://gitlab.khronos.org/openxr/openxr/merge_requests/3975))
+  - hello_xr: Fix Vulkan resource destruction bugs of ShaderProgram and Pipeline.
+    ([OpenXR-SDK-Source PR 538](https://github.com/KhronosGroup/OpenXR-SDK-Source/pull/538))
+- Registry
+  - Chore: Reserve extension numbers.
+    ([internal MR 3916](https://gitlab.khronos.org/openxr/openxr/merge_requests/3916),
+    [internal MR 3956](https://gitlab.khronos.org/openxr/openxr/merge_requests/3956))
+  - Fix: Missing parent struct for `XrSpatialCapabilityConfigurationAnchorEXT`.
+    ([internal MR 3932](https://gitlab.khronos.org/openxr/openxr/merge_requests/3932))
+  - Fix: Missing `XR_EXT_dpad_binding` paths for
+    `/interaction_profiles/facebook/touch_controller_pro` and
+    `/interaction_profiles/meta/touch_controller_plus`.
+    ([internal MR 3945](https://gitlab.khronos.org/openxr/openxr/merge_requests/3945))
+  - Fix: incorrect placement of `*` in
+    `XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING` error description.
+    ([internal MR 3960](https://gitlab.khronos.org/openxr/openxr/merge_requests/3960))
+  - Fix: Missing `XR_EXT_dpad_binding` paths for
+    `/interaction_profiles/varjo/xr-4_controller`.
+    ([internal MR 3965](https://gitlab.khronos.org/openxr/openxr/merge_requests/3965))
+  - Fix: Missing `XR_EXT_dpad_binding`, `XR_EXT_palm_pose`, and
+    `XR_EXT_hand_interaction` bindings for
+    `/interaction_profiles/oppo/mr_controller_oppo`.
+    ([internal MR 3966](https://gitlab.khronos.org/openxr/openxr/merge_requests/3966))
+
 ## OpenXR SDK 1.1.50 (2025-07-24)
 
 This release features a new loader extension for some specific automation use

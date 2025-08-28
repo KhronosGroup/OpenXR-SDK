@@ -67,6 +67,7 @@ XrResult LoaderInitData::initializeProperties(const XrLoaderInitInfoBaseHeaderKH
 }
 
 #ifdef XR_USE_PLATFORM_ANDROID
+#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
 XrResult LoaderInitData::initializePlatform(const XrLoaderInitInfoBaseHeaderKHR* info) {
     // Check and copy the Android-specific init data.
     while (info != nullptr) {
@@ -111,7 +112,8 @@ XrResult LoaderInitData::initializePlatform(const XrLoaderInitInfoBaseHeaderKHR*
     // We didn't find one.
     return XR_ERROR_VALIDATION_FAILURE;
 }
-#endif
+#endif  // def XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+#endif  // def XR_USE_PLATFORM_ANDROID
 
 XrResult InitializeLoaderInitData(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo) {
     if (!ActiveLoaderInstance::IsAvailable()) {

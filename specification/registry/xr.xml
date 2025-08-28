@@ -137,7 +137,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 50)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 51)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -4595,7 +4595,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </type>
 
         <!-- XR_EXT_spatial_anchor -->
-        <type category="struct" name="XrSpatialCapabilityConfigurationAnchorEXT">
+        <type category="struct" name="XrSpatialCapabilityConfigurationAnchorEXT" parentstruct="XrSpatialCapabilityConfigurationBaseHeaderEXT">
             <member values="XR_TYPE_SPATIAL_CAPABILITY_CONFIGURATION_ANCHOR_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*                                                  <name>next</name></member>
             <member><type>XrSpatialCapabilityEXT</type>                                       <name>capability</name></member>
@@ -5558,7 +5558,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="-47"   name="XR_ERROR_ACTIONSETS_ALREADY_ATTACHED"         comment="The session already has attached action sets."/>
         <enum value="-48"   name="XR_ERROR_LOCALIZED_NAME_DUPLICATED"           comment="The localized name provided was a duplicate of an already-existing resource."/>
         <enum value="-49"   name="XR_ERROR_LOCALIZED_NAME_INVALID"              comment="The localized name provided was invalid."/>
-        <enum value="-50"   name="XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING"  comment="The fname:xrGetGraphicsRequirements* call was not made before calling fname:xrCreateSession."/>
+        <enum value="-50"   name="XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING"  comment="The ftext:xrGet*GraphicsRequirements call was not made before calling fname:xrCreateSession."/>
         <enum value="-51"   name="XR_ERROR_RUNTIME_UNAVAILABLE"                 comment="The loader was unable to find or load a runtime."/>
         <unused start="-100"/>
     </enums>
@@ -13204,6 +13204,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="&quot;XR_VARJO_xr4_controller_interaction&quot;" name="XR_VARJO_XR4_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
             <interaction_profile name="/interaction_profiles/varjo/xr-4_controller"/>
         </require>
+        <require depends="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/varjo/xr-4_controller">
+                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
+        </require>
         <require depends="XR_EXT_palm_pose">
             <extend interaction_profile_path="/interaction_profiles/varjo/xr-4_controller">
                 <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
@@ -13797,6 +13805,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="1"                                      name="XR_FB_touch_controller_pro_SPEC_VERSION"/>
             <enum value="&quot;XR_FB_touch_controller_pro&quot;" name="XR_FB_TOUCH_CONTROLLER_PRO_EXTENSION_NAME"/>
             <interaction_profile name="/interaction_profiles/facebook/touch_controller_pro"/>
+        </require>
+        <require depends="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/facebook/touch_controller_pro">
+                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
             <extend interaction_profile_path="/interaction_profiles/facebook/touch_controller_pro">
@@ -14990,6 +15006,14 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="1"                                         name="XR_META_touch_controller_plus_SPEC_VERSION"/>
             <enum value="&quot;XR_META_touch_controller_plus&quot;" name="XR_META_TOUCH_CONTROLLER_PLUS_EXTENSION_NAME"/>
             <interaction_profile name="/interaction_profiles/meta/touch_controller_plus"/>
+        </require>
+        <require depends="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/meta/touch_controller_plus">
+                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
             <extend interaction_profile_path="/interaction_profiles/meta/touch_controller_plus">
@@ -16802,6 +16826,26 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="1"                                          name="XR_OPPO_controller_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_OPPO_controller_interaction&quot;" name="XR_OPPO_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
             <interaction_profile name="/interaction_profiles/oppo/mr_controller_oppo"/>
+        </require>
+
+        <require depends="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/oppo/mr_controller_oppo">
+                <component subpath="/input/thumbstick/dpad_up"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"  type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"  type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
+        </require>
+        <require depends="XR_EXT_palm_pose">
+            <extend interaction_profile_path="/interaction_profiles/oppo/mr_controller_oppo">
+                <component subpath="/input/palm_ext/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+        <require depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/oppo/mr_controller_oppo">
+                <component subpath="/input/pinch_ext/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"  type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
         </require>
     </extension>
 
@@ -20157,7 +20201,19 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
+    <extension name="XR_EXT_extension_840" number="840" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_840_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_840&quot;" name="XR_EXT_EXTENSION_840_EXTENSION_NAME"/>
+        </require>
+    </extension>
 
+    <extension name="XR_KHR_extension_841" number="841" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_KHR_extension_841_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_extension_841&quot;" name="XR_KHR_EXTENSION_841_EXTENSION_NAME"/>
+        </require>
+    </extension>
 
     </extensions>
 

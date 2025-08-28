@@ -8095,6 +8095,7 @@ XR_ENUM_STR(XrResult);
     _(CreateVulkanInstanceKHR, KHR_vulkan_enable2) \
     _(CreateVulkanDeviceKHR, KHR_vulkan_enable2) \
     _(GetVulkanGraphicsDevice2KHR, KHR_vulkan_enable2) \
+    _(GetVulkanGraphicsRequirements2KHR, KHR_vulkan_enable2) \
 
 
 /// For every function defined by XR_KHR_extended_struct_name_lengths in this version of the spec,
@@ -8103,6 +8104,14 @@ XR_ENUM_STR(XrResult);
 /// because it is easy to add back but impossible to remove with the preprocessor.
 #define XR_LIST_FUNCTIONS_XR_KHR_extended_struct_name_lengths(_) \
     _(StructureTypeToString2KHR, KHR_extended_struct_name_lengths) \
+
+
+/// For every function defined by XR_KHR_locate_spaces in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_KHR_locate_spaces(_) \
+    _(LocateSpacesKHR, KHR_locate_spaces) \
 
 
 /// For every function defined by XR_EXT_performance_settings in this version of the spec,
