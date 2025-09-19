@@ -492,6 +492,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrGetSpaceUserIdFB", (PFN_xrVoidFunction*)&table->GetSpaceUserIdFB));
     (get_inst_proc_addr(instance, "xrDestroySpaceUserFB", (PFN_xrVoidFunction*)&table->DestroySpaceUserFB));
 
+    // ---- XR_META_spatial_entity_discovery extension commands
+    (get_inst_proc_addr(instance, "xrDiscoverSpacesMETA", (PFN_xrVoidFunction*)&table->DiscoverSpacesMETA));
+    (get_inst_proc_addr(instance, "xrRetrieveSpaceDiscoveryResultsMETA", (PFN_xrVoidFunction*)&table->RetrieveSpaceDiscoveryResultsMETA));
+
     // ---- XR_META_recommended_layer_resolution extension commands
     (get_inst_proc_addr(instance, "xrGetRecommendedLayerResolutionMETA", (PFN_xrVoidFunction*)&table->GetRecommendedLayerResolutionMETA));
 

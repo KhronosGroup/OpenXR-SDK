@@ -26,7 +26,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 51)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 52)
 
 // OpenXR 1.0 version number
 #define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
@@ -641,6 +641,14 @@ typedef enum XrStructureType {
     XR_TYPE_EVENT_DATA_SPACE_LIST_SAVE_COMPLETE_FB = 1000238001,
     XR_TYPE_SPACE_USER_CREATE_INFO_FB = 1000241001,
     XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META = 1000245000,
+    XR_TYPE_SYSTEM_SPACE_DISCOVERY_PROPERTIES_META = 1000247000,
+    XR_TYPE_SPACE_DISCOVERY_INFO_META = 1000247001,
+    XR_TYPE_SPACE_FILTER_UUID_META = 1000247003,
+    XR_TYPE_SPACE_FILTER_COMPONENT_META = 1000247004,
+    XR_TYPE_SPACE_DISCOVERY_RESULT_META = 1000247005,
+    XR_TYPE_SPACE_DISCOVERY_RESULTS_META = 1000247006,
+    XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_RESULTS_AVAILABLE_META = 1000247007,
+    XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_COMPLETE_META = 1000247008,
     XR_TYPE_RECOMMENDED_LAYER_RESOLUTION_META = 1000254000,
     XR_TYPE_RECOMMENDED_LAYER_RESOLUTION_GET_INFO_META = 1000254001,
     XR_TYPE_SYSTEM_SPACE_PERSISTENCE_PROPERTIES_META = 1000259000,
@@ -2232,6 +2240,12 @@ typedef XrBoxf XrBoxfKHR;
 
 typedef XrFrustumf XrFrustumfKHR;
 
+
+
+// XR_KHR_generic_controller is a preprocessor guard. Do not pass it to API calls.
+#define XR_KHR_generic_controller 1
+#define XR_KHR_generic_controller_SPEC_VERSION 1
+#define XR_KHR_GENERIC_CONTROLLER_EXTENSION_NAME "XR_KHR_generic_controller"
 
 
 // XR_EXT_performance_settings is a preprocessor guard. Do not pass it to API calls.
@@ -6973,6 +6987,86 @@ typedef struct XrSystemHeadsetIdPropertiesMETA {
 
 
 
+// XR_META_spatial_entity_discovery is a preprocessor guard. Do not pass it to API calls.
+#define XR_META_spatial_entity_discovery 1
+#define XR_META_spatial_entity_discovery_SPEC_VERSION 1
+#define XR_META_SPATIAL_ENTITY_DISCOVERY_EXTENSION_NAME "XR_META_spatial_entity_discovery"
+// XrSystemSpaceDiscoveryPropertiesMETA extends XrSystemProperties
+typedef struct XrSystemSpaceDiscoveryPropertiesMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrBool32                    supportsSpaceDiscovery;
+} XrSystemSpaceDiscoveryPropertiesMETA;
+
+typedef struct XR_MAY_ALIAS XrSpaceFilterBaseHeaderMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+} XrSpaceFilterBaseHeaderMETA;
+
+typedef struct XrSpaceDiscoveryInfoMETA {
+    XrStructureType                               type;
+    const void* XR_MAY_ALIAS                      next;
+    uint32_t                                      filterCount;
+    const XrSpaceFilterBaseHeaderMETA* const *    filters;
+} XrSpaceDiscoveryInfoMETA;
+
+typedef struct XrSpaceFilterUuidMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    uint32_t                    uuidCount;
+    const XrUuidEXT*            uuids;
+} XrSpaceFilterUuidMETA;
+
+typedef struct XrSpaceFilterComponentMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrSpaceComponentTypeFB      componentType;
+} XrSpaceFilterComponentMETA;
+
+typedef struct XrSpaceDiscoveryResultMETA {
+    XrSpace      space;
+    XrUuidEXT    uuid;
+} XrSpaceDiscoveryResultMETA;
+
+typedef struct XrSpaceDiscoveryResultsMETA {
+    XrStructureType                type;
+    const void* XR_MAY_ALIAS       next;
+    uint32_t                       resultCapacityInput;
+    uint32_t                       resultCountOutput;
+    XrSpaceDiscoveryResultMETA*    results;
+} XrSpaceDiscoveryResultsMETA;
+
+typedef struct XrEventDataSpaceDiscoveryResultsAvailableMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          requestId;
+} XrEventDataSpaceDiscoveryResultsAvailableMETA;
+
+typedef struct XrEventDataSpaceDiscoveryCompleteMETA {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrAsyncRequestIdFB          requestId;
+    XrResult                    result;
+} XrEventDataSpaceDiscoveryCompleteMETA;
+
+typedef XrResult (XRAPI_PTR *PFN_xrDiscoverSpacesMETA)(XrSession session, const XrSpaceDiscoveryInfoMETA* info, XrAsyncRequestIdFB* requestId);
+typedef XrResult (XRAPI_PTR *PFN_xrRetrieveSpaceDiscoveryResultsMETA)(XrSession session, XrAsyncRequestIdFB requestId, XrSpaceDiscoveryResultsMETA* results);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrDiscoverSpacesMETA(
+    XrSession                                   session,
+    const XrSpaceDiscoveryInfoMETA*             info,
+    XrAsyncRequestIdFB*                         requestId);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrRetrieveSpaceDiscoveryResultsMETA(
+    XrSession                                   session,
+    XrAsyncRequestIdFB                          requestId,
+    XrSpaceDiscoveryResultsMETA*                results);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
 // XR_META_hand_tracking_microgestures is a preprocessor guard. Do not pass it to API calls.
 #define XR_META_hand_tracking_microgestures 1
 #define XR_META_hand_tracking_microgestures_SPEC_VERSION 1
@@ -7881,7 +7975,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetRenderModelPoseTopLevelUserPathEXT(
 
 // XR_EXT_hand_interaction is a preprocessor guard. Do not pass it to API calls.
 #define XR_EXT_hand_interaction 1
-#define XR_EXT_hand_interaction_SPEC_VERSION 1
+#define XR_EXT_hand_interaction_SPEC_VERSION 2
 #define XR_EXT_HAND_INTERACTION_EXTENSION_NAME "XR_EXT_hand_interaction"
 
 
@@ -9167,7 +9261,7 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetPlanePolygonBufferEXT(
 
 XR_DEFINE_ATOM(XrTrackableANDROID)
 XR_DEFINE_HANDLE(XrTrackableTrackerANDROID)
-#define XR_ANDROID_trackables_SPEC_VERSION 1
+#define XR_ANDROID_trackables_SPEC_VERSION 2
 #define XR_ANDROID_TRACKABLES_EXTENSION_NAME "XR_ANDROID_trackables"
 
 typedef enum XrTrackingStateANDROID {
@@ -9227,7 +9321,7 @@ typedef struct XrTrackablePlaneANDROID {
     XrTrackableANDROID        subsumedByPlane;
     XrTime                    lastUpdatedTime;
     uint32_t                  vertexCapacityInput;
-    uint32_t                  vertexCountOutput;
+    uint32_t*                 vertexCountOutput;
     XrVector2f*               vertices;
 } XrTrackablePlaneANDROID;
 

@@ -137,7 +137,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 51)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 52)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -1910,8 +1910,8 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrPosef</type> <name>pose</name></member>
             <member><type>float</type> <name>radius</name></member>
         </type>
-        <type category="struct" name="XrHandJointVelocityEXT">
-            <member><type>XrSpaceVelocityFlags</type> <name>velocityFlags</name></member>
+        <type category="struct" name="XrHandJointVelocityEXT" returnedonly="true">
+            <member optional="true"><type>XrSpaceVelocityFlags</type> <name>velocityFlags</name></member>
             <member><type>XrVector3f</type> <name>linearVelocity</name></member>
             <member><type>XrVector3f</type> <name>angularVelocity</name></member>
         </type>
@@ -2106,11 +2106,11 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member len="requestedDataSourceCount"><type>XrHandTrackingDataSourceEXT</type>* <name>requestedDataSources</name></member>
         </type>
 
-        <type category="struct" name="XrHandTrackingDataSourceStateEXT" structextends="XrHandJointLocationsEXT">
+        <type category="struct" name="XrHandTrackingDataSourceStateEXT" structextends="XrHandJointLocationsEXT" returnedonly="true">
             <member values="XR_TYPE_HAND_TRACKING_DATA_SOURCE_STATE_EXT"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
             <member><type>XrBool32</type> <name>isActive</name></member>
-            <member><type>XrHandTrackingDataSourceEXT</type> <name>dataSource</name></member>
+            <member optional="true"><type>XrHandTrackingDataSourceEXT</type> <name>dataSource</name></member>
         </type>
 
         <!-- XR_MSFT_hand_tracking_mesh -->
@@ -2716,7 +2716,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <type category="struct" name="XrHandTrackingAimStateFB" returnedonly="true" structextends="XrHandJointLocationsEXT">
             <member values="XR_TYPE_HAND_TRACKING_AIM_STATE_FB"><type>XrStructureType</type> <name>type</name></member>
             <member><type>void</type>* <name>next</name></member>
-            <member><type>XrHandTrackingAimFlagsFB</type> <name>status</name></member>
+            <member optional="true"><type>XrHandTrackingAimFlagsFB</type> <name>status</name></member>
             <member><type>XrPosef</type> <name>aimPose</name></member>
             <member><type>float</type> <name>pinchStrengthIndex</name></member>
             <member><type>float</type> <name>pinchStrengthMiddle</name></member>
@@ -3176,26 +3176,26 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </type>
         <type category="struct" name="XrSystemPassthroughProperties2FB" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_PASSTHROUGH_PROPERTIES2_FB"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*                       <name>next</name></member>
-            <member><type>XrPassthroughCapabilityFlagsFB</type>    <name>capabilities</name></member>
+            <member>const <type>void</type>*                                    <name>next</name></member>
+            <member optional="true"><type>XrPassthroughCapabilityFlagsFB</type> <name>capabilities</name></member>
         </type>
         <type category="struct" name="XrPassthroughCreateInfoFB">
             <member values="XR_TYPE_PASSTHROUGH_CREATE_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*          <name>next</name></member>
-            <member><type>XrPassthroughFlagsFB</type> <name>flags</name></member>
+            <member>const <type>void</type>*                          <name>next</name></member>
+            <member optional="true"><type>XrPassthroughFlagsFB</type> <name>flags</name></member>
         </type>
         <type category="struct" name="XrPassthroughLayerCreateInfoFB">
             <member values="XR_TYPE_PASSTHROUGH_LAYER_CREATE_INFO_FB"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*                 <name>next</name></member>
-            <member><type>XrPassthroughFB</type>             <name>passthrough</name></member>
-            <member><type>XrPassthroughFlagsFB</type>        <name>flags</name></member>
-            <member><type>XrPassthroughLayerPurposeFB</type> <name>purpose</name></member>
+            <member>const <type>void</type>*                          <name>next</name></member>
+            <member><type>XrPassthroughFB</type>                      <name>passthrough</name></member>
+            <member optional="true"><type>XrPassthroughFlagsFB</type> <name>flags</name></member>
+            <member><type>XrPassthroughLayerPurposeFB</type>          <name>purpose</name></member>
         </type>
         <type category="struct" name="XrCompositionLayerPassthroughFB" parentstruct="XrCompositionLayerBaseHeader">
             <member values="XR_TYPE_COMPOSITION_LAYER_PASSTHROUGH_FB"><type>XrStructureType</type> <name>type</name></member>
             <member>const <type>void</type>*             <name>next</name></member>
             <member><type>XrCompositionLayerFlags</type> <name>flags</name></member>
-            <member><type>XrSpace</type>                 <name>space</name></member>
+            <member optional="true"><type>XrSpace</type> <name>space</name></member>
             <member><type>XrPassthroughLayerFB</type>    <name>layerHandle</name></member>
         </type>
         <type category="struct" name="XrGeometryInstanceCreateInfoFB">
@@ -3604,6 +3604,64 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrResult</type>           <name>result</name></member>
         </type>
 
+        <!-- XR_META_spatial_entity_discovery structs -->
+        <type category="struct" name="XrSystemSpaceDiscoveryPropertiesMETA" structextends="XrSystemProperties" returnedonly="true">
+            <member values="XR_TYPE_SYSTEM_SPACE_DISCOVERY_PROPERTIES_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrBool32</type>    <name>supportsSpaceDiscovery</name></member>
+        </type>
+
+        <type category="struct" name="XrSpaceFilterBaseHeaderMETA">
+            <member><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+
+        <type category="struct" name="XrSpaceDiscoveryInfoMETA">
+            <member values="XR_TYPE_SPACE_DISCOVERY_INFO_META"><type>XrStructureType</type>                   <name>type</name></member>
+            <member>const <type>void</type>*                                                                  <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                                     <name>filterCount</name></member>
+            <member optional="true" len="filterCount">const <type>XrSpaceFilterBaseHeaderMETA</type>* const * <name>filters</name></member>
+        </type>
+
+        <type category="struct" name="XrSpaceFilterUuidMETA" parentstruct="XrSpaceFilterBaseHeaderMETA">
+            <member values="XR_TYPE_SPACE_FILTER_UUID_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*                      <name>next</name></member>
+            <member><type>uint32_t</type>                         <name>uuidCount</name></member>
+            <member len="uuidCount">const <type>XrUuidEXT</type>* <name>uuids</name></member>
+        </type>
+
+        <type category="struct" name="XrSpaceFilterComponentMETA" parentstruct="XrSpaceFilterBaseHeaderMETA">
+            <member values="XR_TYPE_SPACE_FILTER_COMPONENT_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*            <name>next</name></member>
+            <member><type>XrSpaceComponentTypeFB</type> <name>componentType</name></member>
+        </type>
+
+        <type category="struct" name="XrSpaceDiscoveryResultMETA" returnedonly="true">
+            <member><type>XrSpace</type>   <name>space</name></member>
+            <member><type>XrUuidEXT</type> <name>uuid</name></member>
+        </type>
+
+        <type category="struct" name="XrSpaceDiscoveryResultsMETA">
+            <member values="XR_TYPE_SPACE_DISCOVERY_RESULTS_META"><type>XrStructureType</type>         <name>type</name></member>
+            <member>const <type>void</type>*                                                           <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                              <name>resultCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                              <name>resultCountOutput</name></member>
+            <member optional="true" len="resultCapacityInput"><type>XrSpaceDiscoveryResultMETA</type>* <name>results</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataSpaceDiscoveryResultsAvailableMETA" returnedonly="true" parentstruct="XrEventDataBaseHeader">
+            <member values="XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_RESULTS_AVAILABLE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+        </type>
+
+        <type category="struct" name="XrEventDataSpaceDiscoveryCompleteMETA" returnedonly="true" parentstruct="XrEventDataBaseHeader">
+            <member values="XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_COMPLETE_META"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*        <name>next</name></member>
+            <member><type>XrAsyncRequestIdFB</type> <name>requestId</name></member>
+            <member><type>XrResult</type>           <name>result</name></member>
+        </type>
+
         <!-- XR_META_passthrough_color_lut types -->
         <type category="struct" name="XrPassthroughColorLutDataMETA">
             <member><type>uint32_t</type>                           <name>bufferSize</name></member>
@@ -3796,7 +3854,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrTrackableANDROID</type>                                       <name>subsumedByPlane</name></member>
             <member><type>XrTime</type>                                                   <name>lastUpdatedTime</name></member>
             <member optional="true"><type>uint32_t</type>                                 <name>vertexCapacityInput</name></member>
-            <member optional="true"><type>uint32_t</type>                                 <name>vertexCountOutput</name></member>
+            <member optional="true"><type>uint32_t</type>*                                <name>vertexCountOutput</name></member>
             <member optional="true" len="vertexCapacityInput"><type>XrVector2f</type>*    <name>vertices</name></member>
         </type>
         <type category="struct" name="XrAnchorSpaceCreateInfoANDROID">
@@ -4358,13 +4416,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <!-- XR_META_environment_depth -->
         <type category="struct" name="XrEnvironmentDepthProviderCreateInfoMETA">
             <member values="XR_TYPE_ENVIRONMENT_DEPTH_PROVIDER_CREATE_INFO_META"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*                               <name>next</name></member>
-            <member><type>XrEnvironmentDepthProviderCreateFlagsMETA</type> <name>createFlags</name></member>
+            <member>const <type>void</type>*                                               <name>next</name></member>
+            <member optional="true"><type>XrEnvironmentDepthProviderCreateFlagsMETA</type> <name>createFlags</name></member>
         </type>
         <type category="struct" name="XrEnvironmentDepthSwapchainCreateInfoMETA">
             <member values="XR_TYPE_ENVIRONMENT_DEPTH_SWAPCHAIN_CREATE_INFO_META"><type>XrStructureType</type> <name>type</name></member>
-            <member>const <type>void</type>*                                <name>next</name></member>
-            <member><type>XrEnvironmentDepthSwapchainCreateFlagsMETA</type> <name>createFlags</name></member>
+            <member>const <type>void</type>*                                                <name>next</name></member>
+            <member optional="true"><type>XrEnvironmentDepthSwapchainCreateFlagsMETA</type> <name>createFlags</name></member>
         </type>
         <type category="struct" name="XrEnvironmentDepthSwapchainStateMETA">
             <member values="XR_TYPE_ENVIRONMENT_DEPTH_SWAPCHAIN_STATE_META"><type>XrStructureType</type> <name>type</name></member>
@@ -8829,6 +8887,21 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
         </command>
 
+        <!-- commands for XR_META_spatial_entity_discovery -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SPACE_RATE_LIMITED_META,XR_ERROR_SESSION_NOT_RUNNING,XR_ERROR_INITIALIZATION_FAILED">
+            <proto><type>XrResult</type> <name>xrDiscoverSpacesMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrSpaceDiscoveryInfoMETA</type>* <name>info</name></param>
+            <param><type>XrAsyncRequestIdFB</type>* <name>requestId</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_SIZE_INSUFFICIENT">
+            <proto><type>XrResult</type> <name>xrRetrieveSpaceDiscoveryResultsMETA</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param><type>XrAsyncRequestIdFB</type> <name>requestId</name></param>
+            <param><type>XrSpaceDiscoveryResultsMETA</type>* <name>results</name></param>
+        </command>
+
         <!-- commands for XR_MNDX_force_feedback_curl -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING,XR_SESSION_NOT_FOCUSED" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
             <proto><type>XrResult</type> <name>xrApplyForceFeedbackCurlMNDX</name></proto>
@@ -10023,7 +10096,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component subpath="/output/haptic"          type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
-
         <interaction_profile name="/interaction_profiles/htc/vive_pro" title="HTC Vive Pro">
             <user_path path="/user/head"/>
             <component subpath="/input/system/click"        type="XR_ACTION_TYPE_BOOLEAN_INPUT" system="true"/>
@@ -10790,6 +10862,27 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component subpath="/output/haptic"                                      type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- XR_KHR_generic_controller -->
+        <interaction_profile name="/interaction_profiles/khr/generic_controller" title="Khronos Generic Controller">
+            <user_path path="/user/hand/left"/>
+            <user_path path="/user/hand/right"/>
+            <component subpath="/input/primary/click"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/secondary/click"     type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+
+            <component subpath="/input/thumbstick"          type="XR_ACTION_TYPE_VECTOR2F_INPUT"/>
+            <component subpath="/input/thumbstick/x"        type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/thumbstick/y"        type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/thumbstick/click"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+
+            <component subpath="/input/squeeze/value"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component subpath="/input/trigger/value"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+
+            <component subpath="/input/grip/pose"           type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/input/grip_surface/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/input/aim/pose"            type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component subpath="/output/haptic"             type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
+        </interaction_profile>
+
     </interaction_profiles>
 
     <!-- SECTION: OpenXR 1.0 API interface definitions -->
@@ -11129,6 +11222,16 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require comment="grip_surface/pose (obsoletes palm_ext/pose)" depends="XR_VARJO_xr4_controller_interaction">
             <extend interaction_profile_path="/interaction_profiles/varjo/xr-4_controller">
+                <component subpath="/input/grip_surface/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+        <require comment="grip_surface/pose (obsoletes palm_ext/pose)" depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/ext/hand_interaction_ext">
+                <component subpath="/input/grip_surface/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+        <require comment="grip_surface/pose (obsoletes palm_ext/pose)" depends="XR_LOGITECH_mx_ink_stylus_interaction">
+            <extend interaction_profile_path="/interaction_profiles/logitech/mx_ink_stylus_logitech">
                 <component subpath="/input/grip_surface/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
         </require>
@@ -11578,7 +11681,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </extension>
 
     <!-- Debug Utilities extension -->
-    <extension name="XR_EXT_debug_utils" number="20" type="instance" supported="openxr">
+    <extension name="XR_EXT_debug_utils" number="20" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="5"                              name="XR_EXT_debug_utils_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_debug_utils&quot;" name="XR_EXT_DEBUG_UTILS_EXTENSION_NAME"/>
@@ -13206,10 +13309,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/varjo/xr-4_controller">
-                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
@@ -13808,10 +13911,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/facebook/touch_controller_pro">
-                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
@@ -14702,10 +14805,31 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_FB_extension_248" number="248" type="instance" supported="disabled">
+    <extension name="XR_META_spatial_entity_discovery" number="248" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_FB_extension_248_SPEC_VERSION"/>
-            <enum value="&quot;XR_FB_extension_248&quot;" name="XR_FB_EXTENSION_248_EXTENSION_NAME"/>
+            <enum value="1"                                            name="XR_META_spatial_entity_discovery_SPEC_VERSION"/>
+            <enum value="&quot;XR_META_spatial_entity_discovery&quot;" name="XR_META_SPATIAL_ENTITY_DISCOVERY_EXTENSION_NAME"/>
+
+            <type name="XrSystemSpaceDiscoveryPropertiesMETA"/>
+            <type name="XrSpaceFilterBaseHeaderMETA"/>
+            <type name="XrSpaceDiscoveryInfoMETA"/>
+            <type name="XrSpaceFilterUuidMETA"/>
+            <type name="XrSpaceFilterComponentMETA"/>
+            <type name="XrSpaceDiscoveryResultMETA"/>
+            <type name="XrSpaceDiscoveryResultsMETA"/>
+            <type name="XrEventDataSpaceDiscoveryResultsAvailableMETA"/>
+            <type name="XrEventDataSpaceDiscoveryCompleteMETA"/>
+            <enum offset="0" extends="XrStructureType" name="XR_TYPE_SYSTEM_SPACE_DISCOVERY_PROPERTIES_META"/>
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SPACE_DISCOVERY_INFO_META"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_SPACE_FILTER_UUID_META"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_SPACE_FILTER_COMPONENT_META"/>
+            <enum offset="5" extends="XrStructureType" name="XR_TYPE_SPACE_DISCOVERY_RESULT_META"/>
+            <enum offset="6" extends="XrStructureType" name="XR_TYPE_SPACE_DISCOVERY_RESULTS_META"/>
+            <enum offset="7" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_RESULTS_AVAILABLE_META"/>
+            <enum offset="8" extends="XrStructureType" name="XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_COMPLETE_META"/>
+
+            <command name="xrDiscoverSpacesMETA"/>
+            <command name="xrRetrieveSpaceDiscoveryResultsMETA"/>
         </require>
     </extension>
 
@@ -15009,10 +15133,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/meta/touch_controller_plus">
-                <component subpath="/input/thumbstick/dpad_up" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_down" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_left" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
@@ -15264,7 +15388,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_render_model" number="301" type="instance" supported="openxr" depends="XR_VERSION_1_1,XR_EXT_uuid">
+    <extension name="XR_EXT_render_model" number="301" type="instance" supported="openxr" depends="XR_VERSION_1_1,XR_EXT_uuid" ratified="openxr">
         <require>
             <enum value="1"                               name="XR_EXT_render_model_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_render_model&quot;" name="XR_EXT_RENDER_MODEL_EXTENSION_NAME"/>
@@ -15322,7 +15446,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_interaction_render_model" number="302" type="instance" supported="openxr" depends="XR_EXT_render_model">
+    <extension name="XR_EXT_interaction_render_model" number="302" type="instance" supported="openxr" depends="XR_EXT_render_model" ratified="openxr">
         <require>
             <enum value="1"                                           name="XR_EXT_interaction_render_model_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_interaction_render_model&quot;" name="XR_EXT_INTERACTION_RENDER_MODEL_EXTENSION_NAME"/>
@@ -15346,7 +15470,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_EXT_hand_interaction" number="303" type="instance" supported="openxr" ratified="openxr">
         <require>
-            <enum value="1"                                   name="XR_EXT_hand_interaction_SPEC_VERSION"/>
+            <enum value="2"                                   name="XR_EXT_hand_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_hand_interaction&quot;" name="XR_EXT_HAND_INTERACTION_EXTENSION_NAME"/>
 
             <interaction_profile name="/interaction_profiles/ext/hand_interaction_ext"/>
@@ -16830,21 +16954,21 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
         <require depends="XR_EXT_dpad_binding">
             <extend interaction_profile_path="/interaction_profiles/oppo/mr_controller_oppo">
-                <component subpath="/input/thumbstick/dpad_up"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_down"  type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_left"  type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
-                <component subpath="/input/thumbstick/dpad_right" type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_palm_pose">
             <extend interaction_profile_path="/interaction_profiles/oppo/mr_controller_oppo">
-                <component subpath="/input/palm_ext/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
         </require>
         <require depends="XR_EXT_hand_interaction">
             <extend interaction_profile_path="/interaction_profiles/oppo/mr_controller_oppo">
-                <component subpath="/input/pinch_ext/pose" type="XR_ACTION_TYPE_POSE_INPUT"/>
-                <component subpath="/input/poke_ext/pose"  type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
         </require>
     </extension>
@@ -16858,7 +16982,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_ANDROID_trackables" number="456" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_trackables_SPEC_VERSION"/>
+            <enum value="2"                                    name="XR_ANDROID_trackables_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_trackables&quot;"    name="XR_ANDROID_TRACKABLES_EXTENSION_NAME"/>
 
             <enum offset="0"         extends="XrStructureType" name="XR_TYPE_TRACKABLE_GET_INFO_ANDROID"/>
@@ -19089,13 +19213,43 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
                 <component subpath="/input/grip_surface/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
             </extend>
         </require>
+        <require comment="grip_surface/pose (obsoletes palm_ext/pose)" depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/ext/hand_interaction_ext">
+                <component subpath="/input/grip_surface/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+        <require comment="grip_surface/pose (obsoletes palm_ext/pose)" depends="XR_LOGITECH_mx_ink_stylus_interaction">
+            <extend interaction_profile_path="/interaction_profiles/logitech/mx_ink_stylus_logitech">
+                <component subpath="/input/grip_surface/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
         <!-- grip_surface -->
     </extension>
 
-    <extension name="XR_KHR_game_controller" number="712" type="instance" supported="disabled">
+    <extension name="XR_KHR_generic_controller" number="712" type="instance" supported="openxr" ratified="openxr">
         <require>
-            <enum value="1"                                  name="XR_KHR_game_controller_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_game_controller&quot;" name="XR_KHR_GAME_CONTROLLER_EXTENSION_NAME"/>
+            <enum value="1"                                     name="XR_KHR_generic_controller_SPEC_VERSION"/>
+            <enum value="&quot;XR_KHR_generic_controller&quot;" name="XR_KHR_GENERIC_CONTROLLER_EXTENSION_NAME"/>
+            <interaction_profile name="/interaction_profiles/khr/generic_controller"/>
+        </require>
+        <require depends="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/khr/generic_controller">
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
+        </require>
+        <require depends="XR_EXT_palm_pose">
+            <extend interaction_profile_path="/interaction_profiles/khr/generic_controller">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+        <require depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/khr/generic_controller">
+                <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
         </require>
     </extension>
 
@@ -19476,6 +19630,11 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="1"                                                 name="XR_LOGITECH_mx_ink_stylus_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_LOGITECH_mx_ink_stylus_interaction&quot;" name="XR_LOGITECH_MX_INK_STYLUS_INTERACTION_EXTENSION_NAME"/>
             <interaction_profile name="/interaction_profiles/logitech/mx_ink_stylus_logitech"/>
+        </require>
+        <require depends="XR_EXT_palm_pose">
+            <extend interaction_profile_path="/interaction_profiles/logitech/mx_ink_stylus_logitech">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
         </require>
         <require depends="XR_EXT_hand_interaction">
             <extend interaction_profile_path="/interaction_profiles/logitech/mx_ink_stylus_logitech">
@@ -20212,6 +20371,13 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="1"                                name="XR_KHR_extension_841_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_extension_841&quot;" name="XR_KHR_EXTENSION_841_EXTENSION_NAME"/>
+        </require>
+    </extension>
+
+    <extension name="XR_EXT_extension_842" number="842" type="instance" supported="disabled">
+        <require>
+            <enum value="1"                                name="XR_EXT_extension_842_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_842&quot;" name="XR_EXT_EXTENSION_842_EXTENSION_NAME"/>
         </require>
     </extension>
 

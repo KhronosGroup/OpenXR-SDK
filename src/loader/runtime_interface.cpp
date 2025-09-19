@@ -27,15 +27,9 @@
 #include <utility>
 #include <vector>
 
-#ifdef XR_USE_PLATFORM_ANDROID
+#if defined(XR_USE_PLATFORM_ANDROID) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 #include <json/value.h>
 
-// Needed for the loader init struct
-#include <xr_dependencies.h>
-#include <openxr/openxr_platform.h>
-#endif  // XR_USE_PLATFORM_ANDROID
-
-#if defined(XR_KHR_LOADER_INIT_SUPPORT) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 XrResult GetPlatformRuntimeVirtualManifest(Json::Value& out_manifest) {
     using wrap::android::content::Context;
     auto& initData = LoaderInitData::instance();
@@ -53,7 +47,7 @@ XrResult GetPlatformRuntimeVirtualManifest(Json::Value& out_manifest) {
     out_manifest = virtualManifest;
     return XR_SUCCESS;
 }
-#endif  // defined(XR_KHR_LOADER_INIT_SUPPORT) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
+#endif  // defined(XR_USE_PLATFORM_ANDROID) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 
 XrResult RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_command,
                                                    std::unique_ptr<RuntimeManifestFile>& manifest_file) {
@@ -69,7 +63,7 @@ XrResult RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_com
         return XR_ERROR_FILE_ACCESS_ERROR;
     }
 
-#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+#if defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
     if (!LoaderInitData::instance().initialized()) {
         LoaderLogger::LogErrorMessage(openxr_command, "RuntimeInterface::LoadRuntime skipping manifest file " +
                                                           manifest_file->Filename() +
@@ -78,7 +72,7 @@ XrResult RuntimeInterface::TryLoadingSingleRuntime(const std::string& openxr_com
         LoaderPlatformLibraryClose(runtime_library);
         return XR_ERROR_VALIDATION_FAILURE;
     }
-#endif
+#endif  // defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 
     bool forwardedInitLoader = false;
     if (LoaderInitData::instance().initialized() && LoaderInitData::instance().getPlatformParam() != nullptr) {
@@ -234,14 +228,14 @@ XrResult RuntimeInterface::LoadRuntime(const std::string& openxr_command) {
     if (GetInstance() != nullptr) {
         return XR_SUCCESS;
     }
-#if defined(XR_KHR_LOADER_INIT_SUPPORT) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 
+#if defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
     if (!LoaderInitData::instance().initialized()) {
         LoaderLogger::LogErrorMessage(
             openxr_command, "RuntimeInterface::LoadRuntime cannot run because xrInitializeLoaderKHR was not successfully called.");
         return XR_ERROR_INITIALIZATION_FAILED;
     }
-#endif  // XR_KHR_LOADER_INIT_SUPPORT
+#endif  // XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
 
     std::vector<std::unique_ptr<RuntimeManifestFile>> runtime_manifest_files = {};
 

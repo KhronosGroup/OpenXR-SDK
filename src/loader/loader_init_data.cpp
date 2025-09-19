@@ -21,12 +21,12 @@ XrResult LoaderInitData::initialize(const XrLoaderInitInfoBaseHeaderKHR* info) {
         return result;
     }
 
-#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+#if defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
     result = initializePlatform(info);
     if (result != XR_SUCCESS) {
         return result;
     }
-#endif
+#endif  // defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 
     _initialized = true;
     return XR_SUCCESS;
@@ -66,8 +66,7 @@ XrResult LoaderInitData::initializeProperties(const XrLoaderInitInfoBaseHeaderKH
     return XR_SUCCESS;
 }
 
-#ifdef XR_USE_PLATFORM_ANDROID
-#ifdef XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
+#if defined(XR_USE_PLATFORM_ANDROID) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 XrResult LoaderInitData::initializePlatform(const XrLoaderInitInfoBaseHeaderKHR* info) {
     // Check and copy the Android-specific init data.
     while (info != nullptr) {
@@ -112,8 +111,7 @@ XrResult LoaderInitData::initializePlatform(const XrLoaderInitInfoBaseHeaderKHR*
     // We didn't find one.
     return XR_ERROR_VALIDATION_FAILURE;
 }
-#endif  // def XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT
-#endif  // def XR_USE_PLATFORM_ANDROID
+#endif  // defined(XR_USE_PLATFORM_ANDROID) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 
 XrResult InitializeLoaderInitData(const XrLoaderInitInfoBaseHeaderKHR* loaderInitInfo) {
     if (!ActiveLoaderInstance::IsAvailable()) {
@@ -128,8 +126,8 @@ XrResult InitializeLoaderInitData(const XrLoaderInitInfoBaseHeaderKHR* loaderIni
     return LoaderInitData::instance().initialize(loaderInitInfo);
 }
 
-#ifdef XR_USE_PLATFORM_ANDROID
+#if defined(XR_USE_PLATFORM_ANDROID) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)
 std::string GetAndroidNativeLibraryDir() { return LoaderInitData::instance()._android_native_library_path; }
 
 void* GetAndroidAssetManager() { return LoaderInitData::instance()._android_asset_manager; }
-#endif  // XR_USE_PLATFORM_ANDROID
+#endif  // defined(XR_USE_PLATFORM_ANDROID) && defined(XR_HAS_REQUIRED_PLATFORM_LOADER_INIT_STRUCT)

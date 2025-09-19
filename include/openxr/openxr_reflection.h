@@ -524,6 +524,14 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_EVENT_DATA_SPACE_LIST_SAVE_COMPLETE_FB, 1000238001) \
     _(XR_TYPE_SPACE_USER_CREATE_INFO_FB, 1000241001) \
     _(XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META, 1000245000) \
+    _(XR_TYPE_SYSTEM_SPACE_DISCOVERY_PROPERTIES_META, 1000247000) \
+    _(XR_TYPE_SPACE_DISCOVERY_INFO_META, 1000247001) \
+    _(XR_TYPE_SPACE_FILTER_UUID_META, 1000247003) \
+    _(XR_TYPE_SPACE_FILTER_COMPONENT_META, 1000247004) \
+    _(XR_TYPE_SPACE_DISCOVERY_RESULT_META, 1000247005) \
+    _(XR_TYPE_SPACE_DISCOVERY_RESULTS_META, 1000247006) \
+    _(XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_RESULTS_AVAILABLE_META, 1000247007) \
+    _(XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_COMPLETE_META, 1000247008) \
     _(XR_TYPE_RECOMMENDED_LAYER_RESOLUTION_META, 1000254000) \
     _(XR_TYPE_RECOMMENDED_LAYER_RESOLUTION_GET_INFO_META, 1000254001) \
     _(XR_TYPE_SYSTEM_SPACE_PERSISTENCE_PROPERTIES_META, 1000259000) \
@@ -5275,6 +5283,63 @@ XR_ENUM_STR(XrResult);
     _(next) \
     _(id) \
 
+/// Calls your macro with the name of each member of XrSystemSpaceDiscoveryPropertiesMETA, in order.
+#define XR_LIST_STRUCT_XrSystemSpaceDiscoveryPropertiesMETA(_) \
+    _(type) \
+    _(next) \
+    _(supportsSpaceDiscovery) \
+
+/// Calls your macro with the name of each member of XrSpaceFilterBaseHeaderMETA, in order.
+#define XR_LIST_STRUCT_XrSpaceFilterBaseHeaderMETA(_) \
+    _(type) \
+    _(next) \
+
+/// Calls your macro with the name of each member of XrSpaceDiscoveryInfoMETA, in order.
+#define XR_LIST_STRUCT_XrSpaceDiscoveryInfoMETA(_) \
+    _(type) \
+    _(next) \
+    _(filterCount) \
+    _(filters) \
+
+/// Calls your macro with the name of each member of XrSpaceFilterUuidMETA, in order.
+#define XR_LIST_STRUCT_XrSpaceFilterUuidMETA(_) \
+    _(type) \
+    _(next) \
+    _(uuidCount) \
+    _(uuids) \
+
+/// Calls your macro with the name of each member of XrSpaceFilterComponentMETA, in order.
+#define XR_LIST_STRUCT_XrSpaceFilterComponentMETA(_) \
+    _(type) \
+    _(next) \
+    _(componentType) \
+
+/// Calls your macro with the name of each member of XrSpaceDiscoveryResultMETA, in order.
+#define XR_LIST_STRUCT_XrSpaceDiscoveryResultMETA(_) \
+    _(space) \
+    _(uuid) \
+
+/// Calls your macro with the name of each member of XrSpaceDiscoveryResultsMETA, in order.
+#define XR_LIST_STRUCT_XrSpaceDiscoveryResultsMETA(_) \
+    _(type) \
+    _(next) \
+    _(resultCapacityInput) \
+    _(resultCountOutput) \
+    _(results) \
+
+/// Calls your macro with the name of each member of XrEventDataSpaceDiscoveryResultsAvailableMETA, in order.
+#define XR_LIST_STRUCT_XrEventDataSpaceDiscoveryResultsAvailableMETA(_) \
+    _(type) \
+    _(next) \
+    _(requestId) \
+
+/// Calls your macro with the name of each member of XrEventDataSpaceDiscoveryCompleteMETA, in order.
+#define XR_LIST_STRUCT_XrEventDataSpaceDiscoveryCompleteMETA(_) \
+    _(type) \
+    _(next) \
+    _(requestId) \
+    _(result) \
+
 /// Calls your macro with the name of each member of XrRecommendedLayerResolutionMETA, in order.
 #define XR_LIST_STRUCT_XrRecommendedLayerResolutionMETA(_) \
     _(type) \
@@ -7300,6 +7365,13 @@ XR_ENUM_STR(XrResult);
     _(XrEventDataSpaceListSaveCompleteFB, XR_TYPE_EVENT_DATA_SPACE_LIST_SAVE_COMPLETE_FB) \
     _(XrSpaceUserCreateInfoFB, XR_TYPE_SPACE_USER_CREATE_INFO_FB) \
     _(XrSystemHeadsetIdPropertiesMETA, XR_TYPE_SYSTEM_HEADSET_ID_PROPERTIES_META) \
+    _(XrSystemSpaceDiscoveryPropertiesMETA, XR_TYPE_SYSTEM_SPACE_DISCOVERY_PROPERTIES_META) \
+    _(XrSpaceDiscoveryInfoMETA, XR_TYPE_SPACE_DISCOVERY_INFO_META) \
+    _(XrSpaceFilterUuidMETA, XR_TYPE_SPACE_FILTER_UUID_META) \
+    _(XrSpaceFilterComponentMETA, XR_TYPE_SPACE_FILTER_COMPONENT_META) \
+    _(XrSpaceDiscoveryResultsMETA, XR_TYPE_SPACE_DISCOVERY_RESULTS_META) \
+    _(XrEventDataSpaceDiscoveryResultsAvailableMETA, XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_RESULTS_AVAILABLE_META) \
+    _(XrEventDataSpaceDiscoveryCompleteMETA, XR_TYPE_EVENT_DATA_SPACE_DISCOVERY_COMPLETE_META) \
     _(XrRecommendedLayerResolutionMETA, XR_TYPE_RECOMMENDED_LAYER_RESOLUTION_META) \
     _(XrRecommendedLayerResolutionGetInfoMETA, XR_TYPE_RECOMMENDED_LAYER_RESOLUTION_GET_INFO_META) \
     _(XrSystemSpacePersistencePropertiesMETA, XR_TYPE_SYSTEM_SPACE_PERSISTENCE_PROPERTIES_META) \
@@ -7837,6 +7909,7 @@ XR_ENUM_STR(XrResult);
     _(XR_META_detached_controllers, 241) \
     _(XR_FB_spatial_entity_user, 242) \
     _(XR_META_headset_id, 246) \
+    _(XR_META_spatial_entity_discovery, 248) \
     _(XR_META_hand_tracking_microgestures, 253) \
     _(XR_META_recommended_layer_resolution, 255) \
     _(XR_META_spatial_entity_persistence, 260) \
@@ -7895,6 +7968,7 @@ XR_ENUM_STR(XrResult);
     _(XR_ANDROID_anchor_sharing_export, 702) \
     _(XR_ANDROID_trackables_marker, 708) \
     _(XR_KHR_maintenance1, 711) \
+    _(XR_KHR_generic_controller, 712) \
     _(XR_EXT_spatial_entity, 741) \
     _(XR_EXT_spatial_plane_tracking, 742) \
     _(XR_EXT_spatial_marker_tracking, 744) \
@@ -8682,6 +8756,15 @@ XR_ENUM_STR(XrResult);
     _(CreateSpaceUserFB, FB_spatial_entity_user) \
     _(GetSpaceUserIdFB, FB_spatial_entity_user) \
     _(DestroySpaceUserFB, FB_spatial_entity_user) \
+
+
+/// For every function defined by XR_META_spatial_entity_discovery in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_META_spatial_entity_discovery(_) \
+    _(DiscoverSpacesMETA, META_spatial_entity_discovery) \
+    _(RetrieveSpaceDiscoveryResultsMETA, META_spatial_entity_discovery) \
 
 
 /// For every function defined by XR_META_recommended_layer_resolution in this version of the spec,

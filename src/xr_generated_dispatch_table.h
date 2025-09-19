@@ -498,6 +498,10 @@ struct XrGeneratedDispatchTable {
     PFN_xrGetSpaceUserIdFB GetSpaceUserIdFB;
     PFN_xrDestroySpaceUserFB DestroySpaceUserFB;
 
+    // ---- XR_META_spatial_entity_discovery extension commands
+    PFN_xrDiscoverSpacesMETA DiscoverSpacesMETA;
+    PFN_xrRetrieveSpaceDiscoveryResultsMETA RetrieveSpaceDiscoveryResultsMETA;
+
     // ---- XR_META_recommended_layer_resolution extension commands
     PFN_xrGetRecommendedLayerResolutionMETA GetRecommendedLayerResolutionMETA;
 

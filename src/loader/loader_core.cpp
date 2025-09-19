@@ -75,7 +75,6 @@ inline bool IsMissingNullTerminator(const char (&str)[max_length]) {
 }
 
 // ---- Core 1.0 manual loader trampoline functions
-#ifdef XR_KHR_LOADER_INIT_SUPPORT  // platforms that support XR_KHR_loader_init.
 static XRAPI_ATTR XrResult XRAPI_CALL LoaderXrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *);
 
 static XRAPI_ATTR XrResult XRAPI_CALL LoaderXrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *loaderInitInfo)
@@ -84,7 +83,6 @@ static XRAPI_ATTR XrResult XRAPI_CALL LoaderXrInitializeLoaderKHR(const XrLoader
     return InitializeLoaderInitData(loaderInitInfo);
 }
 XRLOADER_ABI_CATCH_FALLBACK
-#endif
 
 static XRAPI_ATTR XrResult XRAPI_CALL LoaderXrEnumerateApiLayerProperties(uint32_t propertyCapacityInput,
                                                                           uint32_t *propertyCountOutput,
@@ -761,12 +759,8 @@ XRAPI_ATTR XrResult XRAPI_CALL LoaderXrGetInstanceProcAddr(XrInstance instance, 
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrGetInstanceProcAddr);
         return XR_SUCCESS;
     } else if (strcmp(name, "xrInitializeLoaderKHR") == 0) {
-#ifdef XR_KHR_LOADER_INIT_SUPPORT
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrInitializeLoaderKHR);
         return XR_SUCCESS;
-#else
-        return XR_ERROR_FUNCTION_UNSUPPORTED;
-#endif
     } else if (strcmp(name, "xrEnumerateApiLayerProperties") == 0) {
         *function = reinterpret_cast<PFN_xrVoidFunction>(LoaderXrEnumerateApiLayerProperties);
         return XR_SUCCESS;
@@ -844,4 +838,8 @@ LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrDestroyInstance(XrInstance instan
 LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrGetInstanceProcAddr(XrInstance instance, const char *name,
                                                                    PFN_xrVoidFunction *function) {
     return LoaderXrGetInstanceProcAddr(instance, name, function);
+}
+
+LOADER_EXPORT XRAPI_ATTR XrResult XRAPI_CALL xrInitializeLoaderKHR(const XrLoaderInitInfoBaseHeaderKHR *loaderInitInfo) {
+    return LoaderXrInitializeLoaderKHR(loaderInitInfo);
 }
