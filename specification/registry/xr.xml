@@ -137,7 +137,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 52)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 53)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -306,6 +306,12 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_HTC_body_tracking -->
         <type category="define">
 #define <name>XR_BODY_JOINT_COUNT_HTC</name> 26</type>
+
+        <!-- XR_BD_facial_simulation-->
+        <type category="define">
+#define <name>XR_FACE_EXPRESSION_COUNT_BD</name> 52</type>
+        <type category="define">
+#define <name>XR_LIP_EXPRESSION_COUNT_BD</name> 20</type>
 
 
         <!-- Value types -->
@@ -508,6 +514,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- XR_HTC_passthrough -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrPassthroughHTC</name>)</type>
 
+        <!-- XR_ANDROID_face_tracking -->
+        <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrFaceTrackerANDROID</name>)</type>
+
         <!-- XR_ANDROID_trackables -->
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrTrackableTrackerANDROID</name>)</type>
 
@@ -584,6 +593,9 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="handle" parent="XrSession"><type>XR_DEFINE_HANDLE</type>(<name>XrSenseDataProviderBD</name>)</type>
         <type category="handle" parent="XrSenseDataProviderBD"><type>XR_DEFINE_HANDLE</type>(<name>XrSenseDataSnapshotBD</name>)</type>
         <type category="handle" parent="XrSenseDataProviderBD"><type>XR_DEFINE_HANDLE</type>(<name>XrAnchorBD</name>)</type>
+
+        <!-- XR_BD_facial_simulation -->
+        <type category="handle" parent="XrSession"> <type>XR_DEFINE_HANDLE</type>(<name>XrFaceTrackerBD</name>)</type>
 
 
         <!-- Non-handle 64-bit opaque type from XR_EXT_future -->
@@ -726,6 +738,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type name="XrFoveationModeHTC" category="enum"/>
         <type name="XrFoveationDynamicFlagBitsHTC" category="enum"/>
         <type name="XrFoveationLevelHTC" category="enum"/>
+
+        <!-- enums for XR_ANDROID_face_tracking -->
+        <type name="XrFaceParameterIndicesANDROID" category="enum"/>
+        <type name="XrFaceTrackingStateANDROID" category="enum"/>
+        <type name="XrFaceConfidenceRegionsANDROID" category="enum"/>
 
         <!-- enums for XR_ANDROID_trackables -->
         <type name="XrTrackingStateANDROID" category="enum"/>
@@ -877,6 +894,11 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enums for XR_EXT_spatial_marker_tracking -->
         <type name="XrSpatialMarkerArucoDictEXT" category="enum"/>
         <type name="XrSpatialMarkerAprilTagDictEXT" category="enum"/>
+
+        <!-- XR_BD_facial_simulation -->
+        <type name="XrFacialSimulationModeBD" category="enum"/>
+        <type name="XrFaceExpressionBD" category="enum"/>
+        <type name="XrLipExpressionBD" category="enum"/>
 
         <!-- Struct types -->
         <type category="struct" name="XrVector2f">
@@ -3818,6 +3840,35 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>float</type>                           <name>value</name></member>
         </type>
 
+        <!-- XR_ANDROID_face_tracking -->
+        <type category="struct" name="XrFaceTrackerCreateInfoANDROID">
+            <member values="XR_TYPE_FACE_TRACKER_CREATE_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+        </type>
+        <type category="struct" name="XrFaceStateGetInfoANDROID">
+            <member values="XR_TYPE_FACE_STATE_GET_INFO_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+        </type>
+        <type category="struct" name="XrFaceStateANDROID">
+            <member values="XR_TYPE_FACE_STATE_ANDROID"><type>XrStructureType</type>         <name>type</name></member>
+            <member><type>void</type>*                                                       <name>next</name></member>
+            <member optional="true"><type>uint32_t</type>                                    <name>parametersCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                    <name>parametersCountOutput</name></member>
+            <member optional="true" len="parametersCapacityInput"><type>float</type>*        <name>parameters</name></member>
+            <member><type>XrFaceTrackingStateANDROID</type>                                  <name>faceTrackingState</name></member>
+            <member><type>XrTime</type>                                                      <name>sampleTime</name></member>
+            <member><type>XrBool32</type>                                                    <name>isValid</name></member>
+            <member optional="true"><type>uint32_t</type>                                    <name>regionConfidencesCapacityInput</name></member>
+            <member optional="true"><type>uint32_t</type>                                    <name>regionConfidencesCountOutput</name></member>
+            <member optional="true" len="regionConfidencesCapacityInput"><type>float</type>* <name>regionConfidences</name></member>
+        </type>
+        <type category="struct" name="XrSystemFaceTrackingPropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_FACE_TRACKING_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsFaceTracking</name></member>
+        </type>
+
         <!-- XR_ANDROID_passthrough_camera_state -->
         <type category="struct" name="XrSystemPassthroughCameraStatePropertiesANDROID" returnedonly="true" structextends="XrSystemProperties">
             <member values="XR_TYPE_SYSTEM_PASSTHROUGH_CAMERA_STATE_PROPERTIES_ANDROID"><type>XrStructureType</type> <name>type</name></member>
@@ -5474,6 +5525,43 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member len="markerCount"><type>XrSpatialMarkerDataEXT</type>* <name>markers</name></member>
         </type>
 
+        <!-- XR_BD_facial_simulation -->
+        <type category="struct" name="XrSystemFacialSimulationPropertiesBD" returnedonly="true" structextends="XrSystemProperties">
+            <member values="XR_TYPE_SYSTEM_FACIAL_SIMULATION_PROPERTIES_BD"><type>XrStructureType</type>  <name>type</name></member>
+            <member><type>void</type>*    <name>next</name></member>
+            <member><type>XrBool32</type> <name>supportsFaceTracking</name></member>
+        </type>
+
+        <type category="struct" name="XrFaceTrackerCreateInfoBD">
+            <member values="XR_TYPE_FACE_TRACKER_CREATE_INFO_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>*              <name>next</name></member>
+            <member><type>XrFacialSimulationModeBD</type> <name>mode</name></member>
+        </type>
+
+        <type category="struct" name="XrFacialSimulationDataGetInfoBD">
+            <member values="XR_TYPE_FACIAL_SIMULATION_DATA_GET_INFO_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member>const <type>void</type>* <name>next</name></member>
+            <member><type>XrTime</type>      <name>time</name></member>
+        </type>
+
+        <type category="struct" name="XrFacialSimulationDataBD">
+            <member values="XR_TYPE_FACIAL_SIMULATION_DATA_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                  <name>next</name></member>
+            <member><type>uint32_t</type>                               <name>faceExpressionWeightCount</name></member>
+            <member len="faceExpressionWeightCount"><type>float</type>* <name>faceExpressionWeights</name></member>
+            <member><type>XrBool32</type>                               <name>isUpperFaceDataValid</name></member>
+            <member><type>XrBool32</type>                               <name>isLowerFaceDataValid</name></member>
+            <member><type>XrTime</type>                                 <name>time</name></member>
+        </type>
+
+        <type category="struct" name="XrLipExpressionDataBD">
+            <member values="XR_TYPE_LIP_EXPRESSION_DATA_BD"><type>XrStructureType</type> <name>type</name></member>
+            <member><type>void</type>*                                     <name>next</name></member>
+            <member><type>uint32_t</type>                                  <name>lipsyncExpressionWeightCount</name></member>
+            <member len="lipsyncExpressionWeightCount"><type>float</type>* <name>lipsyncExpressionWeights</name></member>
+        </type>
+
+
     </types>
 
 
@@ -6785,6 +6873,88 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="7"   name="XR_COMPARE_OP_ALWAYS_FB"           comment="Comparison is always true."/>
     </enums>
 
+    <!-- enums for XR_ANDROID_face_tracking -->
+    <enums name="XrFaceParameterIndicesANDROID" type="enum">
+        <enum value="0"    name="XR_FACE_PARAMETER_INDICES_BROW_LOWERER_L_ANDROID"         comment="The left brow lowerer blendshape parameter."/>
+        <enum value="1"    name="XR_FACE_PARAMETER_INDICES_BROW_LOWERER_R_ANDROID"         comment="The right brow lowerer blendshape parameter."/>
+        <enum value="2"    name="XR_FACE_PARAMETER_INDICES_CHEEK_PUFF_L_ANDROID"           comment="The left cheek puff blendshape parameter."/>
+        <enum value="3"    name="XR_FACE_PARAMETER_INDICES_CHEEK_PUFF_R_ANDROID"           comment="The right cheek puff blendshape parameter."/>
+        <enum value="4"    name="XR_FACE_PARAMETER_INDICES_CHEEK_RAISER_L_ANDROID"         comment="The left cheek raiser blendshape parameter."/>
+        <enum value="5"    name="XR_FACE_PARAMETER_INDICES_CHEEK_RAISER_R_ANDROID"         comment="The right cheek raiser blendshape parameter."/>
+        <enum value="6"    name="XR_FACE_PARAMETER_INDICES_CHEEK_SUCK_L_ANDROID"           comment="The left cheek suck blendshape parameter."/>
+        <enum value="7"    name="XR_FACE_PARAMETER_INDICES_CHEEK_SUCK_R_ANDROID"           comment="The right cheek suck blendshape parameter."/>
+        <enum value="8"    name="XR_FACE_PARAMETER_INDICES_CHIN_RAISER_B_ANDROID"          comment="The bottom chin raiser blendshape parameter."/>
+        <enum value="9"    name="XR_FACE_PARAMETER_INDICES_CHIN_RAISER_T_ANDROID"          comment="The top chin raiser blendshape parameter."/>
+        <enum value="10"   name="XR_FACE_PARAMETER_INDICES_DIMPLER_L_ANDROID"              comment="The left dimpler blendshape parameter."/>
+        <enum value="11"   name="XR_FACE_PARAMETER_INDICES_DIMPLER_R_ANDROID"              comment="The right dimpler lowerer blendshape parameter."/>
+        <enum value="12"   name="XR_FACE_PARAMETER_INDICES_EYES_CLOSED_L_ANDROID"          comment="The left eyes closed blendshape parameter."/>
+        <enum value="13"   name="XR_FACE_PARAMETER_INDICES_EYES_CLOSED_R_ANDROID"          comment="The right eyes closed blendshape parameter."/>
+        <enum value="14"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_DOWN_L_ANDROID"       comment="The left eyes look down blendshape parameter."/>
+        <enum value="15"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_DOWN_R_ANDROID"       comment="The right eyes look down blendshape parameter."/>
+        <enum value="16"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_LEFT_L_ANDROID"       comment="The left look left blendshape parameter."/>
+        <enum value="17"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_LEFT_R_ANDROID"       comment="The left look right blendshape parameter."/>
+        <enum value="18"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_RIGHT_L_ANDROID"      comment="The right look left blendshape parameter."/>
+        <enum value="19"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_RIGHT_R_ANDROID"      comment="The right look right blendshape parameter."/>
+        <enum value="20"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_UP_L_ANDROID"         comment="The left eyes look up blendshape parameter."/>
+        <enum value="21"   name="XR_FACE_PARAMETER_INDICES_EYES_LOOK_UP_R_ANDROID"         comment="The right eyes look up blendshape parameter."/>
+        <enum value="22"   name="XR_FACE_PARAMETER_INDICES_INNER_BROW_RAISER_L_ANDROID"    comment="The left inner brow raiser blendshape parameter."/>
+        <enum value="23"   name="XR_FACE_PARAMETER_INDICES_INNER_BROW_RAISER_R_ANDROID"    comment="The right inner brow raiser blendshape parameter."/>
+        <enum value="24"   name="XR_FACE_PARAMETER_INDICES_JAW_DROP_ANDROID"               comment="The jaw drop blendshape parameter."/>
+        <enum value="25"   name="XR_FACE_PARAMETER_INDICES_JAW_SIDEWAYS_LEFT_ANDROID"      comment="The left jaw sideways blendshape parameter."/>
+        <enum value="26"   name="XR_FACE_PARAMETER_INDICES_JAW_SIDEWAYS_RIGHT_ANDROID"     comment="The right jaw sideways blendshape parameter."/>
+        <enum value="27"   name="XR_FACE_PARAMETER_INDICES_JAW_THRUST_ANDROID"             comment="The jaw thrust blendshape parameter."/>
+        <enum value="28"   name="XR_FACE_PARAMETER_INDICES_LID_TIGHTENER_L_ANDROID"        comment="The left lid tightener blendshape parameter."/>
+        <enum value="29"   name="XR_FACE_PARAMETER_INDICES_LID_TIGHTENER_R_ANDROID"        comment="The right lid tightener blendshape parameter."/>
+        <enum value="30"   name="XR_FACE_PARAMETER_INDICES_LIP_CORNER_DEPRESSOR_L_ANDROID" comment="The left corner lip depressor blendshape parameter."/>
+        <enum value="31"   name="XR_FACE_PARAMETER_INDICES_LIP_CORNER_DEPRESSOR_R_ANDROID" comment="The right corner lip depressor blendshape parameter."/>
+        <enum value="32"   name="XR_FACE_PARAMETER_INDICES_LIP_CORNER_PULLER_L_ANDROID"    comment="The left corner lip puller blendshape parameter."/>
+        <enum value="33"   name="XR_FACE_PARAMETER_INDICES_LIP_CORNER_PULLER_R_ANDROID"    comment="The right corner lip puller blendshape parameter."/>
+        <enum value="34"   name="XR_FACE_PARAMETER_INDICES_LIP_FUNNELER_LB_ANDROID"        comment="The left bottom lip funneler blendshape parameter."/>
+        <enum value="35"   name="XR_FACE_PARAMETER_INDICES_LIP_FUNNELER_LT_ANDROID"        comment="The left top lip funneler blendshape parameter."/>
+        <enum value="36"   name="XR_FACE_PARAMETER_INDICES_LIP_FUNNELER_RB_ANDROID"        comment="The right bottom lip funneler blendshape parameter."/>
+        <enum value="37"   name="XR_FACE_PARAMETER_INDICES_LIP_FUNNELER_RT_ANDROID"        comment="The right top lip funneler blendshape parameter."/>
+        <enum value="38"   name="XR_FACE_PARAMETER_INDICES_LIP_PRESSOR_L_ANDROID"          comment="The left lip pressor blendshape parameter."/>
+        <enum value="39"   name="XR_FACE_PARAMETER_INDICES_LIP_PRESSOR_R_ANDROID"          comment="The right lip pressor blendshape parameter."/>
+        <enum value="40"   name="XR_FACE_PARAMETER_INDICES_LIP_PUCKER_L_ANDROID"           comment="The left lip pucker blendshape parameter."/>
+        <enum value="41"   name="XR_FACE_PARAMETER_INDICES_LIP_PUCKER_R_ANDROID"           comment="The right lip pucker blendshape parameter."/>
+        <enum value="42"   name="XR_FACE_PARAMETER_INDICES_LIP_STRETCHER_L_ANDROID"        comment="The left lip stretcher blendshape parameter."/>
+        <enum value="43"   name="XR_FACE_PARAMETER_INDICES_LIP_STRETCHER_R_ANDROID"        comment="The right lip stretcher blendshape parameter."/>
+        <enum value="44"   name="XR_FACE_PARAMETER_INDICES_LIP_SUCK_LB_ANDROID"            comment="The left bottom lip suck blendshape parameter."/>
+        <enum value="45"   name="XR_FACE_PARAMETER_INDICES_LIP_SUCK_LT_ANDROID"            comment="The left top lip suck blendshape parameter."/>
+        <enum value="46"   name="XR_FACE_PARAMETER_INDICES_LIP_SUCK_RB_ANDROID"            comment="The right bottom lip suck blendshape parameter."/>
+        <enum value="47"   name="XR_FACE_PARAMETER_INDICES_LIP_SUCK_RT_ANDROID"            comment="The right top lip suck blendshape parameter."/>
+        <enum value="48"   name="XR_FACE_PARAMETER_INDICES_LIP_TIGHTENER_L_ANDROID"        comment="The left lip tightener blendshape parameter."/>
+        <enum value="49"   name="XR_FACE_PARAMETER_INDICES_LIP_TIGHTENER_R_ANDROID"        comment="The right lip tightener blendshape parameter."/>
+        <enum value="50"   name="XR_FACE_PARAMETER_INDICES_LIPS_TOWARD_ANDROID"            comment="The lips toward blendshape parameter."/>
+        <enum value="51"   name="XR_FACE_PARAMETER_INDICES_LOWER_LIP_DEPRESSOR_L_ANDROID"  comment="The left lower lip depressor blendshape parameter."/>
+        <enum value="52"   name="XR_FACE_PARAMETER_INDICES_LOWER_LIP_DEPRESSOR_R_ANDROID"  comment="The right lower lip depressor blendshape parameter."/>
+        <enum value="53"   name="XR_FACE_PARAMETER_INDICES_MOUTH_LEFT_ANDROID"             comment="The mouth move left blendshape parameter."/>
+        <enum value="54"   name="XR_FACE_PARAMETER_INDICES_MOUTH_RIGHT_ANDROID"            comment="The mouth move right blendshape parameter."/>
+        <enum value="55"   name="XR_FACE_PARAMETER_INDICES_NOSE_WRINKLER_L_ANDROID"        comment="The left nose wrinkler blendshape parameter."/>
+        <enum value="56"   name="XR_FACE_PARAMETER_INDICES_NOSE_WRINKLER_R_ANDROID"        comment="The right nose wrinkler blendshape parameter."/>
+        <enum value="57"   name="XR_FACE_PARAMETER_INDICES_OUTER_BROW_RAISER_L_ANDROID"    comment="The left outer brow raiser blendshape parameter."/>
+        <enum value="58"   name="XR_FACE_PARAMETER_INDICES_OUTER_BROW_RAISER_R_ANDROID"    comment="The right outer brow raiser blendshape parameter."/>
+        <enum value="59"   name="XR_FACE_PARAMETER_INDICES_UPPER_LID_RAISER_L_ANDROID"     comment="The left lid raiser blendshape parameter."/>
+        <enum value="60"   name="XR_FACE_PARAMETER_INDICES_UPPER_LID_RAISER_R_ANDROID"     comment="The right lid raiser blendshape parameter."/>
+        <enum value="61"   name="XR_FACE_PARAMETER_INDICES_UPPER_LIP_RAISER_L_ANDROID"     comment="The left lip raiser blendshape parameter."/>
+        <enum value="62"   name="XR_FACE_PARAMETER_INDICES_UPPER_LIP_RAISER_R_ANDROID"     comment="The right lip raiser blendshape parameter."/>
+        <enum value="63"   name="XR_FACE_PARAMETER_INDICES_TONGUE_OUT_ANDROID"             comment="The tongue out blendshape parameter."/>
+        <enum value="64"   name="XR_FACE_PARAMETER_INDICES_TONGUE_LEFT_ANDROID"            comment="The tongue left puller blendshape parameter."/>
+        <enum value="65"   name="XR_FACE_PARAMETER_INDICES_TONGUE_RIGHT_ANDROID"           comment="The right right puller blendshape parameter."/>
+        <enum value="66"   name="XR_FACE_PARAMETER_INDICES_TONGUE_UP_ANDROID"              comment="The right up puller blendshape parameter."/>
+        <enum value="67"   name="XR_FACE_PARAMETER_INDICES_TONGUE_DOWN_ANDROID"            comment="The right down puller blendshape parameter."/>
+    </enums>
+    <enums name="XrFaceTrackingStateANDROID" type="enum">
+        <enum value="0"   name="XR_FACE_TRACKING_STATE_PAUSED_ANDROID"   comment="Indicates that face tracking is paused but may be resumed in the future."/>
+        <enum value="1"   name="XR_FACE_TRACKING_STATE_STOPPED_ANDROID"  comment="Tracking has stopped but the client still has an active face tracker."/>
+        <enum value="2"   name="XR_FACE_TRACKING_STATE_TRACKING_ANDROID" comment="The face is currently tracked and its pose is current."/>
+    </enums>
+    <enums name="XrFaceConfidenceRegionsANDROID" type="enum">
+        <enum value="0"   name="XR_FACE_CONFIDENCE_REGIONS_LOWER_ANDROID"       comment="Confidence corresponding to the lower region."/>
+        <enum value="1"   name="XR_FACE_CONFIDENCE_REGIONS_LEFT_UPPER_ANDROID"  comment="Confidence corresponding to the left upper region."/>
+        <enum value="2"   name="XR_FACE_CONFIDENCE_REGIONS_RIGHT_UPPER_ANDROID" comment="Confidence corresponding to the right upper region."/>
+    </enums>
+
     <!-- enums for XR_ANDROID_passthrough_camera_state-->
     <enums name="XrPassthroughCameraStateANDROID" type="enum">
         <enum value="0"   name="XR_PASSTHROUGH_CAMERA_STATE_DISABLED_ANDROID"     comment="The camera has been disabled by an app, the system or the user."/>
@@ -7287,6 +7457,92 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="1"   name="XR_WORLD_MESH_BLOCK_RESULT_FAILED_ML"         comment="Mesh request has failed."/>
         <enum value="2"   name="XR_WORLD_MESH_BLOCK_RESULT_PENDING_ML"        comment="Mesh request is pending."/>
         <enum value="3"   name="XR_WORLD_MESH_BLOCK_RESULT_PARTIAL_UPDATE_ML" comment="There are partial updates on the mesh request."/>
+    </enums>
+
+    <!-- enums for XR_BD_facial_simulation -->
+    <enums name="XrFacialSimulationModeBD" type="enum">
+        <enum value="0"   name="XR_FACIAL_SIMULATION_MODE_DEFAULT_BD"                 comment="When calling flink:xrGetFacialSimulationDataBD, the output contains the slink:XrFacialSimulationDataBD only."/>
+        <enum value="1"   name="XR_FACIAL_SIMULATION_MODE_COMBINED_AUDIO_BD"          comment="Results in the same output as the `Default` mode, furthermore, runtime can provide a precise result by using the audio input."/>
+        <enum value="2"   name="XR_FACIAL_SIMULATION_MODE_COMBINED_AUDIO_WITH_LIP_BD" comment="Separates the result into two parts, one is slink:XrFacialSimulationDataBD, the other is slink:XrLipExpressionDataBD."/>
+        <enum value="3"   name="XR_FACIAL_SIMULATION_MODE_ONLY_AUDIO_WITH_LIP_BD"     comment="Uses only audio input to produce the output result as slink:XrLipExpressionDataBD."/>
+    </enums>
+
+    <enums name="XrFaceExpressionBD" type="enum">
+        <enum value="0"    name="XR_FACE_EXPRESSION_BROW_DROP_L_BD"/>
+        <enum value="1"    name="XR_FACE_EXPRESSION_BROW_DROP_R_BD"/>
+        <enum value="2"    name="XR_FACE_EXPRESSION_BROW_INNER_UPWARDS_BD"/>
+        <enum value="3"    name="XR_FACE_EXPRESSION_BROW_OUTER_UPWARDS_L_BD"/>
+        <enum value="4"    name="XR_FACE_EXPRESSION_BROW_OUTER_UPWARDS_R_BD"/>
+        <enum value="5"    name="XR_FACE_EXPRESSION_EYE_BLINK_L_BD"/>
+        <enum value="6"    name="XR_FACE_EXPRESSION_EYE_LOOK_DROP_L_BD"/>
+        <enum value="7"    name="XR_FACE_EXPRESSION_EYE_LOOK_IN_L_BD"/>
+        <enum value="8"    name="XR_FACE_EXPRESSION_EYE_LOOK_OUT_L_BD"/>
+        <enum value="9"    name="XR_FACE_EXPRESSION_EYE_LOOK_UPWARDS_L_BD"/>
+        <enum value="10"   name="XR_FACE_EXPRESSION_EYE_LOOK_SQUINT_L_BD"/>
+        <enum value="11"   name="XR_FACE_EXPRESSION_EYE_LOOK_WIDE_L_BD"/>
+        <enum value="12"   name="XR_FACE_EXPRESSION_EYE_BLINK_R_BD"/>
+        <enum value="13"   name="XR_FACE_EXPRESSION_EYE_LOOK_DROP_R_BD"/>
+        <enum value="14"   name="XR_FACE_EXPRESSION_EYE_LOOK_IN_R_BD"/>
+        <enum value="15"   name="XR_FACE_EXPRESSION_EYE_LOOK_OUT_R_BD"/>
+        <enum value="16"   name="XR_FACE_EXPRESSION_EYE_LOOK_UPWARDS_R_BD"/>
+        <enum value="17"   name="XR_FACE_EXPRESSION_EYE_LOOK_SQUINT_R_BD"/>
+        <enum value="18"   name="XR_FACE_EXPRESSION_EYE_LOOK_WIDE_R_BD"/>
+        <enum value="19"   name="XR_FACE_EXPRESSION_NOSE_SNEER_L_BD"/>
+        <enum value="20"   name="XR_FACE_EXPRESSION_NOSE_SNEER_R_BD"/>
+        <enum value="21"   name="XR_FACE_EXPRESSION_CHEEK_PUFF_BD"/>
+        <enum value="22"   name="XR_FACE_EXPRESSION_CHEEK_SQUINT_L_BD"/>
+        <enum value="23"   name="XR_FACE_EXPRESSION_CHEEK_SQUINT_R_BD"/>
+        <enum value="24"   name="XR_FACE_EXPRESSION_MOUTH_CLOSE_BD"/>
+        <enum value="25"   name="XR_FACE_EXPRESSION_MOUTH_FUNNEL_BD"/>
+        <enum value="26"   name="XR_FACE_EXPRESSION_MOUTH_PUCKER_BD"/>
+        <enum value="27"   name="XR_FACE_EXPRESSION_MOUTH_L_BD"/>
+        <enum value="28"   name="XR_FACE_EXPRESSION_MOUTH_R_BD"/>
+        <enum value="29"   name="XR_FACE_EXPRESSION_MOUTH_SMILE_L_BD"/>
+        <enum value="30"   name="XR_FACE_EXPRESSION_MOUTH_SMILE_R_BD"/>
+        <enum value="31"   name="XR_FACE_EXPRESSION_MOUTH_FROWN_L_BD"/>
+        <enum value="32"   name="XR_FACE_EXPRESSION_MOUTH_FROWN_R_BD"/>
+        <enum value="33"   name="XR_FACE_EXPRESSION_MOUTH_DIMPLE_L_BD"/>
+        <enum value="34"   name="XR_FACE_EXPRESSION_MOUTH_DIMPLE_R_BD"/>
+        <enum value="35"   name="XR_FACE_EXPRESSION_MOUTH_STRETCH_L_BD"/>
+        <enum value="36"   name="XR_FACE_EXPRESSION_MOUTH_STRETCH_R_BD"/>
+        <enum value="37"   name="XR_FACE_EXPRESSION_MOUTH_ROLL_LOWER_BD"/>
+        <enum value="38"   name="XR_FACE_EXPRESSION_MOUTH_ROLL_UPPER_BD"/>
+        <enum value="39"   name="XR_FACE_EXPRESSION_MOUTH_SHRUG_LOWER_BD"/>
+        <enum value="40"   name="XR_FACE_EXPRESSION_MOUTH_SHRUG_UPPER_BD"/>
+        <enum value="41"   name="XR_FACE_EXPRESSION_MOUTH_PRESS_L_BD"/>
+        <enum value="42"   name="XR_FACE_EXPRESSION_MOUTH_PRESS_R_BD"/>
+        <enum value="43"   name="XR_FACE_EXPRESSION_MOUTH_LOWER_DROP_L_BD"/>
+        <enum value="44"   name="XR_FACE_EXPRESSION_MOUTH_LOWER_DROP_R_BD"/>
+        <enum value="45"   name="XR_FACE_EXPRESSION_MOUTH_UPPER_UPWARDS_L_BD"/>
+        <enum value="46"   name="XR_FACE_EXPRESSION_MOUTH_UPPER_UPWARDS_R_BD"/>
+        <enum value="47"   name="XR_FACE_EXPRESSION_JAW_FORWARD_BD"/>
+        <enum value="48"   name="XR_FACE_EXPRESSION_JAW_L_BD"/>
+        <enum value="49"   name="XR_FACE_EXPRESSION_JAW_R_BD"/>
+        <enum value="50"   name="XR_FACE_EXPRESSION_JAW_OPEN_BD"/>
+        <enum value="51"   name="XR_FACE_EXPRESSION_TONGUE_OUT_BD"/>
+    </enums>
+
+    <enums name="XrLipExpressionBD" type="enum">
+        <enum value="0"    name="XR_LIP_EXPRESSION_PP_BD"/>
+        <enum value="1"    name="XR_LIP_EXPRESSION_CH_BD"/>
+        <enum value="2"    name="XR_LIP_EXPRESSION_LO_BD"/>
+        <enum value="3"    name="XR_LIP_EXPRESSION_O_BD"/>
+        <enum value="4"    name="XR_LIP_EXPRESSION_I_BD"/>
+        <enum value="5"    name="XR_LIP_EXPRESSION_LU_BD"/>
+        <enum value="6"    name="XR_LIP_EXPRESSION_RR_BD"/>
+        <enum value="7"    name="XR_LIP_EXPRESSION_XX_BD"/>
+        <enum value="8"    name="XR_LIP_EXPRESSION_LAA_BD"/>
+        <enum value="9"    name="XR_LIP_EXPRESSION_LI_BD"/>
+        <enum value="10"   name="XR_LIP_EXPRESSION_FF_BD"/>
+        <enum value="11"   name="XR_LIP_EXPRESSION_U_BD"/>
+        <enum value="12"   name="XR_LIP_EXPRESSION_TH_BD"/>
+        <enum value="13"   name="XR_LIP_EXPRESSION_LKK_BD"/>
+        <enum value="14"   name="XR_LIP_EXPRESSION_SS_BD"/>
+        <enum value="15"   name="XR_LIP_EXPRESSION_LE_BD"/>
+        <enum value="16"   name="XR_LIP_EXPRESSION_DD_BD"/>
+        <enum value="17"   name="XR_LIP_EXPRESSION_E_BD"/>
+        <enum value="18"   name="XR_LIP_EXPRESSION_LNN_BD"/>
+        <enum value="19"   name="XR_LIP_EXPRESSION_SIL_BD"/>
     </enums>
 
     <!-- SECTION: OpenXR command definitions -->
@@ -8909,6 +9165,29 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param>const <type>XrForceFeedbackCurlApplyLocationsMNDX</type>* <name>locations</name></param>
         </command>
 
+        <!-- commands for XR_ANDROID_face_tracking -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateFaceTrackerANDROID</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrFaceTrackerCreateInfoANDROID</type>* <name>createInfo</name></param>
+            <param><type>XrFaceTrackerANDROID</type>* <name>faceTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyFaceTrackerANDROID</name></proto>
+            <param externsync="true_with_children"><type>XrFaceTrackerANDROID</type> <name>faceTracker</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_SIZE_INSUFFICIENT,XR_ERROR_TIME_INVALID,XR_ERROR_SERVICE_NOT_READY_ANDROID">
+            <proto><type>XrResult</type> <name>xrGetFaceStateANDROID</name></proto>
+            <param><type>XrFaceTrackerANDROID</type> <name>faceTracker</name></param>
+            <param>const <type>XrFaceStateGetInfoANDROID</type>* <name>getInfo</name></param>
+            <param><type>XrFaceStateANDROID</type>* <name>faceStateOutput</name></param>
+        </command>
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED">
+            <proto><type>XrResult</type> <name>xrGetFaceCalibrationStateANDROID</name></proto>
+            <param><type>XrFaceTrackerANDROID</type> <name>faceTracker</name></param>
+            <param><type>XrBool32</type>* <name>faceIsCalibratedOutput</name></param>
+        </command>
+
         <!-- commands for XR_ANDROID_passthrough_camera_state -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
             <proto><type>XrResult</type> <name>xrGetPassthroughCameraStateANDROID</name></proto>
@@ -10052,6 +10331,47 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param>const <type>XrSimultaneousHandsAndControllersTrackingPauseInfoMETA</type>* <name>pauseInfo</name></param>
         </command>
 
+        <!-- commands for XR_BD_facial_simulation -->
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_SIZE_INSUFFICIENT">
+            <proto><type>XrResult</type> <name>xrEnumerateFacialSimulationModesBD</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param optional="true"><type>uint32_t</type> <name>modeCapacityInput</name></param>
+            <param><type>uint32_t</type>* <name>modeCountOutput</name></param>
+            <param optional="true" len="modeCapacityInput"><type>XrFacialSimulationModeBD</type>* <name>modes</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_LIMIT_REACHED,XR_ERROR_PERMISSION_INSUFFICIENT,XR_ERROR_FEATURE_UNSUPPORTED">
+            <proto><type>XrResult</type> <name>xrCreateFaceTrackerBD</name></proto>
+            <param><type>XrSession</type> <name>session</name></param>
+            <param>const <type>XrFaceTrackerCreateInfoBD</type>* <name>createInfo</name></param>
+            <param><type>XrFaceTrackerBD</type>* <name>tracker</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID">
+            <proto><type>XrResult</type> <name>xrDestroyFaceTrackerBD</name></proto>
+            <param externsync="true_with_children"><type>XrFaceTrackerBD</type> <name>tracker</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID">
+            <proto><type>XrResult</type> <name>xrGetFacialSimulationDataBD</name></proto>
+            <param><type>XrFaceTrackerBD</type> <name>tracker</name></param>
+            <param>const <type>XrFacialSimulationDataGetInfoBD</type>*<name>info</name></param>
+            <param><type>XrFacialSimulationDataBD</type>* <name>facialData</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrSetFacialSimulationModeBD</name></proto>
+            <param><type>XrFaceTrackerBD</type> <name>tracker</name></param>
+            <param><type>XrFacialSimulationModeBD</type> <name>mode</name></param>
+        </command>
+
+        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_VALIDATION_FAILURE,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_SESSION_LOST">
+            <proto><type>XrResult</type> <name>xrGetFacialSimulationModeBD</name></proto>
+            <param><type>XrFaceTrackerBD</type> <name>tracker</name></param>
+            <param><type>XrFacialSimulationModeBD</type>*<name>mode</name></param>
+        </command>
+
+
     </commands>
 
     <interaction_profiles>
@@ -10748,6 +11068,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component subpath="/input/thumbstick/y"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
             <component subpath="/input/thumbstick/click"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
         </interaction_profile>
+
+        <interaction_profile name="/interaction_profiles/bytedance/pico_ultra_controller_bd" title="PICO Ultra Controller">
+            <user_path path="/user/hand/left"/>
+            <user_path path="/user/hand/right"/>
+            <component user_path="/user/hand/left"    subpath="/input/x/click"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/x/touch"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/y/click"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/menu/click"          type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/left"    subpath="/input/y/touch"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/a/click"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/a/touch"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/b/click"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component user_path="/user/hand/right"   subpath="/input/b/touch"             type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/system/click"        type="XR_ACTION_TYPE_BOOLEAN_INPUT"    system="true"/>
+            <component                                subpath="/input/squeeze/click"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/squeeze/value"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/trigger/click"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/trigger/touch"       type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/trigger/value"       type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick"          type="XR_ACTION_TYPE_VECTOR2F_INPUT"/>
+            <component                                subpath="/input/thumbstick/x"        type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick/y"        type="XR_ACTION_TYPE_FLOAT_INPUT"/>
+            <component                                subpath="/input/thumbstick/click"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/thumbstick/touch"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component                                subpath="/input/aim/pose"            type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/input/grip/pose"           type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/input/grip_surface/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            <component                                subpath="/output/haptic"             type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
+        </interaction_profile>
+
 
         <!-- XR_EXT_hand_interaction -->
         <interaction_profile name="/interaction_profiles/ext/hand_interaction_ext" title="EXT hand interaction profile">
@@ -11958,7 +12308,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_MND_headless" number="43" type="instance" supported="openxr">
         <require>
-            <enum value="2"                           name="XR_MND_headless_SPEC_VERSION"/>
+            <enum value="3"                           name="XR_MND_headless_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_headless&quot;" name="XR_MND_HEADLESS_EXTENSION_NAME"/>
         </require>
     </extension>
@@ -12036,7 +12386,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_MSFT_hand_interaction" number="51" type="instance" supported="openxr">
+    <extension name="XR_MSFT_hand_interaction" number="51" type="instance" supported="openxr" promotedto="XR_EXT_hand_interaction">
         <require>
             <enum value="1"                                    name="XR_MSFT_hand_interaction_SPEC_VERSION"/>
             <enum value="&quot;XR_MSFT_hand_interaction&quot;" name="XR_MSFT_HAND_INTERACTION_EXTENSION_NAME"/>
@@ -16256,10 +16606,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_BD_extension_387" number="387" type="instance" supported="disabled">
+    <extension name="XR_BD_facial_simulation" number="387" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_BD_extension_387_SPEC_VERSION"/>
-            <enum value="&quot;XR_BD_extension_387&quot;" name="XR_BD_extension_387_EXTENSION_NAME"/>
+            <enum value="1"                                   name="XR_BD_facial_simulation_SPEC_VERSION"/>
+            <enum value="&quot;XR_BD_facial_simulation&quot;" name="XR_BD_FACIAL_SIMULATION_EXTENSION_NAME"/>
+            <type name="XrFaceTrackerBD"/>
+            <type name="XrSystemFacialSimulationPropertiesBD"/>
+            <type name="XrFaceTrackerCreateInfoBD"/>
+            <type name="XrFacialSimulationDataGetInfoBD"/>
+            <type name="XrFacialSimulationDataBD"/>
+            <type name="XrLipExpressionDataBD"/>
+            <type name="XrFaceExpressionBD"/>
+            <type name="XrLipExpressionBD"/>
+            <type name="XrFacialSimulationModeBD"/>
+            <type name="XR_FACE_EXPRESSION_COUNT_BD"/>
+            <type name="XR_LIP_EXPRESSION_COUNT_BD"/>
+
+            <enum offset="0" extends="XrObjectType"    name="XR_OBJECT_TYPE_FACE_TRACKER_BD"                 comment="XrFaceTrackerBD"/>
+
+            <enum offset="1" extends="XrStructureType" name="XR_TYPE_SYSTEM_FACIAL_SIMULATION_PROPERTIES_BD"/>
+            <enum offset="2" extends="XrStructureType" name="XR_TYPE_FACE_TRACKER_CREATE_INFO_BD"/>
+            <enum offset="3" extends="XrStructureType" name="XR_TYPE_FACIAL_SIMULATION_DATA_GET_INFO_BD"/>
+            <enum offset="4" extends="XrStructureType" name="XR_TYPE_FACIAL_SIMULATION_DATA_BD"/>
+            <enum offset="5" extends="XrStructureType" name="XR_TYPE_LIP_EXPRESSION_DATA_BD"/>
+
+            <command name="xrEnumerateFacialSimulationModesBD"/>
+            <command name="xrCreateFaceTrackerBD"/>
+            <command name="xrDestroyFaceTrackerBD"/>
+            <command name="xrGetFacialSimulationDataBD"/>
+            <command name="xrSetFacialSimulationModeBD"/>
+            <command name="xrGetFacialSimulationModeBD"/>
         </require>
     </extension>
 
@@ -16551,11 +16927,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_BD_extension_404" number="404" type="instance" supported="disabled">
+    <extension name="XR_BD_ultra_controller_interaction" number="404" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_BD_extension_404_SPEC_VERSION"/>
-            <enum value="&quot;XR_BD_extension_404&quot;" name="XR_BD_extension_404_EXTENSION_NAME"/>
+            <enum value="1"                                              name="XR_BD_ultra_controller_interaction_SPEC_VERSION"/>
+            <enum value="&quot;XR_BD_ultra_controller_interaction&quot;" name="XR_BD_ULTRA_CONTROLLER_INTERACTION_EXTENSION_NAME"/>
+
+            <interaction_profile name="/interaction_profiles/bytedance/pico_ultra_controller_bd"/>
         </require>
+
+        <require depends="XR_EXT_palm_pose">
+            <extend interaction_profile_path="/interaction_profiles/bytedance/pico_ultra_controller_bd">
+                <component subpath="/input/palm_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+
+        <require depends="XR_EXT_hand_interaction">
+            <extend interaction_profile_path="/interaction_profiles/bytedance/pico_ultra_controller_bd">
+                <component subpath="/input/pinch_ext/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+                <component subpath="/input/poke_ext/pose"    type="XR_ACTION_TYPE_POSE_INPUT"/>
+            </extend>
+        </require>
+
+        <require depends="XR_EXT_dpad_binding">
+            <extend interaction_profile_path="/interaction_profiles/bytedance/pico4_controller">
+                <component subpath="/input/thumbstick/dpad_up"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_down"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_left"    type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+                <component subpath="/input/thumbstick/dpad_right"   type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            </extend>
+        </require>
+
     </extension>
 
     <extension name="XR_BD_extension_405" number="405" type="instance" supported="disabled">
@@ -17061,10 +17462,36 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_459" number="459" type="instance" supported="disabled">
+    <extension name="XR_ANDROID_face_tracking" number="459" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_459_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_459&quot;" name="XR_ANDROID_extension_459_EXTENSION_NAME"/>
+            <enum value="1"                                    name="XR_ANDROID_face_tracking_SPEC_VERSION"/>
+            <enum value="&quot;XR_ANDROID_face_tracking&quot;" name="XR_ANDROID_FACE_TRACKING_EXTENSION_NAME"/>
+
+            <enum offset="0"         extends="XrStructureType" name="XR_TYPE_FACE_TRACKER_CREATE_INFO_ANDROID"/>
+            <enum offset="1"         extends="XrStructureType" name="XR_TYPE_FACE_STATE_GET_INFO_ANDROID"/>
+            <enum offset="2"         extends="XrStructureType" name="XR_TYPE_FACE_STATE_ANDROID"/>
+            <enum offset="3"         extends="XrStructureType" name="XR_TYPE_SYSTEM_FACE_TRACKING_PROPERTIES_ANDROID"/>
+
+            <enum offset="0" dir="-" extends="XrResult"        name="XR_ERROR_SERVICE_NOT_READY_ANDROID"              comment="The underlying tracking service is not yet ready."/>
+
+            <enum offset="0"         extends="XrObjectType"    name="XR_OBJECT_TYPE_FACE_TRACKER_ANDROID"             comment="XrFaceTrackerANDROID"/>
+
+            <enum value="68"                                   name="XR_FACE_PARAMETER_COUNT_ANDROID"/>
+            <enum value="3"                                    name="XR_FACE_REGION_CONFIDENCE_COUNT_ANDROID"/>
+
+            <type name="XrFaceTrackerANDROID"/>
+            <type name="XrFaceParameterIndicesANDROID"/>
+            <type name="XrFaceTrackingStateANDROID"/>
+            <type name="XrFaceConfidenceRegionsANDROID"/>
+            <type name="XrFaceTrackerCreateInfoANDROID"/>
+            <type name="XrFaceStateGetInfoANDROID"/>
+            <type name="XrFaceStateANDROID"/>
+            <type name="XrSystemFaceTrackingPropertiesANDROID"/>
+
+            <command name="xrCreateFaceTrackerANDROID"/>
+            <command name="xrDestroyFaceTrackerANDROID"/>
+            <command name="xrGetFaceStateANDROID"/>
+            <command name="xrGetFaceCalibrationStateANDROID"/>
         </require>
     </extension>
 
@@ -17140,7 +17567,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_ANDROID_trackables_object" number="467" type="instance" supported="openxr" depends="XR_ANDROID_trackables">
         <require>
-            <enum value="1"                                        name="XR_ANDROID_trackables_object_SPEC_VERSION"/>
+            <enum value="2"                                        name="XR_ANDROID_trackables_object_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_trackables_object&quot;" name="XR_ANDROID_TRACKABLES_OBJECT_EXTENSION_NAME"/>
 
             <enum offset="0" extends="XrStructureType"             name="XR_TYPE_TRACKABLE_OBJECT_ANDROID"/>

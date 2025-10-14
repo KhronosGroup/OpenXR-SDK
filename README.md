@@ -55,9 +55,9 @@ following table is provided to help you:
 
 | Visual Studio        | Version Number |
 | -------------------- |:--------------:|
-| Visual Studio 2013   |       12       |
-| Visual Studio 2015   |       14       |
 | Visual Studio 2017   |       15       |
+| Visual Studio 2019   |       16       |
+| Visual Studio 2022   |       17       |
 
 Specific sample command lines for building follow.
 If you're already familiar with the process of building a project with
@@ -126,3 +126,18 @@ cd build/linux_release
 cmake -DCMAKE_BUILD_TYPE=Release ../..
 make
 ```
+
+### macOS
+
+Building the OpenXR components in this tree on macOS is supported using Xcode
+14.0 and newer. You may need to install Xcode Command Line Tools and cmake.
+
+First, generate the Xcode project file using CMake:
+
+```cmd
+mkdir -p build/macos
+cd build/macos
+cmake -G "Xcode" ../..
+```
+
+Finally, open the build/macos/OPENXR.xcodeproj in Xcode to build the samples.

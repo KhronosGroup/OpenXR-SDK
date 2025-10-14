@@ -21,6 +21,41 @@ along with any public pull requests that have been accepted.
 In this repository in particular, since it is primarily software,
 pull requests may be integrated as they are accepted even between periodic updates.
 
+## OpenXR SDK 1.1.53 (2025-10-14)
+
+This release contains three new vendor extensions and some code cleanups. The
+test_runtime expansion is primarily intended for CTS self-testing but may be
+useful in other development processes as well.
+
+- SDK
+  - Improvement: fix clang-tidy bugprone-branch-clone warning
+    ([internal MR 3864](https://gitlab.khronos.org/openxr/openxr/merge_requests/3864),
+    [internal MR 4027](https://gitlab.khronos.org/openxr/openxr/merge_requests/4027))
+  - Improvement: Expand the "test_runtime" to implement all OpenXR 1.0 / OpenXR 1.1
+    functions for self-test purposes.
+    ([internal MR 3989](https://gitlab.khronos.org/openxr/openxr/merge_requests/3989))
+  - Improvement: Add stricter compiler flags to the loader and hello_xr, fixing
+    issues found.
+    ([internal MR 4028](https://gitlab.khronos.org/openxr/openxr/merge_requests/4028),
+    [internal MR 4042](https://gitlab.khronos.org/openxr/openxr/merge_requests/4042))
+  - Loader: Fix: Remove unused function definition `xrInitializeLoaderKHR` to fix
+    pedantic builds.
+    ([internal MR 4020](https://gitlab.khronos.org/openxr/openxr/merge_requests/4020))
+- Registry
+  - Fix: Bump `XR_ANDROID_trackables_object` version for fix to orientation.
+    ([internal MR 4018](https://gitlab.khronos.org/openxr/openxr/merge_requests/4018))
+  - New vendor extension: `XR_BD_facial_simulation` for vendor-specific access to
+    facial expressions.
+    ([internal MR 2925](https://gitlab.khronos.org/openxr/openxr/merge_requests/2925))
+  - New vendor extension: `XR_BD_ultra_controller_interaction` for PICO Ultra
+    controller interaction profile.
+    ([internal MR 3789](https://gitlab.khronos.org/openxr/openxr/merge_requests/3789))
+  - New vendor extension specification: `XR_ANDROID_face_tracking` for vendor-
+    specific access to facial expressions.
+    ([internal MR 3613](https://gitlab.khronos.org/openxr/openxr/merge_requests/3613))
+  - Update: Bump version of `XR_MND_headless` for clarification.
+    ([internal MR 3961](https://gitlab.khronos.org/openxr/openxr/merge_requests/3961))
+
 ## OpenXR SDK 1.1.52 (2025-09-19)
 
 This release contains a new ratified Khronos extension, a new vendor extension,

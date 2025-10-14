@@ -173,6 +173,9 @@ endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conformance/CMakeLists.txt")
     option(BUILD_CONFORMANCE_TESTS "Build conformance tests" ON)
 endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/hello_xr/CMakeLists.txt")
+    option(BUILD_SDK_TESTS "Build SDK samples" ON)
+endif()
 include(CMakeDependentOption)
 
 cmake_dependent_option(

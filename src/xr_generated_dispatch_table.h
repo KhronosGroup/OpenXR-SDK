@@ -585,6 +585,14 @@ struct XrGeneratedDispatchTable {
     PFN_xrDestroyBodyTrackerBD DestroyBodyTrackerBD;
     PFN_xrLocateBodyJointsBD LocateBodyJointsBD;
 
+    // ---- XR_BD_facial_simulation extension commands
+    PFN_xrEnumerateFacialSimulationModesBD EnumerateFacialSimulationModesBD;
+    PFN_xrCreateFaceTrackerBD CreateFaceTrackerBD;
+    PFN_xrDestroyFaceTrackerBD DestroyFaceTrackerBD;
+    PFN_xrGetFacialSimulationDataBD GetFacialSimulationDataBD;
+    PFN_xrSetFacialSimulationModeBD SetFacialSimulationModeBD;
+    PFN_xrGetFacialSimulationModeBD GetFacialSimulationModeBD;
+
     // ---- XR_BD_spatial_sensing extension commands
     PFN_xrEnumerateSpatialEntityComponentTypesBD EnumerateSpatialEntityComponentTypesBD;
     PFN_xrGetSpatialEntityUuidBD GetSpatialEntityUuidBD;
@@ -648,6 +656,12 @@ struct XrGeneratedDispatchTable {
     PFN_xrCreatePersistedAnchorSpaceANDROID CreatePersistedAnchorSpaceANDROID;
     PFN_xrEnumeratePersistedAnchorsANDROID EnumeratePersistedAnchorsANDROID;
     PFN_xrUnpersistAnchorANDROID UnpersistAnchorANDROID;
+
+    // ---- XR_ANDROID_face_tracking extension commands
+    PFN_xrCreateFaceTrackerANDROID CreateFaceTrackerANDROID;
+    PFN_xrDestroyFaceTrackerANDROID DestroyFaceTrackerANDROID;
+    PFN_xrGetFaceStateANDROID GetFaceStateANDROID;
+    PFN_xrGetFaceCalibrationStateANDROID GetFaceCalibrationStateANDROID;
 
     // ---- XR_ANDROID_passthrough_camera_state extension commands
     PFN_xrGetPassthroughCameraStateANDROID GetPassthroughCameraStateANDROID;

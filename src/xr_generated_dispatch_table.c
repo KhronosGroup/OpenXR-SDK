@@ -579,6 +579,14 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrDestroyBodyTrackerBD", (PFN_xrVoidFunction*)&table->DestroyBodyTrackerBD));
     (get_inst_proc_addr(instance, "xrLocateBodyJointsBD", (PFN_xrVoidFunction*)&table->LocateBodyJointsBD));
 
+    // ---- XR_BD_facial_simulation extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateFacialSimulationModesBD", (PFN_xrVoidFunction*)&table->EnumerateFacialSimulationModesBD));
+    (get_inst_proc_addr(instance, "xrCreateFaceTrackerBD", (PFN_xrVoidFunction*)&table->CreateFaceTrackerBD));
+    (get_inst_proc_addr(instance, "xrDestroyFaceTrackerBD", (PFN_xrVoidFunction*)&table->DestroyFaceTrackerBD));
+    (get_inst_proc_addr(instance, "xrGetFacialSimulationDataBD", (PFN_xrVoidFunction*)&table->GetFacialSimulationDataBD));
+    (get_inst_proc_addr(instance, "xrSetFacialSimulationModeBD", (PFN_xrVoidFunction*)&table->SetFacialSimulationModeBD));
+    (get_inst_proc_addr(instance, "xrGetFacialSimulationModeBD", (PFN_xrVoidFunction*)&table->GetFacialSimulationModeBD));
+
     // ---- XR_BD_spatial_sensing extension commands
     (get_inst_proc_addr(instance, "xrEnumerateSpatialEntityComponentTypesBD", (PFN_xrVoidFunction*)&table->EnumerateSpatialEntityComponentTypesBD));
     (get_inst_proc_addr(instance, "xrGetSpatialEntityUuidBD", (PFN_xrVoidFunction*)&table->GetSpatialEntityUuidBD));
@@ -642,6 +650,12 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrCreatePersistedAnchorSpaceANDROID", (PFN_xrVoidFunction*)&table->CreatePersistedAnchorSpaceANDROID));
     (get_inst_proc_addr(instance, "xrEnumeratePersistedAnchorsANDROID", (PFN_xrVoidFunction*)&table->EnumeratePersistedAnchorsANDROID));
     (get_inst_proc_addr(instance, "xrUnpersistAnchorANDROID", (PFN_xrVoidFunction*)&table->UnpersistAnchorANDROID));
+
+    // ---- XR_ANDROID_face_tracking extension commands
+    (get_inst_proc_addr(instance, "xrCreateFaceTrackerANDROID", (PFN_xrVoidFunction*)&table->CreateFaceTrackerANDROID));
+    (get_inst_proc_addr(instance, "xrDestroyFaceTrackerANDROID", (PFN_xrVoidFunction*)&table->DestroyFaceTrackerANDROID));
+    (get_inst_proc_addr(instance, "xrGetFaceStateANDROID", (PFN_xrVoidFunction*)&table->GetFaceStateANDROID));
+    (get_inst_proc_addr(instance, "xrGetFaceCalibrationStateANDROID", (PFN_xrVoidFunction*)&table->GetFaceCalibrationStateANDROID));
 
     // ---- XR_ANDROID_passthrough_camera_state extension commands
     (get_inst_proc_addr(instance, "xrGetPassthroughCameraStateANDROID", (PFN_xrVoidFunction*)&table->GetPassthroughCameraStateANDROID));

@@ -384,6 +384,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     endif()
 endif()
 
+include(CheckCCompilerFlag)
+
+if(NOT ANDROID)
+    check_c_compiler_flag(-Wmissing-prototypes HAVE_MISSING_PROTOTYPES)
+    # https://gitlab.khronos.org/openxr/openxr/-/merge_requests/4020 highlighted that
+    # teams often have stricter compiler settings for the openxr_loader
+    if(HAVE_MISSING_PROTOTYPES)
+        # apply only for C source files
+        target_compile_options(openxr_loader PRIVATE $<IF:$<COMPILE_LANGUAGE:C>,-Werror=missing-prototypes,>)
+    endif()
+endif()
+
 # We will never actually install here, but it's easier to set something than block all install code.
 if(ANDROID AND NOT INSTALL_TO_ARCHITECTURE_PREFIXES)
     set(CMAKE_INSTALL_BINDIR bin)

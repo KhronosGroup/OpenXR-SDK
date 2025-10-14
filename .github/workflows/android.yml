@@ -1,4 +1,4 @@
-# Copyright 2021-2023, Collabora, Ltd.
+# Copyright 2021-2025, Collabora, Ltd.
 # SPDX-License-Identifier: CC0-1.0
 
 name: Android
@@ -23,9 +23,9 @@ jobs:
   loader:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get modern CMake and Ninja
-        uses: "lukka/get-cmake@v4.0.3"
+        uses: "lukka/get-cmake@v4.1.2"
 
       # Do this before building aar since it affects the version
       - name: Touch SNAPSHOT marker file
@@ -45,16 +45,16 @@ jobs:
   build-helloxr:
     runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v5"
       - name: "Get modern CMake and Ninja"
-        uses: "lukka/get-cmake@v4.0.3"
+        uses: "lukka/get-cmake@v4.1.2"
       - name: "set up JDK"
-        uses: "actions/setup-java@v4"
+        uses: "actions/setup-java@v5"
         with:
           java-version-file: ".github/.java-version"
           distribution: "temurin"
       # Also performs Gradle wrapper validation
-      - uses: "gradle/actions/setup-gradle@v4"
+      - uses: "gradle/actions/setup-gradle@v5"
 
       # HelloXR OpenGLES version
       - name: Build HelloXR OpenGLES for Android

@@ -1,4 +1,4 @@
-# Copyright 2021-2024, Collabora, Ltd.
+# Copyright 2021-2025, Collabora, Ltd.
 # SPDX-License-Identifier: CC0-1.0
 
 on:
@@ -29,14 +29,14 @@ jobs:
       VULKAN_SDK_VERSION: "1.1.114.0"
       INSTALL_DIR: "${{ github.workspace }}/install"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
           fetch-tags: "${{ !github.event.release }}"
           fetch-depth: "${{ github.event.release && '0' || '1'}}"
 
       - name: Get modern CMake and Ninja
-        uses: lukka/get-cmake@v4.0.3
+        uses: lukka/get-cmake@v4.1.2
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
