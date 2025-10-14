@@ -109,6 +109,15 @@ Specific sample command lines for building follow.
 If you're already familiar with the process of building a project with
 CMake, you may skim or skip these instructions.
 
+For the following steps, make sure your starting directory is in OpenXR-SDK-main extracted from source code zip, or do a git clone.
+
+```sh
+mkdir git
+cd git
+git clone https://github.com/KhronosGroup/OpenXR-SDK.git
+cd OpenXR-SDK
+```
+
 #### Linux Debug
 
 ```sh
