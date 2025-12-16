@@ -58,6 +58,7 @@ following table is provided to help you:
 | Visual Studio 2017   |       15       |
 | Visual Studio 2019   |       16       |
 | Visual Studio 2022   |       17       |
+| Visual Studio 2026   |       18       |
 
 Specific sample command lines for building follow.
 If you're already familiar with the process of building a project with
