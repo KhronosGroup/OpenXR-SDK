@@ -30,7 +30,7 @@ list(
 
 include(StdFilesystemFlags)
 
-find_package(Sanitizers)
+find_package(Sanitizers QUIET)
 
 ### Dependencies
 
