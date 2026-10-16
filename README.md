@@ -48,7 +48,7 @@ e.g. by adding `-DDYNAMIC_LOADER=ON` or `-DDYNAMIC_LOADER=OFF` to your CMake com
 ### Windows
 
 Building the OpenXR components in this tree on Windows is supported using
-Visual Studio 2013 and newer.  Before beginning, make sure the appropriate
+Visual Studio 2017 and newer.  Before beginning, make sure the appropriate
 "msbuild.exe" is in your PATH.  Also, when generating the solutions/projects
 using CMake, be sure to use the correct compiler version number.  The
 following table is provided to help you:

@@ -929,6 +929,21 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrBeginSpatialContainerRenderingEXT", (PFN_xrVoidFunction*)&table->BeginSpatialContainerRenderingEXT));
     (get_inst_proc_addr(instance, "xrEndSpatialContainerRenderingEXT", (PFN_xrVoidFunction*)&table->EndSpatialContainerRenderingEXT));
     (get_inst_proc_addr(instance, "xrLocateSpatialContainerViewsEXT", (PFN_xrVoidFunction*)&table->LocateSpatialContainerViewsEXT));
+
+    // ---- XR_EXT_spatial_entity_archetypes extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateSpatialArchetypesEXT", (PFN_xrVoidFunction*)&table->EnumerateSpatialArchetypesEXT));
+    (get_inst_proc_addr(instance, "xrEnumerateSpatialArchetypeComponentTypesEXT", (PFN_xrVoidFunction*)&table->EnumerateSpatialArchetypeComponentTypesEXT));
+
+    // ---- XR_EXT_enumerate_swapchain_formats2 extension commands
+    (get_inst_proc_addr(instance, "xrEnumerateSwapchainFormats2EXT", (PFN_xrVoidFunction*)&table->EnumerateSwapchainFormats2EXT));
+
+    // ---- XR_EXT_app_consumed_swapchain extension commands
+    (get_inst_proc_addr(instance, "xrCreateAppConsumedSwapchainEXT", (PFN_xrVoidFunction*)&table->CreateAppConsumedSwapchainEXT));
+    (get_inst_proc_addr(instance, "xrDestroyAppConsumedSwapchainEXT", (PFN_xrVoidFunction*)&table->DestroyAppConsumedSwapchainEXT));
+    (get_inst_proc_addr(instance, "xrGetAppConsumedSwapchainPropertiesEXT", (PFN_xrVoidFunction*)&table->GetAppConsumedSwapchainPropertiesEXT));
+    (get_inst_proc_addr(instance, "xrEnumerateAppConsumedSwapchainImagesEXT", (PFN_xrVoidFunction*)&table->EnumerateAppConsumedSwapchainImagesEXT));
+    (get_inst_proc_addr(instance, "xrAcquireAppConsumedSwapchainImageEXT", (PFN_xrVoidFunction*)&table->AcquireAppConsumedSwapchainImageEXT));
+    (get_inst_proc_addr(instance, "xrReleaseAppConsumedSwapchainImageEXT", (PFN_xrVoidFunction*)&table->ReleaseAppConsumedSwapchainImageEXT));
 }
 
 

@@ -28,8 +28,6 @@ list(
     "${CMAKE_CURRENT_SOURCE_DIR}/external/sanitizers-cmake/cmake"
 )
 
-include(StdFilesystemFlags)
-
 find_package(Sanitizers QUIET)
 
 ### Dependencies
@@ -202,13 +200,6 @@ cmake_dependent_option(
     "Use system jsoncpp instead of vendored source"
     ON
     "JSONCPP_FOUND"
-    OFF
-)
-cmake_dependent_option(
-    BUILD_WITH_STD_FILESYSTEM
-    "Use std::[experimental::]filesystem."
-    ON
-    "HAVE_FILESYSTEM_WITHOUT_LIB OR HAVE_FILESYSTEM_NEEDING_LIBSTDCXXFS OR HAVE_FILESYSTEM_NEEDING_LIBCXXFS"
     OFF
 )
 

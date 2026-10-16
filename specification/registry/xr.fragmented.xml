@@ -139,7 +139,7 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         updates them automatically by processing a line at a time.
         -->
         <type category="define">// OpenXR current version number.
-#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 63)</type>
+#define <name>XR_CURRENT_API_VERSION</name> <type>XR_MAKE_VERSION</type>(1, 1, 65)</type>
 
         <!--
         Defines for a fixed major.minor version of OpenXR preserving the shared patch version.
@@ -650,7 +650,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <type category="handle" parent="XrInstance"><type>XR_DEFINE_HANDLE</type>(<name>XrCameraDeviceBD</name>)</type>
         <type category="handle" parent="XrCameraDeviceBD"><type>XR_DEFINE_HANDLE</type>(<name>XrCameraCaptureSessionBD</name>)</type>
 
-
         <!-- Non-handle 64-bit opaque type from XR_EXT_future -->
         <type category="basetype"><type>XR_DEFINE_OPAQUE_64</type>(<name>XrFutureEXT</name>)</type>
 
@@ -875,10 +874,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
         <!-- enums for XR_ML_global_dimmer -->
         <type name="XrGlobalDimmerFrameEndInfoFlagBitsML" category="enum"/>
 
-        <!-- enums for XR_QCOM_tracking_optimization_settings -->
-        <type name="XrTrackingOptimizationSettingsDomainQCOM" category="enum"/>
-        <type name="XrTrackingOptimizationSettingsHintQCOM" category="enum"/>
-
         <!-- XR_MNDX_force_feedback_curl -->
         <type name="XrForceFeedbackCurlLocationMNDX" category="enum"/>
 
@@ -1013,9 +1008,6 @@ maintained in the default branch of the Khronos OpenXR GitHub project.
 
         <!-- XR_META_environment_raycast -->
         <type name="XrEnvironmentRaycastHitStatusMETA" category="enum"/>
-
-        <!-- XR_QCOM_hand_tracking_gesture -->
-        <type name="XrHandGestureTypeQCOM" category="enum"/>
 
         <!-- XR_EXT_haptic_parametric -->
         <type name="XrHapticParametricStreamFrameTypeEXT" category="enum"/>
@@ -6573,13 +6565,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <member><type>XrTime</type> <name>captureTime</name></member>
         </type>
 
-        <!-- XR_QCOM_hand_tracking_gesture -->
-        <type category="struct" name="XrHandGestureQCOM">
-            <member><type>XrHandGestureTypeQCOM</type> <name>gesture</name></member>
-            <member><type>float</type>                 <name>gestureRatio</name></member>
-            <member><type>float</type>                 <name>flipRatio</name></member>
-        </type>
-
         <!-- XR_META_hand_tracking_frequency_hint -->
         <type category="enum" name="XrHandTrackingFrequencyHintMETA"/>
 
@@ -7041,7 +7026,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="-47"   name="XR_ERROR_ACTIONSETS_ALREADY_ATTACHED"         comment="The session already has attached action sets."/>
         <enum value="-48"   name="XR_ERROR_LOCALIZED_NAME_DUPLICATED"           comment="The localized name provided was a duplicate of an already-existing resource."/>
         <enum value="-49"   name="XR_ERROR_LOCALIZED_NAME_INVALID"              comment="The localized name provided was invalid."/>
-        <enum value="-50"   name="XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING"  comment="The ftext:xrGet*GraphicsRequirements call was not made before calling fname:xrCreateSession."/>
+        <enum value="-50"   name="XR_ERROR_GRAPHICS_REQUIREMENTS_CALL_MISSING"  comment="The ftext:xrGet*GraphicsRequirements call was not made before calling flink:xrCreateSession."/>
         <enum value="-51"   name="XR_ERROR_RUNTIME_UNAVAILABLE"                 comment="The loader was unable to find or load a runtime."/>
         <unused start="-100"/>
     </enums>
@@ -7120,7 +7105,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     </enums>
     <enums name="XrPerfSettingsNotificationLevelEXT" type="enum">
         <enum value="0"    name="XR_PERF_SETTINGS_NOTIF_LEVEL_NORMAL_EXT"   comment="Notifies that the sub-domain has reached a level where no further actions other than currently applied are necessary"/>
-        <enum value="25"   name="XR_PERF_SETTINGS_NOTIF_LEVEL_WARNING_EXT"  comment="Notifies that the sub-domain has reached an early warning level where the application should start proactive mitigation actions with the goal to return to the ename:XR_PERF_NOTIF_LEVEL_NORMAL level"/>
+        <enum value="25"   name="XR_PERF_SETTINGS_NOTIF_LEVEL_WARNING_EXT"  comment="Notifies that the sub-domain has reached an early warning level where the application should start proactive mitigation actions with the goal to return to the ename:XR_PERF_SETTINGS_NOTIF_LEVEL_NORMAL_EXT level"/>
         <enum value="75"   name="XR_PERF_SETTINGS_NOTIF_LEVEL_IMPAIRED_EXT" comment="Notifies that the sub-domain has reached a critical level with significant performance degradation. The application should take drastic mitigation action"/>
     </enums>
 
@@ -7551,8 +7536,8 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- XR_META_body_tracking_calibration -->
     <enums name="XrBodyTrackingCalibrationStateMETA" type="enum">
         <enum value="1"   name="XR_BODY_TRACKING_CALIBRATION_STATE_VALID_META"       comment="Valid calibration, body tracking expected to be stable."/>
-        <enum value="2"   name="XR_BODY_TRACKING_CALIBRATION_STATE_CALIBRATING_META" comment="Calibration is in progress, body joint poses from ename:XR_FB_body_tracking are valid to read and internally consistent within a single call, but may: be more variable than normal, shifting dramatically before calibration ends."/>
-        <enum value="3"   name="XR_BODY_TRACKING_CALIBRATION_STATE_INVALID_META"     comment="Calibration is invalid, accessing the body joint poses from ename:XR_FB_body_tracking is defined behavior but their contents are unspecified. Tracking data may: be read but must: not be interpreted as body tracking poses."/>
+        <enum value="2"   name="XR_BODY_TRACKING_CALIBRATION_STATE_CALIBRATING_META" comment="Calibration is in progress, body joint poses from apiext:XR_FB_body_tracking are valid to read and internally consistent within a single call, but may: be more variable than normal, shifting dramatically before calibration ends."/>
+        <enum value="3"   name="XR_BODY_TRACKING_CALIBRATION_STATE_INVALID_META"     comment="Calibration is invalid, accessing the body joint poses from apiext:XR_FB_body_tracking is defined behavior but their contents are unspecified. Tracking data may: be read but must: not be interpreted as body tracking poses."/>
     </enums>
 
     <!-- XR_META_body_tracking_fidelity -->
@@ -7647,7 +7632,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="0"   name="XR_BODY_TRACKING_MESSAGE_NO_ERROR_BD"                        comment="No error"/>
         <enum value="1"   name="XR_BODY_TRACKING_MESSAGE_TRACKER_NOT_CALIBRATED_BD"          comment="Body tracker is not calibrated"/>
         <enum value="2"   name="XR_BODY_TRACKING_MESSAGE_TRACKER_NUM_NOT_ENOUGH_BD"          comment="The number of connected trackers is insufficient."/>
-        <enum value="3"   name="XR_BODY_TRACKING_MESSAGE_TRACKER_STATE_NOT_SATISFIED_BD"     comment="The tracker is not in normal tracking mode, e.g., it is being charged."/>
+        <enum value="3"   name="XR_BODY_TRACKING_MESSAGE_TRACKER_STATE_NOT_SATISFIED_BD"     comment="The tracker is not in normal tracking mode, e.g. it is being charged."/>
         <enum value="4"   name="XR_BODY_TRACKING_MESSAGE_TRACKER_PERSISTENT_INVISIBILITY_BD" comment="The tracker remains persistently undetected or invisible."/>
         <enum value="5"   name="XR_BODY_TRACKING_MESSAGE_TRACKER_DATA_ERROR_BD"              comment="There are errors in the data generated by the tracker."/>
         <enum value="6"   name="XR_BODY_TRACKING_MESSAGE_USER_CHANGE_BD"                     comment="The user of the tracker may have been changed."/>
@@ -8028,7 +8013,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="2"   name="XR_SEMANTIC_LABEL_CEILING_META"             comment="Ceiling of a room or space."/>
         <enum value="3"   name="XR_SEMANTIC_LABEL_WALL_FACE_META"           comment="Wall face of a room or space. Wall faces, along with invisible wall faces, are used to define the outer boundary of a room."/>
         <enum value="4"   name="XR_SEMANTIC_LABEL_INNER_WALL_FACE_META"     comment="Inner wall face, which is a wall face that exists inside a room and is not connected to the outer boundary of the room. For example, a pillar that exists at the center of a room may: be represented by using four inner wall faces."/>
-        <enum value="5"   name="XR_SEMANTIC_LABEL_INVISIBLE_WALL_FACE_META" comment="Invisible wall face, which is used to conceptually separate a space (e.g., separate a living space from a kitchen space in an open floor plan house even though there is no real wall between the two spaces)."/>
+        <enum value="5"   name="XR_SEMANTIC_LABEL_INVISIBLE_WALL_FACE_META" comment="Invisible wall face, which is used to conceptually separate a space (e.g. separate a living space from a kitchen space in an open floor plan house even though there is no real wall between the two spaces)."/>
         <enum value="6"   name="XR_SEMANTIC_LABEL_DOOR_FRAME_META"          comment="Door frame, which usually exists on a wall face."/>
         <enum value="7"   name="XR_SEMANTIC_LABEL_WINDOW_FRAME_META"        comment="Window frame, which usually exists on a wall face."/>
     </enums>
@@ -8043,7 +8028,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <enums name="XrSemanticLabelsSupportFlagBitsFB" type="bitmask">
         <enum bitpos="0" name="XR_SEMANTIC_LABELS_SUPPORT_MULTIPLE_SEMANTIC_LABELS_BIT_FB"       comment="If set, and the runtime reports the pname:extensionVersion as 2 or greater, the runtime may: return multiple semantic labels separated by a comma without spaces. Otherwise, the runtime must: return a single semantic label."/>
         <enum bitpos="1" name="XR_SEMANTIC_LABELS_SUPPORT_ACCEPT_DESK_TO_TABLE_MIGRATION_BIT_FB" comment="If set, and the runtime reports the pname:extensionVersion as 3 or greater, the runtime must: return &quot;TABLE&quot; instead of &quot;DESK&quot; as a semantic label to the application. Otherwise, the runtime must: return &quot;DESK&quot; instead of &quot;TABLE&quot; as a semantic label to the application, when applicable."/>
-        <enum bitpos="2" name="XR_SEMANTIC_LABELS_SUPPORT_ACCEPT_INVISIBLE_WALL_FACE_BIT_FB"     comment="If set, and the runtime reports the pname:extensionVersion as 4 or greater, the runtime may: return &quot;INVISIBLE_WALL_FACE&quot; instead of &quot;WALL_FACE&quot; as a semantic label to the application in order to represent an invisible wall used to conceptually separate a space (e.g., separate a living space from a kitchen space in an open floor plan house even though there is no real wall between the two spaces) instead of a real wall. Otherwise, the runtime must: return &quot;WALL_FACE&quot; as a semantic label to the application in order to represent both an invisible and real wall, when applicable."/>
+        <enum bitpos="2" name="XR_SEMANTIC_LABELS_SUPPORT_ACCEPT_INVISIBLE_WALL_FACE_BIT_FB"     comment="If set, and the runtime reports the pname:extensionVersion as 4 or greater, the runtime may: return &quot;INVISIBLE_WALL_FACE&quot; instead of &quot;WALL_FACE&quot; as a semantic label to the application in order to represent an invisible wall used to conceptually separate a space (e.g. separate a living space from a kitchen space in an open floor plan house even though there is no real wall between the two spaces) instead of a real wall. Otherwise, the runtime must: return &quot;WALL_FACE&quot; as a semantic label to the application in order to represent both an invisible and real wall, when applicable."/>
     </enums>
 
     <!-- enums for XR_META_local_dimming -->
@@ -8073,16 +8058,16 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <!-- flags for XR_FB_keyboard_tracking query state -->
     <enums name="XrKeyboardTrackingFlagBitsFB" type="bitmask">
-        <enum bitpos="0" name="XR_KEYBOARD_TRACKING_EXISTS_BIT_FB"    comment="indicates that the system has a physically tracked keyboard to report.  If not set then no other bits should be considered to be valid or meaningful.  If set either XR_KEYBOARD_TRACKING_LOCAL_BIT_FB or XR_KEYBOARD_TRACKING_REMOTE_BIT_FB must also be set."/>
-        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_LOCAL_BIT_FB"     comment="indicates that the physically tracked keyboard is intended to be used in a local pairing with the system.  Mutually exclusive with XR_KEYBOARD_TRACKING_REMOTE_BIT_FB."/>
-        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_REMOTE_BIT_FB"    comment="indicates that the physically tracked keyboard is intended to be used while paired to a separate remote computing device. Mutually exclusive with XR_KEYBOARD_TRACKING_LOCAL_BIT_FB."/>
+        <enum bitpos="0" name="XR_KEYBOARD_TRACKING_EXISTS_BIT_FB"    comment="indicates that the system has a physically tracked keyboard to report.  If not set then no other bits should be considered to be valid or meaningful.  If set either ename:XR_KEYBOARD_TRACKING_LOCAL_BIT_FB or ename:XR_KEYBOARD_TRACKING_REMOTE_BIT_FB must also be set."/>
+        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_LOCAL_BIT_FB"     comment="indicates that the physically tracked keyboard is intended to be used in a local pairing with the system.  Mutually exclusive with ename:XR_KEYBOARD_TRACKING_REMOTE_BIT_FB."/>
+        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_REMOTE_BIT_FB"    comment="indicates that the physically tracked keyboard is intended to be used while paired to a separate remote computing device. Mutually exclusive with ename:XR_KEYBOARD_TRACKING_LOCAL_BIT_FB."/>
         <enum bitpos="3" name="XR_KEYBOARD_TRACKING_CONNECTED_BIT_FB" comment="indicates that the physically tracked keyboard is actively connected to the headset and capable of sending key data"/>
     </enums>
 
     <!-- flags for XR_FB_keyboard_tracking query -->
     <enums name="XrKeyboardTrackingQueryFlagBitsFB" type="bitmask">
-        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB"  comment="indicates the query is for the physically tracked keyboard that is intended to be used in a local pairing with the System. Mutually exclusive with XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB."/>
-        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB" comment="indicates the query is for the physically tracked keyboard that may be connected to a separate remote computing device. Mutually exclusive with XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB."/>
+        <enum bitpos="1" name="XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB"  comment="indicates the query is for the physically tracked keyboard that is intended to be used in a local pairing with the System. Mutually exclusive with ename:XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB."/>
+        <enum bitpos="2" name="XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB" comment="indicates the query is for the physically tracked keyboard that may be connected to a separate remote computing device. Mutually exclusive with ename:XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB."/>
     </enums>
 
     <!-- flags for XR_FB_space_warp -->
@@ -8093,7 +8078,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- flags for XR_FB_render_model -->
     <enums name="XrRenderModelFlagBitsFB" type="bitmask">
         <enum bitpos="0" name="XR_RENDER_MODEL_SUPPORTS_GLTF_2_0_SUBSET_1_BIT_FB" comment="Minimal level of support.  Can only contain a single mesh.  Can only contain a single texture.  Can not contain transparency.  Assumes unlit rendering.  Requires Extension KHR_texturebasisu."/>
-        <enum bitpos="1" name="XR_RENDER_MODEL_SUPPORTS_GLTF_2_0_SUBSET_2_BIT_FB" comment="All of XR_RENDER_MODEL_SUPPORTS_GLTF_2_0_SUBSET_1_BIT_FB support plus: Multiple meshes. Multiple Textures. Texture Transparency."/>
+        <enum bitpos="1" name="XR_RENDER_MODEL_SUPPORTS_GLTF_2_0_SUBSET_2_BIT_FB" comment="All of ename:XR_RENDER_MODEL_SUPPORTS_GLTF_2_0_SUBSET_1_BIT_FB support plus: Multiple meshes. Multiple Textures. Texture Transparency."/>
     </enums>
 
     <!-- enums for XR_HTC_facial_tracking -->
@@ -8212,9 +8197,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <!-- flags for XR_META_performance_metrics -->
     <enums name="XrPerformanceMetricsCounterFlagBitsMETA" type="bitmask">
-        <enum bitpos="0" name="XR_PERFORMANCE_METRICS_COUNTER_ANY_VALUE_VALID_BIT_META"   comment="Indicates any of the values in XrPerformanceMetricsCounterMETA is valid."/>
-        <enum bitpos="1" name="XR_PERFORMANCE_METRICS_COUNTER_UINT_VALUE_VALID_BIT_META"  comment="Indicates the uintValue in XrPerformanceMetricsCounterMETA is valid."/>
-        <enum bitpos="2" name="XR_PERFORMANCE_METRICS_COUNTER_FLOAT_VALUE_VALID_BIT_META" comment="Indicates the floatValue in XrPerformanceMetricsCounterMETA is valid."/>
+        <enum bitpos="0" name="XR_PERFORMANCE_METRICS_COUNTER_ANY_VALUE_VALID_BIT_META"   comment="Indicates any of the values in slink:XrPerformanceMetricsCounterMETA is valid."/>
+        <enum bitpos="1" name="XR_PERFORMANCE_METRICS_COUNTER_UINT_VALUE_VALID_BIT_META"  comment="Indicates the `uintValue` in slink:XrPerformanceMetricsCounterMETA is valid."/>
+        <enum bitpos="2" name="XR_PERFORMANCE_METRICS_COUNTER_FLOAT_VALUE_VALID_BIT_META" comment="Indicates the `floatValue` in slink:XrPerformanceMetricsCounterMETA is valid."/>
     </enums>
 
     <enums name="XrPerformanceMetricsCounterUnitMETA" type="enum">
@@ -8297,9 +8282,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="4"   name="XR_PERFORMANCE_METRICS_COUNTER_UNIT_HERTZ_ANDROID"        comment="The performance counter unit is hertz (Hz)."/>
     </enums>
     <enums name="XrPerformanceMetricsCounterFlagBitsANDROID" type="bitmask">
-        <enum bitpos="0" name="XR_PERFORMANCE_METRICS_COUNTER_ANY_VALUE_VALID_BIT_ANDROID"   comment="Indicates any of the values in XrPerformanceMetricsCounterANDROID is valid."/>
-        <enum bitpos="1" name="XR_PERFORMANCE_METRICS_COUNTER_UINT_VALUE_VALID_BIT_ANDROID"  comment="Indicates the uintValue in XrPerformanceMetricsCounterANDROID is valid."/>
-        <enum bitpos="2" name="XR_PERFORMANCE_METRICS_COUNTER_FLOAT_VALUE_VALID_BIT_ANDROID" comment="Indicates the floatValue in XrPerformanceMetricsCounterANDROID is valid."/>
+        <enum bitpos="0" name="XR_PERFORMANCE_METRICS_COUNTER_ANY_VALUE_VALID_BIT_ANDROID"   comment="Indicates any of the values in slink:XrPerformanceMetricsCounterANDROID is valid."/>
+        <enum bitpos="1" name="XR_PERFORMANCE_METRICS_COUNTER_UINT_VALUE_VALID_BIT_ANDROID"  comment="Indicates the uintValue in slink:XrPerformanceMetricsCounterANDROID is valid."/>
+        <enum bitpos="2" name="XR_PERFORMANCE_METRICS_COUNTER_FLOAT_VALUE_VALID_BIT_ANDROID" comment="Indicates the floatValue in slink:XrPerformanceMetricsCounterANDROID is valid."/>
     </enums>
 
     <!-- enums for XR_FB_composition_layer_depth_test -->
@@ -8463,7 +8448,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- enums for XR_ANDROID_scene_meshing -->
     <enums name="XrSceneMeshSemanticLabelSetANDROID" type="enum">
         <enum value="0"   name="XR_SCENE_MESH_SEMANTIC_LABEL_SET_NONE_ANDROID"    comment="This semantic label set represents absence of semantic labels."/>
-        <enum value="1"   name="XR_SCENE_MESH_SEMANTIC_LABEL_SET_DEFAULT_ANDROID" comment="This semantic label set represents XrSceneMeshSemanticLabelANDROID."/>
+        <enum value="1"   name="XR_SCENE_MESH_SEMANTIC_LABEL_SET_DEFAULT_ANDROID" comment="This semantic label set represents elink:XrSceneMeshSemanticLabelANDROID."/>
     </enums>
     <enums name="XrSceneMeshSemanticLabelANDROID" type="enum">
         <enum value="0"   name="XR_SCENE_MESH_SEMANTIC_LABEL_OTHER_ANDROID"   comment="This semantic label indicates that the corresponding mesh element represents an unknown object."/>
@@ -8505,19 +8490,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <!-- enums for XR_ML_global_dimmer -->
     <enums name="XrGlobalDimmerFrameEndInfoFlagBitsML" type="bitmask">
         <enum bitpos="0" name="XR_GLOBAL_DIMMER_FRAME_END_INFO_ENABLED_BIT_ML" comment="Indicates that the global dimmer should: be enabled and controlled by slink:XrGlobalDimmerFrameEndInfoML::pname:dimmerValue."/>
-    </enums>
-
-    <!-- enums for XR_QCOM_tracking_optimization_settings -->
-    <enums name="XrTrackingOptimizationSettingsHintQCOM" type="enum">
-        <enum value="0"   name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_NONE_QCOM"                       comment="Used by the application to indicate that it does not have a preference to optimize for. The run-time is understood to choose a balanced approach."/>
-        <enum value="1"   name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_LONG_RANGE_PRIORITIZATION_QCOM"  comment="Used by the application to indicate that it prefers tracking to be optimized for long range, possibly at the expense of competing interests."/>
-        <enum value="2"   name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_CLOSE_RANGE_PRIORITIZATION_QCOM" comment="Used by the application to indicate that it prefers tracking to be optimized for close range, possibly at the expense of competing interests."/>
-        <enum value="3"   name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_LOW_POWER_PRIORITIZATION_QCOM"   comment="Used by the application to indicate that it prefers tracking to be optimized for low power consumption, possibly at the expense of competing interests."/>
-        <enum value="4"   name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_HIGH_POWER_PRIORITIZATION_QCOM"  comment="Used by the application to indicate that it prefers tracking to be optimized for increased tracking performance, possibly at the cost of increased power consumption."/>
-    </enums>
-
-    <enums name="XrTrackingOptimizationSettingsDomainQCOM" type="enum">
-        <enum value="1"   name="XR_TRACKING_OPTIMIZATION_SETTINGS_DOMAIN_ALL_QCOM" comment="Setting applies to all QCOM tracking extensions."/>
     </enums>
 
     <!-- enums for XR_MNDX_force_feedback_curl -->
@@ -8822,7 +8794,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
     <enums name="XrSoundObstacleFlagBitsBD" type="bitmask">
         <enum bitpos="0" name="XR_SOUND_OBSTACLE_ENABLED_BIT_BD"   comment="to indicate an update of slink:XrSoundObstacleConfigBD::pname:enabled"/>
         <enum bitpos="1" name="XR_SOUND_OBSTACLE_POSE_BIT_BD"      comment="to indicate an update of slink:XrSoundObstacleConfigBD::pname:pose"/>
-        <enum bitpos="2" name="XR_SOUND_OBSTACLE_MESH_BIT_BD"      comment="to indicate an update of slink:XrSoundObstacleConfigBD::pname:mesh"/>
+        <enum bitpos="2" name="XR_SOUND_OBSTACLE_MESH_BIT_BD"      comment="to indicate an update of flink:xrUpdateSoundObstacleConfigBD::pname:mesh"/>
         <enum bitpos="3" name="XR_SOUND_OBSTACLE_MATERIALS_BIT_BD" comment="to indicate an update of slink:XrSoundObstacleConfigBD::pname:materials"/>
     </enums>
 
@@ -8840,7 +8812,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <enums name="XrSoundFieldFlagBitsBD" type="bitmask">
         <enum bitpos="0" name="XR_SOUND_FIELD_ENABLED_BIT_BD"     comment="to indicate an update of slink:XrSoundFieldConfigBD::pname:enabled"/>
-        <enum bitpos="1" name="XR_SOUND_FIELD_ORIENTATION_BIT_BD" comment="to indicate an update of slink:XrSoundFieldConfigBD::pname:pose and/or slink:XrSoundFieldConfigBD::pname:baseSpace"/>
+        <enum bitpos="1" name="XR_SOUND_FIELD_ORIENTATION_BIT_BD" comment="to indicate an update of slink:XrSoundFieldConfigBD::pname:orientation and/or slink:XrSoundFieldConfigBD::pname:baseSpace"/>
         <enum bitpos="2" name="XR_SOUND_FIELD_MAIN_VOLUME_BIT_BD" comment="to indicate an update of slink:XrSoundFieldConfigBD::pname:mainVolume"/>
         <enum bitpos="3" name="XR_SOUND_FIELD_LFE_GAIN_BIT_BD"    comment="to indicate an update of slink:XrSoundFieldConfigBD::pname:lfeGain"/>
     </enums>
@@ -9049,17 +9021,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <enum value="1"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_HIT_META"                      comment="The intersection with the environment is found."/>
         <enum value="2"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_NO_HIT_META"                   comment="The intersection with the environment is not found."/>
         <enum value="3"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_HIT_POINT_OCCLUDED_META"       comment="The ray intersects with the environment, but the actual hit point is invisible."/>
-        <enum value="4"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_HIT_POINT_OUTSIDE_OF_FOV_META" comment="The hit point can't be determined because it lies outside of the field of view."/>
+        <enum value="4"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_HIT_POINT_OUTSIDE_OF_FOV_META" comment="The hit point cannot be determined because it lies outside of the field of view."/>
         <enum value="5"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_RAY_OCCLUDED_META"             comment="The ray is completely occluded by the environment."/>
         <enum value="6"   name="XR_ENVIRONMENT_RAYCAST_HIT_STATUS_HIT_INVALID_ORIENTATION_META"  comment="The intersection with the environment is found, but the hit orientation cannot be determined."/>
-    </enums>
-
-    <!-- XR_QCOM_hand_tracking_gesture -->
-    <enums name="XrHandGestureTypeQCOM" type="enum">
-        <enum value="-1"   name="XR_HAND_GESTURE_TYPE_UNKNOWN_QCOM"   comment="Indicates that no gesture can be detected."/>
-        <enum value="0"    name="XR_HAND_GESTURE_TYPE_OPEN_HAND_QCOM" comment="The open hand gesture is a neutral position. It is performed by extending the hand with the fingers opened and the palm away from the user."/>
-        <enum value="2"    name="XR_HAND_GESTURE_TYPE_GRAB_QCOM"      comment="The grab gesture is performed by placing the hand in front of the user and closing the hand into a fist."/>
-        <enum value="7"    name="XR_HAND_GESTURE_TYPE_PINCH_QCOM"     comment="The pinch gesture is performed by touching the tip of the thumb to the tip of the index finger while extending the remaining fingers."/>
     </enums>
 
     <!-- XR_EXT_haptic_parametric -->
@@ -10907,13 +10871,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrDevicePcmSampleRateGetInfoFB</type>* <name>deviceSampleRate</name></param>
         </command>
 
-        <!-- XR_QCOM_tracking_optimization_settings -->
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID,XR_ERROR_HINT_ALREADY_SET_QCOM,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_SESSION_LOST,XR_ERROR_VALIDATION_FAILURE">
-            <proto><type>XrResult</type> <name>xrSetTrackingOptimizationSettingsHintQCOM</name></proto>
-            <param><type>XrSession</type> <name>session</name></param>
-            <param><type>XrTrackingOptimizationSettingsDomainQCOM</type> <name>domain</name></param>
-            <param><type>XrTrackingOptimizationSettingsHintQCOM</type> <name>hint</name></param>
-        </command>
 
         <!-- commands for XR_FB_spatial_entity_user -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_LIMIT_REACHED,XR_ERROR_OUT_OF_MEMORY,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_SESSION_LOST,XR_ERROR_VALIDATION_FAILURE">
@@ -12622,14 +12579,6 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <param><type>XrSpatialSnapshotEXT</type>* <name>snapshot</name></param>
         </command>
 
-        <!-- XR_QCOM_hand_tracking_gesture -->
-        <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_SESSION_LOST,XR_ERROR_TIME_INVALID">
-            <proto><type>XrResult</type> <name>xrGetHandGestureQCOM</name></proto>
-            <param><type>XrHandTrackerEXT</type> <name>handTracker</name></param>
-            <param><type>XrTime</type> <name>time</name></param>
-            <param><type>XrHandGestureQCOM</type>* <name>handGesture</name></param>
-        </command>
-
         <!-- XR_META_hand_tracking_frequency -->
         <command successcodes="XR_SUCCESS,XR_SESSION_LOSS_PENDING" errorcodes="XR_ERROR_FUNCTION_UNSUPPORTED,XR_ERROR_HANDLE_INVALID,XR_ERROR_INSTANCE_LOST,XR_ERROR_RUNTIME_FAILURE,XR_ERROR_SESSION_LOST,XR_ERROR_VALIDATION_FAILURE">
             <proto><type>XrResult</type> <name>xrSetHandTrackingFrequencyHintMETA</name></proto>
@@ -13625,6 +13574,18 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <component subpath="/output/haptic"             type="XR_ACTION_TYPE_VIBRATION_OUTPUT"/>
         </interaction_profile>
 
+        <!-- XR_BD_motion_tracker -->
+        <interaction_profile name="/interaction_profiles/bytedance/motion_tracker_bd" title="ByteDance motion tracker">
+            <user_path path="/user/motion_tracker_bd/tracker1"/>
+            <user_path path="/user/motion_tracker_bd/tracker2"/>
+            <user_path path="/user/motion_tracker_bd/tracker3"/>
+            <user_path path="/user/motion_tracker_bd/tracker4"/>
+            <user_path path="/user/motion_tracker_bd/tracker5"/>
+
+            <component subpath="/input/primary/click"      type="XR_ACTION_TYPE_BOOLEAN_INPUT"/>
+            <component subpath="/input/centroid_bd/pose"   type="XR_ACTION_TYPE_POSE_INPUT"/>
+        </interaction_profile>
+
     </interaction_profiles>
 
     <!-- SECTION: OpenXR 1.0 API interface definitions -->
@@ -14425,8 +14386,8 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="6"                                          name="XR_KHR_android_thread_settings_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_android_thread_settings&quot;" name="XR_KHR_ANDROID_THREAD_SETTINGS_EXTENSION_NAME"/>
-            <enum offset="0" dir="-" extends="XrResult"              name="XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR" comment="xrSetAndroidApplicationThreadKHR failed as thread id is invalid."/>
-            <enum offset="1" dir="-" extends="XrResult"              name="XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR"    comment="xrSetAndroidApplicationThreadKHR failed setting the thread attributes/priority."/>
+            <enum offset="0" dir="-" extends="XrResult"              name="XR_ERROR_ANDROID_THREAD_SETTINGS_ID_INVALID_KHR" comment="flink:xrSetAndroidApplicationThreadKHR failed as thread ID is invalid."/>
+            <enum offset="1" dir="-" extends="XrResult"              name="XR_ERROR_ANDROID_THREAD_SETTINGS_FAILURE_KHR"    comment="flink:xrSetAndroidApplicationThreadKHR failed setting the thread attributes/priority."/>
             <type name="XrAndroidThreadTypeKHR"/>
             <command name="xrSetAndroidApplicationThreadKHR"/>
         </require>
@@ -15545,7 +15506,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="2"                                                       name="XR_MND_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
             <enum value="&quot;XR_MND_swapchain_usage_input_attachment_bit&quot;" name="XR_MND_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME"/>
             <!-- NOTE: This was added before the working group established a process, and has been normalized by promotion to KHR. Future vendor extensions MUST NOT extend core bitmasks. -->
-            <enum bitpos="7" extends="XrSwapchainUsageFlagBits" name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND" comment="Specifies that the image may: be used as a input attachment."/>
+            <enum extends="XrSwapchainUsageFlagBits" name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND" alias="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_KHR" comment="Specifies that the image may: be used as a input attachment."/>
         </require>
     </extension>
 
@@ -16386,7 +16347,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ML_localization_map" number="140" type="instance" depends="XR_VERSION_1_0+XR_EXT_uuid" supported="openxr">
+    <extension name="XR_ML_localization_map" number="140" type="instance" supported="openxr">
         <require>
             <enum value="1"                                         name="XR_ML_localization_map_SPEC_VERSION"/>
             <enum value="&quot;XR_ML_localization_map&quot;"        name="XR_ML_LOCALIZATION_MAP_EXTENSION_NAME"/>
@@ -16803,7 +16764,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         <require>
             <enum value="3"                                                       name="XR_KHR_swapchain_usage_input_attachment_bit_SPEC_VERSION"/>
             <enum value="&quot;XR_KHR_swapchain_usage_input_attachment_bit&quot;" name="XR_KHR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_EXTENSION_NAME"/>
-            <enum extends="XrSwapchainUsageFlagBits"                              name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_KHR"                alias="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_MND" comment="Specifies that the image may: be used as a input attachment."/>
+            <enum bitpos="7" extends="XrSwapchainUsageFlagBits"                   name="XR_SWAPCHAIN_USAGE_INPUT_ATTACHMENT_BIT_KHR"                comment="Specifies that the image may: be used as a input attachment."/>
         </require>
     </extension>
 
@@ -18332,7 +18293,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_render_model" number="301" type="instance" supported="openxr" depends="XR_VERSION_1_1,XR_EXT_uuid" ratified="openxr">
+    <extension name="XR_EXT_render_model" number="301" type="instance" supported="openxr" ratified="openxr">
         <require>
             <enum value="1"                               name="XR_EXT_render_model_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_render_model&quot;" name="XR_EXT_RENDER_MODEL_EXTENSION_NAME"/>
@@ -18408,7 +18369,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <command name="xrEnumerateRenderModelSubactionPathsEXT"/>
             <command name="xrGetRenderModelPoseTopLevelUserPathEXT"/>
 
-            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_NOT_INTERACTION_RENDER_MODEL_EXT" comment="The provided slink:XrRenderModelEXT was not created from a basetype:XrRenderModelIdEXT from `&lt;&lt;XR_EXT_interaction_render_model&gt;&gt;`"/>
+            <enum offset="0" dir="-" extends="XrResult" name="XR_ERROR_NOT_INTERACTION_RENDER_MODEL_EXT" comment="The provided slink:XrRenderModelEXT was not created from an basetype:XrRenderModelIdEXT from apiext:XR_EXT_interaction_render_model"/>
         </require>
     </extension>
 
@@ -18481,23 +18442,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_QCOM_tracking_optimization_settings" number="307" type="instance" supported="openxr">
-        <require>
-            <enum value="2"                                                  name="XR_QCOM_tracking_optimization_settings_SPEC_VERSION"/>
-            <enum value="&quot;XR_QCOM_tracking_optimization_settings&quot;" name="XR_QCOM_TRACKING_OPTIMIZATION_SETTINGS_EXTENSION_NAME"/>
-            <enum offset="0" dir="-" extends="XrResult"                      name="XR_ERROR_HINT_ALREADY_SET_QCOM"                        comment="Tracking optimization hint is already set for the domain."/>
-
-            <type name="XrTrackingOptimizationSettingsDomainQCOM"/>
-            <type name="XrTrackingOptimizationSettingsHintQCOM"/>
-
-            <enum extends="XrTrackingOptimizationSettingsHintQCOM" name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_LONG_RANGE_PRIORIZATION_QCOM"  alias="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_LONG_RANGE_PRIORITIZATION_QCOM"  comment="Backward-compatibility alias containing typo."/>
-            <enum extends="XrTrackingOptimizationSettingsHintQCOM" name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_CLOSE_RANGE_PRIORIZATION_QCOM" alias="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_CLOSE_RANGE_PRIORITIZATION_QCOM" comment="Backward-compatibility alias containing typo."/>
-            <enum extends="XrTrackingOptimizationSettingsHintQCOM" name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_LOW_POWER_PRIORIZATION_QCOM"   alias="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_LOW_POWER_PRIORITIZATION_QCOM"   comment="Backward-compatibility alias containing typo."/>
-            <enum extends="XrTrackingOptimizationSettingsHintQCOM" name="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_HIGH_POWER_PRIORIZATION_QCOM"  alias="XR_TRACKING_OPTIMIZATION_SETTINGS_HINT_HIGH_POWER_PRIORITIZATION_QCOM"  comment="Backward-compatibility alias containing typo."/>
-
-            <command name="xrSetTrackingOptimizationSettingsHintQCOM"/>
-        </require>
-    </extension>
+    <extension name="XR_QCOM_tracking_optimization_settings" number="307" type="instance" fragment="true"/>
 
     <extension name="XR_QCOM_ray_casting" number="308" type="instance" supported="disabled">
         <require>
@@ -18520,17 +18465,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_QCOM_hand_tracking_gesture" number="311" type="instance" supported="openxr" depends="XR_VERSION_1_0+XR_EXT_hand_tracking" deprecatedby="XR_EXT_hand_interaction">
-        <require>
-            <enum value="1"                                         name="XR_QCOM_hand_tracking_gesture_SPEC_VERSION"/>
-            <enum value="&quot;XR_QCOM_hand_tracking_gesture&quot;" name="XR_QCOM_HAND_TRACKING_GESTURE_EXTENSION_NAME"/>
-
-            <type name="XrHandGestureTypeQCOM"/>
-            <type name="XrHandGestureQCOM"/>
-
-            <command name="xrGetHandGestureQCOM"/>
-        </require>
-    </extension>
+    <extension name="XR_QCOM_hand_tracking_gesture" number="311" type="instance" fragment="true"/>
 
     <extension name="XR_QCOM_extension_312" number="312" type="instance" supported="disabled">
         <require>
@@ -19505,9 +19440,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="1"                                           name="XR_BD_spatial_plane_SPEC_VERSION"/>
             <enum value="&quot;XR_BD_spatial_plane&quot;"             name="XR_BD_SPATIAL_PLANE_EXTENSION_NAME"/>
 
-            <enum offset="0" extends="XrStructureType"                name="XR_TYPE_SYSTEM_SPATIAL_PLANE_PROPERTIES_BD"                 comment="XrSystemSpatialPlanePropertiesBD"/>
-            <enum offset="1" extends="XrStructureType"                name="XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_PLANE_ORIENTATION_BD" comment="XrSpatialEntityComponentDataPlaneOrientationBD"/>
-            <enum offset="2" extends="XrStructureType"                name="XR_TYPE_SENSE_DATA_FILTER_PLANE_ORIENTATION_BD"             comment="XrSenseDataFilterPlaneOrientationBD"/>
+            <enum offset="0" extends="XrStructureType"                name="XR_TYPE_SYSTEM_SPATIAL_PLANE_PROPERTIES_BD"/>
+            <enum offset="1" extends="XrStructureType"                name="XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_PLANE_ORIENTATION_BD"/>
+            <enum offset="2" extends="XrStructureType"                name="XR_TYPE_SENSE_DATA_FILTER_PLANE_ORIENTATION_BD"/>
 
             <enum offset="0" extends="XrSenseDataProviderTypeBD"      name="XR_SENSE_DATA_PROVIDER_TYPE_PLANE_BD"                       comment="Capture spatial plane data."/>
             <enum offset="0" extends="XrSpatialEntityComponentTypeBD" name="XR_SPATIAL_ENTITY_COMPONENT_TYPE_PLANE_ORIENTATION_BD"      comment="The plane orientation. Corresponds to component data structure slink:XrSpatialEntityComponentDataPlaneOrientationBD."/>
@@ -20155,7 +20090,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_device_anchor_persistence" number="458" type="instance" depends="XR_EXT_uuid+XR_ANDROID_trackables" supported="openxr" deprecatedby="XR_EXT_spatial_persistence+XR_EXT_spatial_persistence_operations">
+    <extension name="XR_ANDROID_device_anchor_persistence" number="458" type="instance" depends="XR_ANDROID_trackables" supported="openxr" deprecatedby="XR_EXT_spatial_persistence+XR_EXT_spatial_persistence_operations">
         <require>
             <enum value="1"                                                name="XR_ANDROID_device_anchor_persistence_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_device_anchor_persistence&quot;" name="XR_ANDROID_DEVICE_ANCHOR_PERSISTENCE_EXTENSION_NAME"/>
@@ -20165,8 +20100,8 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum offset="3"         extends="XrStructureType"             name="XR_TYPE_DEVICE_ANCHOR_PERSISTENCE_CREATE_INFO_ANDROID"/>
             <enum offset="4"         extends="XrStructureType"             name="XR_TYPE_SYSTEM_DEVICE_ANCHOR_PERSISTENCE_PROPERTIES_ANDROID"/>
 
-            <enum offset="0" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_ID_NOT_FOUND_ANDROID"                        comment="XrUuidExt passed to the function was not found to be a persisted anchor."/>
-            <enum offset="1" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_ALREADY_PERSISTED_ANDROID"                   comment="XrUuidExt passed to the function was already marked to be persisted."/>
+            <enum offset="0" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_ID_NOT_FOUND_ANDROID"                        comment="slink:XrUuidEXT passed to the function was not found to be a persisted anchor."/>
+            <enum offset="1" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_ALREADY_PERSISTED_ANDROID"                   comment="slink:XrUuidEXT passed to the function was already marked to be persisted."/>
             <enum offset="2" dir="-" extends="XrResult"                    name="XR_ERROR_ANCHOR_NOT_TRACKING_ANDROID"                        comment="ANchor cannot be persisted because it is not tracking."/>
             <enum offset="3" dir="-" extends="XrResult"                    name="XR_ERROR_PERSISTED_DATA_NOT_READY_ANDROID"                   comment="Persisted data stored by this app has not been loaded yet."/>
 
@@ -20347,7 +20282,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_unbounded_reference_space" number="468" type="instance" supported="openxr">
+    <extension name="XR_ANDROID_unbounded_reference_space" number="468" type="instance" supported="openxr" deprecatedby="XR_EXT_stationary_reference_space">
         <require>
             <enum value="1"                                                name="XR_ANDROID_unbounded_reference_space_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_unbounded_reference_space&quot;" name="XR_ANDROID_UNBOUNDED_REFERENCE_SPACE_EXTENSION_NAME"/>
@@ -20880,40 +20815,15 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_NV_extension_524" number="524" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_524_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_524&quot;" name="XR_NV_extension_524_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_524" number="524" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_525" number="525" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_525_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_525&quot;" name="XR_NV_extension_525_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_525" number="525" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_526" number="526" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_526_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_526&quot;" name="XR_NV_extension_526_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_526" number="526" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_527" number="527" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_527_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_527&quot;" name="XR_NV_extension_527_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_527" number="527" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_528" number="528" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_528_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_528&quot;" name="XR_NV_extension_528_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_528" number="528" type="instance" stubs="true"/>
 
     <extension name="XR_META_boundary_visibility" number="529" type="instance" supported="openxr">
         <require>
@@ -22405,7 +22315,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_trackables_image" number="710" type="instance" supported="openxr" depends="XR_EXT_future+XR_ANDROID_trackables">
+    <extension name="XR_ANDROID_trackables_image" number="710" type="instance" supported="openxr" depends="XR_EXT_future+XR_ANDROID_trackables" deprecatedby="XR_EXT_spatial_image_tracking">
         <require>
             <enum value="1"                                           name="XR_ANDROID_trackables_image_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_trackables_image&quot;"     name="XR_ANDROID_TRACKABLES_IMAGE_EXTENSION_NAME"/>
@@ -22652,7 +22562,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_scene_meshing" number="719" type="instance" supported="openxr">
+    <extension name="XR_ANDROID_scene_meshing" number="719" type="instance" supported="openxr" deprecatedby="XR_EXT_spatial_mesh_tracking">
         <require>
             <enum value="3"                                    name="XR_ANDROID_scene_meshing_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_scene_meshing&quot;" name="XR_ANDROID_SCENE_MESHING_EXTENSION_NAME"/>
@@ -22960,7 +22870,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_stationary_reference_space" number="743" type="instance" depends="XR_VERSION_1_0+XR_EXT_uuid" supported="openxr">
+    <extension name="XR_EXT_stationary_reference_space" number="743" type="instance" supported="openxr">
         <require>
             <enum value="1"                                             name="XR_EXT_stationary_reference_space_SPEC_VERSION"/>
             <enum value="&quot;XR_EXT_stationary_reference_space&quot;" name="XR_EXT_STATIONARY_REFERENCE_SPACE_EXTENSION_NAME"/>
@@ -23014,12 +22924,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_745" number="745" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                                name="XR_EXT_extension_745_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_745&quot;" name="XR_EXT_EXTENSION_745_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_EXT_spatial_object_tracking" number="745" type="instance" fragment="true"/>
 
     <extension name="XR_LOGITECH_mx_ink_stylus_interaction" number="746" type="instance" supported="openxr">
         <require>
@@ -23049,7 +22954,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum offset="1" extends="XrStructureType"                name="XR_TYPE_SENSE_DATA_PROVIDER_CREATE_INFO_DYNAMIC_OBJECT_BD"/>
             <enum offset="2" extends="XrStructureType"                name="XR_TYPE_SPATIAL_ENTITY_COMPONENT_DATA_DYNAMIC_OBJECT_BD"/>
             <enum offset="3" extends="XrStructureType"                name="XR_TYPE_DYNAMIC_OBJECT_DATA_BD"/>
-            <enum offset="4" extends="XrStructureType"                name="XR_TYPE_SENSE_DATA_FILTER_DYNAMIC_OBJECT_TYPE_BD"          comment="XrSenseDataFilterDynamicObjectTypeBD"/>
+            <enum offset="4" extends="XrStructureType"                name="XR_TYPE_SENSE_DATA_FILTER_DYNAMIC_OBJECT_TYPE_BD"/>
 
             <enum offset="0" extends="XrSenseDataProviderTypeBD"      name="XR_SENSE_DATA_PROVIDER_TYPE_DYNAMIC_OBJECT_BD"             comment="Capture dynamic object data."/>
 
@@ -23091,10 +22996,11 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_BD_extension_750" number="750" type="instance" supported="disabled">
+    <extension name="XR_BD_motion_tracker" number="750" type="instance" supported="openxr">
         <require>
-            <enum value="1"                               name="XR_BD_extension_750_SPEC_VERSION"/>
-            <enum value="&quot;XR_BD_extension_750&quot;" name="XR_BD_EXTENSION_750_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_BD_motion_tracker_SPEC_VERSION"/>
+            <enum value="&quot;XR_BD_motion_tracker&quot;" name="XR_BD_MOTION_TRACKER_EXTENSION_NAME"/>
+            <interaction_profile name="/interaction_profiles/bytedance/motion_tracker_bd"/>
         </require>
     </extension>
 
@@ -23221,8 +23127,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <type name="XrCameraModelBD"/>
             <type name="XrCameraSupportedCapabilityCameraModelBD"/>
             <type name="XrCameraCapabilityCameraModelBD"/>
+            <type name="XrCameraDeviceBD"/>
             <type name="XrCameraDeviceCreateInfoBD"/>
             <type name="XrCreateCameraDeviceCompletionBD"/>
+            <type name="XrCameraCaptureSessionBD"/>
             <type name="XrCameraCaptureSessionCreateInfoBD"/>
             <type name="XrCreateCameraCaptureSessionCompletionBD"/>
             <type name="XrCameraIntrinsicsBD"/>
@@ -23547,12 +23455,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
 
     <extension name="XR_EXT_spatial_image_tracking" number="783" type="instance" fragment="true"/>
 
-    <extension name="XR_EXT_extension_784" number="784" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                                name="XR_EXT_extension_784_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_784&quot;" name="XR_EXT_EXTENSION_784_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_EXT_spatial_mesh_tracking" number="784" type="instance" fragment="true"/>
 
     <extension name="XR_EXT_extension_785" number="785" type="instance" supported="disabled">
         <require>
@@ -23680,7 +23583,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
             <enum value="2"                                                  name="XR_ANDROID_spatial_entity_bound_anchor_SPEC_VERSION"/>
             <enum value="&quot;XR_ANDROID_spatial_entity_bound_anchor&quot;" name="XR_ANDROID_SPATIAL_ENTITY_BOUND_ANCHOR_EXTENSION_NAME"/>
 
-            <enum offset="1" dir="-" extends="XrResult"                      name="XR_ERROR_SPATIAL_ANCHOR_ATTACHABLE_COMPONENT_NOT_FOUND_ANDROID" comment="Spatial entity with parent ID does not have at least one component enumerated by xrEnumerateSpatialAnchorAttachableComponentsANDROID"/>
+            <enum offset="1" dir="-" extends="XrResult"                      name="XR_ERROR_SPATIAL_ANCHOR_ATTACHABLE_COMPONENT_NOT_FOUND_ANDROID" comment="Spatial entity with parent ID does not have at least one component enumerated by flink:xrEnumerateSpatialAnchorAttachableComponentsANDROID"/>
 
             <type name="XrSpatialAnchorParentANDROID"/>
             <enum offset="0" extends="XrStructureType" name="XR_TYPE_SPATIAL_ANCHOR_PARENT_ANDROID"/>
@@ -23866,10 +23769,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_813" number="813" type="instance" supported="disabled">
+    <extension name="XR_EXT_extension_813" number="813" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_813_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_813&quot;" name="XR_ANDROID_EXTENSION_813_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_EXT_extension_813_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_813&quot;" name="XR_EXT_EXTENSION_813_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -23882,24 +23785,24 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_816" number="816" type="instance" supported="disabled">
+    <extension name="XR_EXT_extension_816" number="816" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_816_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_816&quot;" name="XR_ANDROID_EXTENSION_816_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_EXT_extension_816_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_816&quot;" name="XR_EXT_EXTENSION_816_EXTENSION_NAME"/>
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_817" number="817" type="instance" supported="disabled">
+    <extension name="XR_EXT_extension_817" number="817" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_817_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_817&quot;" name="XR_ANDROID_EXTENSION_817_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_EXT_extension_817_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_817&quot;" name="XR_EXT_EXTENSION_817_EXTENSION_NAME"/>
         </require>
     </extension>
 
-    <extension name="XR_ANDROID_extension_818" number="818" type="instance" supported="disabled">
+    <extension name="XR_EXT_extension_818" number="818" type="instance" supported="disabled">
         <require>
-            <enum value="1"                                    name="XR_ANDROID_extension_818_SPEC_VERSION"/>
-            <enum value="&quot;XR_ANDROID_extension_818&quot;" name="XR_ANDROID_EXTENSION_818_EXTENSION_NAME"/>
+            <enum value="1"                                name="XR_EXT_extension_818_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_extension_818&quot;" name="XR_EXT_EXTENSION_818_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -24070,10 +23973,10 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_KHR_extension_841" number="841" type="instance" supported="disabled">
+    <extension name="XR_EXT_aosp_hand_tracking_permission" number="841" type="instance" supported="openxr">
         <require>
-            <enum value="1"                                name="XR_KHR_extension_841_SPEC_VERSION"/>
-            <enum value="&quot;XR_KHR_extension_841&quot;" name="XR_KHR_EXTENSION_841_EXTENSION_NAME"/>
+            <enum value="1"                                                name="XR_EXT_aosp_hand_tracking_permission_SPEC_VERSION"/>
+            <enum value="&quot;XR_EXT_aosp_hand_tracking_permission&quot;" name="XR_EXT_AOSP_HAND_TRACKING_PERMISSION_EXTENSION_NAME"/>
         </require>
     </extension>
 
@@ -24084,12 +23987,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_843" number="843" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                                name="XR_EXT_extension_843_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_843&quot;" name="XR_EXT_EXTENSION_843_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_EXT_spatial_entity_archetypes" number="843" type="instance" fragment="true"/>
 
     <extension name="XR_EXT_extension_844" number="844" type="instance" supported="disabled">
         <require>
@@ -24133,75 +24031,25 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_NV_extension_850" number="850" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_850_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_850&quot;" name="XR_NV_EXTENSION_850_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_850" number="850" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_851" number="851" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_851_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_851&quot;" name="XR_NV_EXTENSION_851_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_851" number="851" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_852" number="852" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_852_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_852&quot;" name="XR_NV_EXTENSION_852_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_852" number="852" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_853" number="853" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_853_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_853&quot;" name="XR_NV_EXTENSION_853_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_853" number="853" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_854" number="854" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_854_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_854&quot;" name="XR_NV_EXTENSION_854_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_854" number="854" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_855" number="855" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_855_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_855&quot;" name="XR_NV_EXTENSION_855_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_855" number="855" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_856" number="856" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_856_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_856&quot;" name="XR_NV_EXTENSION_856_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_856" number="856" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_857" number="857" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_857_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_857&quot;" name="XR_NV_EXTENSION_857_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_857" number="857" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_858" number="858" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_858_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_858&quot;" name="XR_NV_EXTENSION_858_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_858" number="858" type="instance" stubs="true"/>
 
-    <extension name="XR_NV_extension_859" number="859" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                               name="XR_NV_extension_859_SPEC_VERSION"/>
-            <enum value="&quot;XR_NV_extension_859&quot;" name="XR_NV_EXTENSION_859_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_NV_extension_859" number="859" type="instance" stubs="true"/>
 
     <extension name="XR_QCOM_extension_860" number="860" type="instance" supported="disabled">
         <require>
@@ -24273,12 +24121,7 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_870" number="870" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                                name="XR_EXT_extension_870_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_870&quot;" name="XR_EXT_EXTENSION_870_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_EXT_spatial_plane_semantic_label2" number="870" type="instance" fragment="true"/>
 
     <extension name="XR_EXT_extension_871" number="871" type="instance" supported="disabled">
         <require>
@@ -24317,19 +24160,9 @@ typedef XrResult (XRAPI_PTR *<name>PFN_xrCreateApiLayerInstance</name>)(
         </require>
     </extension>
 
-    <extension name="XR_EXT_extension_877" number="877" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                                name="XR_EXT_extension_877_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_877&quot;" name="XR_EXT_EXTENSION_877_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_EXT_enumerate_swapchain_formats2" number="877" type="instance" fragment="true"/>
 
-    <extension name="XR_EXT_extension_878" number="878" type="instance" supported="disabled">
-        <require>
-            <enum value="1"                                name="XR_EXT_extension_878_SPEC_VERSION"/>
-            <enum value="&quot;XR_EXT_extension_878&quot;" name="XR_EXT_EXTENSION_878_EXTENSION_NAME"/>
-        </require>
-    </extension>
+    <extension name="XR_EXT_app_consumed_swapchain" number="878" type="instance" fragment="true"/>
 
     <extension name="XR_META_extension_879" number="879" type="instance" supported="disabled">
         <require>

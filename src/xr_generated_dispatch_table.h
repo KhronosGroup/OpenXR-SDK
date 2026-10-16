@@ -935,6 +935,21 @@ struct XrGeneratedDispatchTable {
     PFN_xrBeginSpatialContainerRenderingEXT BeginSpatialContainerRenderingEXT;
     PFN_xrEndSpatialContainerRenderingEXT EndSpatialContainerRenderingEXT;
     PFN_xrLocateSpatialContainerViewsEXT LocateSpatialContainerViewsEXT;
+
+    // ---- XR_EXT_spatial_entity_archetypes extension commands
+    PFN_xrEnumerateSpatialArchetypesEXT EnumerateSpatialArchetypesEXT;
+    PFN_xrEnumerateSpatialArchetypeComponentTypesEXT EnumerateSpatialArchetypeComponentTypesEXT;
+
+    // ---- XR_EXT_enumerate_swapchain_formats2 extension commands
+    PFN_xrEnumerateSwapchainFormats2EXT EnumerateSwapchainFormats2EXT;
+
+    // ---- XR_EXT_app_consumed_swapchain extension commands
+    PFN_xrCreateAppConsumedSwapchainEXT CreateAppConsumedSwapchainEXT;
+    PFN_xrDestroyAppConsumedSwapchainEXT DestroyAppConsumedSwapchainEXT;
+    PFN_xrGetAppConsumedSwapchainPropertiesEXT GetAppConsumedSwapchainPropertiesEXT;
+    PFN_xrEnumerateAppConsumedSwapchainImagesEXT EnumerateAppConsumedSwapchainImagesEXT;
+    PFN_xrAcquireAppConsumedSwapchainImageEXT AcquireAppConsumedSwapchainImageEXT;
+    PFN_xrReleaseAppConsumedSwapchainImageEXT ReleaseAppConsumedSwapchainImageEXT;
 };
 
 

@@ -58,6 +58,8 @@ add_library(
     runtime_interface.cpp
     runtime_interface.hpp
     "${PROJECT_SOURCE_DIR}/src/common/hex_and_handles.h"
+    "${PROJECT_SOURCE_DIR}/src/common/filesystem_utils.hpp"
+    "${PROJECT_SOURCE_DIR}/src/common/filesystem_utils.cpp"
     "${PROJECT_SOURCE_DIR}/src/common/object_info.cpp"
     "${PROJECT_SOURCE_DIR}/src/common/object_info.h"
     "${PROJECT_SOURCE_DIR}/src/common/platform_utils.hpp"
@@ -92,7 +94,6 @@ target_link_libraries(
 target_compile_definitions(
     openxr_loader PRIVATE ${OPENXR_ALL_SUPPORTED_DEFINES}
 )
-openxr_add_filesystem_utils(openxr_loader)
 
 set_target_properties(
     openxr_loader PROPERTIES DEBUG_POSTFIX "${OPENXR_DEBUG_POSTFIX}"
